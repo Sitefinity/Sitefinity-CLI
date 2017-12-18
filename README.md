@@ -17,7 +17,7 @@ The CLI is now ready for use!
 ## How to use
 
 * Navigate to the root of your Sitefinity project (SitefinityWebApp folder).
-* Run ```sf``` command. A help will appear describind the available commands and options.
+* Run ```sf``` command. A help will appear describing the available commands and options.
 
 ## Available commands
 
