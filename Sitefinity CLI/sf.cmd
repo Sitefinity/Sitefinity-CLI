@@ -1,0 +1,1 @@
+"%~dp0sf-cli.exe" %*

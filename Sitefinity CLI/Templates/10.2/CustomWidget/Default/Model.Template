@@ -1,0 +1,12 @@
+﻿{{> sign}}
+
+using System.Web.Mvc;
+using Telerik.Sitefinity.Mvc;
+
+namespace SitefinityWebApp.Mvc.Models
+{
+	public class {{name}}Model
+	{
+		public string Message { get; set; }
+	}
+}

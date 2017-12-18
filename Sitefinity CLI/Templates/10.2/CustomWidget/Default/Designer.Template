@@ -1,0 +1,27 @@
+﻿{{> sign}}
+
+angular.module('designer')
+	.controller('CustomDesignerCtrl', ['$scope', 'propertyService', function ($scope, propertyService) {
+		$scope.feedback.showLoadingIndicator = true;
+		// Get widget properies and load them in the controller's scope
+		propertyService.get()
+			.then(function (data) {
+				if (data) {
+					$scope.properties = propertyService.toAssociativeArray(data.Items);
+				}
+			}, function (data) {
+				$scope.feedback.showError = true;
+				if (data) {
+						$scope.feedback.errorMessage = data.Detail;
+				}
+			})
+			.finally(function () {
+				$scope.feedback.showLoadingIndicator = false;
+			});
+		$scope.$watch('message', function (newValue, oldValue) {
+			if (newValue) {
+				var timeStamp = new Date();
+				$scope.properties.Message.PropertyValue = newValue + " " + timeStamp.toString();
+			}
+		});
+	}]);

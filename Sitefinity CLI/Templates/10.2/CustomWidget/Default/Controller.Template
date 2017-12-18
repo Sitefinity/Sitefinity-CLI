@@ -1,0 +1,19 @@
+﻿{{> sign}}
+
+using System.Web.Mvc;
+using Telerik.Sitefinity.Mvc;
+
+namespace SitefinityWebApp.Mvc.Controllers
+{
+	[ControllerToolboxItem(Name = "{{name}}Widget", Title = "{{name}} Widget", SectionName = "CustomWidgets")]
+	public class {{name}}Controller : Controller
+	{
+		// GET: {{name}}
+		public ActionResult Index()
+		{
+			var model = new {{name}}Model();
+			model.Message = "Hello World";
+			return View(model);
+		}
+	}
+}
