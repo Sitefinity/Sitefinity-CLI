@@ -34,7 +34,7 @@
 
         public const string CreateCommandName = "create";
         public const string CreateResourcePackageCommandName = "package";
-        public const string CreatePageTemplateCommandName = "page";
+        public const string CreatePageTemplateCommandName = "template";
         public const string CreateGridWidgetCommandName = "grid";
         public const string CreateCustomWidgetCommandName = "widget";
 

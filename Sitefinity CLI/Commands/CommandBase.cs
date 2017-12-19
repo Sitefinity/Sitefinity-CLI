@@ -73,15 +73,24 @@ namespace Sitefinity_CLI.Commands
 
             if (this.Version == null)
             {
+                var latestTemplatesVersion = this.GetLatestTemplatesVersion();
                 if (!this.IsSitefinityProject)
                 {
-                    this.Version = this.GetLatestTemplatesVersion();
+                    this.WriteLine(string.Format("Templates for version {1} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
+                    this.Version = latestTemplatesVersion;
                     return 0;
                 }
 
                 Assembly assmebly = Assembly.LoadFile(assemblyPath);
                 var version = assmebly.GetName().Version;
                 this.Version = string.Format("{0}.{1}", version.Major, version.Minor);
+
+                // if current Sitefinity version is higher than latest templates version - fallback to latest
+                if (this.Version.CompareTo(latestTemplatesVersion) == 1)
+                {
+                    this.WriteLine(string.Format("No templates found for Sitefinity version {0}. Templates for {1} will be used", this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
+                    this.Version = latestTemplatesVersion;
+                }
             }
             
             if (config.Options.First(x => x.LongName == Constants.OptionTemplateName).Value() == null)

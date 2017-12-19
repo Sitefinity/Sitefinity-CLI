@@ -10,7 +10,7 @@ dotnet publish -c release -r win10-x64
 ```
 Add the following path to the PATH System variable:
 ```
-(project_root_path)\bin\release\netcoreapp2.0\win10-x64
+(project_root_path)\bin\release\netcoreapp2.0\win10-x64\publish
 ```
 The CLI is now ready for use!
 
@@ -32,7 +32,7 @@ sf create package "Test resource package"
 #### Create new Page template
 
 ```
-sf create page "Test page"
+sf create template "Test page"
 ```
 
 #### Create new Grid wiget
@@ -55,7 +55,7 @@ sf create [command name] -?
 ## Sitefinity version
 Every command has an option **"-version"**. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the _"Templates"_ folder, in separate folders for each sitefinity version (starting from 10.2). 
 
-When running a command the CLI will try to automatically detect Sitefinity version and use the coresponding templates. If it cannot detect the version it will be set to the latest available. By using the **"-version"** option it can be explicitly set which templates version should be used.
+When running a command the CLI will try to automatically detect Sitefinity version and use the coresponding templates. If it cannot detect the version or Sitefinity version is higher that latest templates version it will be set to the latest available. By using the **"-version"** option it can be explicitly set which templates version should be used.
 
 Example:
 ```

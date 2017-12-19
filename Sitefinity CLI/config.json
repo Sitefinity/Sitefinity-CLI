@@ -15,7 +15,7 @@
   },
   {
     "title": "Create new Page Template",
-    "name": "create page",
+    "name": "create template",
     "args": [
       "Name"
     ],
