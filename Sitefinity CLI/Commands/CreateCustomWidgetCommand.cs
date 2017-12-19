@@ -33,7 +33,7 @@ namespace Sitefinity_CLI.Commands
             {
                 if (!Directory.Exists(mvcFolderPath))
                 {
-                    this.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, mvcFolderPath), ConsoleColor.Red);
+                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, mvcFolderPath), ConsoleColor.Red);
                     return 1;
                 }
             }
@@ -53,7 +53,7 @@ namespace Sitefinity_CLI.Commands
 
                 if (!Directory.Exists(templatePath))
                 {
-                    this.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, templatePath), ConsoleColor.Red);
+                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, templatePath), ConsoleColor.Red);
                     return 1;
                 }
 
@@ -85,11 +85,11 @@ namespace Sitefinity_CLI.Commands
             catch (Exception ex)
             {
                 this.DeleteFiles();
-                this.WriteLine(ex.Message, ConsoleColor.Red);
+                Utils.WriteLine(ex.Message, ConsoleColor.Red);
                 return 1;
             }
 
-            this.WriteLine(string.Format("Custom widget \"{0}\" created!", this.Name), ConsoleColor.Green);
+            Utils.WriteLine(string.Format("Custom widget \"{0}\" created!", this.Name), ConsoleColor.Green);
             return 0;
         }
 

@@ -26,20 +26,20 @@ namespace Sitefinity_CLI.Commands
             {
                 if (!Directory.Exists(resourcePackagesFolderPath))
                 {
-                    this.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, resourcePackagesFolderPath), ConsoleColor.Red);
+                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, resourcePackagesFolderPath), ConsoleColor.Red);
                     return 1;
                 }
             }
 
             if (!Directory.Exists(templatePackageFolderPath))
             {
-                this.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, templatePackageFolderPath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, templatePackageFolderPath), ConsoleColor.Red);
                 return 1;
             }
 
             if (Directory.Exists(newResourcePackagePath))
             {
-                this.WriteLine(string.Format(Constants.DirectoryExistsMessage, newResourcePackagePath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.DirectoryExistsMessage, newResourcePackagePath), ConsoleColor.Red);
                 return 1;
             }
 
@@ -55,7 +55,7 @@ namespace Sitefinity_CLI.Commands
                 this.AddSignToFile(newFilePath);
             }
 
-            this.WriteLine(string.Format("Resource package \"{0}\" created! Path: \"{1}\"", directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);
+            Utils.WriteLine(string.Format("Resource package \"{0}\" created! Path: \"{1}\"", directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);
             return 0;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Sitefinity_CLI.Commands;
 using McMaster.Extensions.CommandLineUtils;
+using System;
 
 namespace Sitefinity_CLI
 {
@@ -8,8 +9,17 @@ namespace Sitefinity_CLI
     [Subcommand(Constants.CreateCommandName, typeof(CreateCommand))]
     public class Program
     {
-        public static void Main(string[] args) 
-            => CommandLineApplication.Execute<Program>(args);
+        public static void Main(string[] args)
+        {
+            try
+            {
+                CommandLineApplication.Execute<Program>(args);
+            }
+            catch (System.Exception e)
+            {
+                Utils.WriteLine(e.Message, ConsoleColor.Red);
+            }
+        }
 
         protected int OnExecute(CommandLineApplication app)
         {

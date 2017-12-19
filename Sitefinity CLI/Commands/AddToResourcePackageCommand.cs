@@ -28,7 +28,7 @@ namespace Sitefinity_CLI.Commands
             
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
             {
-                this.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath)), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath)), ConsoleColor.Red);
                 return 1;
             }
 

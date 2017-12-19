@@ -77,7 +77,7 @@ namespace Sitefinity_CLI.Commands
                 var latestTemplatesVersion = this.GetLatestTemplatesVersion();
                 if (!this.IsSitefinityProject)
                 {
-                    this.WriteLine(string.Format("Templates for version {1} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
+                    Utils.WriteLine(string.Format("Templates for version {1} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
                     this.Version = latestTemplatesVersion;
                     return 0;
                 }
@@ -89,7 +89,7 @@ namespace Sitefinity_CLI.Commands
                 // if current Sitefinity version is higher than latest templates version - fallback to latest
                 if (this.Version.CompareTo(latestTemplatesVersion) == 1)
                 {
-                    this.WriteLine(string.Format("No templates found for Sitefinity version {0}. Templates for {1} will be used", this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
+                    Utils.WriteLine(string.Format("No templates found for Sitefinity version {0}. Templates for {1} will be used", this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
                     this.Version = latestTemplatesVersion;
                 }
             }
@@ -129,13 +129,13 @@ namespace Sitefinity_CLI.Commands
         {
             if (File.Exists(filePath))
             {
-                this.WriteLine(string.Format(Constants.FileExistsMessage, filePath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.FileExistsMessage, filePath), ConsoleColor.Red);
                 return 1;
             }
 
             if (!File.Exists(templatePath))
             {
-                this.WriteLine(string.Format(Constants.FileNotFoundMessage, templatePath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.FileNotFoundMessage, templatePath), ConsoleColor.Red);
                 return 1;
             }
 
@@ -144,7 +144,7 @@ namespace Sitefinity_CLI.Commands
             var result = template(data);
 
             File.WriteAllText(filePath, result);
-            this.WriteLine(string.Format("File \"{0}\" created! Path: \"{1}\"", Path.GetFileName(filePath), filePath), ConsoleColor.Green);
+            Utils.WriteLine(string.Format("File \"{0}\" created! Path: \"{1}\"", Path.GetFileName(filePath), filePath), ConsoleColor.Green);
             return 0;
         }
 
@@ -188,21 +188,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             return data;
-        }
-
-        protected void WriteLine(string message, ConsoleColor? foregroundColor = null)
-        {
-            if (foregroundColor.HasValue)
-            {
-                Console.ForegroundColor = foregroundColor.Value;
-            }
-
-            Console.WriteLine(message);
-
-            if (foregroundColor.HasValue)
-            {
-                Console.ResetColor();
-            }
         }
     }
 }
