@@ -1,4 +1,4 @@
-﻿{{> sign}}
+﻿@* {{> sign}} *@
 
 @model SitefinityWebApp.Mvc.Models.{{name}}Model
 <div>

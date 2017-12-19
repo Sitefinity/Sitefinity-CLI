@@ -1,4 +1,4 @@
-﻿{{> sign}}
+﻿@* {{> sign}} *@
 
 <div>
 	<label>Your Message: </label>

@@ -1,4 +1,4 @@
-﻿{{> sign}}
+﻿/* {{> sign}} */
 
 angular.module('designer')
 	.controller('CustomDesignerCtrl', ['$scope', 'propertyService', function ($scope, propertyService) {

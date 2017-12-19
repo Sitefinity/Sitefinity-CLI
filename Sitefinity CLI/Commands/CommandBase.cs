@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -104,7 +105,24 @@ namespace Sitefinity_CLI.Commands
         protected void AddSignToFile(string filePath)
         {
             var content = File.ReadAllText(filePath);
-            File.WriteAllText(filePath, string.Format("{0}{1}", this.Sign, content));
+            var fileExtension = Path.GetExtension(filePath);
+            string commentedSign;
+            switch (fileExtension)
+            {
+                case ".html":
+                    commentedSign = string.Format("<!-- {0} -->{1}", this.Sign, Environment.NewLine);
+                    break;
+                case ".cshtml":
+                    commentedSign = string.Format("@* {0} *@{1}", this.Sign, Environment.NewLine);
+                    break;
+                case ".cs":
+                case ".js":
+                default:
+                    commentedSign = string.Format("/* {0} */{1}", this.Sign, Environment.NewLine);
+                    break;
+            }
+
+            File.WriteAllText(filePath, string.Format("{0}{1}", commentedSign, content));
         }
 
         protected virtual int CreateFileFromTemplate(string filePath, string templatePath, object data)
@@ -135,17 +153,19 @@ namespace Sitefinity_CLI.Commands
             var templatesFolderPath = Path.Combine(this.CurrentPath, "Templates");
             var directoryNames = Directory.GetDirectories(templatesFolderPath);
             List<float> versions = new List<float>();
+            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
             foreach (var name in directoryNames)
             {
                 float version;
-                if (float.TryParse(Path.GetFileName(name), out version))
+                if (float.TryParse(Path.GetFileName(name), NumberStyles.Any, cultureInfo, out version))
                 {
                     versions.Add(version);
                 }
             }
 
             versions.Sort();
-            return versions.Last().ToString("n1");
+            return versions.Last().ToString("n1", cultureInfo);
         }
 
         protected IDictionary<string, string> GetTemplateData(string templatePath)

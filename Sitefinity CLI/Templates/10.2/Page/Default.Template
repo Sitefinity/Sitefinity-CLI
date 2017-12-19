@@ -1,4 +1,4 @@
-﻿{{> sign}}
+﻿@* {{> sign}} *@
 
 @using System.Web.Mvc;
 @using Telerik.Sitefinity.Frontend.Mvc.Helpers;
