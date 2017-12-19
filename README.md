@@ -69,7 +69,7 @@ When running a command the CLI will prompt you for the name of the template to b
 
 Example:
 ```
-sf create page "New page" -template "CustomPageTemplate"
+sf create template "New page" -template "CustomPageTemplate"
 ```
 The CLI will look for a file _"CustomPageTemplate.Template"_ in the _"Templates\(version)\Page"_ folder. 
 
