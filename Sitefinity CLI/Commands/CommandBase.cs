@@ -137,7 +137,11 @@ namespace Sitefinity_CLI.Commands
             List<float> versions = new List<float>();
             foreach (var name in directoryNames)
             {
-                versions.Add(float.Parse(Path.GetFileName(name)));
+                float version;
+                if (float.TryParse(Path.GetFileName(name), out version))
+                {
+                    versions.Add(version);
+                }
             }
 
             versions.Sort();
