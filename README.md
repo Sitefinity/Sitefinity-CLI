@@ -65,7 +65,7 @@ The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folde
 
 ## Template generation
 
-When running a command the CLI will prompt you for the name of the template to be used in generation. The default name is _"Default"_. The template name can also be set using the option **"-template"**.
+When running a command the CLI will prompt you for the name of the template to be used in generation. The default name is _"Default"_. The template name can also be set using the option **"--template"**.
 
 Example:
 ```
