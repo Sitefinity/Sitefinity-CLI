@@ -59,7 +59,7 @@ When running a command the CLI will try to automatically detect Sitefinity versi
 
 Example:
 ```
-sf create package "New resource package" -version "11.0"
+sf create package "New resource package" --version "11.0"
 ```
 The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folder. _"11.0"_ folder has to have _"ResourcePakcage"_ folder containing templates for a resource package. 
 
@@ -69,7 +69,7 @@ When running a command the CLI will prompt you for the name of the template to b
 
 Example:
 ```
-sf create template "New page" -template "CustomPageTemplate"
+sf create template "New page" --template "CustomPageTemplate"
 ```
 The CLI will look for a file _"CustomPageTemplate.Template"_ in the _"Templates\(version)\Page"_ folder. 
 
