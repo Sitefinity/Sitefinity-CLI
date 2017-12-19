@@ -1,5 +1,6 @@
 ﻿/* {{> sign}} */
 
+using SitefinityWebApp.Mvc.Models;
 using System.Web.Mvc;
 using Telerik.Sitefinity.Mvc;
 
