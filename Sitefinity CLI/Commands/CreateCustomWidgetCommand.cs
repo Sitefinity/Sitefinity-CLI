@@ -49,7 +49,7 @@ namespace Sitefinity_CLI.Commands
 
             try
             {
-                var templatePath = Path.Combine(this.CurrentPath, string.Format("Templates\\{0}\\CustomWidget\\{1}", this.Version, this.TemplateName));
+                var templatePath = Path.Combine(this.CurrentPath, "Templates", this.Version, "CustomWidget", this.TemplateName);
 
                 if (!Directory.Exists(templatePath))
                 {

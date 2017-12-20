@@ -1,4 +1,6 @@
-﻿namespace Sitefinity_CLI
+﻿using System.IO;
+
+namespace Sitefinity_CLI
 {
     internal class Constants
     {
@@ -14,8 +16,8 @@
         public const string ScriptsFolderName = "Scripts";
         public const string ModelsFolderName = "Models";
 
-        public const string PageTemplatesPath = "MVC\\Views\\Layouts";
-        public const string GridWidgetPath = "GridSystem\\Templates";
+        public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
+        public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
 
         public const string DirectoryNotFoundMessage = "Directory not found! Path: {0}";
         public const string FileNotFoundMessage = "File not found! Path: {0}";

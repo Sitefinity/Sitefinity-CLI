@@ -44,7 +44,7 @@ namespace Sitefinity_CLI.Commands
                 version = Constants.Version
             };
 
-            var templateSource = File.ReadAllText(Path.Combine(this.CurrentPath, "Templates\\Sign.Template"));
+            var templateSource = File.ReadAllText(Path.Combine(this.CurrentPath, "Templates", "Sign.Template"));
             var template = Handlebars.Compile(templateSource);
             this.Sign = template(data);
             Handlebars.RegisterTemplate("sign", templateSource);

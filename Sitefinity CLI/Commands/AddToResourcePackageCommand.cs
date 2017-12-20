@@ -32,7 +32,7 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            var templatePath = Path.Combine(this.CurrentPath, string.Format("Templates\\{0}\\{1}", this.Version, templateType));
+            var templatePath = Path.Combine(this.CurrentPath, "Templates", this.Version, templateType);
             var templateFile = Path.Combine(templatePath, string.Format("{0}.Template", this.TemplateName));
             var data = this.GetTemplateData(templatePath);
             data["toolName"] = Constants.CLIName;
