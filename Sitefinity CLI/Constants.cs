@@ -37,6 +37,7 @@
         public const string CreatePageTemplateCommandName = "template";
         public const string CreateGridWidgetCommandName = "grid";
         public const string CreateCustomWidgetCommandName = "widget";
+        public const string GenerateConfigCommandName = "config";
 
         public const string DefaultResourcePackageName = "Bootstrap";
         public const string DefaultTemplateName = "Default";

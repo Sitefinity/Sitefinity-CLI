@@ -3,7 +3,7 @@
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command("create", Description = "Create a new resource.")]
+    [Command(Constants.CreateCommandName, Description = "Create a new resource.")]
     [Subcommand(Constants.CreateResourcePackageCommandName, typeof(CreateResourcePackageCommand))]
     [Subcommand(Constants.CreatePageTemplateCommandName, typeof(CreatePageTemplateCommand))]
     [Subcommand(Constants.CreateGridWidgetCommandName, typeof(CreateGridWidgetCommand))]

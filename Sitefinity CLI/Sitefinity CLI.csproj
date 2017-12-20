@@ -13,9 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="sf.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
