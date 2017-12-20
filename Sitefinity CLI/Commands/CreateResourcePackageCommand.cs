@@ -18,18 +18,7 @@ namespace Sitefinity_CLI.Commands
             var templatePackageFolderPath = Path.Combine(this.CurrentPath, "Templates", this.Version, "ResourcePackage", this.TemplateName);
             var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.Name);
 
-            if (this.IsSitefinityProject)
-            {
-                Directory.CreateDirectory(resourcePackagesFolderPath);
-            }
-            else
-            {
-                if (!Directory.Exists(resourcePackagesFolderPath))
-                {
-                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, resourcePackagesFolderPath), ConsoleColor.Red);
-                    return 1;
-                }
-            }
+            Directory.CreateDirectory(resourcePackagesFolderPath);
 
             if (!Directory.Exists(templatePackageFolderPath))
             {
