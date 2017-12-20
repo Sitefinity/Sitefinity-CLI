@@ -61,7 +61,7 @@ namespace Sitefinity_CLI.Commands
             var assemblyPath = Path.Combine(this.ProjectRootPath, "bin", "Telerik.Sitefinity.dll");
             if (!File.Exists(assemblyPath))
             {
-                var proceed = Prompt.GetYesNo("Cannot recognize project as Sitefinity. Do you wish to proceed?", false);
+                var proceed = Prompt.GetYesNo("Cannot recognize project as Sitefinity. Do you wish to proceed?", false, promptColor: ConsoleColor.Yellow);
                 if (proceed)
                 {
                     this.IsSitefinityProject = false;
@@ -77,7 +77,7 @@ namespace Sitefinity_CLI.Commands
                 var latestTemplatesVersion = this.GetLatestTemplatesVersion();
                 if (!this.IsSitefinityProject)
                 {
-                    Utils.WriteLine(string.Format("Templates for version {1} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
+                    Utils.WriteLine(string.Format("Templates for version {0} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
                     this.Version = latestTemplatesVersion;
                     return 0;
                 }
