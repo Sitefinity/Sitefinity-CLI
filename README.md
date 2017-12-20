@@ -4,13 +4,20 @@
 
 In order to build the CLI you need to install .NET Core. It can be downloaded from [HERE](https://www.microsoft.com/net/download/windows).
 
-Build the application(for Windows OS) by running the following command from the project root folder:
-```batch
+Build the application for your OS by running the following command from the project root folder:
+```
+dotnet publish -c release -r [rid]
+```
+**NOTE**: Replace **[rid]** with the identifier for your OS. .NET Core RID Catalogue can be found [HERE](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog)
+
+Example for Windows 10 x64:
+```
 dotnet publish -c release -r win10-x64
 ```
+
 Add the following path to the PATH System variable:
 ```
-(project_root_path)\bin\release\netcoreapp2.0\win10-x64\publish
+(project_root_path)\bin\release\netcoreapp2.0\(rid)\publish
 ```
 The CLI is now ready for use!
 
