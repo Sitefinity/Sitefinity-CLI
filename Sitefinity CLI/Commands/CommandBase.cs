@@ -61,7 +61,7 @@ namespace Sitefinity_CLI.Commands
             var assemblyPath = Path.Combine(this.ProjectRootPath, "bin", "Telerik.Sitefinity.dll");
             if (!File.Exists(assemblyPath))
             {
-                var proceed = Prompt.GetYesNo("Cannot recognize project as Sitefinity. Do you wish to proceed?", false, promptColor: ConsoleColor.Yellow);
+                var proceed = Prompt.GetYesNo(Constants.SitefinityNotRecognizedMessage, false, promptColor: ConsoleColor.Yellow);
                 if (proceed)
                 {
                     this.IsSitefinityProject = false;
@@ -79,18 +79,19 @@ namespace Sitefinity_CLI.Commands
                 {
                     Utils.WriteLine(string.Format("Templates for version {0} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
                     this.Version = latestTemplatesVersion;
-                    return 0;
                 }
-
-                Assembly assmebly = Assembly.LoadFile(assemblyPath);
-                var version = assmebly.GetName().Version;
-                this.Version = string.Format("{0}.{1}", version.Major, version.Minor);
-
-                // if current Sitefinity version is higher than latest templates version - fallback to latest
-                if (this.Version.CompareTo(latestTemplatesVersion) == 1)
+                else
                 {
-                    Utils.WriteLine(string.Format("No templates found for Sitefinity version {0}. Templates for {1} will be used", this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
-                    this.Version = latestTemplatesVersion;
+                    Assembly assmebly = Assembly.LoadFile(assemblyPath);
+                    var version = assmebly.GetName().Version;
+                    this.Version = string.Format("{0}.{1}", version.Major, version.Minor);
+
+                    // if current Sitefinity version is higher than latest templates version - fallback to latest
+                    if (this.Version.CompareTo(latestTemplatesVersion) == 1)
+                    {
+                        Utils.WriteLine(string.Format("No templates found for Sitefinity version {0}. Templates for {1} will be used", this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
+                        this.Version = latestTemplatesVersion;
+                    }
                 }
             }
             

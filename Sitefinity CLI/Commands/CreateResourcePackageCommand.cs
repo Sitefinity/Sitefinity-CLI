@@ -44,7 +44,7 @@ namespace Sitefinity_CLI.Commands
                 this.AddSignToFile(newFilePath);
             }
 
-            Utils.WriteLine(string.Format("Resource package \"{0}\" created! Path: \"{1}\"", directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);
+            Utils.WriteLine(string.Format(Constants.ResourcePackageCreatedMessage, directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);
             return 0;
         }
     }

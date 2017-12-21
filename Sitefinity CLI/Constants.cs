@@ -2,7 +2,7 @@
 
 namespace Sitefinity_CLI
 {
-    internal class Constants
+    public class Constants
     {
         public const string CLIName = "Sitefinity CLI";
         public const string CLIFullName = "Sitefinity CLI.exe";
@@ -23,6 +23,8 @@ namespace Sitefinity_CLI
         public const string FileNotFoundMessage = "File not found! Path: {0}";
         public const string FileExistsMessage = "File already exists! Path: {0}";
         public const string DirectoryExistsMessage = "Directory already exists! Path: {0}";
+        public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity. Do you wish to proceed?";
+        public const string ResourcePackageCreatedMessage = "Resource package \"{0}\" created! Path: \"{1}\"";
 
         public const string ArgumentCommand = "command";
         public const string ArgumentProjectRootPath = "path";
