@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  
+  <!-- These should be regenerated on every new version -->
+  <?if $(var.Platform)=x64 ?>
+  <?define ProductCode = "{9E999ECC-7FFD-4539-9768-BEA1B38D42BA}" ?>
+  <?else?>
+  <?define ProductCode = "{FCF4D603-3D1E-4FAB-AE65-D56C00D1BAD8}" ?>
+  <?endif?>
+
+  <!-- This should NOT be regenerated on every new version -->
+  <?define UpgradeCode = "{40F03931-3FC5-4871-BF01-496DE87A9BB0}" ?>
+  
+  <!-- Define main product -->
+	<Product Id="$(var.ProductCode)" 
+           Name="Sitefinity CLI $(var.Platform)" 
+           Language="1033" 
+           Version="$(var.BuildVersion)"
+           Manufacturer="Progress" 
+           UpgradeCode="$(var.UpgradeCode)">
+    
+    <!-- Provide package details -->
+		<Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Platform="$(var.Platform)"
+             Manufacturer="Progress"
+             Description="Sitefinity CLI for creating a Sitefinity related files"
+             Languages="1033"
+             />
+
+    <!-- Downgrade error message -->
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <!-- Include .cab file into .msi file -->
+		<MediaTemplate 
+      EmbedCab="yes"
+      />
+
+    <!-- Define icon -->
+    <Icon Id="icon.ico" SourceFile="$(var.ProjectDir)\favicon.ico"/>
+
+    <!-- Use the icon for the installer -->
+    <Property Id="ARPPRODUCTICON">icon.ico</Property>
+    <Property Id="ARPURLINFOABOUT">https://github.com/Sitefinity/Sitefinity-CLI</Property>
+
+    <!-- Create a basic UI for the installer -->
+    <UIRef Id="WixUI_Minimal" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\background.bmp"/>
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\banner.bmp"/>
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\License.rtf"/>
+    
+    <!-- Define components, shortcuts, files, etc. -->
+		<Feature Id="ProductFeature" Title="Sitefinity_CLI.Installer" Level="1">
+      
+      <ComponentGroupRef Id="PublishedComponents" />
+      <ComponentRef Id="setEnvironment" />
+      
+		</Feature>
+    
+	</Product>
+</Wix>

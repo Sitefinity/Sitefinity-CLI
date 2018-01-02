@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <?if $(var.Platform)=x64 ?>
+        <Directory Id="ProgramFiles64Folder">
+          <Directory Id="INSTALLFOLDER" Name="Sitefinity CLI" />
+        </Directory>
+      <?else?>
+        <Directory Id="ProgramFilesFolder">
+          <Directory Id="INSTALLFOLDER" Name="Sitefinity CLI" />
+        </Directory>
+      <?endif?>
+
+      <Component Id="setEnvironment" Guid="{AAF89782-48F7-4105-9913-C5D45AC36D12}">
+        <Environment Id="Path" Name="Path" Value="[INSTALLFOLDER]" Permanent="no" Part="last" Action="set" System="no" Separator=";"/>
+      </Component>
+    </Directory>
+  </Fragment>
+  
+</Wix>
