@@ -2,6 +2,13 @@
 
 ## Installation
 
+### Using installer 
+Windows installer(x32/x64) can be downloaded from the releases assets. It will guide you through the setup of the app.
+
+### Using prebuild version
+A prebuild version for some operating systems can be downloaded from releases assets. Extract the archive to a folder of your choice and add this folder to the PATH System variable.
+
+### Building the app by yourself
 In order to build the CLI you need to install .NET Core. It can be downloaded from [HERE](https://www.microsoft.com/net/download/windows).
 
 Build the application for your OS by running the following command from the project root folder:
@@ -23,7 +30,7 @@ The CLI is now ready for use!
 
 ## How to use
 
-* Navigate to the root of your Sitefinity project (SitefinityWebApp folder).
+* Open command prompt and navigate to the root of your Sitefinity project (SitefinityWebApp folder).
 * Run ```sf``` command. A help will appear describing the available commands and options.
 
 ## Available commands
