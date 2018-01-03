@@ -59,7 +59,7 @@ namespace Sitefinity_CLI.Commands
 
                 var data = this.GetTemplateData(templatePath);
                 data["toolName"] = Constants.CLIName;
-                data["version"] = Constants.Version;
+                data["version"] = this.AssemblyVersion;
                 data["name"] = this.Name;
 
                 // Create controller

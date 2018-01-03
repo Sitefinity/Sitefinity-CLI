@@ -32,16 +32,19 @@ namespace Sitefinity_CLI.Commands
 
         protected string CurrentPath { get; set; }
 
+        protected string AssemblyVersion { get; set; }
+
         protected bool IsSitefinityProject { get; set; } = true;
 
         public CommandBase()
         {
             this.CurrentPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            this.AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             var data = new
             {
                 toolName = Constants.CLIName,
-                version = Constants.Version
+                version = this.AssemblyVersion
             };
 
             var templateSource = File.ReadAllText(Path.Combine(this.CurrentPath, "Templates", "Sign.Template"));

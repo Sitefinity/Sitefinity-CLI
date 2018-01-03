@@ -7,8 +7,6 @@ namespace Sitefinity_CLI
         public const string CLIName = "Sitefinity CLI";
         public const string CLIFullName = "Sitefinity CLI.exe";
 
-        public const string Version = "0.1.0";
-
         public const string ResourcePackagesFolderName = "ResourcePackages";
         public const string MVCFolderName = "MVC";
         public const string ControllersFolderName = "Controllers";

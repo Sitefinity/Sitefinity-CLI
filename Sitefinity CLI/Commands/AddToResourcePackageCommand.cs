@@ -36,7 +36,7 @@ namespace Sitefinity_CLI.Commands
             var templateFile = Path.Combine(templatePath, string.Format("{0}.Template", this.TemplateName));
             var data = this.GetTemplateData(templatePath);
             data["toolName"] = Constants.CLIName;
-            data["version"] = Constants.Version;
+            data["version"] = this.AssemblyVersion;
 
             return this.CreateFileFromTemplate(filePath, templateFile, data);
         }
