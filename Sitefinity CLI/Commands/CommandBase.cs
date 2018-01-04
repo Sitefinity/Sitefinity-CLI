@@ -20,10 +20,8 @@ namespace Sitefinity_CLI.Commands
 
         [Option("-r|--root", "The path to the root of the project upon the command should be executed.", CommandOptionType.SingleValue)]
         public string ProjectRootPath { get; set; }
-
-        [Option("-t|--template", "The name of the template to be used for resource creation. Default value: " + Constants.DefaultTemplateName, CommandOptionType.SingleValue)]
-        [DefaultValue(Constants.DefaultTemplateName)]
-        public string TemplateName { get; set; } = Constants.DefaultTemplateName;
+        
+        public abstract string TemplateName { get; set; }
 
         [Option("-v|--version", "The template version to be used for resource creation", CommandOptionType.SingleValue)]
         public string Version { get; set; }
@@ -80,7 +78,7 @@ namespace Sitefinity_CLI.Commands
                 var latestTemplatesVersion = this.GetLatestTemplatesVersion();
                 if (!this.IsSitefinityProject)
                 {
-                    Utils.WriteLine(string.Format("Templates for version {0} will be used", latestTemplatesVersion), ConsoleColor.Yellow);
+                    Utils.WriteLine(string.Format(Constants.ProducedFilesVersionMessage, latestTemplatesVersion), ConsoleColor.Yellow);
                     this.Version = latestTemplatesVersion;
                 }
                 else
@@ -92,7 +90,7 @@ namespace Sitefinity_CLI.Commands
                     // if current Sitefinity version is higher than latest templates version - fallback to latest
                     if (this.Version.CompareTo(latestTemplatesVersion) == 1)
                     {
-                        Utils.WriteLine(string.Format("No templates found for Sitefinity version {0}. Templates for {1} will be used", this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
+                        Utils.WriteLine(string.Format(Constants.HigherSitefinityVersionMessage, this.Version, latestTemplatesVersion), ConsoleColor.Yellow);
                         this.Version = latestTemplatesVersion;
                     }
                 }
@@ -100,7 +98,11 @@ namespace Sitefinity_CLI.Commands
             
             if (config.Options.First(x => x.LongName == Constants.OptionTemplateName).Value() == null)
             {
-                this.TemplateName = Prompt.GetString("Please enter template name", promptColor: ConsoleColor.Yellow, defaultValue: Constants.DefaultTemplateName);
+                var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
+                var templateNameProp = this.GetType().GetProperties().Where(prop => prop.Name == "TemplateName").FirstOrDefault();
+                var defaultValueAttr = templateNameProp.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
+                var defaultValue = defaultValueAttr.Value.ToString();
+                this.TemplateName = Prompt.GetString(promptMessage, promptColor: ConsoleColor.Yellow, defaultValue: defaultValue);
             }
 
             return 0;
@@ -129,17 +131,17 @@ namespace Sitefinity_CLI.Commands
             File.WriteAllText(filePath, string.Format("{0}{1}", commentedSign, content));
         }
 
-        protected virtual int CreateFileFromTemplate(string filePath, string templatePath, object data)
+        protected virtual int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
             if (File.Exists(filePath))
             {
-                Utils.WriteLine(string.Format(Constants.FileExistsMessage, filePath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Red);
                 return 1;
             }
 
             if (!File.Exists(templatePath))
             {
-                Utils.WriteLine(string.Format(Constants.FileNotFoundMessage, templatePath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, resourceFullName, templatePath), ConsoleColor.Red);
                 return 1;
             }
 

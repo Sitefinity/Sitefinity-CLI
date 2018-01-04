@@ -2,13 +2,18 @@
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.CreateCustomWidgetCommandName, Description = "Creates a new custom widget.")]
-    internal class CreateCustomWidgetCommand : CommandBase
+    [Command(Constants.AddCustomWidgetCommandName, Description = "Creates a new custom widget.", FullName = "Widget")]
+    internal class AddCustomWidgetCommand : CommandBase
     {
         private List<string> createdFiles;
+
+        [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
+        [DefaultValue(Constants.DefaultSourceTemplateName)]
+        public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
         public override int OnExecute(CommandLineApplication config)
         {
@@ -53,7 +58,7 @@ namespace Sitefinity_CLI.Commands
 
                 if (!Directory.Exists(templatePath))
                 {
-                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, templatePath), ConsoleColor.Red);
+                    Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath), ConsoleColor.Red);
                     return 1;
                 }
 
@@ -64,28 +69,27 @@ namespace Sitefinity_CLI.Commands
 
                 // Create controller
                 var filePath = Path.Combine(controllersFolderPath, string.Format("{0}{1}{2}", this.Name, "Controller", Constants.CSharpFileExtension));
-                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Controller.Template"), data);
+                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Controller.Template"), config.FullName, data);
 
                 // Create model
                 filePath = Path.Combine(modelsFolderPath, string.Format("{0}{1}{2}", this.Name, "Model", Constants.CSharpFileExtension));
-                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Model.Template"), data);
+                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Model.Template"), config.FullName, data);
 
                 // Create view
                 filePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "Index", Constants.RazorFileExtension));
-                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "View.Template"), data);
+                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "View.Template"), config.FullName, data);
 
                 // Create designer
                 filePath = Path.Combine(scriptsWidgetFolderPath, string.Format("{0}{1}", "designerview-customdesigner", Constants.JavaScriptFileExtension));
-                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Designer.Template"), data);
+                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Designer.Template"), config.FullName, data);
 
                 // Create designer view
                 filePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.CustomDesigner", Constants.RazorFileExtension));
-                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "DesignerView.Template"), data);
+                this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "DesignerView.Template"), config.FullName, data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 this.DeleteFiles();
-                Utils.WriteLine(ex.Message, ConsoleColor.Red);
                 return 1;
             }
 
@@ -101,11 +105,11 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        protected override int CreateFileFromTemplate(string filePath, string templatePath, object data)
+        protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
-            if(base.CreateFileFromTemplate(filePath, templatePath, data) == 1)
+            if(base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
             {
-                throw new Exception(string.Format("An error occured when creating an item from template. Path: {0}", filePath));
+                throw new Exception(string.Format("An error occured while creating an item from template. Path: {0}", filePath));
             }
 
             this.createdFiles.Add(filePath);

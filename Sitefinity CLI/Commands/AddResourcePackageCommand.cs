@@ -1,12 +1,17 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using System;
+using System.ComponentModel;
 using System.IO;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.CreateResourcePackageCommandName, Description = "Creates a new Resource package.")]
-    internal class CreateResourcePackageCommand : CommandBase
+    [Command(Constants.AddResourcePackageCommandName, Description = "Creates a new resource package.", FullName = "Resource package")]
+    internal class AddResourcePackageCommand : CommandBase
     {
+        [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
+        [DefaultValue(Constants.DefaultResourcePackageName)]
+        public override string TemplateName { get; set; } = Constants.DefaultResourcePackageName;
+
         public override int OnExecute(CommandLineApplication config)
         {
             if (base.OnExecute(config) == 1)
@@ -22,13 +27,13 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(templatePackageFolderPath))
             {
-                Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, templatePackageFolderPath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePackageFolderPath), ConsoleColor.Red);
                 return 1;
             }
 
             if (Directory.Exists(newResourcePackagePath))
             {
-                Utils.WriteLine(string.Format(Constants.DirectoryExistsMessage, newResourcePackagePath), ConsoleColor.Red);
+                Utils.WriteLine(string.Format(Constants.ResourceExistsMessage, config.FullName, this.Name, newResourcePackagePath), ConsoleColor.Red);
                 return 1;
             }
 

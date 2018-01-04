@@ -21,7 +21,7 @@ namespace Sitefinity_CLI.Commands
 
             if (config.Options.First(x => x.LongName == Constants.OptionResourcePackageName).Value() == null)
             {
-                this.ResourcePackage = Prompt.GetString("Please enter resource package name", promptColor: ConsoleColor.Yellow, defaultValue: Constants.DefaultResourcePackageName);
+                this.ResourcePackage = Prompt.GetString(Constants.EnterResourcePackagePromptMessage, promptColor: ConsoleColor.Yellow, defaultValue: Constants.DefaultResourcePackageName);
             }
 
             var filePath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName, this.ResourcePackage, destinationPath, this.Name + fileExtension);
@@ -38,7 +38,7 @@ namespace Sitefinity_CLI.Commands
             data["toolName"] = Constants.CLIName;
             data["version"] = this.AssemblyVersion;
 
-            return this.CreateFileFromTemplate(filePath, templateFile, data);
+            return this.CreateFileFromTemplate(filePath, templateFile, config.FullName, data);
         }
     }
 }

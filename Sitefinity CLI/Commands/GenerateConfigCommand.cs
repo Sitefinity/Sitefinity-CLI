@@ -42,7 +42,7 @@ namespace Sitefinity_CLI.Commands
 
                     // title and name
                     commandModel.Name = string.Format("{0} {1}", subCommandMainCommandAttribute.Name, commandAttribute.Name);
-                    commandModel.Title = commandAttribute.Description;
+                    commandModel.Title = commandAttribute.FullName;
 
                     // arguments
                     var argumentProps = commandType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ArgumentAttribute)));
@@ -80,7 +80,7 @@ namespace Sitefinity_CLI.Commands
             var content = JsonConvert.SerializeObject(config);
             var configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
             File.WriteAllText(configFilePath, content);
-            Utils.WriteLine(string.Format("Configuration file created successfully! Path:{0}", configFilePath), ConsoleColor.Green);
+            Utils.WriteLine(string.Format(Constants.ConfigFileCreatedMessage, configFilePath), ConsoleColor.Green);
             return 0;
         }
     }

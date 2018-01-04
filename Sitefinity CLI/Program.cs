@@ -6,7 +6,7 @@ namespace Sitefinity_CLI
 {
     [HelpOption]
     [Command("sf")]
-    [Subcommand(Constants.CreateCommandName, typeof(CreateCommand))]
+    [Subcommand(Constants.AddCommandName, typeof(AddCommand))]
     [Subcommand(Constants.GenerateConfigCommandName, typeof(GenerateConfigCommand))]
     public class Program
     {
