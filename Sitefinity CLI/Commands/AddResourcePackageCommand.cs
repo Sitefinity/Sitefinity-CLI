@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.AddResourcePackageCommandName, Description = "Creates a new resource package.", FullName = "Resource package")]
+    [Command(Constants.AddResourcePackageCommandName, Description = "Adds a new resource package to current project.", FullName = "Resource package")]
     internal class AddResourcePackageCommand : CommandBase
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]

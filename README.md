@@ -37,25 +37,25 @@ The CLI is now ready for use!
 
 At the moment the only available command is ```add```. It has 4 subcommands:
 
-#### Create new Resource package
+#### Add new Resource package to current project
 
 ```
 sf add package "Test resource package"
 ```
 
-#### Create new Page template
+#### Add new Page template to current project
 
 ```
 sf add pagetemplate "Test page"
 ```
 
-#### Create new Grid template
+#### Add new Grid template to current project
 
 ```
 sf add gridtemplate "Test grid"
 ```
 
-#### Create new Widget
+#### Add new Widget to current project
 
 ```
 sf add widget "CustomWidget"

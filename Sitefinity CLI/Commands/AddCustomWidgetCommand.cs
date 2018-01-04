@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.AddCustomWidgetCommandName, Description = "Creates a new custom widget.", FullName = "Widget")]
+    [Command(Constants.AddCustomWidgetCommandName, Description = "Adds a new custom widget to current project.", FullName = "Widget")]
     internal class AddCustomWidgetCommand : CommandBase
     {
         private List<string> createdFiles;
