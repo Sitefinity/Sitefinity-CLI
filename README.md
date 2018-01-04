@@ -35,35 +35,35 @@ The CLI is now ready for use!
 
 ## Available commands
 
-At the moment the only available command is ```create```. It has 4 subcommands:
+At the moment the only available command is ```add```. It has 4 subcommands:
 
 #### Create new Resource package
 
 ```
-sf create package "Test resource package"
+sf add package "Test resource package"
 ```
 
 #### Create new Page template
 
 ```
-sf create template "Test page"
+sf add pagetemplate "Test page"
 ```
 
-#### Create new Grid wiget
+#### Create new Grid template
 
 ```
-sf create grid "Test grid"
+sf add gridtemplate "Test grid"
 ```
 
 #### Create new Widget
 
 ```
-sf create widget "CustomWidget"
+sf add widget "CustomWidget"
 ```
 
 For more information about the arguments and options for each command run the help option:
 ```
-sf create [command name] -?
+sf add [command name] -?
 ```
 
 ## Sitefinity version
@@ -73,17 +73,17 @@ When running a command the CLI will try to automatically detect Sitefinity versi
 
 Example:
 ```
-sf create package "New resource package" --version "11.0"
+sf add package "New resource package" --version "11.0"
 ```
 The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folder. _"11.0"_ folder has to have _"ResourcePakcage"_ folder containing templates for a resource package. 
 
 ## Template generation
 
-When running a command the CLI will prompt you for the name of the template to be used in generation. The default name is _"Default"_. The template name can also be set using the option **"--template"**.
+When running a command the CLI will prompt you for the name of the template to be used in generation. The template name can also be set using the option **"--template"**.
 
 Example:
 ```
-sf create template "New page" --template "CustomPageTemplate"
+sf add pagetemplate "New page" --template "CustomPageTemplate"
 ```
 The CLI will look for a file _"CustomPageTemplate.Template"_ in the _"Templates\(version)\Page"_ folder. 
 
