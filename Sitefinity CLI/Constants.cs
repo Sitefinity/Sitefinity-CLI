@@ -15,7 +15,7 @@ namespace Sitefinity_CLI
         public const string ModelsFolderName = "Models";
 
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
-        public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
+        public static string GridTemplatePath = Path.Combine("GridSystem", "Templates");
 
         public const string DirectoryNotFoundMessage = "Directory not found! Path: {0}";
         public const string FileNotFoundMessage = "File not found! Path: {0}";
@@ -23,6 +23,8 @@ namespace Sitefinity_CLI
         public const string DirectoryExistsMessage = "Directory already exists! Path: {0}";
         public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity. Do you wish to proceed?";
         public const string ResourcePackageCreatedMessage = "Resource package \"{0}\" created! Path: \"{1}\"";
+        public const string FileCreatedMessage = "File \"{0}\" created! Path: \"{1}\"";
+        public const string CustomWidgetCreatedMessage = "Custom widget \"{0}\" created!";
 
         public const string ArgumentCommand = "command";
         public const string ArgumentProjectRootPath = "path";
@@ -37,7 +39,7 @@ namespace Sitefinity_CLI
         public const string CreateCommandName = "create";
         public const string CreateResourcePackageCommandName = "package";
         public const string CreatePageTemplateCommandName = "template";
-        public const string CreateGridWidgetCommandName = "grid";
+        public const string CreateGridTemplateCommandName = "grid";
         public const string CreateCustomWidgetCommandName = "widget";
         public const string GenerateConfigCommandName = "config";
 

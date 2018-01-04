@@ -148,7 +148,7 @@ namespace Sitefinity_CLI.Commands
             var result = template(data);
 
             File.WriteAllText(filePath, result);
-            Utils.WriteLine(string.Format("File \"{0}\" created! Path: \"{1}\"", Path.GetFileName(filePath), filePath), ConsoleColor.Green);
+            Utils.WriteLine(string.Format(Constants.FileCreatedMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Green);
             return 0;
         }
 

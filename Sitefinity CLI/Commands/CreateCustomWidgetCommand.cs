@@ -89,7 +89,7 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            Utils.WriteLine(string.Format("Custom widget \"{0}\" created!", this.Name), ConsoleColor.Green);
+            Utils.WriteLine(string.Format(Constants.CustomWidgetCreatedMessage, this.Name), ConsoleColor.Green);
             return 0;
         }
 
