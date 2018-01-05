@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.AddResourcePackageCommandName, Description = "Adds a new resource package to current project.", FullName = "Resource package")]
+    [Command(Constants.AddResourcePackageCommandName, Description = "Adds a new resource package to current project.", FullName = Constants.AddResourcePackageCommandFullName)]
     internal class AddResourcePackageCommand : CommandBase
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
@@ -20,7 +20,7 @@ namespace Sitefinity_CLI.Commands
             }
 
             var resourcePackagesFolderPath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName);
-            var templatePackageFolderPath = Path.Combine(this.CurrentPath, "Templates", this.Version, "ResourcePackage", this.TemplateName);
+            var templatePackageFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ResourcePackageTemplatesFolderName, this.TemplateName);
             var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.Name);
 
             Directory.CreateDirectory(resourcePackagesFolderPath);

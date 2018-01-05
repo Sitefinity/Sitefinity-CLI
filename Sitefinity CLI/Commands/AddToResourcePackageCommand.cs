@@ -8,7 +8,7 @@ namespace Sitefinity_CLI.Commands
 {
     internal abstract class AddToResourcePackageCommand : CommandBase
     {
-        [Option("-p|--package", "The name of the resource package where the file should be created. Default value: " + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
+        [Option("-p|--package", Constants.ResourcePackageOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultResourcePackageName)]
         public string ResourcePackage { get; set; }
 
@@ -19,7 +19,7 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            if (config.Options.First(x => x.LongName == Constants.OptionResourcePackageName).Value() == null)
+            if (config.Options.First(x => x.LongName == "package").Value() == null)
             {
                 this.ResourcePackage = Prompt.GetString(Constants.EnterResourcePackagePromptMessage, promptColor: ConsoleColor.Yellow, defaultValue: Constants.DefaultResourcePackageName);
             }
@@ -32,7 +32,7 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            var templatePath = Path.Combine(this.CurrentPath, "Templates", this.Version, templateType);
+            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, templateType);
             var templateFile = Path.Combine(templatePath, string.Format("{0}.Template", this.TemplateName));
             var data = this.GetTemplateData(templatePath);
             data["toolName"] = Constants.CLIName;

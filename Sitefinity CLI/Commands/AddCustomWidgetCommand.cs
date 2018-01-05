@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.AddCustomWidgetCommandName, Description = "Adds a new custom widget to current project.", FullName = "Widget")]
+    [Command(Constants.AddCustomWidgetCommandName, Description = "Adds a new custom widget to current project.", FullName = Constants.AddCustomWidgetCommandFullName)]
     internal class AddCustomWidgetCommand : CommandBase
     {
         private List<string> createdFiles;
@@ -54,7 +54,7 @@ namespace Sitefinity_CLI.Commands
 
             try
             {
-                var templatePath = Path.Combine(this.CurrentPath, "Templates", this.Version, "CustomWidget", this.TemplateName);
+                var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.CustomWidgetTemplatesFolderName, this.TemplateName);
 
                 if (!Directory.Exists(templatePath))
                 {

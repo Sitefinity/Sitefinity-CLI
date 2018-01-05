@@ -75,7 +75,7 @@ Example:
 ```
 sf add package "New resource package" --version "11.0"
 ```
-The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folder. _"11.0"_ folder has to have _"ResourcePakcage"_ folder containing templates for a resource package. 
+The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folder. _"11.0"_ folder has to have _"ResourcePackage"_ folder containing templates for a resource package. 
 
 ## Template generation
 

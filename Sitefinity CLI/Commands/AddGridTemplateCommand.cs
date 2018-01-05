@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.AddGridTemplateCommandName, Description = "Adds a new grid template to current project.", FullName = "Grid template")]
+    [Command(Constants.AddGridTemplateCommandName, Description = "Adds a new grid template to current project.", FullName = Constants.AddGridTemplateCommandFullName)]
     internal class AddGridTemplateCommand : AddToResourcePackageCommand
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultGridTemplateName, CommandOptionType.SingleValue)]
@@ -12,7 +12,7 @@ namespace Sitefinity_CLI.Commands
 
         public override int OnExecute(CommandLineApplication config)
         {
-            return this.AddFileToResourcePackage(config, Constants.GridTemplatePath, "GridTemplate", Constants.HtmlFileExtension);
+            return this.AddFileToResourcePackage(config, Constants.GridTemplatePath, Constants.GridTemplateTemplatesFolderName, Constants.HtmlFileExtension);
         }
     }
 }

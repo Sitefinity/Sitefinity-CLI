@@ -14,16 +14,16 @@ namespace Sitefinity_CLI.Commands
     [HelpOption]
     internal abstract class CommandBase
     {
-        [Argument(0, Description = "The name of the resource to be created.")]
-        [Required(ErrorMessage = "You must specify the name of the resource to be created!")]
+        [Argument(0, Description = Constants.NameArgumentDescription)]
+        [Required(ErrorMessage = "You must specify the name of the resource!")]
         public string Name { get; set; }
 
-        [Option("-r|--root", "The path to the root of the project upon the command should be executed.", CommandOptionType.SingleValue)]
+        [Option("-r|--root", Constants.ProjectRoothPathOptionDescription, CommandOptionType.SingleValue)]
         public string ProjectRootPath { get; set; }
         
         public abstract string TemplateName { get; set; }
 
-        [Option("-v|--version", "The template version to be used for resource creation", CommandOptionType.SingleValue)]
+        [Option("-v|--version", Constants.VersionOptionDescription, CommandOptionType.SingleValue)]
         public string Version { get; set; }
 
         protected string Sign { get; set; }
@@ -45,7 +45,7 @@ namespace Sitefinity_CLI.Commands
                 version = this.AssemblyVersion
             };
 
-            var templateSource = File.ReadAllText(Path.Combine(this.CurrentPath, "Templates", "Sign.Template"));
+            var templateSource = File.ReadAllText(Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, "Sign.Template"));
             var template = Handlebars.Compile(templateSource);
             this.Sign = template(data);
             Handlebars.RegisterTemplate("sign", templateSource);
@@ -96,7 +96,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
             
-            if (config.Options.First(x => x.LongName == Constants.OptionTemplateName).Value() == null)
+            if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
                 var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
                 var templateNameProp = this.GetType().GetProperties().Where(prop => prop.Name == "TemplateName").FirstOrDefault();
@@ -156,7 +156,7 @@ namespace Sitefinity_CLI.Commands
 
         private string GetLatestTemplatesVersion()
         {
-            var templatesFolderPath = Path.Combine(this.CurrentPath, "Templates");
+            var templatesFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName);
             var directoryNames = Directory.GetDirectories(templatesFolderPath);
             List<float> versions = new List<float>();
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
