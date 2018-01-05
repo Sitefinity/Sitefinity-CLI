@@ -46,7 +46,7 @@ namespace Sitefinity_CLI
         public const string TemplateNameOptionDescription = "The name of the source template used for resource creation. Default value: ";
         public const string ResourcePackageOptionDescription = "The name of the resource package where the file should be created. Default value: ";
         public const string ProjectRoothPathOptionDescription = "The path to the root of the project upon the command should be executed.";
-        public const string VersionOptionDescription = "The template version used for resource creation.";
+        public const string VersionOptionDescription = "Sitefinity version which is compatible with the resource to be generated.";
         public const string NameArgumentDescription = "The name of the resource added to current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
 

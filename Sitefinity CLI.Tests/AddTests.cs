@@ -1,4 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,6 +11,8 @@ namespace Sitefinity_CLI.Tests
     [TestClass]
     public class AddTests
     {
+        private const string TemplatesVersion = "10.2";
+
         private string testFolderPath;
         private string workingDirectory;
 
@@ -34,12 +38,11 @@ namespace Sitefinity_CLI.Tests
         public void AddResourcePackageTest()
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
 
             var process = ExecuteCommand(
                 commandName: Constants.AddResourcePackageCommandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: Constants.DefaultResourcePackageName);
 
             StreamReader myStreamReader = process.StandardOutput;
@@ -61,7 +64,7 @@ namespace Sitefinity_CLI.Tests
             Assert.IsTrue(Directory.Exists(expectedFolderPath));
 
             // Compare folders content
-            var resourcePackageDefaultTemplateFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, templatesVersion, Constants.ResourcePackageTemplatesFolderName, Constants.DefaultResourcePackageName);
+            var resourcePackageDefaultTemplateFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, TemplatesVersion, Constants.ResourcePackageTemplatesFolderName, Constants.DefaultResourcePackageName);
             var dir1Files = Directory.EnumerateFiles(resourcePackageDefaultTemplateFolderPath, "*", SearchOption.AllDirectories).Select(Path.GetFileName);
             var dir2Files = Directory.EnumerateFiles(expectedFolderPath, "*", SearchOption.AllDirectories).Select(Path.GetFileName);
             var diffs = dir1Files.Except(dir2Files);
@@ -88,12 +91,11 @@ namespace Sitefinity_CLI.Tests
             Directory.CreateDirectory(mvcFolderPath);
 
             var resourceName = "Test";
-            var templatesVersion = "10.2";
 
             var process = ExecuteCommand(
                 commandName: Constants.AddCustomWidgetCommandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: Constants.DefaultSourceTemplateName);
 
             StreamReader myStreamReader = process.StandardOutput;
@@ -141,15 +143,14 @@ namespace Sitefinity_CLI.Tests
         public void AddResourcePackageWithSameNameTest()
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
 
             // first we create a resource package
-            AddResource(Constants.AddResourcePackageCommandName, resourceName, templatesVersion, Constants.DefaultResourcePackageName);
+            AddResource(Constants.AddResourcePackageCommandName, resourceName, TemplatesVersion, Constants.DefaultResourcePackageName);
 
             var process = ExecuteCommand(
                 commandName: Constants.AddResourcePackageCommandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: Constants.DefaultResourcePackageName);
 
             StreamReader myStreamReader = process.StandardOutput;
@@ -172,19 +173,18 @@ namespace Sitefinity_CLI.Tests
         public void AddPageTemplateWithSameNameTest()
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
             var resourcePackageName = "TestResourcePackage";
 
             // first we create a resource package
-            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
 
             // then a page template
-            AddResource(Constants.AddPageTemplateCommandName, resourceName, templatesVersion, Constants.DefaultSourceTemplateName, resourcePackageName);
+            AddResource(Constants.AddPageTemplateCommandName, resourceName, TemplatesVersion, Constants.DefaultSourceTemplateName, resourcePackageName);
 
             var process = ExecuteCommand(
                 commandName: Constants.AddPageTemplateCommandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: Constants.DefaultSourceTemplateName,
                 resourcePackageName: resourcePackageName);
 
@@ -209,19 +209,18 @@ namespace Sitefinity_CLI.Tests
         public void AddGridTemplateWithSameNameTest()
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
             var resourcePackageName = "TestResourcePackage";
 
             // first we create a resource package
-            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
 
             // then a grid template
-            AddResource(Constants.AddGridTemplateCommandName, resourceName, templatesVersion, Constants.DefaultGridTemplateName, resourcePackageName);
+            AddResource(Constants.AddGridTemplateCommandName, resourceName, TemplatesVersion, Constants.DefaultGridTemplateName, resourcePackageName);
 
             var process = ExecuteCommand(
                 commandName: Constants.AddGridTemplateCommandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: Constants.DefaultGridTemplateName,
                 resourcePackageName: resourcePackageName);
 
@@ -250,15 +249,14 @@ namespace Sitefinity_CLI.Tests
             Directory.CreateDirectory(mvcFolderPath);
 
             var resourceName = "Test";
-            var templatesVersion = "10.2";
 
             // then a widget
-            AddResource(Constants.AddCustomWidgetCommandName, resourceName, templatesVersion, Constants.DefaultSourceTemplateName);
+            AddResource(Constants.AddCustomWidgetCommandName, resourceName, TemplatesVersion, Constants.DefaultSourceTemplateName);
 
             var process = ExecuteCommand(
                 commandName: Constants.AddCustomWidgetCommandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: Constants.DefaultSourceTemplateName);
 
             StreamReader myStreamReader = process.StandardOutput;
@@ -338,19 +336,179 @@ namespace Sitefinity_CLI.Tests
             this.AddResourceNonExistingResourcePackage(Constants.AddGridTemplateCommandName, Constants.DefaultGridTemplateName, Constants.GridTemplatePath);
         }
 
-        private void AddResourceToResourcePackage(string commandName, string defaultTemplateName, string fileExtension, string templatePath)
+        [TestMethod]
+        public void AddWidgetNonExistingMVCFolderTest()
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
+
+            var process = ExecuteCommand(
+                commandName: Constants.AddCustomWidgetCommandName,
+                resourceName: resourceName,
+                templatesVersion: TemplatesVersion,
+                templateName: Constants.DefaultSourceTemplateName);
+
+            StreamReader myStreamReader = process.StandardOutput;
+            StreamWriter myStreamWriter = process.StandardInput;
+
+            // Answer to the prompt that says Sitefinity project is not recognized
+            myStreamWriter.WriteLine("y");
+            process.WaitForExit();
+
+            // Check output string to verify message
+            var folderPath = Path.Combine(this.testFolderPath, Constants.MVCFolderName);
+            var outputString = myStreamReader.ReadToEnd();
+            var expectedOutputString = new StringBuilder();
+            expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
+            expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
+            Assert.AreEqual(expectedOutputString.ToString(), outputString);
+        }
+
+        [TestMethod]
+        public void VerifyMessageForSupportedVersionTest()
+        {
+            var resourceName = "Test";
+
+            var process = ExecuteCommand(
+                commandName: Constants.AddResourcePackageCommandName,
+                resourceName: resourceName,
+                templateName: Constants.DefaultResourcePackageName);
+
+            StreamReader myStreamReader = process.StandardOutput;
+            StreamWriter myStreamWriter = process.StandardInput;
+
+            // Answer to the prompt that says Sitefinity project is not recognized
+            myStreamWriter.WriteLine("y");
+            process.WaitForExit();
+
+            // Check output string to verify message
+            var expectedFolderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourceName);
+            var outputString = myStreamReader.ReadToEnd();
+            var expectedOutputString = new StringBuilder();
+            expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
+            expectedOutputString.AppendLine(string.Format(Constants.ProducedFilesVersionMessage, TemplatesVersion));
+            expectedOutputString.AppendLine(string.Format(Constants.ResourcePackageCreatedMessage, resourceName, expectedFolderPath));
+            Assert.AreEqual(expectedOutputString.ToString(), outputString);
+        }
+
+        [TestMethod]
+        public void VerifyPromptsForTemplateNameAndResourcePackageNameTest()
+        {
+            var resourceName = "Test";
             var resourcePackageName = "TestResourcePackage";
 
             // first we create a resource package
-            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
+
+            var process = ExecuteCommand(
+                commandName: Constants.AddGridTemplateCommandName,
+                resourceName: resourceName,
+                templatesVersion: TemplatesVersion);
+
+            StreamReader myStreamReader = process.StandardOutput;
+            StreamWriter myStreamWriter = process.StandardInput;
+
+            // Answer to the prompt that says Sitefinity project is not recognized
+            myStreamWriter.WriteLine("y");
+            myStreamWriter.WriteLine("");
+            myStreamWriter.WriteLine(resourcePackageName);
+            process.WaitForExit();
+
+            // Check output string to verify message
+            var fileName = string.Format("{0}{1}", resourceName, Constants.HtmlFileExtension);
+            var folderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourcePackageName, Constants.GridTemplatePath);
+            var outputString = myStreamReader.ReadToEnd();
+            var expectedOutputString = new StringBuilder();
+            expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
+            var prompMessage = string.Format(Constants.SourceTemplatePromptMessage, Constants.AddGridTemplateCommandFullName);
+            expectedOutputString.Append(string.Format("{0} [{1}] ", prompMessage, Constants.DefaultGridTemplateName));
+            expectedOutputString.Append(string.Format("{0} [{1}] ", Constants.EnterResourcePackagePromptMessage, Constants.DefaultResourcePackageName));
+            AssertFileCreated(folderPath, fileName, expectedOutputString);
+            Assert.AreEqual(expectedOutputString.ToString(), outputString);
+        }
+
+        [TestMethod]
+        public void VerifyPromptsCustomTemplateTest()
+        {
+            var resourceName = "Test";
+            var resourcePackageName = "TestResourcePackage";
+            var templateName = "Test";
+
+            // first we create a resource package
+            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
+
+            var process = ExecuteCommand(
+                commandName: Constants.AddPageTemplateCommandName,
+                resourceName: resourceName,
+                templatesVersion: TemplatesVersion,
+                templateName: templateName,
+                resourcePackageName: resourcePackageName);
+
+            StreamReader myStreamReader = process.StandardOutput;
+            StreamWriter myStreamWriter = process.StandardInput;
+
+            var expectedOutputString = new StringBuilder();
+            expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
+
+            var inputString = new StringBuilder();
+
+            // read config file
+            var configTemplateFileName = string.Format("{0}.config.json", templateName);
+            var configTemplateFilePath = Path.Combine(
+                this.workingDirectory,
+                Constants.TemplatesFolderName,
+                TemplatesVersion,
+                Constants.PageTemplateTemplatesFolderName,
+                configTemplateFileName);
+
+            if (File.Exists(configTemplateFilePath))
+            {
+                List<string> templateParams = new List<string>();
+                using (StreamReader reader = new StreamReader(configTemplateFilePath))
+                {
+                    string content = reader.ReadToEnd();
+                    templateParams = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(content);
+                }
+
+                foreach (var parameter in templateParams)
+                {
+                    expectedOutputString.Append(string.Format("Please enter {0}: ", parameter));
+                    inputString.AppendLine(Guid.NewGuid().ToString());
+                }
+            }
+
+            // Answer to the prompt that says Sitefinity project is not recognized
+            myStreamWriter.WriteLine("y");
+
+            // build answers
+            myStreamWriter.Write(inputString.ToString());
+            process.WaitForExit();
+
+            // Check output string to verify message
+            var fileName = string.Format("{0}{1}", resourceName, Constants.RazorFileExtension);
+            var folderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourcePackageName, Constants.PageTemplatesPath);
+            var outputString = myStreamReader.ReadToEnd();
+
+            AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+            // assert file content
+            var filePath = Path.Combine(folderPath, fileName);
+            var generatedFileContent = File.ReadAllText(filePath);
+            Assert.AreEqual(expectedOutputString.ToString(), outputString);
+            Assert.IsTrue(generatedFileContent.EndsWith(inputString.ToString().TrimEnd(Environment.NewLine.ToCharArray())));
+        }
+
+        private void AddResourceToResourcePackage(string commandName, string defaultTemplateName, string fileExtension, string templatePath)
+        {
+            var resourceName = "Test";
+            var resourcePackageName = "TestResourcePackage";
+
+            // first we create a resource package
+            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
 
             var process = ExecuteCommand(
                 commandName: commandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 resourcePackageName: resourcePackageName,
                 templateName: defaultTemplateName);
 
@@ -374,20 +532,19 @@ namespace Sitefinity_CLI.Tests
         private void AddResourceNonExistingTemplate(string commandName, string commandFullName, string resourceTemplatesFolderName, bool templateIsFile = false, bool createResourcePackage = false)
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
             var templateName = "NonExistingTemplate";
             string resourcePackageName = null;
 
             if (createResourcePackage)
             {
                 resourcePackageName = "TestResourcePackage";
-                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
             }
 
             var process = ExecuteCommand(
                 commandName: commandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 templateName: templateName,
                 resourcePackageName: resourcePackageName);
 
@@ -405,7 +562,7 @@ namespace Sitefinity_CLI.Tests
                 templatePath = string.Format("{0}.Template", templateName);
             }
 
-            var expectedFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, templatesVersion, resourceTemplatesFolderName, templatePath);
+            var expectedFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, TemplatesVersion, resourceTemplatesFolderName, templatePath);
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
@@ -416,13 +573,12 @@ namespace Sitefinity_CLI.Tests
         private void AddResourceNonExistingResourcePackage(string commandName, string templateName, string destinationPath)
         {
             var resourceName = "Test";
-            var templatesVersion = "10.2";
             var resourcePackageName = "TestResourcePackage";
 
             var process = ExecuteCommand(
                 commandName: commandName,
                 resourceName: resourceName,
-                templatesVersion: templatesVersion,
+                templatesVersion: TemplatesVersion,
                 resourcePackageName: resourcePackageName,
                 templateName: templateName);
 
@@ -463,14 +619,22 @@ namespace Sitefinity_CLI.Tests
             };
         }
 
-        private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion, string templateName, string resourcePackageName = null)
+        private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion = null, string templateName = null, string resourcePackageName = null)
         {
             var process = this.CreateNewProcess();
             
             var args = string.Format("sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", this.testFolderPath);
-            args = AddOptionToArguments(args, "-t", templateName);
-            args = AddOptionToArguments(args, "-v", templatesVersion);
+
+            if (templateName != null)
+            {
+                args = AddOptionToArguments(args, "-t", templateName);
+            }
+
+            if (templatesVersion != null)
+            {
+                args = AddOptionToArguments(args, "-v", templatesVersion);
+            }
 
             if (resourcePackageName != null)
             {

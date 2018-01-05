@@ -11,7 +11,7 @@ using System.Reflection;
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.GenerateConfigCommandName, Description = "Generates a configuration file describing the available commands. The file is to be used by the Sitefinity DevKit.")]
+    [Command(Constants.GenerateConfigCommandName, Description = "Generates a configuration file describing the available commands. The file is used by the Sitefinity VSIX.")]
     internal class GenerateConfigCommand
     {
         private string[] optionsToSkip = { "ProjectRootPath", "Version" };
