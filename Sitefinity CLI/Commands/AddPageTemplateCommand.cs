@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
 {
-    [Command(Constants.AddPageTemplateCommandName, Description = "Adds a new page template to current project.", FullName = Constants.AddPageTemplateCommandFullName)]
+    [Command(Constants.AddPageTemplateCommandName, Description = "Adds a new page template to the current project.", FullName = Constants.AddPageTemplateCommandFullName)]
     internal class AddPageTemplateCommand : AddToResourcePackageCommand
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]

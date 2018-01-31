@@ -15,39 +15,39 @@ namespace Sitefinity_CLI
         public const string ModelsFolderName = "Models";
         public const string TemplatesFolderName = "Templates";
         public const string ResourcePackageTemplatesFolderName = "ResourcePackage";
-        public const string GridTemplateTemplatesFolderName = "GridTemplate";
+        public const string GridWidgetTemplatesFolderName = "GridWidget";
         public const string PageTemplateTemplatesFolderName = "PageTemplate";
         public const string CustomWidgetTemplatesFolderName = "CustomWidget";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
-        public static string GridTemplatePath = Path.Combine("GridSystem", "Templates");
+        public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
 
         // Error messages
-        public const string DirectoryNotFoundMessage = "Directory not found! Path: \"{0}\"";
-        public const string FileExistsMessage = "File \"{0}\" already exists! Path: \"{1}\"";
-        public const string TemplateNotFoundMessage = "Source {0} not found! Path: {1}";
-        public const string ResourceExistsMessage = "{0} with the same name {1} already exists! Path: {2}";
+        public const string DirectoryNotFoundMessage = "Directory not found. Path: \"{0}\"";
+        public const string FileExistsMessage = "File \"{0}\" already exists. Path: \"{1}\"";
+        public const string TemplateNotFoundMessage = "The {0} you want to replicate is not found. Path: \"{1}\"";
+        public const string ResourceExistsMessage = "{0} with name {1} already exists. Path: \"{2}\"";
 
         // Warning messages
-        public const string EnterResourcePackagePromptMessage = "Please enter the name of the resource package where the resource should be added:";
-        public const string SourceTemplatePromptMessage = "Please enter the source {0} to replicate:";
-        public const string HigherSitefinityVersionMessage = "Your version of CLI produces files compatible with Sitefinity {1}. There might be some inconsistencies with your Sitefinity project version - {0}";
-        public const string ProducedFilesVersionMessage = "Produced files are compatible with Sitefinity version {0}";
-        public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity. Do you wish to proceed?";
+        public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
+        public const string SourceTemplatePromptMessage = "Enter the name of the {0} you want to replicate:";
+        public const string HigherSitefinityVersionMessage = "Your version of Sitefinity CLI creates files compatible with Sitefinity CMS {1}. There may be inconsistencies with your project version - {0}";
+        public const string ProducedFilesVersionMessage = "Created files are compatible with Sitefinity CMS version {0}";
+        public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity CMS. Do you wish to proceed?";
 
         // Success messages
-        public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: {0}";
+        public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
         public const string CustomWidgetCreatedMessage = "Custom widget \"{0}\" created!";
         public const string FileCreatedMessage = "File \"{0}\" created! Path: \"{1}\"";
         public const string ResourcePackageCreatedMessage = "Resource package \"{0}\" created! Path: \"{1}\"";
 
         // Descriptions
-        public const string TemplateNameOptionDescription = "The name of the source template used for resource creation. Default value: ";
-        public const string ResourcePackageOptionDescription = "The name of the resource package where the file should be created. Default value: ";
-        public const string ProjectRoothPathOptionDescription = "The path to the root of the project upon the command should be executed.";
-        public const string VersionOptionDescription = "Sitefinity version which is compatible with the resource to be generated.";
-        public const string NameArgumentDescription = "The name of the resource added to current project.";
+        public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
+        public const string ResourcePackageOptionDescription = "The name of the resource package where you want to add the generated resource. Default value: ";
+        public const string ProjectRoothPathOptionDescription = "The path to the root of the project where the command will execute.";
+        public const string VersionOptionDescription = "Sitefinity version which is compatible with the resource you want to generate.";
+        public const string NameArgumentDescription = "The name of the resource you want to add to the current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
 
         // File extensions
@@ -62,14 +62,14 @@ namespace Sitefinity_CLI
         public const string AddResourcePackageCommandFullName = "Resource package";
         public const string AddPageTemplateCommandName = "pagetemplate";
         public const string AddPageTemplateCommandFullName = "Page template";
-        public const string AddGridTemplateCommandName = "gridtemplate";
-        public const string AddGridTemplateCommandFullName = "Grid template";
+        public const string AddGridWidgetCommandName = "gridwidget";
+        public const string AddGridWidgetCommandFullName = "Grid widget";
         public const string AddCustomWidgetCommandName = "widget";
         public const string AddCustomWidgetCommandFullName = "Widget";
         public const string GenerateConfigCommandName = "config";
 
         public const string DefaultResourcePackageName = "Bootstrap";
-        public const string DefaultGridTemplateName = "grid-6+6";
+        public const string DefaultGridWidgetName = "grid-6+6";
         public const string DefaultSourceTemplateName = "Default";
     }
 }

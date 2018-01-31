@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -56,6 +57,7 @@ namespace Sitefinity_CLI.Commands
                     // options
                     var optionProps = commandType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(OptionAttribute)));
                     var options = new List<OptionModel>();
+                    var optionNameRegex = new Regex("(?<=[^A-Z])(?=[A-Z])");
                     foreach (var option in optionProps)
                     {
                         if (optionsToSkip.Contains(option.Name))
@@ -67,7 +69,7 @@ namespace Sitefinity_CLI.Commands
                         var defaultValueAttr = option.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
                         var optionModel = new OptionModel();
                         optionModel.Name = optionAttr.Template.Split('|').First();
-                        optionModel.Title = option.Name;
+                        optionModel.Title = optionNameRegex.Replace(option.Name, " ");
                         optionModel.DefaultValue = defaultValueAttr.Value.ToString();
                         options.Add(optionModel);
                     }

@@ -78,9 +78,9 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddGridTemplateTest()
+        public void AddGridWidgetTest()
         {
-            this.AddResourceToResourcePackage(Constants.AddGridTemplateCommandName, Constants.DefaultGridTemplateName, Constants.HtmlFileExtension, Constants.GridTemplatePath);
+            this.AddResourceToResourcePackage(Constants.AddGridWidgetCommandName, Constants.DefaultGridWidgetName, Constants.HtmlFileExtension, Constants.GridWidgetPath);
         }
 
         [TestMethod]
@@ -206,7 +206,7 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddGridTemplateWithSameNameTest()
+        public void AddGridWidgetWithSameNameTest()
         {
             var resourceName = "Test";
             var resourcePackageName = "TestResourcePackage";
@@ -215,13 +215,13 @@ namespace Sitefinity_CLI.Tests
             AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
 
             // then a grid template
-            AddResource(Constants.AddGridTemplateCommandName, resourceName, TemplatesVersion, Constants.DefaultGridTemplateName, resourcePackageName);
+            AddResource(Constants.AddGridWidgetCommandName, resourceName, TemplatesVersion, Constants.DefaultGridWidgetName, resourcePackageName);
 
             var process = ExecuteCommand(
-                commandName: Constants.AddGridTemplateCommandName,
+                commandName: Constants.AddGridWidgetCommandName,
                 resourceName: resourceName,
                 templatesVersion: TemplatesVersion,
-                templateName: Constants.DefaultGridTemplateName,
+                templateName: Constants.DefaultGridWidgetName,
                 resourcePackageName: resourcePackageName);
 
             StreamReader myStreamReader = process.StandardOutput;
@@ -233,7 +233,7 @@ namespace Sitefinity_CLI.Tests
 
             // Check output string to verify message
             var fileName = string.Format("{0}{1}", resourceName, Constants.HtmlFileExtension);
-            var folderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourcePackageName, Constants.GridTemplatePath, fileName);
+            var folderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourcePackageName, Constants.GridWidgetPath, fileName);
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
@@ -288,12 +288,12 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddGridTemplateNonExistingTemplateTest()
+        public void AddGridWidgetNonExistingTemplateTest()
         {
             this.AddResourceNonExistingTemplate(
-                Constants.AddGridTemplateCommandName,
-                Constants.AddGridTemplateCommandFullName,
-                Constants.GridTemplateTemplatesFolderName,
+                Constants.AddGridWidgetCommandName,
+                Constants.AddGridWidgetCommandFullName,
+                Constants.GridWidgetTemplatesFolderName,
                 true,
                 true);
         }
@@ -331,9 +331,9 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddGridTemplateNonExistingResourcePackageTest()
+        public void AddGridWidgetNonExistingResourcePackageTest()
         {
-            this.AddResourceNonExistingResourcePackage(Constants.AddGridTemplateCommandName, Constants.DefaultGridTemplateName, Constants.GridTemplatePath);
+            this.AddResourceNonExistingResourcePackage(Constants.AddGridWidgetCommandName, Constants.DefaultGridWidgetName, Constants.GridWidgetPath);
         }
 
         [TestMethod]
@@ -400,7 +400,7 @@ namespace Sitefinity_CLI.Tests
             AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, TemplatesVersion, Constants.DefaultResourcePackageName);
 
             var process = ExecuteCommand(
-                commandName: Constants.AddGridTemplateCommandName,
+                commandName: Constants.AddGridWidgetCommandName,
                 resourceName: resourceName,
                 templatesVersion: TemplatesVersion);
 
@@ -415,12 +415,12 @@ namespace Sitefinity_CLI.Tests
 
             // Check output string to verify message
             var fileName = string.Format("{0}{1}", resourceName, Constants.HtmlFileExtension);
-            var folderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourcePackageName, Constants.GridTemplatePath);
+            var folderPath = Path.Combine(this.testFolderPath, Constants.ResourcePackagesFolderName, resourcePackageName, Constants.GridWidgetPath);
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            var prompMessage = string.Format(Constants.SourceTemplatePromptMessage, Constants.AddGridTemplateCommandFullName);
-            expectedOutputString.Append(string.Format("{0} [{1}] ", prompMessage, Constants.DefaultGridTemplateName));
+            var prompMessage = string.Format(Constants.SourceTemplatePromptMessage, Constants.AddGridWidgetCommandFullName);
+            expectedOutputString.Append(string.Format("{0} [{1}] ", prompMessage, Constants.DefaultGridWidgetName));
             expectedOutputString.Append(string.Format("{0} [{1}] ", Constants.EnterResourcePackagePromptMessage, Constants.DefaultResourcePackageName));
             AssertFileCreated(folderPath, fileName, expectedOutputString);
             Assert.AreEqual(expectedOutputString.ToString(), outputString);

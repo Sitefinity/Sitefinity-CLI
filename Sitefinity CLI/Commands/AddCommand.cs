@@ -6,7 +6,7 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.AddCommandName, Description = "Create a new resource.")]
     [Subcommand(Constants.AddResourcePackageCommandName, typeof(AddResourcePackageCommand))]
     [Subcommand(Constants.AddPageTemplateCommandName, typeof(AddPageTemplateCommand))]
-    [Subcommand(Constants.AddGridTemplateCommandName, typeof(AddGridTemplateCommand))]
+    [Subcommand(Constants.AddGridWidgetCommandName, typeof(AddGridWidgetCommand))]
     [Subcommand(Constants.AddCustomWidgetCommandName, typeof(AddCustomWidgetCommand))]
     internal class AddCommand
     {
