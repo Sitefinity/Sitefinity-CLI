@@ -13,8 +13,10 @@ namespace SitefinityWebApp.Mvc.Controllers
 		public ActionResult Index()
 		{
 			var model = new {{name}}Model();
-			model.Message = "Hello World";
+			model.Message = this.Message;
 			return View(model);
 		}
+
+		public string Message { get; set; }
 	}
 }
