@@ -80,11 +80,11 @@ namespace Sitefinity_CLI.Commands
                 this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "View.Template"), config.FullName, data);
 
                 // Create designer
-                filePath = Path.Combine(scriptsWidgetFolderPath, string.Format("{0}{1}", "designerview-customdesigner", Constants.JavaScriptFileExtension));
+                filePath = Path.Combine(scriptsWidgetFolderPath, string.Format("{0}{1}", "designerview-simple", Constants.JavaScriptFileExtension));
                 this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "Designer.Template"), config.FullName, data);
 
                 // Create designer view
-                filePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.CustomDesigner", Constants.RazorFileExtension));
+                filePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension));
                 this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "DesignerView.Template"), config.FullName, data);
             }
             catch (Exception)

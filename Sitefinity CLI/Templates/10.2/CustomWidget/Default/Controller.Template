@@ -6,7 +6,7 @@ using Telerik.Sitefinity.Mvc;
 
 namespace SitefinityWebApp.Mvc.Controllers
 {
-	[ControllerToolboxItem(Name = "{{name}}Widget", Title = "{{name}} Widget", SectionName = "CustomWidgets")]
+	[ControllerToolboxItem(Name = "{{name}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
 	public class {{name}}Controller : Controller
 	{
 		// GET: {{name}}
