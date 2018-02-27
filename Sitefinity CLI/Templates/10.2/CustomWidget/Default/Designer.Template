@@ -18,10 +18,4 @@ angular.module('designer')
 			.finally(function () {
 				$scope.feedback.showLoadingIndicator = false;
 			});
-		$scope.$watch('message', function (newValue, oldValue) {
-			if (newValue) {
-				var timeStamp = new Date();
-				$scope.properties.Message.PropertyValue = newValue + " " + timeStamp.toString();
-			}
-		});
 	}]);
