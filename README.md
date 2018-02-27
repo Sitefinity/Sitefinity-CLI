@@ -69,7 +69,7 @@ sf add [command name] -?
 ## Sitefinity version
 Every command has an option **"-version"**. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the _"Templates"_ folder, in separate folders for each sitefinity version (starting from 10.2). 
 
-When running a command the CLI will try to automatically detect Sitefinity version and use the coresponding templates. If it cannot detect the version or Sitefinity version is higher that latest templates version it will be set to the latest available. By using the **"-version"** option it can be explicitly set which templates version should be used.
+When running a command the CLI will try to automatically detect Sitefinity version and use the corresponding templates. If it cannot detect the version or Sitefinity version is higher that latest templates version it will be set to the latest available. By using the **"-version"** option it can be explicitly set which templates version should be used.
 
 Example:
 ```
