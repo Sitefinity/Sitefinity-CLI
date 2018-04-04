@@ -54,6 +54,7 @@
 		<Feature Id="ProductFeature" Title="Sitefinity_CLI.Installer" Level="1">
       
       <ComponentGroupRef Id="PublishedComponents" />
+      <ComponentGroupRef Id="LicenseComponents" />
       <ComponentRef Id="setEnvironment" />
       
 		</Feature>

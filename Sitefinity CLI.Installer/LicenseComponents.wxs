@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="License" Guid="{8D03D106-B9AA-4AA7-9A3C-ADACD4A354FA}">
+        <File Id="LicenseFile" KeyPath="yes" Source="..\LICENSE.md" />
+      </Component>
+      <Component Id="Notices" Guid="{7327C7E7-6210-40BD-834A-D57EAF878027}">
+        <File Id="NoticesFile" KeyPath="yes" Source="..\NOTICE.txt" />
+      </Component>
+    </DirectoryRef>
+    <ComponentGroup Id="LicenseComponents">
+      <ComponentRef Id="License" />
+      <ComponentRef Id="Notices" />
+    </ComponentGroup>
+	</Fragment>
+</Wix>
