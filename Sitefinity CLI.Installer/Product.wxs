@@ -3,9 +3,9 @@
   
   <!-- These should be regenerated on every new version -->
   <?if $(var.Platform)=x64 ?>
-  <?define ProductCode = "{9E999ECC-7FFD-4539-9768-BEA1B38D42BA}" ?>
+  <?define ProductCode = "{0EBB9221-6018-4750-BC2A-AAEA47C6D125}" ?>
   <?else?>
-  <?define ProductCode = "{FCF4D603-3D1E-4FAB-AE65-D56C00D1BAD8}" ?>
+  <?define ProductCode = "{8689A7B8-B444-4054-BBF8-9AFA79F0E8FA}" ?>
   <?endif?>
 
   <!-- This should NOT be regenerated on every new version -->
