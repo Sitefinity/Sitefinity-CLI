@@ -9,6 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\NOTICE.txt" Link="NOTICE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md" Link="LICENSE.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Handlebars.Net" Version="1.9.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
