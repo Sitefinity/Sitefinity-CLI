@@ -1,7 +1,7 @@
 ﻿/* {{> sign}} */
 
 angular.module('designer')
-	.controller('CustomDesignerCtrl', ['$scope', 'propertyService', function ($scope, propertyService) {
+	.controller('SimpleCtrl', ['$scope', 'propertyService', function ($scope, propertyService) {
 		$scope.feedback.showLoadingIndicator = true;
 		// Get widget properies and load them in the controller's scope
 		propertyService.get()
