@@ -1,32 +1,28 @@
-# Sitefinity-CLI
+# Sitefinity CLI
 
 ## Installation
 
-### Using installer 
-Windows installer(x32/x64) can be downloaded from the releases assets. It will guide you through the setup of the app.
+* Use the installer
+  
+  Download the Windows installer(x32/x64) from the releases assets and follow the steps to setup the app.
 
-### Using prebuild version
-A prebuild version for some operating systems can be downloaded from releases assets. Extract the archive to a folder of your choice and add this folder to the PATH System variable.
+* Use prebuild version
 
-### Building the app by yourself
-In order to build the CLI you need to install .NET Core. It can be downloaded from [HERE](https://www.microsoft.com/net/download/windows).
+  You can download a prebuild version for some operating systems from the releases assets. Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
 
-Build the application for your OS by running the following command from the project root folder:
-```
-dotnet publish -c release -r [rid]
-```
-**NOTE**: Replace **[rid]** with the identifier for your OS. .NET Core RID Catalogue can be found [HERE](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog)
+* Build the app yourself
 
-Example for Windows 10 x64:
-```
-dotnet publish -c release -r win10-x64
-```
-
-Add the following path to the PATH System variable:
-```
-(project_root_path)\bin\release\netcoreapp2.0\(rid)\publish
-```
-The CLI is now ready for use!
+  **PREREQUISITES**: To build the CLI, you need to install [.NET Core](https://www.microsoft.com/net/download/windows).
+  
+  To build the application for your OS, enter the following command from the project root folder:
+  ```dotnet publish -c release -r [rid]```
+  
+  **NOTE**: Replace [rid] with the identifier for your OS. For more information, see the [.NET Core RID Catalogue](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog).
+  
+  **EXAMPLE**: To build the app for Windows 10 x64, enter the following command:
+  ```dotnet publish -c release -r win10-x64```
+  and add the following path to the PATH System variable:
+  ```(project_root_path)\bin\release\netcoreapp2.0\(rid)\publish```
 
 ## How to use
 
