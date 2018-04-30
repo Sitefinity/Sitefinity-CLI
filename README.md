@@ -59,33 +59,37 @@ You can use the add command with the following subcommands:
 
 ```sf add [command name] -?```
 
-## Sitefinity version
-Every command has an option **"-version"**. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the _"Templates"_ folder, in separate folders for each sitefinity version (starting from 10.2). 
+## Sitefinity CMS version
 
-When running a command the CLI will try to automatically detect Sitefinity version and use the corresponding templates. If it cannot detect the version or Sitefinity version is higher that latest templates version it will be set to the latest available. By using the **"-version"** option it can be explicitly set which templates version should be used.
+Every command has an option ```-version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Telates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
 
-Example:
+When running a command the CLI will try to automatically detect your Sitefinity CMS project version and use the corresponding template. If it cannot detect the version or your Sitefinity CMS version is higher than latest templates version, CLI will use the latest available. 
+
+You can use the ```-version``` option to explicitly set the templates version that CLI should use.
+
+**EXAMPLE**: Following is an example command of using the ```–version``` option:
 ```
 sf add package "New resource package" --version "11.0"
 ```
-The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folder. _"11.0"_ folder has to have _"ResourcePackage"_ folder containing templates for a resource package. 
+In this case, the CLI will look for a folder named ```11.0``` inside folder ```Templates```. Folder 11.0 must have ```ResourcePackage``` folder containing templates for a resource package.
 
 ## Template generation
 
-When running a command the CLI will prompt you for the name of the template to be used in generation. The template name can also be set using the option **"--template"**.
+When you run a command, the CLI prompts you to enter the name of the template to be used for the generation. You can also set the name using option ```-template```.
 
-Example:
+**EXAMPLE**: Following is an example command of using the –template option:
 ```
 sf add pagetemplate "New page" --template "CustomPageTemplate"
 ```
-The CLI will look for a file _"CustomPageTemplate.Template"_ in the _"Templates\(version)\Page"_ folder. 
+In this case, the CLI will look for a file ```CustomPageTemplate.Template``` in the folder ```Templates(version)\Page```.
 
 ### Custom templates
 
-Templates use Handlebars syntax. More about it can be found [HERE](https://github.com/rexm/Handlebars.Net).
-Users can easily create custom templates. They should create a file with _".Template"_ extension and place it in the corresponding folder. If the template contains some properties a _"(templateName).config.json"_ file should be created. It must contain all the properties used in the template. The CLI will read the config file and prompt the user to enter the properties when the template is selected.
+Templates use Handlebars syntax. For more information, see [Handlebars.Net](https://github.com/rexm/Handlebars.Net).
 
-Example template file:
+You can easily create custom templates. To do this, create a file with extension ```.Template``` and place it in the corresponding folder. If the template contains some properties, you should also create a ```(templateName).config.json``` file. It must contain all the properties used in the template. The CLI will read the ```.config``` file and prompt you to enter the properties when the template is selected.
+
+**EXAMPLE**: Following is a sample template file:
 ```
 {{> sign}}
 
@@ -93,7 +97,8 @@ Example template file:
 {{time}}
 {{age}}
 ```
-Example config file:
+
+**EXAMPLE**: Following is a sample config file:
 ```json
 [
   "message",
@@ -101,4 +106,4 @@ Example config file:
   "age"
 ]
 ```
-The partial ```{{> sign}}``` is automatically populated by the CLI.
+**NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
