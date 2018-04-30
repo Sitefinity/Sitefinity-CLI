@@ -15,52 +15,49 @@
   **PREREQUISITES**: To build the CLI, you need to install [.NET Core](https://www.microsoft.com/net/download/windows).
   
   To build the application for your OS, enter the following command from the project root folder:
+  
   ```dotnet publish -c release -r [rid]```
   
   **NOTE**: Replace [rid] with the identifier for your OS. For more information, see the [.NET Core RID Catalogue](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog).
   
   **EXAMPLE**: To build the app for Windows 10 x64, enter the following command:
+  
   ```dotnet publish -c release -r win10-x64```
+  
   and add the following path to the PATH System variable:
+  
   ```(project_root_path)\bin\release\netcoreapp2.0\(rid)\publish```
 
 ## How to use
 
 * Open command prompt and navigate to the root of your Sitefinity project (SitefinityWebApp folder).
-* Run ```sf``` command. A help will appear describing the available commands and options.
+* Run ```sf``` command. 
+  
+  A help will appear describing the available commands and options.
 
-## Available commands
+## CLI commands
 
-At the moment the only available command is ```add```. It has 4 subcommands:
+You can use the add command with the following subcommands:
 
-#### Add new Resource package to current project
+* To create a new **Resource package**, execute the following command:
 
-```
-sf add package "Test resource package"
-```
+  ```sf add package "Test resource package"```
 
-#### Add new Page template to current project
+* To create a new **Page template**, execute the following command:
 
-```
-sf add pagetemplate "Test page"
-```
+  ```sf add pagetemplate "Test page"```
 
-#### Add new Grid template to current project
+* To create a new **Grid widget**, execute the following command:
 
-```
-sf add gridtemplate "Test grid"
-```
+  ```sf add gridtemplate "Test grid"```
 
-#### Add new Widget to current project
+* To create a new **Widget**, execute the following command:
 
-```
-sf add widget "CustomWidget"
-```
+  ```sf add widget "CustomWidget"```
 
-For more information about the arguments and options for each command run the help option:
-```
-sf add [command name] -?
-```
+**NOTE**: For more information about the arguments and options for each command, run the help option:
+
+```sf add [command name] -?```
 
 ## Sitefinity version
 Every command has an option **"-version"**. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the _"Templates"_ folder, in separate folders for each sitefinity version (starting from 10.2). 
