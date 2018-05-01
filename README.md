@@ -1,98 +1,95 @@
-# Sitefinity-CLI
+# Sitefinity CLI
 
 ## Installation
 
-### Using installer 
-Windows installer(x32/x64) can be downloaded from the releases assets. It will guide you through the setup of the app.
+* Use the installer
+  
+  Download the Windows installer(x32/x64) from the releases assets and follow the steps to setup the app.
 
-### Using prebuild version
-A prebuild version for some operating systems can be downloaded from releases assets. Extract the archive to a folder of your choice and add this folder to the PATH System variable.
+* Use prebuild version
 
-### Building the app by yourself
-In order to build the CLI you need to install .NET Core. It can be downloaded from [HERE](https://www.microsoft.com/net/download/windows).
+  You can download a prebuild version for some operating systems from the releases assets. Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
 
-Build the application for your OS by running the following command from the project root folder:
-```
-dotnet publish -c release -r [rid]
-```
-**NOTE**: Replace **[rid]** with the identifier for your OS. .NET Core RID Catalogue can be found [HERE](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog)
+* Build the app yourself
 
-Example for Windows 10 x64:
-```
-dotnet publish -c release -r win10-x64
-```
-
-Add the following path to the PATH System variable:
-```
-(project_root_path)\bin\release\netcoreapp2.0\(rid)\publish
-```
-The CLI is now ready for use!
+  **PREREQUISITES**: To build the CLI, you need to install [.NET Core](https://www.microsoft.com/net/download/windows).
+  
+  To build the application for your OS, enter the following command from the project root folder:
+  
+  ```dotnet publish -c release -r [rid]```
+  
+  **NOTE**: Replace [rid] with the identifier for your OS. For more information, see the [.NET Core RID Catalogue](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog).
+  
+  **EXAMPLE**: To build the app for Windows 10 x64, enter the following command:
+  
+  ```dotnet publish -c release -r win10-x64```
+  
+  and add the following path to the PATH System variable:
+  
+  ```(project_root_path)\bin\release\netcoreapp2.0\(rid)\publish```
 
 ## How to use
 
 * Open command prompt and navigate to the root of your Sitefinity project (SitefinityWebApp folder).
-* Run ```sf``` command. A help will appear describing the available commands and options.
+* Run ```sf``` command. 
+  
+  A help will appear describing the available commands and options.
 
-## Available commands
+## CLI commands
 
-At the moment the only available command is ```add```. It has 4 subcommands:
+You can use the add command with the following subcommands:
 
-#### Add new Resource package to current project
+* To create a new **Resource package**, execute the following command:
 
-```
-sf add package "Test resource package"
-```
+  ```sf add package "Test resource package"```
 
-#### Add new Page template to current project
+* To create a new **Page template**, execute the following command:
 
-```
-sf add pagetemplate "Test page"
-```
+  ```sf add pagetemplate "Test page"```
 
-#### Add new Grid template to current project
+* To create a new **Grid widget**, execute the following command:
 
-```
-sf add gridtemplate "Test grid"
-```
+  ```sf add gridtemplate "Test grid"```
 
-#### Add new Widget to current project
+* To create a new **Widget**, execute the following command:
 
-```
-sf add widget "CustomWidget"
-```
+  ```sf add widget "CustomWidget"```
 
-For more information about the arguments and options for each command run the help option:
-```
-sf add [command name] -?
-```
+**NOTE**: For more information about the arguments and options for each command, run the help option:
 
-## Sitefinity version
-Every command has an option **"-version"**. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the _"Templates"_ folder, in separate folders for each sitefinity version (starting from 10.2). 
+```sf add [command name] -?```
 
-When running a command the CLI will try to automatically detect Sitefinity version and use the corresponding templates. If it cannot detect the version or Sitefinity version is higher that latest templates version it will be set to the latest available. By using the **"-version"** option it can be explicitly set which templates version should be used.
+## Sitefinity CMS version
 
-Example:
+Every command has an option ```-version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Telates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
+
+When running a command the CLI will try to automatically detect your Sitefinity CMS project version and use the corresponding template. If it cannot detect the version or your Sitefinity CMS version is higher than latest templates version, CLI will use the latest available. 
+
+You can use the ```-version``` option to explicitly set the templates version that CLI should use.
+
+**EXAMPLE**: Following is an example command of using the ```–version``` option:
 ```
 sf add package "New resource package" --version "11.0"
 ```
-The CLI will look for a folder with name _"11.0"_ inside the _"Templates"_ folder. _"11.0"_ folder has to have _"ResourcePackage"_ folder containing templates for a resource package. 
+In this case, the CLI will look for a folder named ```11.0``` inside folder ```Templates```. Folder 11.0 must have ```ResourcePackage``` folder containing templates for a resource package.
 
 ## Template generation
 
-When running a command the CLI will prompt you for the name of the template to be used in generation. The template name can also be set using the option **"--template"**.
+When you run a command, the CLI prompts you to enter the name of the template to be used for the generation. You can also set the name using option ```-template```.
 
-Example:
+**EXAMPLE**: Following is an example command of using the –template option:
 ```
 sf add pagetemplate "New page" --template "CustomPageTemplate"
 ```
-The CLI will look for a file _"CustomPageTemplate.Template"_ in the _"Templates\(version)\Page"_ folder. 
+In this case, the CLI will look for a file ```CustomPageTemplate.Template``` in the folder ```Templates(version)\Page```.
 
 ### Custom templates
 
-Templates use Handlebars syntax. More about it can be found [HERE](https://github.com/rexm/Handlebars.Net).
-Users can easily create custom templates. They should create a file with _".Template"_ extension and place it in the corresponding folder. If the template contains some properties a _"(templateName).config.json"_ file should be created. It must contain all the properties used in the template. The CLI will read the config file and prompt the user to enter the properties when the template is selected.
+Templates use Handlebars syntax. For more information, see [Handlebars.Net](https://github.com/rexm/Handlebars.Net).
 
-Example template file:
+You can easily create custom templates. To do this, create a file with extension ```.Template``` and place it in the corresponding folder. If the template contains some properties, you should also create a ```(templateName).config.json``` file. It must contain all the properties used in the template. The CLI will read the ```.config``` file and prompt you to enter the properties when the template is selected.
+
+**EXAMPLE**: Following is a sample template file:
 ```
 {{> sign}}
 
@@ -100,7 +97,8 @@ Example template file:
 {{time}}
 {{age}}
 ```
-Example config file:
+
+**EXAMPLE**: Following is a sample config file:
 ```json
 [
   "message",
@@ -108,4 +106,4 @@ Example config file:
   "age"
 ]
 ```
-The partial ```{{> sign}}``` is automatically populated by the CLI.
+**NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
