@@ -1,0 +1,6 @@
+﻿@* {{> sign}} *@
+
+@model SitefinityWebApp.Mvc.Models.{{name}}Model
+<div>
+	@Model.Message
+</div>
