@@ -33,6 +33,9 @@ Before doing anything else, we ask that you file an issue in the Issues list for
 
 ### 2. Fork and Branch
 
+#### Install dependancies
+[Sitefinity CLI.Installer](https://github.com/Sitefinity/Sitefinity-CLI/tree/master/Sitefinity%20CLI.Installer) is a WIX project, make  sure Visual Studio 2017 has the [WIX extension](https://marketplace.visualstudio.com/items?itemName=RobMensching.WixToolsetVisualStudio2017Extension) installed 
+
 #### Fork Us, Then Create A Topic Branch For Your Work
 
 The work you are doing for your pull request should not be done in the master branch of your forked repository. Create a topic branch for your work. This allows you to isolate the work you are doing from other changes that may be happening.
