@@ -12,7 +12,7 @@ namespace Sitefinity_CLI.Tests
     [TestClass]
     public class AddTests
     {
-        private readonly string[] TestedTemplateVersions = { "10.2", "11.0" };
+        private List<string> testedTemplateVersions;
 
         private Dictionary<string, string> testFolderPaths;
         private string workingDirectory;
@@ -23,10 +23,12 @@ namespace Sitefinity_CLI.Tests
             var currenPath = Directory.GetCurrentDirectory();
             var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.FullName;
             this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "Debug", "netcoreapp2.0");
+            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            this.testedTemplateVersions = this.GetAllTemplatesVersions(cultureInfo).Select(x => x.ToString("n1", cultureInfo)).ToList();
 
             // create Test folders, where file will be created. They will be deleted afterwards the test ends 
             testFolderPaths = new Dictionary<string, string>();
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 var testFolderPath = Path.Combine(currenPath, $"Test {templatesVersion}");
                 Directory.CreateDirectory(testFolderPath);
@@ -37,7 +39,7 @@ namespace Sitefinity_CLI.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 Directory.Delete(this.testFolderPaths[templatesVersion], true);
             }
@@ -48,7 +50,7 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 var process = ExecuteCommand(
                     commandName: Constants.AddResourcePackageCommandName,
@@ -87,7 +89,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddPageTemplateTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceToResourcePackage(Constants.AddPageTemplateCommandName, Constants.DefaultSourceTemplateName, Constants.RazorFileExtension, Constants.PageTemplatesPath, templatesVersion);
             }
@@ -96,7 +98,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddGridWidgetTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceToResourcePackage(Constants.AddGridWidgetCommandName, Constants.DefaultGridWidgetName, Constants.HtmlFileExtension, Constants.GridWidgetPath, templatesVersion);
             }
@@ -107,7 +109,7 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first create mvc folder
                 var mvcFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], Constants.MVCFolderName);
@@ -167,7 +169,7 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
                 AddResource(Constants.AddResourcePackageCommandName, resourceName, templatesVersion, Constants.DefaultResourcePackageName);
@@ -201,7 +203,7 @@ namespace Sitefinity_CLI.Tests
             var resourceName = "Test";
             var resourcePackageName = "TestResourcePackage";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
                 AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
@@ -240,7 +242,7 @@ namespace Sitefinity_CLI.Tests
             var resourceName = "Test";
             var resourcePackageName = "TestResourcePackage";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
                 AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
@@ -278,7 +280,7 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first create mvc folder
                 var mvcFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], Constants.MVCFolderName);
@@ -314,7 +316,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddResourcePackageNonExistingTemplateTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceNonExistingTemplate(
                 Constants.AddResourcePackageCommandName,
@@ -329,7 +331,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddGridWidgetNonExistingTemplateTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceNonExistingTemplate(
                 Constants.AddGridWidgetCommandName,
@@ -344,7 +346,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddPageTemplateNonExistingTemplateTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceNonExistingTemplate(
                 Constants.AddPageTemplateCommandName,
@@ -359,7 +361,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddWidgetNonExistingTemplateTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first create mvc folder
                 var mvcFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], Constants.MVCFolderName);
@@ -378,7 +380,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddPageTemplateNonExistingResourcePackageTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceNonExistingResourcePackage(Constants.AddPageTemplateCommandName, Constants.DefaultSourceTemplateName, Constants.PageTemplatesPath, templatesVersion);
             }
@@ -387,7 +389,7 @@ namespace Sitefinity_CLI.Tests
         [TestMethod]
         public void AddGridWidgetNonExistingResourcePackageTest()
         {
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceNonExistingResourcePackage(Constants.AddGridWidgetCommandName, Constants.DefaultGridWidgetName, Constants.GridWidgetPath, templatesVersion);
             }
@@ -398,7 +400,7 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 var process = ExecuteCommand(
                 commandName: Constants.AddCustomWidgetCommandName,
@@ -441,7 +443,7 @@ namespace Sitefinity_CLI.Tests
             process.WaitForExit();
 
             // Check output string to verify message
-            var expectedFolderPath = Path.Combine(this.GetLatestTemplatesVersion(), Constants.ResourcePackagesFolderName, resourceName);
+            var expectedFolderPath = Path.Combine(this.testFolderPaths[this.GetLatestTemplatesVersion()], Constants.ResourcePackagesFolderName, resourceName);
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
@@ -457,7 +459,7 @@ namespace Sitefinity_CLI.Tests
             var resourceName = "Test";
             var resourcePackageName = "TestResourcePackage";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
                 AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
@@ -500,7 +502,7 @@ namespace Sitefinity_CLI.Tests
             var resourcePackageName = "TestResourcePackage";
             var templateName = "Test";
 
-            foreach (var templatesVersion in TestedTemplateVersions)
+            foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
                 AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
@@ -698,7 +700,7 @@ namespace Sitefinity_CLI.Tests
             var process = this.CreateNewProcess();
             
             var args = string.Format("sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
-            args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.GetLatestTemplatesVersion());
+            args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 
             if (templateName != null)
             {
@@ -747,10 +749,18 @@ namespace Sitefinity_CLI.Tests
 
         private string GetLatestTemplatesVersion()
         {
+            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            var versions = this.GetAllTemplatesVersions(cultureInfo);
+
+            versions.Sort();
+            return versions.Last().ToString("n1", cultureInfo);
+        }
+
+        private List<float> GetAllTemplatesVersions(CultureInfo cultureInfo)
+        {
             var templatesFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName);
             var directoryNames = Directory.GetDirectories(templatesFolderPath);
             List<float> versions = new List<float>();
-            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
             foreach (var name in directoryNames)
             {
@@ -761,8 +771,7 @@ namespace Sitefinity_CLI.Tests
                 }
             }
 
-            versions.Sort();
-            return versions.Last().ToString("n1", cultureInfo);
+            return versions;
         }
     }
 }
