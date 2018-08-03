@@ -1,0 +1,12 @@
+language: csharp
+
+solution: 'Sitefinity CLI.sln'
+
+mono: none
+
+dotnet: 2.0.0
+
+script:
+  - dotnet restore
+  - dotnet publish -c release -r ubuntu.14.04-x64
+  - dotnet test './Sitefinity CLI.Tests/Sitefinity CLI.Tests.csproj'
