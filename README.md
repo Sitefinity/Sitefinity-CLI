@@ -107,3 +107,4 @@ You can easily create custom templates. To do this, create a file with extension
 ]
 ```
 **NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
+
