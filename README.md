@@ -4,13 +4,13 @@
 
 * Use the installer
   
-  Download the Windows installer(x32/x64) from the releases assets and follow the steps to setup the app.
+  Download the Windows installer(x32/x64) from the [release assets](https://github.com/Sitefinity/Sitefinity-CLI/releases) and follow the steps to setup the app.
 
 * Use prebuild version
 
   You can download a prebuild version for some operating systems from the releases assets. Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
 
-* Build the app yourself
+## Build the app yourself
 
   **PREREQUISITES**: To build the CLI, you need to install [.NET Core](https://www.microsoft.com/net/download/windows).
   
