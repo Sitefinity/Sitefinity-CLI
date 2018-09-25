@@ -8,7 +8,7 @@
 
 * Use prebuild version
 
-  You can download a prebuild version for some operating systems from the releases assets. Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
+  You can download a prebuild version for some operating systems from the [release assets](https://github.com/Sitefinity/Sitefinity-CLI/releases). Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
 
 ## Build the app yourself
 
