@@ -154,7 +154,6 @@ main.scss
 
 // Sitefinity
 @import "../../sitefinity/sass/components/icons/sf-icon-font";
-@import "../../sitefinity/sass/widgets/socialShare/sf-sprite";
 @import "../../sitefinity.sass/sitefinity.svss";
 
 //Import .scss files here
