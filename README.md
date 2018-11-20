@@ -49,7 +49,7 @@ You can use the add command with the following subcommands:
 
 * To create a new **Grid widget**, execute the following command:
 
-  ```sf add gridtemplate "Test grid"```
+  ```sf add gridwidget "Test grid"```
 
 * To create a new **Widget**, execute the following command:
 
