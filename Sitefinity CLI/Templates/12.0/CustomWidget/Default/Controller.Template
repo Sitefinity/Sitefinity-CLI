@@ -1,0 +1,22 @@
+﻿/* {{> sign}} */
+
+using SitefinityWebApp.Mvc.Models;
+using System.Web.Mvc;
+using Telerik.Sitefinity.Mvc;
+
+namespace SitefinityWebApp.Mvc.Controllers
+{
+	[ControllerToolboxItem(Name = "{{name}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
+	public class {{name}}Controller : Controller
+	{
+		// GET: {{name}}
+		public ActionResult Index()
+		{
+			var model = new {{name}}Model();
+			model.Message = this.Message;
+			return View(model);
+		}
+
+		public string Message { get; set; }
+	}
+}
