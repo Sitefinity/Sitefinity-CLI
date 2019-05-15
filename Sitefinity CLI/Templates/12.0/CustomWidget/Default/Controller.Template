@@ -16,6 +16,11 @@ namespace SitefinityWebApp.Mvc.Controllers
 			model.Message = this.Message;
 			return View(model);
 		}
+		
+        protected override void HandleUnknownAction(string actionName)
+        {
+            this.ActionInvoker.InvokeAction(this.ControllerContext, "Index");
+        }
 
 		public string Message { get; set; }
 	}

@@ -69,7 +69,7 @@ namespace Sitefinity_CLI
         public const string AddCustomWidgetCommandFullName = "Widget";
         public const string GenerateConfigCommandName = "config";
 
-        public const string DefaultResourcePackageName = "Bootstrap";
+        public const string DefaultResourcePackageName = "Bootstrap4";
         public const string DefaultGridWidgetName = "grid-6+6";
         public const string DefaultSourceTemplateName = "Default";
     }
