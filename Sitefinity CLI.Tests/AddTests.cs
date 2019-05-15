@@ -56,7 +56,7 @@ namespace Sitefinity_CLI.Tests
                     commandName: Constants.AddResourcePackageCommandName,
                     resourceName: resourceName,
                     templatesVersion: templatesVersion,
-                    templateName: Constants.DefaultResourcePackageName);
+                    templateName: this.GetDefaulResourcetPackage(templatesVersion));
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
@@ -78,7 +78,7 @@ namespace Sitefinity_CLI.Tests
                 Assert.IsTrue(Directory.Exists(expectedFolderPath));
 
                 // Compare folders content
-                var resourcePackageDefaultTemplateFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, templatesVersion, Constants.ResourcePackageTemplatesFolderName, Constants.DefaultResourcePackageName);
+                var resourcePackageDefaultTemplateFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, templatesVersion, Constants.ResourcePackageTemplatesFolderName, this.GetDefaulResourcetPackage(templatesVersion));
                 var dir1Files = Directory.EnumerateFiles(resourcePackageDefaultTemplateFolderPath, "*", SearchOption.AllDirectories).Select(Path.GetFileName);
                 var dir2Files = Directory.EnumerateFiles(expectedFolderPath, "*", SearchOption.AllDirectories).Select(Path.GetFileName);
                 var diffs = dir1Files.Except(dir2Files);
@@ -172,13 +172,13 @@ namespace Sitefinity_CLI.Tests
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
-                AddResource(Constants.AddResourcePackageCommandName, resourceName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourceName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
 
                 var process = ExecuteCommand(
                     commandName: Constants.AddResourcePackageCommandName,
                     resourceName: resourceName,
                     templatesVersion: templatesVersion,
-                    templateName: Constants.DefaultResourcePackageName);
+                    templateName: this.GetDefaulResourcetPackage(templatesVersion));
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
@@ -206,7 +206,7 @@ namespace Sitefinity_CLI.Tests
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
-                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
 
                 // then a page template
                 AddResource(Constants.AddPageTemplateCommandName, resourceName, templatesVersion, Constants.DefaultSourceTemplateName, resourcePackageName);
@@ -245,7 +245,7 @@ namespace Sitefinity_CLI.Tests
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
-                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
 
                 // then a grid template
                 AddResource(Constants.AddGridWidgetCommandName, resourceName, templatesVersion, Constants.DefaultGridWidgetName, resourcePackageName);
@@ -462,7 +462,7 @@ namespace Sitefinity_CLI.Tests
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
-                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
 
                 var process = ExecuteCommand(
                     commandName: Constants.AddGridWidgetCommandName,
@@ -505,7 +505,7 @@ namespace Sitefinity_CLI.Tests
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 // first we create a resource package
-                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
 
                 var process = ExecuteCommand(
                     commandName: Constants.AddPageTemplateCommandName,
@@ -570,13 +570,28 @@ namespace Sitefinity_CLI.Tests
             }
         }
 
+        private string GetDefaulResourcetPackage(string version)
+        {
+            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+            var versionValue = float.Parse(version, cultureInfo.NumberFormat);
+            if (versionValue < 12)
+            {
+                return Constants.DefaultResourcePackageName_VersionsBefore12_0;
+            }
+            else
+            {
+                return Constants.DefaultResourcePackageName;
+            }
+        }
+
         private void AddResourceToResourcePackage(string commandName, string defaultTemplateName, string fileExtension, string templatePath, string templatesVersion)
         {
             var resourceName = "Test";
             var resourcePackageName = "TestResourcePackage";
 
             // first we create a resource package
-            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+            AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
 
             var process = ExecuteCommand(
                 commandName: commandName,
@@ -614,7 +629,7 @@ namespace Sitefinity_CLI.Tests
             if (createResourcePackage)
             {
                 resourcePackageName = "TestResourcePackage";
-                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, Constants.DefaultResourcePackageName);
+                AddResource(Constants.AddResourcePackageCommandName, resourcePackageName, templatesVersion, this.GetDefaulResourcetPackage(templatesVersion));
             }
 
             var process = ExecuteCommand(
