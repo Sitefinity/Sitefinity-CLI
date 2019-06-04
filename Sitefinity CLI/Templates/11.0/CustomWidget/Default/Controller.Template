@@ -5,10 +5,10 @@ using System.Web.Mvc;
 using Telerik.Sitefinity.Mvc;
 using Telerik.Sitefinity.Personalization;
 
-namespace SitefinityWebApp.Mvc.Controllers : IPersonalizable
+namespace SitefinityWebApp.Mvc.Controllers
 {
 	[ControllerToolboxItem(Name = "{{name}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
-	public class {{name}}Controller : Controller
+	public class {{name}}Controller : Controller, IPersonalizable
 	{
 		// GET: {{name}}
 		public ActionResult Index()
