@@ -23,6 +23,7 @@ namespace Sitefinity_CLI
 
         public void AddFileToCsproj(string filePath)
         {
+            Utils.WriteLine($"Attempting to add file to {_xmlFilePath}");
             if (!Validate())
             {
                 return;
@@ -35,6 +36,7 @@ namespace Sitefinity_CLI
             {
                 elem = new XElement(CompileElem, new XAttribute(IncludeProperty, filePath));
                 parent.Add(elem);
+                Utils.WriteLine($"File added to {_xmlFilePath}");
             }
         }
 
@@ -57,6 +59,7 @@ namespace Sitefinity_CLI
         public void SaveDocument()
         {
             _doc.Save(_xmlFilePath);
+            Utils.WriteLine($"File {_xmlFilePath} saved", ConsoleColor.Green);
         }
 
         private XElement GetFirstParentWithCompileElements()

@@ -14,13 +14,15 @@ namespace Sitefinity_CLI.Commands
     [HelpOption]
     internal abstract class CommandBase
     {
+        protected CsProjModifier _csProjModifier;
+
         [Argument(0, Description = Constants.NameArgumentDescription)]
         [Required(ErrorMessage = "You must specify the name of the resource!")]
         public string Name { get; set; }
 
         [Option("-r|--root", Constants.ProjectRoothPathOptionDescription, CommandOptionType.SingleValue)]
         public string ProjectRootPath { get; set; }
-        
+
         public abstract string TemplateName { get; set; }
 
         [Option("-v|--version", Constants.VersionOptionDescription, CommandOptionType.SingleValue)]
@@ -56,6 +58,7 @@ namespace Sitefinity_CLI.Commands
             if (this.ProjectRootPath == null)
             {
                 this.ProjectRootPath = Environment.CurrentDirectory;
+                _csProjModifier = new CsProjModifier(GetCsprojFileName());
             }
 
             var assemblyName = Path.GetFileName(this.ProjectRootPath);
@@ -95,7 +98,7 @@ namespace Sitefinity_CLI.Commands
                     }
                 }
             }
-            
+
             if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
                 var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
@@ -150,6 +153,8 @@ namespace Sitefinity_CLI.Commands
             var result = template(data);
 
             File.WriteAllText(filePath, result);
+            _csProjModifier.AddFileToCsproj(filePath);
+            _csProjModifier.SaveDocument();
             Utils.WriteLine(string.Format(Constants.FileCreatedMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Green);
             return 0;
         }
@@ -194,6 +199,17 @@ namespace Sitefinity_CLI.Commands
             }
 
             return data;
+        }
+
+        private string GetCsprojFileName()
+        {
+            string csProjFilePath = Directory.GetFiles(this.ProjectRootPath, "*.csproj").FirstOrDefault();
+            if (string.IsNullOrEmpty(csProjFilePath))
+            {
+                throw new Exception(".csproj file not found");
+            }
+
+            return csProjFilePath;
         }
     }
 }
