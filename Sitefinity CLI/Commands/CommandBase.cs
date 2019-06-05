@@ -20,7 +20,7 @@ namespace Sitefinity_CLI.Commands
 
         [Option("-r|--root", Constants.ProjectRoothPathOptionDescription, CommandOptionType.SingleValue)]
         public string ProjectRootPath { get; set; }
-        
+
         public abstract string TemplateName { get; set; }
 
         [Option("-v|--version", Constants.VersionOptionDescription, CommandOptionType.SingleValue)]
@@ -36,8 +36,8 @@ namespace Sitefinity_CLI.Commands
 
         public CommandBase()
         {
-            this.CurrentPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            this.AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.CurrentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            this.AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             var data = new
             {
@@ -95,7 +95,7 @@ namespace Sitefinity_CLI.Commands
                     }
                 }
             }
-            
+
             if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
                 var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
@@ -151,6 +151,7 @@ namespace Sitefinity_CLI.Commands
 
             File.WriteAllText(filePath, result);
             Utils.WriteLine(string.Format(Constants.FileCreatedMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Green);
+
             return 0;
         }
 

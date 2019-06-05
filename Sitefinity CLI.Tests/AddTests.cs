@@ -713,7 +713,7 @@ namespace Sitefinity_CLI.Tests
         private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion = null, string templateName = null, string resourcePackageName = null)
         {
             var process = this.CreateNewProcess();
-            
+
             var args = string.Format("sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 

@@ -36,6 +36,8 @@ namespace Sitefinity_CLI
         public const string ProducedFilesVersionMessage = "Created files are compatible with Sitefinity CMS version {0}";
         public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity CMS. Do you wish to proceed?";
         public const string AddFilesToProjectMessage = "The file(s) should be added to the project manually.";
+        public const string FilesAddedToProjectMessage = "The file(s) are added to the project successfully.";
+        public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add the file(s) to the project.";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
@@ -55,7 +57,9 @@ namespace Sitefinity_CLI
         public const string RazorFileExtension = ".cshtml";
         public const string HtmlFileExtension = ".html";
         public const string CSharpFileExtension = ".cs";
+        public const string VBFileExtension = ".vb";
         public const string JavaScriptFileExtension = ".js";
+        public const string CsprojFileExtension = ".csproj";
 
         // Command names
         public const string AddCommandName = "add";
@@ -73,5 +77,13 @@ namespace Sitefinity_CLI
         public const string DefaultResourcePackageName = "Bootstrap4";
         public const string DefaultGridWidgetName = "grid-6+6";
         public const string DefaultSourceTemplateName = "Default";
+
+        // cs proj modifier constants
+        public const string ItemGroupElem = "ItemGroup";
+        public const string CompileElem = "Compile";
+        public const string ContentElem = "Content";
+        public const string ProjectElem = "Project";
+        public const string IncludeAttribute = "Include";
+        public const string XmlnsAttribute = "xmlns";
     }
 }
