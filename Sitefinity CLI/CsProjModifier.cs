@@ -66,7 +66,7 @@ namespace Sitefinity_CLI
 
             try
             {
-                _doc = new XDocument(_csProjFileName);
+                _doc = XDocument.Load(_csProjFileName);
             }
             catch
             {
