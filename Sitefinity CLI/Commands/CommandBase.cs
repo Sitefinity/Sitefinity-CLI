@@ -58,7 +58,7 @@ namespace Sitefinity_CLI.Commands
             if (this.ProjectRootPath == null)
             {
                 this.ProjectRootPath = Environment.CurrentDirectory;
-                _csProjModifier = new CsProjModifier(Directory.GetFiles(this.ProjectRootPath, "*.csproj").FirstOrDefault());
+                _csProjModifier = new CsProjModifier(Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault());
             }
 
             var assemblyName = Path.GetFileName(this.ProjectRootPath);

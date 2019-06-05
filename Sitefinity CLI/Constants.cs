@@ -56,6 +56,7 @@ namespace Sitefinity_CLI
         public const string HtmlFileExtension = ".html";
         public const string CSharpFileExtension = ".cs";
         public const string JavaScriptFileExtension = ".js";
+        public const string CsprojFileExtension = ".csproj";
 
         // Command names
         public const string AddCommandName = "add";
