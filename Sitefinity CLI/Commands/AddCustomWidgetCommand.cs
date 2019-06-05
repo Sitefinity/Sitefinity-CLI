@@ -94,7 +94,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             Utils.WriteLine(string.Format(Constants.CustomWidgetCreatedMessage, this.Name), ConsoleColor.Green);
-            Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
             return 0;
         }
 
