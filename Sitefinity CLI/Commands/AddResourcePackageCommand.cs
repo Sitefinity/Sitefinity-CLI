@@ -51,6 +51,7 @@ namespace Sitefinity_CLI.Commands
 
             Utils.WriteLine(string.Format(Constants.ResourcePackageCreatedMessage, directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);
             Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
+
             return 0;
         }
     }
