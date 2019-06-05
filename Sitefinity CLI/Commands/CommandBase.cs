@@ -58,7 +58,7 @@ namespace Sitefinity_CLI.Commands
             if (this.ProjectRootPath == null)
             {
                 this.ProjectRootPath = Environment.CurrentDirectory;
-                _csProjModifier = new CsProjModifier(GetCsprojFileName());
+                _csProjModifier = new CsProjModifier(Directory.GetFiles(this.ProjectRootPath, "*.csproj").FirstOrDefault());
             }
 
             var assemblyName = Path.GetFileName(this.ProjectRootPath);
@@ -199,17 +199,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             return data;
-        }
-
-        private string GetCsprojFileName()
-        {
-            string csProjFilePath = Directory.GetFiles(this.ProjectRootPath, "*.csproj").FirstOrDefault();
-            if (string.IsNullOrEmpty(csProjFilePath))
-            {
-                throw new Exception(".csproj file not found");
-            }
-
-            return csProjFilePath;
         }
     }
 }
