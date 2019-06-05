@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace Sitefinity_CLI
@@ -9,6 +10,7 @@ namespace Sitefinity_CLI
         private const string CompileElem = "Compile";
         private const string IncludeProperty = "Include";
         private const string CsprojNotFoundMessage = ".csproj file was not found.";
+        private const string UnableToAddFileMessage = "Unable to add file to solution.";
 
         private readonly string _csProjFileName;
         private XDocument _doc;
@@ -44,18 +46,32 @@ namespace Sitefinity_CLI
 
         public void SaveDocument()
         {
-            _doc.Save(_csProjFileName);
+            try
+            {
+                _doc.Save(_csProjFileName);
+            }
+            catch
+            {
+                ShowUnableToAddFileMessage(UnableToAddFileMessage);
+            }
         }
 
         private void CreateXDocument()
         {
             if (string.IsNullOrEmpty(_csProjFileName))
             {
-                Utils.WriteLine($"{CsprojNotFoundMessage} {Constants.AddFilesToProjectMessage}");
+                ShowUnableToAddFileMessage(CsprojNotFoundMessage);
                 return;
             }
 
-            _doc = new XDocument(_csProjFileName);
+            try
+            {
+                _doc = new XDocument(_csProjFileName);
+            }
+            catch
+            {
+                ShowUnableToAddFileMessage();
+            }
         }
 
         private XElement GetFirstParentWithCompileElements()
@@ -74,6 +90,12 @@ namespace Sitefinity_CLI
                 .FirstOrDefault();
 
             return elem;
+        }
+
+        private void ShowUnableToAddFileMessage(string additionalMessage = "")
+        {
+            string fullMessage = string.IsNullOrEmpty(additionalMessage) ? Constants.AddFilesToProjectMessage : $"{additionalMessage} {Constants.AddFilesToProjectMessage}";
+            Utils.WriteLine(fullMessage, ConsoleColor.Yellow);
         }
     }
 }
