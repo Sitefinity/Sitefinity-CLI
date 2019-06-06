@@ -8,7 +8,9 @@ namespace Sitefinity_CLI
     {
         private const string ItemGroupElem = "ItemGroup";
         private const string CompileElem = "Compile";
-        private const string IncludeProperty = "Include";
+        private const string ProjectElem = "Project";
+        private const string IncludeAttribute = "Include";
+        private const string XmlnsAttribute = "xmlns";
         private const string CsprojNotFoundMessage = ".csproj file was not found.";
         private const string UnableToAddFileMessage = "Unable to add file to solution.";
 
@@ -23,20 +25,30 @@ namespace Sitefinity_CLI
 
         public void AddFileToCsproj(string filePath)
         {
-            XElement parent = GetFirstParentWithCompileElements();
-            XElement elem = GetElementByAttributeValue(parent, filePath);
+            XElement compileElement = GetCompileElementByAttributeValue(filePath);
 
-            if (elem == null)
+            if (compileElement == null)
             {
-                elem = new XElement(CompileElem, new XAttribute(IncludeProperty, filePath));
-                parent.Add(elem);
+                XElement projectElement = _doc.Descendants().First(x => x.Name.ToString().EndsWith(ProjectElem));
+                XNamespace projectElementXmlnsAttributeValue = projectElement.Attribute(XmlnsAttribute).Value;
+                XElement itemGroupElement = GetFirstItemGroupElementWithCompileElements();
+
+                if (itemGroupElement == null)
+                {
+                    // sets the xmlns attr to be the one that is in the project element, so that no xmlns is added by default
+                    itemGroupElement = new XElement(projectElementXmlnsAttributeValue + ItemGroupElem);
+                    projectElement.Add(itemGroupElement);
+                }
+
+                // sets the xmlns attr to be the one that is in the project element, so that no xmlns is added by default
+                compileElement = new XElement(projectElementXmlnsAttributeValue + CompileElem, new XAttribute(IncludeAttribute, filePath));
+                itemGroupElement.Add(compileElement);
             }
         }
 
         public void RemoveFileFromCsProj(string filePath)
         {
-            XElement parent = GetFirstParentWithCompileElements();
-            XElement elem = GetElementByAttributeValue(parent, filePath);
+            XElement elem = GetCompileElementByAttributeValue(filePath);
 
             if (elem != null)
             {
@@ -74,7 +86,7 @@ namespace Sitefinity_CLI
             }
         }
 
-        private XElement GetFirstParentWithCompileElements()
+        private XElement GetFirstItemGroupElementWithCompileElements()
         {
             XElement parent = _doc.Descendants()
                     .FirstOrDefault(x => x.Name.ToString().EndsWith(ItemGroupElem)
@@ -83,11 +95,12 @@ namespace Sitefinity_CLI
             return parent;
         }
 
-        private XElement GetElementByAttributeValue(XElement parent, string value)
+        private XElement GetCompileElementByAttributeValue(string value)
         {
-            XElement elem = parent.Descendants()
-                .Where(x => x.Attribute(IncludeProperty).Value == value)
-                .FirstOrDefault();
+            XElement elem = _doc.Descendants()
+                    .Where(x => x.Name.ToString().EndsWith(CompileElem)
+                            && x.Attribute(IncludeAttribute)?.Value == value)
+                                .FirstOrDefault();
 
             return elem;
         }
