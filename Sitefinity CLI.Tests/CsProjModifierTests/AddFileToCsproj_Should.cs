@@ -19,8 +19,8 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
         private CsProjModifier _csProjModifier;
 
         // save the initial state of the csproj files
-        private XDocument _initialCsprojWithCompile;
-        private XDocument _initialCsprojWithoutCompile;
+        private readonly XDocument _initialCsprojWithCompile;
+        private readonly XDocument _initialCsprojWithoutCompile;
 
         public AddFileToCsproj_Should()
         {
@@ -54,10 +54,29 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             int compileElementsBeforeAddCount = _initialCsprojWithCompile.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem)).Count();
             int compileElementsAfterAddCount = compileElementsAfterAdd.Count();
 
-            Assert.AreEqual(compileElementsBeforeAddCount + 1, compileElementsAfterAddCount);
+            Assert.AreNotEqual(compileElementsBeforeAddCount, compileElementsAfterAddCount);
 
             XElement newCompileElem = compileElementsAfterAdd.Last();
             Assert.AreEqual(TestFileDummyPath, newCompileElem.Attribute(Constants.IncludeAttribute).Value);
+        }
+
+        [TestMethod]
+        public void SuccessfullyRemoveFile_When_CsProjHasOtherCompileElements()
+        {
+            IEnumerable<XElement> compileElementsBeforeRemove = _initialCsprojWithCompile.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
+            string firstCompileElementIncludeValue = compileElementsBeforeRemove.First().Attribute(Constants.IncludeAttribute).Value;
+
+            _csProjModifier = new CsProjModifier(CsProjWithCompileElementsPath);
+            _csProjModifier.RemoveFileFromCsProj(firstCompileElementIncludeValue);
+            _csProjModifier.SaveDocument();
+
+            XDocument resultCsproj = XDocument.Load(CsProjWithCompileElementsPath);
+            IEnumerable<XElement> compileElementsAfterRemove = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
+
+            int compileElementsBeforeRemoveCount = compileElementsBeforeRemove.Count();
+            int compileElementsAfterRemoveCount = compileElementsAfterRemove.Count();
+
+            Assert.AreNotEqual(compileElementsAfterRemoveCount, compileElementsBeforeRemoveCount);
         }
 
         [TestCleanup]
