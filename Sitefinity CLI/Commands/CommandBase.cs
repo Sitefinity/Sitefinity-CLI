@@ -14,8 +14,6 @@ namespace Sitefinity_CLI.Commands
     [HelpOption]
     internal abstract class CommandBase
     {
-        protected CsProjModifier _csProjModifier;
-
         [Argument(0, Description = Constants.NameArgumentDescription)]
         [Required(ErrorMessage = "You must specify the name of the resource!")]
         public string Name { get; set; }
@@ -38,8 +36,8 @@ namespace Sitefinity_CLI.Commands
 
         public CommandBase()
         {
-            this.CurrentPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            this.AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.CurrentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            this.AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             var data = new
             {
@@ -58,7 +56,6 @@ namespace Sitefinity_CLI.Commands
             if (this.ProjectRootPath == null)
             {
                 this.ProjectRootPath = Environment.CurrentDirectory;
-                _csProjModifier = new CsProjModifier(Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault());
             }
 
             var assemblyName = Path.GetFileName(this.ProjectRootPath);
@@ -153,9 +150,9 @@ namespace Sitefinity_CLI.Commands
             var result = template(data);
 
             File.WriteAllText(filePath, result);
-            _csProjModifier.AddFileToCsproj(filePath);
-            _csProjModifier.SaveDocument();
             Utils.WriteLine(string.Format(Constants.FileCreatedMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Green);
+            AddFileToCsProj(filePath);
+
             return 0;
         }
 
@@ -177,6 +174,24 @@ namespace Sitefinity_CLI.Commands
 
             versions.Sort();
             return versions.Last().ToString("n1", cultureInfo);
+        }
+
+        private void AddFileToCsProj(string filePath)
+        {
+            CsProjModifier csProjModifier = CreateCsProjModifier();
+
+            if (csProjModifier != null)
+            {
+                csProjModifier.AddFileToCsproj(filePath);
+                csProjModifier.SaveDocument();
+            }
+        }
+
+        private CsProjModifier CreateCsProjModifier()
+        {
+            string csprojFilePath = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
+
+            return string.IsNullOrEmpty(csprojFilePath) ? null : new CsProjModifier(csprojFilePath);
         }
 
         protected IDictionary<string, string> GetTemplateData(string templatePath)
