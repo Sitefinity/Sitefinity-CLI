@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -38,6 +39,25 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             XElement compileElem = resultCsproj.Descendants().FirstOrDefault(x => x.Name.ToString().EndsWith(Constants.CompileElem));
             Assert.IsNotNull(compileElem);
             Assert.AreEqual(TestFileDummyPath, compileElem.Attribute(Constants.IncludeAttribute).Value);
+        }
+
+        [TestMethod]
+        public void SuccessfullyAddNewFile_When_CsProjHasOtherCompileElements()
+        {
+            _csProjModifier = new CsProjModifier(CsProjWithCompileElementsPath);
+            _csProjModifier.AddFileToCsproj(TestFileDummyPath);
+            _csProjModifier.SaveDocument();
+
+            XDocument resultCsproj = XDocument.Load(CsProjWithCompileElementsPath);
+            IEnumerable<XElement> compileElementsAfterAdd = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
+
+            int compileElementsBeforeAddCount = _initialCsprojWithCompile.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem)).Count();
+            int compileElementsAfterAddCount = compileElementsAfterAdd.Count();
+
+            Assert.AreEqual(compileElementsBeforeAddCount + 1, compileElementsAfterAddCount);
+
+            XElement newCompileElem = compileElementsAfterAdd.Last();
+            Assert.AreEqual(TestFileDummyPath, newCompileElem.Attribute(Constants.IncludeAttribute).Value);
         }
 
         [TestCleanup]
