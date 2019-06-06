@@ -34,7 +34,7 @@ namespace Sitefinity_CLI.Commands
 
         protected bool IsSitefinityProject { get; set; } = true;
 
-        protected bool ShowAddFilesToProjectMessage {get; set;}
+        protected bool ShowAddFilesToProjectMessage { get; set; }
 
         public CommandBase()
         {
