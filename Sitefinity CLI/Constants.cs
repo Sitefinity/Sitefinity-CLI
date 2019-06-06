@@ -74,5 +74,14 @@ namespace Sitefinity_CLI
         public const string DefaultResourcePackageName = "Bootstrap4";
         public const string DefaultGridWidgetName = "grid-6+6";
         public const string DefaultSourceTemplateName = "Default";
+
+        // cs proj modifier constants
+        public const string ItemGroupElem = "ItemGroup";
+        public const string CompileElem = "Compile";
+        public const string ProjectElem = "Project";
+        public const string IncludeAttribute = "Include";
+        public const string XmlnsAttribute = "xmlns";
+        public const string CsprojNotFoundMessage = ".csproj file was not found.";
+        public const string UnableToAddFileMessage = "Unable to add file to solution.";
     }
 }
