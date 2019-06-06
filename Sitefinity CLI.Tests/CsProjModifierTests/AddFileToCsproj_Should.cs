@@ -61,6 +61,25 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
         }
 
         [TestMethod]
+        public void NotAddFileTwice_When_CsProjAlreadyHasTheSameCompileElement()
+        {
+            IEnumerable<XElement> compileElementsBeforeAdd = _initialCsprojWithCompile.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
+            string firstCompileElementIncludeValue = compileElementsBeforeAdd.First().Attribute(Constants.IncludeAttribute).Value;
+
+            _csProjModifier = new CsProjModifier(CsProjWithCompileElementsPath);
+            _csProjModifier.AddFileToCsproj(firstCompileElementIncludeValue);
+            _csProjModifier.SaveDocument();
+
+            XDocument resultCsproj = XDocument.Load(CsProjWithCompileElementsPath);
+            IEnumerable<XElement> compileElementsAfterAdd = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
+
+            int compileElementsBeforeAddCount = compileElementsBeforeAdd.Count();
+            int compileElementsAfterAddCount = compileElementsAfterAdd.Count();
+
+            Assert.AreEqual(compileElementsAfterAddCount, compileElementsBeforeAddCount);
+        }
+
+        [TestMethod]
         public void SuccessfullyRemoveFile_When_CsProjHasOtherCompileElements()
         {
             IEnumerable<XElement> compileElementsBeforeRemove = _initialCsprojWithCompile.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
