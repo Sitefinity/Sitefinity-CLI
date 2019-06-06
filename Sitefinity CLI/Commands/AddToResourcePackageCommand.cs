@@ -39,6 +39,10 @@ namespace Sitefinity_CLI.Commands
             data["version"] = this.AssemblyVersion;
 
             var result = this.CreateFileFromTemplate(filePath, templateFile, config.FullName, data);
+            if (this.ShowAddFilesToProjectMessage)
+            {
+                Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
+            }
 
             return result;
         }

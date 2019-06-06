@@ -42,7 +42,7 @@ namespace Sitefinity_CLI.Commands
                     return 1;
                 }
             }
-            
+
             Directory.CreateDirectory(viewsFolderPath);
             Directory.CreateDirectory(scriptsFolderPath);
             Directory.CreateDirectory(controllersFolderPath);
@@ -94,6 +94,11 @@ namespace Sitefinity_CLI.Commands
             }
 
             Utils.WriteLine(string.Format(Constants.CustomWidgetCreatedMessage, this.Name), ConsoleColor.Green);
+            if (this.ShowAddFilesToProjectMessage)
+            {
+                Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
+            }
+
             return 0;
         }
 
@@ -107,7 +112,7 @@ namespace Sitefinity_CLI.Commands
 
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
-            if(base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
+            if (base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
             {
                 throw new Exception(string.Format("An error occured while creating an item from template. Path: {0}", filePath));
             }

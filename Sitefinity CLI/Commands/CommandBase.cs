@@ -34,6 +34,8 @@ namespace Sitefinity_CLI.Commands
 
         protected bool IsSitefinityProject { get; set; } = true;
 
+        protected bool ShowAddFilesToProjectMessage {get; set;}
+
         public CommandBase()
         {
             this.CurrentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -184,6 +186,12 @@ namespace Sitefinity_CLI.Commands
             {
                 csProjModifier.AddFileToCsproj(filePath);
                 csProjModifier.SaveDocument();
+
+                this.ShowAddFilesToProjectMessage = !csProjModifier.FilesModifiedSuccessfully;
+            }
+            else
+            {
+                this.ShowAddFilesToProjectMessage = true;
             }
         }
 

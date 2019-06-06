@@ -71,6 +71,7 @@ namespace Sitefinity_CLI.Tests
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
                 expectedOutputString.AppendLine(string.Format(Constants.ResourcePackageCreatedMessage, resourceName, expectedFolderPath));
+                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
 
                 // Check if folder ResourcePackages is created
@@ -158,6 +159,7 @@ namespace Sitefinity_CLI.Tests
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
                 expectedOutputString.AppendLine(string.Format(Constants.CustomWidgetCreatedMessage, resourceName));
+                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -447,6 +449,7 @@ namespace Sitefinity_CLI.Tests
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
             expectedOutputString.AppendLine(string.Format(Constants.ProducedFilesVersionMessage, this.GetLatestTemplatesVersion()));
             expectedOutputString.AppendLine(string.Format(Constants.ResourcePackageCreatedMessage, resourceName, expectedFolderPath));
+            expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -487,6 +490,7 @@ namespace Sitefinity_CLI.Tests
 
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
+                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -556,6 +560,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
 
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
+                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
 
                 // assert file content
                 var filePath = Path.Combine(folderPath, fileName);
@@ -611,6 +616,7 @@ namespace Sitefinity_CLI.Tests
 
             AssertFileCreated(folderPath, fileName, expectedOutputString);
 
+            expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 

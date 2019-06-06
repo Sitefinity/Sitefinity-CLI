@@ -15,6 +15,8 @@ namespace Sitefinity_CLI
             CreateXDocument();
         }
 
+        public bool FilesModifiedSuccessfully { get; private set; }
+
         public void AddFileToCsproj(string filePath)
         {
             XElement compileElement = GetCompileElementByAttributeValue(filePath);
@@ -53,10 +55,12 @@ namespace Sitefinity_CLI
             try
             {
                 _doc.Save(_csProjFileName);
+                FilesModifiedSuccessfully = true;
             }
             catch
             {
                 ShowUnableToAddFileMessage(Constants.UnableToAddFileMessage);
+                FilesModifiedSuccessfully = false;
             }
         }
 
@@ -65,6 +69,7 @@ namespace Sitefinity_CLI
             if (string.IsNullOrEmpty(_csProjFileName))
             {
                 ShowUnableToAddFileMessage(Constants.CsprojNotFoundMessage);
+                FilesModifiedSuccessfully = false;
                 return;
             }
 
@@ -75,6 +80,7 @@ namespace Sitefinity_CLI
             catch
             {
                 ShowUnableToAddFileMessage();
+                FilesModifiedSuccessfully = false;
             }
         }
 
