@@ -16,4 +16,13 @@
     <ProjectReference Include="..\Sitefinity CLI\Sitefinity CLI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="CsProjModifierTests\Data\WithoutCompileElements.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="CsProjModifierTests\Data\WithCompileElements.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
+[assembly: InternalsVisibleTo("Sitefinity CLI.Tests")]
 namespace Sitefinity_CLI
 {
     internal class CsProjModifier
