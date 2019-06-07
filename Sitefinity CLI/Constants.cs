@@ -81,7 +81,5 @@ namespace Sitefinity_CLI
         public const string ProjectElem = "Project";
         public const string IncludeAttribute = "Include";
         public const string XmlnsAttribute = "xmlns";
-        public const string CsprojNotFoundMessage = ".csproj file was not found.";
-        public const string UnableToAddFileMessage = "Unable to add file to solution.";
     }
 }
