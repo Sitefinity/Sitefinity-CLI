@@ -111,6 +111,7 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
+        // TODO: If needed in other commands, move this method to CommandBase
         private void DeleteFiles()
         {
             foreach (var filePath in this.createdFiles)
@@ -119,6 +120,7 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
+        // TODO: If needed in other commands, move this method to CommandBase
         private bool AddFilesToCsProj()
         {
             string csprojFilePath = GetCsprojFilePath();
@@ -127,6 +129,7 @@ namespace Sitefinity_CLI.Commands
             return filesAdded;
         }
 
+        // TODO: If needed in other commands, move this method to CommandBase
         private void RemoveFilesFromCsproj()
         {
             string csProjFilePath = GetCsprojFilePath();
