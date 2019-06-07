@@ -17,10 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="CsProjModifierTests\Data\WithoutCompileElements.csproj">
+    <None Include="CsProjModifierTests\Data\WithoutElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="CsProjModifierTests\Data\WithCompileElements.csproj">
+    <None Include="CsProjModifierTests\Data\WithElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

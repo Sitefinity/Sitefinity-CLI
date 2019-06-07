@@ -72,7 +72,7 @@ namespace Sitefinity_CLI
                 }
 
                 // sets the xmlns attr to be the one that is in the project element, so that no xmlns is added by default
-                element = new XElement(projectElementXmlnsAttributeValue + Constants.CompileElem, new XAttribute(Constants.IncludeAttribute, filePath));
+                element = new XElement(projectElementXmlnsAttributeValue + elementType, new XAttribute(Constants.IncludeAttribute, filePath));
                 itemGroupElement.Add(element);
             }
         }
