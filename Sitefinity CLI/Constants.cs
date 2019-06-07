@@ -56,6 +56,7 @@ namespace Sitefinity_CLI
         public const string RazorFileExtension = ".cshtml";
         public const string HtmlFileExtension = ".html";
         public const string CSharpFileExtension = ".cs";
+        public const string VBFileExtension = ".vb";
         public const string JavaScriptFileExtension = ".js";
         public const string CsprojFileExtension = ".csproj";
 
@@ -79,6 +80,7 @@ namespace Sitefinity_CLI
         // cs proj modifier constants
         public const string ItemGroupElem = "ItemGroup";
         public const string CompileElem = "Compile";
+        public const string ContentElem = "Content";
         public const string ProjectElem = "Project";
         public const string IncludeAttribute = "Include";
         public const string XmlnsAttribute = "xmlns";

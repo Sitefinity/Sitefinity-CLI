@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
@@ -54,13 +55,14 @@ namespace Sitefinity_CLI
 
         private static void AddFile(XDocument doc, string filePath)
         {
-            XElement compileElement = GetCompileElementByAttributeValue(doc, filePath);
+            string elementType = GetXElementType(filePath);
+            XElement element = GetXElementByAttributeValue(doc, filePath, elementType);
 
-            if (compileElement == null)
+            if (element == null)
             {
                 XElement projectElement = doc.Descendants().First(x => x.Name.ToString().EndsWith(Constants.ProjectElem));
                 XNamespace projectElementXmlnsAttributeValue = projectElement.Attribute(Constants.XmlnsAttribute).Value;
-                XElement itemGroupElement = GetFirstItemGroupElementWithCompileElements(doc);
+                XElement itemGroupElement = GetFirstItemGroupXElementWithXElementsOfType(doc, elementType);
 
                 if (itemGroupElement == null)
                 {
@@ -70,14 +72,15 @@ namespace Sitefinity_CLI
                 }
 
                 // sets the xmlns attr to be the one that is in the project element, so that no xmlns is added by default
-                compileElement = new XElement(projectElementXmlnsAttributeValue + Constants.CompileElem, new XAttribute(Constants.IncludeAttribute, filePath));
-                itemGroupElement.Add(compileElement);
+                element = new XElement(projectElementXmlnsAttributeValue + Constants.CompileElem, new XAttribute(Constants.IncludeAttribute, filePath));
+                itemGroupElement.Add(element);
             }
         }
 
         private static void RemoveFile(XDocument doc, string filePath)
         {
-            XElement elem = GetCompileElementByAttributeValue(doc, filePath);
+            string elementType = GetXElementType(filePath);
+            XElement elem = GetXElementByAttributeValue(doc, filePath, elementType);
 
             if (elem != null)
             {
@@ -85,22 +88,32 @@ namespace Sitefinity_CLI
             }
         }
 
-        private static XElement GetCompileElementByAttributeValue(XDocument doc, string value)
+        private static string GetXElementType(string filePath)
+        {
+            string fileExtension = Path.GetExtension(filePath);
+            if(fileExtension.Equals(Constants.CSharpFileExtension) || fileExtension.Equals(Constants.VBFileExtension))
+            {
+                return Constants.CompileElem;
+            }
+
+            return Constants.ContentElem;
+        }
+
+        private static XElement GetXElementByAttributeValue(XDocument doc, string value, string elementType)
         {
             XElement elem = doc.Descendants()
-                    .Where(x => x.Name.ToString().EndsWith(Constants.CompileElem)
-                            && x.Attribute(Constants.IncludeAttribute)?.Value == value)
-                                .FirstOrDefault();
+                                .Where(x => x.Name.ToString().EndsWith(elementType)
+                                        && x.Attribute(Constants.IncludeAttribute)?.Value == value)
+                                            .FirstOrDefault();
 
             return elem;
         }
 
-
-        private static XElement GetFirstItemGroupElementWithCompileElements(XDocument doc)
+        private static XElement GetFirstItemGroupXElementWithXElementsOfType(XDocument doc, string elementType)
         {
             XElement parent = doc.Descendants()
                     .FirstOrDefault(x => x.Name.ToString().EndsWith(Constants.ItemGroupElem)
-                            && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(Constants.CompileElem)));
+                            && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(elementType)));
 
             return parent;
         }
