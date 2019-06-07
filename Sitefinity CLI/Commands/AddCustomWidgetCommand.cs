@@ -103,6 +103,10 @@ namespace Sitefinity_CLI.Commands
             {
                 Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
             }
+            else
+            {
+                Utils.WriteLine(Constants.FilesAddedToProjectMessage, ConsoleColor.Green);
+            }
 
             return 0;
         }

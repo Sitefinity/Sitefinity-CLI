@@ -36,6 +36,7 @@ namespace Sitefinity_CLI
         public const string ProducedFilesVersionMessage = "Created files are compatible with Sitefinity CMS version {0}";
         public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity CMS. Do you wish to proceed?";
         public const string AddFilesToProjectMessage = "The file(s) should be added to the project manually.";
+        public const string FilesAddedToProjectMessage = "The file(s) are added to the project successfully.";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
