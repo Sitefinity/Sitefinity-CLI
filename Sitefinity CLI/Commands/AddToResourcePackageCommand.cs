@@ -25,7 +25,7 @@ namespace Sitefinity_CLI.Commands
             }
 
             var filePath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName, this.ResourcePackage, destinationPath, this.Name + fileExtension);
-            
+
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
             {
                 Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath)), ConsoleColor.Red);
@@ -39,10 +39,7 @@ namespace Sitefinity_CLI.Commands
             data["version"] = this.AssemblyVersion;
 
             var result = this.CreateFileFromTemplate(filePath, templateFile, config.FullName, data);
-            if (this.ShowAddFilesToProjectMessage)
-            {
-                Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
-            }
+            Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
 
             return result;
         }

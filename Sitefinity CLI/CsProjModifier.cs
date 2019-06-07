@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
@@ -7,13 +9,37 @@ namespace Sitefinity_CLI
 {
     internal static class CsProjModifier
     {
-        public static bool AddFile(string csProjFilePath, string fileToAddPath)
+        public static bool AddFiles(string csProjFilePath, IEnumerable<string> filePaths)
+        {
+            bool success = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
+            {
+                AddFile(doc, filePath);
+            });
+
+            return success;
+        }
+
+        public static bool RemoveFiles(string csProjFilePath, IEnumerable<string> filePaths)
+        {
+            bool success = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
+            {
+                RemoveFile(doc, filePath);
+            });
+
+            return success;
+        }
+
+        private static bool ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
         {
             bool success = false;
             try
             {
                 XDocument doc = XDocument.Load(csProjFilePath);
-                AddFile(doc, fileToAddPath);
+                foreach (var filePath in filePaths)
+                {
+                    modifyFileAction(doc, filePath);
+                }
+
                 doc.Save(csProjFilePath);
                 success = true;
             }
@@ -48,6 +74,17 @@ namespace Sitefinity_CLI
                 itemGroupElement.Add(compileElement);
             }
         }
+
+        private static void RemoveFile(XDocument doc, string filePath)
+        {
+            XElement elem = GetCompileElementByAttributeValue(doc, filePath);
+
+            if (elem != null)
+            {
+                elem.Remove();
+            }
+        }
+
         private static XElement GetCompileElementByAttributeValue(XDocument doc, string value)
         {
             XElement elem = doc.Descendants()

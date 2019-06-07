@@ -34,8 +34,6 @@ namespace Sitefinity_CLI.Commands
 
         protected bool IsSitefinityProject { get; set; } = true;
 
-        protected bool ShowAddFilesToProjectMessage { get; set; }
-
         public CommandBase()
         {
             this.CurrentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -153,7 +151,6 @@ namespace Sitefinity_CLI.Commands
 
             File.WriteAllText(filePath, result);
             Utils.WriteLine(string.Format(Constants.FileCreatedMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Green);
-            AddFileToCsProj(filePath);
 
             return 0;
         }
@@ -176,14 +173,6 @@ namespace Sitefinity_CLI.Commands
 
             versions.Sort();
             return versions.Last().ToString("n1", cultureInfo);
-        }
-
-        private void AddFileToCsProj(string filePath)
-        {
-            string csprojFilePath = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
-            bool fileAdded = CsProjModifier.AddFile(csprojFilePath, filePath);
-
-            this.ShowAddFilesToProjectMessage = !fileAdded;
         }
 
         protected IDictionary<string, string> GetTemplateData(string templatePath)

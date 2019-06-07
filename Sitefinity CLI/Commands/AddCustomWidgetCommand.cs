@@ -3,6 +3,7 @@ using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -51,6 +52,7 @@ namespace Sitefinity_CLI.Commands
             Directory.CreateDirectory(scriptsWidgetFolderPath);
 
             this.createdFiles = new List<string>();
+            bool filesAddedToCsProj = false;
 
             try
             {
@@ -86,15 +88,18 @@ namespace Sitefinity_CLI.Commands
                 // Create designer view
                 filePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension));
                 this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "DesignerView.Template"), config.FullName, data);
+
+                filesAddedToCsProj = this.AddFilesToCsProj();
             }
             catch (Exception)
             {
                 this.DeleteFiles();
+                this.RemoveFilesFromCsproj();
                 return 1;
             }
 
             Utils.WriteLine(string.Format(Constants.CustomWidgetCreatedMessage, this.Name), ConsoleColor.Green);
-            if (this.ShowAddFilesToProjectMessage)
+            if (!filesAddedToCsProj)
             {
                 Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
             }
@@ -108,6 +113,27 @@ namespace Sitefinity_CLI.Commands
             {
                 File.Delete(filePath);
             }
+        }
+
+        private bool AddFilesToCsProj()
+        {
+            string csprojFilePath = GetCsprojFilePath();
+            bool filesAdded = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
+
+            return filesAdded;
+        }
+
+        private void RemoveFilesFromCsproj()
+        {
+            string csProjFilePath = GetCsprojFilePath();
+            CsProjModifier.RemoveFiles(csProjFilePath, this.createdFiles);
+        }
+
+        private string GetCsprojFilePath()
+        {
+            string path = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
+
+            return path;
         }
 
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
