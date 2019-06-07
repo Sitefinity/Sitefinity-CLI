@@ -6,28 +6,36 @@ using System.Xml.Linq;
 [assembly: InternalsVisibleTo("Sitefinity CLI.Tests")]
 namespace Sitefinity_CLI
 {
-    internal class CsProjModifier
+    internal static class CsProjModifier
     {
-        private readonly string _csProjFileName;
-        private XDocument _doc;
-
-        public CsProjModifier(string csProjFileName)
+        public static bool AddFile(string csProjFilePath, string fileToAddPath)
         {
-            _csProjFileName = csProjFileName;
-            CreateXDocument();
+            bool success = false;
+            try
+            {
+                XDocument doc = XDocument.Load(csProjFilePath);
+                AddFile(doc, fileToAddPath);
+                doc.Save(csProjFilePath);
+                success = true;
+            }
+            catch
+            {
+                success = false;
+            }
+
+
+            return success;
         }
 
-        public bool FilesModifiedSuccessfully { get; private set; }
-
-        public void AddFileToCsproj(string filePath)
+        private static void AddFile(XDocument doc, string filePath)
         {
-            XElement compileElement = GetCompileElementByAttributeValue(filePath);
+            XElement compileElement = GetCompileElementByAttributeValue(doc, filePath);
 
             if (compileElement == null)
             {
-                XElement projectElement = _doc.Descendants().First(x => x.Name.ToString().EndsWith(Constants.ProjectElem));
+                XElement projectElement = doc.Descendants().First(x => x.Name.ToString().EndsWith(Constants.ProjectElem));
                 XNamespace projectElementXmlnsAttributeValue = projectElement.Attribute(Constants.XmlnsAttribute).Value;
-                XElement itemGroupElement = GetFirstItemGroupElementWithCompileElements();
+                XElement itemGroupElement = GetFirstItemGroupElementWithCompileElements(doc);
 
                 if (itemGroupElement == null)
                 {
@@ -41,63 +49,9 @@ namespace Sitefinity_CLI
                 itemGroupElement.Add(compileElement);
             }
         }
-
-        public void RemoveFileFromCsProj(string filePath)
+        private static XElement GetCompileElementByAttributeValue(XDocument doc, string value)
         {
-            XElement elem = GetCompileElementByAttributeValue(filePath);
-
-            if (elem != null)
-            {
-                elem.Remove();
-            }
-        }
-
-        public void SaveDocument()
-        {
-            try
-            {
-                _doc.Save(_csProjFileName);
-                FilesModifiedSuccessfully = true;
-            }
-            catch
-            {
-                ShowUnableToAddFileMessage(Constants.UnableToAddFileMessage);
-                FilesModifiedSuccessfully = false;
-            }
-        }
-
-        private void CreateXDocument()
-        {
-            if (string.IsNullOrEmpty(_csProjFileName))
-            {
-                ShowUnableToAddFileMessage(Constants.CsprojNotFoundMessage);
-                FilesModifiedSuccessfully = false;
-                return;
-            }
-
-            try
-            {
-                _doc = XDocument.Load(_csProjFileName);
-            }
-            catch
-            {
-                ShowUnableToAddFileMessage();
-                FilesModifiedSuccessfully = false;
-            }
-        }
-
-        private XElement GetFirstItemGroupElementWithCompileElements()
-        {
-            XElement parent = _doc.Descendants()
-                    .FirstOrDefault(x => x.Name.ToString().EndsWith(Constants.ItemGroupElem)
-                            && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(Constants.CompileElem)));
-
-            return parent;
-        }
-
-        private XElement GetCompileElementByAttributeValue(string value)
-        {
-            XElement elem = _doc.Descendants()
+            XElement elem = doc.Descendants()
                     .Where(x => x.Name.ToString().EndsWith(Constants.CompileElem)
                             && x.Attribute(Constants.IncludeAttribute)?.Value == value)
                                 .FirstOrDefault();
@@ -105,10 +59,14 @@ namespace Sitefinity_CLI
             return elem;
         }
 
-        private void ShowUnableToAddFileMessage(string additionalMessage = "")
+
+        private static XElement GetFirstItemGroupElementWithCompileElements(XDocument doc)
         {
-            string fullMessage = string.IsNullOrEmpty(additionalMessage) ? Constants.AddFilesToProjectMessage : $"{additionalMessage} {Constants.AddFilesToProjectMessage}";
-            Utils.WriteLine(fullMessage, ConsoleColor.Yellow);
+            XElement parent = doc.Descendants()
+                    .FirstOrDefault(x => x.Name.ToString().EndsWith(Constants.ItemGroupElem)
+                            && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(Constants.CompileElem)));
+
+            return parent;
         }
     }
 }

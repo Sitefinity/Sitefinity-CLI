@@ -180,26 +180,10 @@ namespace Sitefinity_CLI.Commands
 
         private void AddFileToCsProj(string filePath)
         {
-            CsProjModifier csProjModifier = CreateCsProjModifier();
-
-            if (csProjModifier != null)
-            {
-                csProjModifier.AddFileToCsproj(filePath);
-                csProjModifier.SaveDocument();
-
-                this.ShowAddFilesToProjectMessage = !csProjModifier.FilesModifiedSuccessfully;
-            }
-            else
-            {
-                this.ShowAddFilesToProjectMessage = true;
-            }
-        }
-
-        private CsProjModifier CreateCsProjModifier()
-        {
             string csprojFilePath = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
+            bool fileAdded = CsProjModifier.AddFile(csprojFilePath, filePath);
 
-            return string.IsNullOrEmpty(csprojFilePath) ? null : new CsProjModifier(csprojFilePath);
+            this.ShowAddFilesToProjectMessage = !fileAdded;
         }
 
         protected IDictionary<string, string> GetTemplateData(string templatePath)
