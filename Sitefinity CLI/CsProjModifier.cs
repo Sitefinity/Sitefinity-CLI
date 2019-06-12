@@ -33,10 +33,11 @@ namespace Sitefinity_CLI
         private static bool ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
         {
             bool success = false;
+            FileAttributes initialAttributes = FileAttributeModifier.GetFileAttributes(csProjFilePath);
             try
             {
-                // if file has one of these attributes, unathorized exception is thrown
-                FileAttributes removedAttributes = FileAttributeModifier.RemoveAttributesFromFile(csProjFilePath, FileAttributes.ReadOnly | FileAttributes.Hidden);
+                // if file has one of these attributes, unathorized exception is thrown, so they are removed
+                FileAttributeModifier.RemoveAttributesFromFile(csProjFilePath, FileAttributes.ReadOnly | FileAttributes.Hidden);
                 XDocument doc = XDocument.Load(csProjFilePath);
                 foreach (var filePath in filePaths)
                 {
@@ -45,14 +46,16 @@ namespace Sitefinity_CLI
 
                 doc.Save(csProjFilePath);
 
-                // return the attributes to normal
-                FileAttributeModifier.AddAttributesToFile(csProjFilePath, removedAttributes);
-
                 success = true;
             }
             catch
             {
                 success = false;
+            }
+            finally
+            {
+                // return the attributes to normal
+                FileAttributeModifier.SetFileAttributes(csProjFilePath, initialAttributes);
             }
 
 

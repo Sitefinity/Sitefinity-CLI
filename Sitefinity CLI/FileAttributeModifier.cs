@@ -5,45 +5,24 @@ namespace Sitefinity_CLI
 {
     public static class FileAttributeModifier
     {
-        public static FileAttributes RemoveAttributesFromFile(string filePath, FileAttributes attributesToRemove)
+        public static FileAttributes GetFileAttributes(string filePath)
         {
-            return ModifyAttributes(filePath, attributesToRemove, (currentAttributes, providedAttributes) =>
-            {
-                return RemoveAttribute(currentAttributes, providedAttributes);
-            });
+            return File.GetAttributes(filePath);
+        }
+        public static void RemoveAttributesFromFile(string filePath, FileAttributes attributesToRemove)
+        {
+            FileAttributes attributes = File.GetAttributes(filePath);
+            attributes = RemoveAttribute(attributes, attributesToRemove);
+            File.SetAttributes(filePath, attributes);
         }
 
-        public static FileAttributes AddAttributesToFile(string filePath, FileAttributes attributesToAdd)
+        public static void SetFileAttributes(string filePath, FileAttributes attributes)
         {
-            return ModifyAttributes(filePath, attributesToAdd, (currentAttributes, providedAttributes) =>
-            {
-                return AddAttribute(currentAttributes, providedAttributes);
-            });
-        }
-
-        private static FileAttributes ModifyAttributes(string filePath, FileAttributes attrs, Func<FileAttributes, FileAttributes, FileAttributes> modifyAction)
-        {
-            try
-            {
-                FileAttributes attributes = File.GetAttributes(filePath);
-                FileAttributes attributesAfterModification = modifyAction(attributes, attrs);
-                File.SetAttributes(filePath, attributesAfterModification);
-
-                return attributesAfterModification ^ attributes;
-            }
-            catch
-            {
-                return 0;
-            }
+            File.SetAttributes(filePath, attributes);
         }
         private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
         {
             return attributes & ~attributesToRemove;
-        }
-
-        private static FileAttributes AddAttribute(FileAttributes attributes, FileAttributes attributesToAdd)
-        {
-            return attributes | attributesToAdd;
         }
     }
 }
