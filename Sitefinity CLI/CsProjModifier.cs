@@ -35,6 +35,8 @@ namespace Sitefinity_CLI
             bool success = false;
             try
             {
+                // if file has one of these attributes, unathorized exception is thrown
+                FileAttributes removedAttributes = FileAttributeModifier.RemoveAttributesFromFile(csProjFilePath, FileAttributes.ReadOnly | FileAttributes.Hidden);
                 XDocument doc = XDocument.Load(csProjFilePath);
                 foreach (var filePath in filePaths)
                 {
@@ -42,6 +44,10 @@ namespace Sitefinity_CLI
                 }
 
                 doc.Save(csProjFilePath);
+
+                // return the attributes to normal
+                FileAttributeModifier.AddAttributesToFile(csProjFilePath, removedAttributes);
+
                 success = true;
             }
             catch
@@ -91,7 +97,7 @@ namespace Sitefinity_CLI
         private static string GetXElementType(string filePath)
         {
             string fileExtension = Path.GetExtension(filePath);
-            if(fileExtension.Equals(Constants.CSharpFileExtension) || fileExtension.Equals(Constants.VBFileExtension))
+            if (fileExtension.Equals(Constants.CSharpFileExtension) || fileExtension.Equals(Constants.VBFileExtension))
             {
                 return Constants.CompileElem;
             }
