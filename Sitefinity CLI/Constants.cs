@@ -37,6 +37,7 @@ namespace Sitefinity_CLI
         public const string SitefinityNotRecognizedMessage = "Cannot recognize project as Sitefinity CMS. Do you wish to proceed?";
         public const string AddFilesToProjectMessage = "The file(s) should be added to the project manually.";
         public const string FilesAddedToProjectMessage = "The file(s) are added to the project successfully.";
+        public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add the file(s) to the project.";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
@@ -84,6 +85,5 @@ namespace Sitefinity_CLI
         public const string ProjectElem = "Project";
         public const string IncludeAttribute = "Include";
         public const string XmlnsAttribute = "xmlns";
-        public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add files to project.";
     }
 }
