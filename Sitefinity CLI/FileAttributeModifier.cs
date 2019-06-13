@@ -11,14 +11,18 @@ namespace Sitefinity_CLI
         }
         public static void RemoveAttributesFromFile(string filePath, FileAttributes attributesToRemove)
         {
-            FileAttributes attributes = File.GetAttributes(filePath);
+            FileAttributes attributes = GetFileAttributes(filePath);
             attributes = RemoveAttribute(attributes, attributesToRemove);
-            File.SetAttributes(filePath, attributes);
+            SetFileAttributes(filePath, attributes);
         }
 
         public static void SetFileAttributes(string filePath, FileAttributes attributes)
         {
-            File.SetAttributes(filePath, attributes);
+            try
+            {
+                File.SetAttributes(filePath, attributes);
+            }
+            catch { }
         }
         private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
         {
