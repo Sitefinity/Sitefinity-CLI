@@ -84,5 +84,6 @@ namespace Sitefinity_CLI
         public const string ProjectElem = "Project";
         public const string IncludeAttribute = "Include";
         public const string XmlnsAttribute = "xmlns";
+        public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add files to project.";
     }
 }

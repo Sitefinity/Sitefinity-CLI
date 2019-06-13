@@ -52,7 +52,7 @@ namespace Sitefinity_CLI.Commands
             Directory.CreateDirectory(scriptsWidgetFolderPath);
 
             this.createdFiles = new List<string>();
-            bool filesAddedToCsProj = false;
+            var filesAddedToCsProjResult = new CsProjModifierResult();
 
             try
             {
@@ -89,7 +89,7 @@ namespace Sitefinity_CLI.Commands
                 filePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension));
                 this.CreateFileFromTemplate(filePath, Path.Combine(templatePath, "DesignerView.Template"), config.FullName, data);
 
-                filesAddedToCsProj = this.AddFilesToCsProj();
+                filesAddedToCsProjResult = this.AddFilesToCsProj();
             }
             catch (Exception)
             {
@@ -99,8 +99,13 @@ namespace Sitefinity_CLI.Commands
             }
 
             Utils.WriteLine(string.Format(Constants.CustomWidgetCreatedMessage, this.Name), ConsoleColor.Green);
-            if (!filesAddedToCsProj)
+            if (!filesAddedToCsProjResult.Success)
             {
+                if (!string.IsNullOrEmpty(filesAddedToCsProjResult.Message))
+                {
+                    Utils.WriteLine(filesAddedToCsProjResult.Message, ConsoleColor.Yellow);
+                }
+
                 Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
             }
             else
@@ -121,12 +126,12 @@ namespace Sitefinity_CLI.Commands
         }
 
         // TODO: If needed in other commands, move this method to CommandBase
-        private bool AddFilesToCsProj()
+        private CsProjModifierResult AddFilesToCsProj()
         {
             string csprojFilePath = GetCsprojFilePath();
-            bool filesAdded = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
+            CsProjModifierResult result = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
 
-            return filesAdded;
+            return result;
         }
 
         // TODO: If needed in other commands, move this method to CommandBase

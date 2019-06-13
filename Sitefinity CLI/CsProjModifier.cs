@@ -10,29 +10,29 @@ namespace Sitefinity_CLI
 {
     internal static class CsProjModifier
     {
-        public static bool AddFiles(string csProjFilePath, IEnumerable<string> filePaths)
+        public static CsProjModifierResult AddFiles(string csProjFilePath, IEnumerable<string> filePaths)
         {
-            bool success = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
+            CsProjModifierResult result = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
             {
                 AddFile(doc, filePath);
             });
 
-            return success;
+            return result;
         }
 
-        public static bool RemoveFiles(string csProjFilePath, IEnumerable<string> filePaths)
+        public static CsProjModifierResult RemoveFiles(string csProjFilePath, IEnumerable<string> filePaths)
         {
-            bool success = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
+            CsProjModifierResult result = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
             {
                 RemoveFile(doc, filePath);
             });
 
-            return success;
+            return result;
         }
 
-        private static bool ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
+        private static CsProjModifierResult ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
         {
-            bool success = false;
+            var result = new CsProjModifierResult { Success = true };
             FileAttributes initialAttributes = FileAttributeModifier.GetFileAttributes(csProjFilePath);
             try
             {
@@ -45,21 +45,28 @@ namespace Sitefinity_CLI
                 }
 
                 doc.Save(csProjFilePath);
-
-                success = true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                result.Message = Constants.AddFilesInsufficientPrivilegesMessage;
+                result.Success = false;
             }
             catch
             {
-                success = false;
+                result.Success = false;
             }
             finally
             {
                 // return the attributes to normal
-                FileAttributeModifier.SetFileAttributes(csProjFilePath, initialAttributes);
+                try
+                {
+                    FileAttributeModifier.SetFileAttributes(csProjFilePath, initialAttributes);
+                }
+                catch { }
             }
 
 
-            return success;
+            return result;
         }
 
         private static void AddFile(XDocument doc, string filePath)
