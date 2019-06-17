@@ -52,7 +52,7 @@ namespace Sitefinity_CLI.Commands
             Directory.CreateDirectory(scriptsWidgetFolderPath);
 
             this.createdFiles = new List<string>();
-            var filesAddedToCsProjResult = new CsProjModifierResult();
+            CsProjModifierResult filesAddedToCsProjResult = null;
 
             try
             {
@@ -99,9 +99,9 @@ namespace Sitefinity_CLI.Commands
             }
 
             Utils.WriteLine(string.Format(Constants.CustomWidgetCreatedMessage, this.Name), ConsoleColor.Green);
-            if (!filesAddedToCsProjResult.Success)
+            if (filesAddedToCsProjResult == null || !filesAddedToCsProjResult.Success)
             {
-                if (!string.IsNullOrEmpty(filesAddedToCsProjResult.Message))
+                if (filesAddedToCsProjResult != null && !string.IsNullOrEmpty(filesAddedToCsProjResult.Message))
                 {
                     Utils.WriteLine(filesAddedToCsProjResult.Message, ConsoleColor.Yellow);
                 }
