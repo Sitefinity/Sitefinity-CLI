@@ -40,7 +40,12 @@ namespace Sitefinity_CLI
                 XDocument doc = XDocument.Load(csProjFilePath);
                 foreach (var filePath in filePaths)
                 {
-                    modifyFileAction(doc, filePath);
+                    var relativeFilePath = filePath;
+                    if (Path.IsPathRooted(filePath))
+                    {
+                        relativeFilePath = GetRelativePath(filePath, csProjFilePath);
+                    }
+                    modifyFileAction(doc, relativeFilePath);
                 }
 
                 doc.Save(csProjFilePath);
@@ -131,6 +136,22 @@ namespace Sitefinity_CLI
                             && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(elementType)));
 
             return parent;
+        }
+
+        private static string GetRelativePath(string destination, string origin)
+        {
+            Uri pathUri = new Uri(destination);
+
+            origin = Path.GetDirectoryName(origin);
+
+            if (!origin.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                origin += Path.DirectorySeparatorChar;
+            }
+
+            Uri folderUri = new Uri(origin);
+            var result = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+            return result;
         }
     }
 }
