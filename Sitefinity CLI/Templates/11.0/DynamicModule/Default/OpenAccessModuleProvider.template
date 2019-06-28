@@ -8,7 +8,6 @@ namespace SitefinityWebApp.Modules.{{name}}
 {
     public class OpenAccess{{name}}ModuleProvider : {{name}}ModuleDataProvider, IOpenAccessDataProvider
     {
-
         public OpenAccessProviderContext Context
         {
             get;

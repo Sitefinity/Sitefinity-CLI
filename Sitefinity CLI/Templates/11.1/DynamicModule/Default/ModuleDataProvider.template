@@ -7,7 +7,6 @@ namespace SitefinityWebApp.Modules.{{name}}
 {
     public class {{name}}ModuleDataProvider : DataProviderBase
     {
-
         public override Type[] GetKnownTypes()
         {
             return new Type[] { typeof({{name}}ModuleItem) };

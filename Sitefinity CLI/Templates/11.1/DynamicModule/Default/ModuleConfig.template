@@ -11,7 +11,6 @@ namespace SitefinityWebApp.Modules.{{name}}
 {
     internal class {{name}}ModuleConfig : ContentModuleConfigBase
     {
-
         protected override void InitializeDefaultViews(ConfigElementDictionary<string, ContentViewControlElement> contentViewControls)
         {
             contentViewControls.Add({{name}}ModuleDefinitions.BackendDefinitionName,
