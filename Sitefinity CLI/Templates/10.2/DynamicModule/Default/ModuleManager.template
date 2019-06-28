@@ -3,53 +3,53 @@
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Data;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    public class DummyModuleManager : ManagerBase<DummyModuleDataProvider>
+    public class {{name}}ModuleManager : ManagerBase<{{name}}ModuleDataProvider>
     {
-        public DummyModuleManager()
+        public {{name}}ModuleManager()
             : this(null)
         {
         }
 
-        public DummyModuleManager(string providerName)
+        public {{name}}ModuleManager(string providerName)
             : base(providerName)
         {
         }
 
-        public DummyModuleManager(string providerName, string transactionName)
+        public {{name}}ModuleManager(string providerName, string transactionName)
             : base(providerName, transactionName)
         {
         }
 
         protected override GetDefaultProvider DefaultProviderDelegate
         {
-            get { return () => Config.Get<DummyModuleConfig>().DefaultProvider; }
+            get { return () => Config.Get<{{name}}ModuleConfig>().DefaultProvider; }
         }
 
         public override string ModuleName
         {
-            get { return DummyModule.moduleName; }
+            get { return {{name}}Module.moduleName; }
         }
 
         protected override ConfigElementDictionary<string, DataProviderSettings> ProvidersSettings
         {
-            get { return Config.Get<DummyModuleConfig>().Providers; }
+            get { return Config.Get<{{name}}ModuleConfig>().Providers; }
         }
 
-        public static DummyModuleManager GetManager()
+        public static {{name}}ModuleManager GetManager()
         {
-            return ManagerBase<DummyModuleDataProvider>.GetManager<DummyModuleManager>();
+            return ManagerBase<{{name}}ModuleDataProvider>.GetManager<{{name}}ModuleManager>();
         }
 
-        public static DummyModuleManager GetManager(string providerName, string transactionName)
+        public static {{name}}ModuleManager GetManager(string providerName, string transactionName)
         {
-            return ManagerBase<DummyModuleDataProvider>.GetManager<DummyModuleManager>(providerName, transactionName);
+            return ManagerBase<{{name}}ModuleDataProvider>.GetManager<{{name}}ModuleManager>(providerName, transactionName);
         }
 
-        public static DummyModuleManager GetManager(string providerName)
+        public static {{name}}ModuleManager GetManager(string providerName)
         {
-            return ManagerBase<DummyModuleDataProvider>.GetManager<DummyModuleManager>(providerName);
+            return ManagerBase<{{name}}ModuleDataProvider>.GetManager<{{name}}ModuleManager>(providerName);
         }
     }
 }

@@ -2,9 +2,9 @@
 
 using Telerik.Sitefinity.Web.UI.ContentUI;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    internal class DummyModuleView : ContentView
+    internal class {{name}}ModuleView : ContentView
     {
 
     }

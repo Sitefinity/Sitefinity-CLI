@@ -2,13 +2,13 @@
 
 using Telerik.Sitefinity.Localization;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    internal class DummyModuleResources : Resource
+    internal class {{name}}ModuleResources : Resource
     {
         [ResourceEntry(
             "PageGroupNodeTitle",
-            Value = "Dummy Group",
+            Value = "{{name}} Group",
             Description = "",
             LastModified = "2012/04/19")
         ]
@@ -19,7 +19,7 @@ namespace DocumentationSamples.ModuleSamples
 
         [ResourceEntry(
             "PageGroupNodeDescription",
-            Value = "Dummy Group Description",
+            Value = "{{name}} Group Description",
             Description = "",
             LastModified = "2012/04/19")
         ]
@@ -29,47 +29,47 @@ namespace DocumentationSamples.ModuleSamples
         }
 
         [ResourceEntry(
-            "DummyTitle",
-            Value = "Dummy",
+            "{{name}}Title",
+            Value = "{{name}}",
             Description = "",
             LastModified = "2012/04/19")
         ]
-        public string DummyTitle
+        public string {{name}}Title
         {
-            get { return this["DummyTitle"]; }
+            get { return this["{{name}}Title"]; }
         }
 
         [ResourceEntry(
-            "DummyDescription",
-            Value = "Dummy Description",
+            "{{name}}Description",
+            Value = "{{name}} Description",
             Description = "",
             LastModified = "2012/04/19")
         ]
-        public string DummyDescription
+        public string {{name}}Description
         {
-            get { return this["DummyDescription"]; }
+            get { return this["{{name}}Description"]; }
         }
 
         [ResourceEntry(
-            "DummyViewTitle",
-            Value = "Dummy View",
+            "{{name}}ViewTitle",
+            Value = "{{name}} View",
             Description = "",
             LastModified = "2012/04/19")
         ]
-        public string DummyViewTitle
+        public string {{name}}ViewTitle
         {
-            get { return this["DummyViewTitle"]; }
+            get { return this["{{name}}ViewTitle"]; }
         }
 
         [ResourceEntry(
-            "DummyViewDescription",
-            Value = "Dummy View Frontend Control",
+            "{{name}}ViewDescription",
+            Value = "{{name}} View Frontend Control",
             Description = "",
             LastModified = "2012/04/19")
         ]
-        public string DummyViewDescription
+        public string {{name}}ViewDescription
         {
-            get { return this["DummyViewDescription"]; }
+            get { return this["{{name}}ViewDescription"]; }
         }
     }
 }

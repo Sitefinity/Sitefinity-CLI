@@ -5,27 +5,27 @@ using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Fluent.Definitions;
 using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    internal static class DummyModuleDefinitions
+    internal static class {{name}}ModuleDefinitions
     {
-        internal static ContentViewControlElement DefineDummyBackendContentView(ConfigElement parent)
+        internal static ContentViewControlElement Define{{name}}BackendContentView(ConfigElement parent)
         {
             // define content view control
-            var fluentContentView = App.WorkWith().Module(DummyModule.moduleName).DefineContainer(parent, BackendDefinitionName, typeof(DummyModuleItem));
+            var fluentContentView = App.WorkWith().Module({{name}}Module.moduleName).DefineContainer(parent, BackendDefinitionName, typeof({{name}}ModuleItem));
             var backendContentView = fluentContentView.Get();
 
-            backendContentView.ViewsConfig.AddLazy(DummyModuleDefinitions.BackendListViewName, () => DefineNewsBackendListView(fluentContentView));
+            backendContentView.ViewsConfig.AddLazy({{name}}ModuleDefinitions.BackendListViewName, () => DefineNewsBackendListView(fluentContentView));
             return backendContentView;
         }
 
         private static ConfigElement DefineNewsBackendListView(ContentViewControlDefinitionFacade fluentContentView)
         {
             var fluentMasterView = fluentContentView
-                .AddMasterView(DummyModuleDefinitions.BackendListViewName)
-                .LocalizeUsing<DummyModuleResources>()
-                .SetTitle("DummyTitle")
-                .SetServiceBaseUrl("~/Sitefinity/Services/Content/DummyItemService.svc/");
+                .AddMasterView({{name}}ModuleDefinitions.BackendListViewName)
+                .LocalizeUsing<{{name}}ModuleResources>()
+                .SetTitle("{{name}}Title")
+                .SetServiceBaseUrl("~/Sitefinity/Services/Content/{{name}}ItemService.svc/");
             var newsGridView = fluentMasterView.Get();
             return newsGridView;
         }

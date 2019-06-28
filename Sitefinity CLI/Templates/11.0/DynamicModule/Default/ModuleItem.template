@@ -4,9 +4,9 @@ using System;
 using Telerik.Sitefinity;
 using Telerik.Sitefinity.Workflow.Model.Tracking;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    internal class DummyModuleItem : IWorkflowItem
+    internal class {{name}}ModuleItem : IWorkflowItem
     {
         public Guid Id
         {

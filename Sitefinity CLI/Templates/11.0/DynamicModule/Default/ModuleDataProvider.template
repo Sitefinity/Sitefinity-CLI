@@ -3,19 +3,19 @@
 using System;
 using Telerik.Sitefinity.Data;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    public class DummyModuleDataProvider : DataProviderBase
+    public class {{name}}ModuleDataProvider : DataProviderBase
     {
 
         public override Type[] GetKnownTypes()
         {
-            return new Type[] { typeof(DummyModuleItem) };
+            return new Type[] { typeof({{name}}ModuleItem) };
         }
 
         public override string RootKey
         {
-            get { return "DummyModule"; }
+            get { return "{{name}}Module"; }
         }
     }
 }

@@ -86,7 +86,7 @@
                         {
                             <div data-sf-role="captcha-container" class="sf-Comments-captcha">
                                 <div>
-                                    <img data-sf-role="captcha-image" src="@Url.WidgetContent("assets/dist/img/dummy.jpg")" />
+                                    <img data-sf-role="captcha-image" src="@Url.WidgetContent("assets/dist/img/{{name}}.jpg")" />
                                 </div>
 
                                 <a data-sf-role="captcha-refresh-button"> @Html.Resource("NewCode") </a>
@@ -147,7 +147,7 @@
 
         <div class="media sf-media">
             <div class="media-left sf-img-thmb"> 
-                <img alt="comment-avatar" data-sf-role="comment-avatar" width="40" height="40" src="@Url.WidgetContent("assets/dist/img/dummy.jpg")"/>
+                <img alt="comment-avatar" data-sf-role="comment-avatar" width="40" height="40" src="@Url.WidgetContent("assets/dist/img/{{name}}.jpg")"/>
             </div>
             <div class="media-body sf-media-body">
            

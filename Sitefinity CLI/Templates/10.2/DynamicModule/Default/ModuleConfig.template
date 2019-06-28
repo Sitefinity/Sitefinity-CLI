@@ -7,15 +7,15 @@ using Telerik.Sitefinity.Security;
 using Telerik.Sitefinity.Security.Configuration;
 using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
-namespace DocumentationSamples.ModuleSamples
+namespace SitefinityWebApp.Modules.{{name}}
 {
-    internal class DummyModuleConfig : ContentModuleConfigBase
+    internal class {{name}}ModuleConfig : ContentModuleConfigBase
     {
 
         protected override void InitializeDefaultViews(ConfigElementDictionary<string, ContentViewControlElement> contentViewControls)
         {
-            contentViewControls.Add(DummyModuleDefinitions.BackendDefinitionName,
-                DummyModuleDefinitions.DefineDummyBackendContentView(contentViewControls));
+            contentViewControls.Add({{name}}ModuleDefinitions.BackendDefinitionName,
+                {{name}}ModuleDefinitions.Define{{name}}BackendContentView(contentViewControls));
 
         }
 
@@ -24,9 +24,9 @@ namespace DocumentationSamples.ModuleSamples
             providers.Add(new DataProviderSettings(providers)
             {
                 Name = "OpenAccessDataProvider",
-                Description = "A provider that stores dummy module data in database using OpenAccess ORM.",
-                ProviderType = typeof(OpenAccessDummyModuleProvider),
-                Parameters = new NameValueCollection() { { "applicationName", "/Dummy" } }
+                Description = "A provider that stores {{name}} module data in database using OpenAccess ORM.",
+                ProviderType = typeof(OpenAccess{{name}}ModuleProvider),
+                Parameters = new NameValueCollection() { { "applicationName", "/{{name}}" } }
             });
 
         }
@@ -42,8 +42,8 @@ namespace DocumentationSamples.ModuleSamples
         {
             var permission = new Permission(Permissions)
             {
-                Name = "Dummy",
-                Title = "Dummy",
+                Name = "{{name}}",
+                Title = "{{name}}",
             };
             Permissions.Add(permission);
 
@@ -51,7 +51,7 @@ namespace DocumentationSamples.ModuleSamples
             {
                 Name = "View",
                 Type = SecurityActionTypes.View,
-                Title = "ViewDummy",
+                Title = "View{{name}}",
             });
 
             var customPermissionsDisplaySettings = CustomPermissionsDisplaySettings;
@@ -63,7 +63,7 @@ namespace DocumentationSamples.ModuleSamples
 
             var newsCustomActions = new SecuredObjectCustomPermissionSet(generalCustomSet.SecuredObjectCustomPermissionSets)
             {
-                TypeName = typeof(DummyModuleItem).FullName
+                TypeName = typeof({{name}}ModuleItem).FullName
             };
             generalCustomSet.SecuredObjectCustomPermissionSets.Add(newsCustomActions);
 
