@@ -1,0 +1,28 @@
+﻿/* {{> sign}} */
+
+using System;
+using Telerik.Sitefinity;
+using Telerik.Sitefinity.Workflow.Model.Tracking;
+
+namespace DocumentationSamples.ModuleSamples
+{
+    internal class DummyModuleItem : IWorkflowItem
+    {
+        public Guid Id
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ApprovalTrackingRecordMap ApprovalTrackingRecordMap
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+}

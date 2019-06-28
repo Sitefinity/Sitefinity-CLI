@@ -8,6 +8,7 @@ namespace Sitefinity_CLI.Commands
     [Subcommand(Constants.AddPageTemplateCommandName, typeof(AddPageTemplateCommand))]
     [Subcommand(Constants.AddGridWidgetCommandName, typeof(AddGridWidgetCommand))]
     [Subcommand(Constants.AddCustomWidgetCommandName, typeof(AddCustomWidgetCommand))]
+    [Subcommand(Constants.AddDynamicModuleCommandName, typeof(AddDynamicModuleCommand))]
     internal class AddCommand
     {
         protected int OnExecute(CommandLineApplication app)

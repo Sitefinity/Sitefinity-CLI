@@ -8,10 +8,8 @@ using System.Linq;
 namespace Sitefinity_CLI.Commands
 {
     [Command(Constants.AddCustomWidgetCommandName, Description = "Adds a new custom widget to the current project.", FullName = Constants.AddCustomWidgetCommandFullName)]
-    internal class AddCustomWidgetCommand : CommandBase
+    internal class AddCustomWidgetCommand : AddToSitefinityCommandBase
     {
-        private List<string> createdFiles;
-
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
@@ -114,38 +112,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             return 0;
-        }
-
-        // TODO: If needed in other commands, move this method to CommandBase
-        private void DeleteFiles()
-        {
-            foreach (var filePath in this.createdFiles)
-            {
-                File.Delete(filePath);
-            }
-        }
-
-        // TODO: If needed in other commands, move this method to CommandBase
-        private CsProjModifierResult AddFilesToCsProj()
-        {
-            string csprojFilePath = GetCsprojFilePath();
-            CsProjModifierResult result = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
-
-            return result;
-        }
-
-        // TODO: If needed in other commands, move this method to CommandBase
-        private void RemoveFilesFromCsproj()
-        {
-            string csProjFilePath = GetCsprojFilePath();
-            CsProjModifier.RemoveFiles(csProjFilePath, this.createdFiles);
-        }
-
-        private string GetCsprojFilePath()
-        {
-            string path = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
-
-            return path;
         }
 
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)

@@ -1,0 +1,23 @@
+﻿/* {{> sign}} */
+
+using Telerik.OpenAccess.Metadata;
+using Telerik.Sitefinity.Data;
+using Telerik.Sitefinity.Model;
+
+namespace DocumentationSamples.ModuleSamples
+{
+    public class OpenAccessDummyModuleProvider : DummyModuleDataProvider, IOpenAccessDataProvider
+    {
+
+        public OpenAccessProviderContext Context
+        {
+            get;
+            set;
+        }
+
+        public MetadataSource GetMetaDataSource(IDatabaseMappingContext context)
+        {
+            return null;
+        }
+    }
+}

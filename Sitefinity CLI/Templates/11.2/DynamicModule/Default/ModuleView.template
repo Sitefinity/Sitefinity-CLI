@@ -1,0 +1,11 @@
+﻿/* {{> sign}} */
+
+using Telerik.Sitefinity.Web.UI.ContentUI;
+
+namespace DocumentationSamples.ModuleSamples
+{
+    internal class DummyModuleView : ContentView
+    {
+
+    }
+}

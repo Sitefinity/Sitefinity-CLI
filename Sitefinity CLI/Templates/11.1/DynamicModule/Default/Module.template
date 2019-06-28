@@ -1,0 +1,85 @@
+/* {{> sign}} */
+
+using DocumentationSamples.ModuleSamples;
+using System;
+using Telerik.Sitefinity;
+using Telerik.Sitefinity.Abstractions;
+using Telerik.Sitefinity.Configuration;
+using Telerik.Sitefinity.Fluent.Modules;
+using Telerik.Sitefinity.Services;
+
+[assembly: SitefinityModule(DummyModule.moduleName, typeof(DummyModule), "DummyModuleTitle", "DummyModuleDescription", StartupType.OnApplicationStart)]
+namespace DocumentationSamples.ModuleSamples
+{
+    public class DummyModule : ModuleBase
+    {
+        public override Guid LandingPageId
+        {
+            get { return homePageId; }
+        }
+
+        public override void Initialize(ModuleSettings settings)
+        {
+            base.Initialize(settings);
+
+            App.WorkWith().Module(Name)
+                .Initialize()
+                    .Configuration<DummyModuleConfig>()
+                    .Localization<DummyModuleResources>();
+        }
+
+        public override void Install(SiteInitializer initializer)
+        {
+            initializer.Installer
+                .CreateModuleGroupPage(groupPageId, "Dummy")
+                    .PlaceUnder(CommonNode.TypesOfContent)
+                    .LocalizeUsing<DummyModuleResources>()
+                    .SetTitleLocalized("PageGroupNodeTitle")
+                    .SetUrlName("dummy")
+                    .SetDescriptionLocalized("PageGroupNodeDescription")
+                    .AddChildPage(DummyModule.homePageId, "DummyHome")
+                        .LocalizeUsing<DummyModuleResources>()
+                        .SetTitleLocalized("DummyTitle")
+                        .SetHtmlTitleLocalized("DummyTitle")
+                        .SetUrlName("dummyhome")
+                        .SetDescriptionLocalized("DummyDescription")
+                        .AddContentView(DummyModuleDefinitions.BackendDefinitionName, "DummyBackendView")
+                        .Done()
+                    .Done()
+            .PageToolbox()
+                .ContentSection()
+                    .LoadOrAddWidget<DummyModuleView>("DummyView")
+                        .SetTitle("DummyViewTitle")
+                        .SetDescription("DummyViewDescription")
+                        .LocalizeUsing<DummyModuleResources>()
+                        .SetCssClass("sfDummyViewIcn")
+                        .Done()
+                    .Done()
+                .Done()
+            .AddWorkflowType<DummyModuleItem>()
+                .SetTitle("DummyTitle")
+                .SetServiceUrl("~/Workflows/DummyWorkflow.xamlx")
+                .LocalizeUsing<DummyModuleResources>()
+                .Done();
+
+        }
+
+        public override void Upgrade(SiteInitializer initializer, Version upgradeFrom)
+        {
+        }
+
+        protected override ConfigSection GetModuleConfig()
+        {
+            return Config.Get<DummyModuleConfig>();
+        }
+
+        public override Type[] Managers
+        {
+            get { return new Type[] { typeof(DummyModuleManager) }; }
+        }
+
+        internal static Guid groupPageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3971");
+        internal static Guid homePageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3972");
+        internal const string moduleName = "DummyModule";
+    }
+}

@@ -1,0 +1,75 @@
+﻿/* {{> sign}} */
+
+using Telerik.Sitefinity.Localization;
+
+namespace DocumentationSamples.ModuleSamples
+{
+    internal class DummyModuleResources : Resource
+    {
+        [ResourceEntry(
+            "PageGroupNodeTitle",
+            Value = "Dummy Group",
+            Description = "",
+            LastModified = "2012/04/19")
+        ]
+        public string PageGroupNodeTitle
+        {
+            get { return this["PageGroupNodeTitle"]; }
+        }
+
+        [ResourceEntry(
+            "PageGroupNodeDescription",
+            Value = "Dummy Group Description",
+            Description = "",
+            LastModified = "2012/04/19")
+        ]
+        public string PageGroupNodeDescription
+        {
+            get { return this["PageGroupNodeDescription"]; }
+        }
+
+        [ResourceEntry(
+            "DummyTitle",
+            Value = "Dummy",
+            Description = "",
+            LastModified = "2012/04/19")
+        ]
+        public string DummyTitle
+        {
+            get { return this["DummyTitle"]; }
+        }
+
+        [ResourceEntry(
+            "DummyDescription",
+            Value = "Dummy Description",
+            Description = "",
+            LastModified = "2012/04/19")
+        ]
+        public string DummyDescription
+        {
+            get { return this["DummyDescription"]; }
+        }
+
+        [ResourceEntry(
+            "DummyViewTitle",
+            Value = "Dummy View",
+            Description = "",
+            LastModified = "2012/04/19")
+        ]
+        public string DummyViewTitle
+        {
+            get { return this["DummyViewTitle"]; }
+        }
+
+        [ResourceEntry(
+            "DummyViewDescription",
+            Value = "Dummy View Frontend Control",
+            Description = "",
+            LastModified = "2012/04/19")
+        ]
+        public string DummyViewDescription
+        {
+            get { return this["DummyViewDescription"]; }
+        }
+    }
+}

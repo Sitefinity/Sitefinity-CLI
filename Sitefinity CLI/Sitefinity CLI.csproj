@@ -32,4 +32,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Templates\12.0\DynamicModule\" />
+  </ItemGroup>
+
 </Project>

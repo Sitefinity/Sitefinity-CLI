@@ -1,0 +1,21 @@
+﻿/* {{> sign}} */
+
+using System;
+using Telerik.Sitefinity.Data;
+
+namespace DocumentationSamples.ModuleSamples
+{
+    public class DummyModuleDataProvider : DataProviderBase
+    {
+
+        public override Type[] GetKnownTypes()
+        {
+            return new Type[] { typeof(DummyModuleItem) };
+        }
+
+        public override string RootKey
+        {
+            get { return "DummyModule"; }
+        }
+    }
+}

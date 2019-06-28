@@ -1,0 +1,55 @@
+﻿/* {{> sign}} */
+
+using Telerik.Sitefinity.Configuration;
+using Telerik.Sitefinity.Data;
+
+namespace DocumentationSamples.ModuleSamples
+{
+    public class DummyModuleManager : ManagerBase<DummyModuleDataProvider>
+    {
+        public DummyModuleManager()
+            : this(null)
+        {
+        }
+
+        public DummyModuleManager(string providerName)
+            : base(providerName)
+        {
+        }
+
+        public DummyModuleManager(string providerName, string transactionName)
+            : base(providerName, transactionName)
+        {
+        }
+
+        protected override GetDefaultProvider DefaultProviderDelegate
+        {
+            get { return () => Config.Get<DummyModuleConfig>().DefaultProvider; }
+        }
+
+        public override string ModuleName
+        {
+            get { return DummyModule.moduleName; }
+        }
+
+        protected override ConfigElementDictionary<string, DataProviderSettings> ProvidersSettings
+        {
+            get { return Config.Get<DummyModuleConfig>().Providers; }
+        }
+
+        public static DummyModuleManager GetManager()
+        {
+            return ManagerBase<DummyModuleDataProvider>.GetManager<DummyModuleManager>();
+        }
+
+        public static DummyModuleManager GetManager(string providerName, string transactionName)
+        {
+            return ManagerBase<DummyModuleDataProvider>.GetManager<DummyModuleManager>(providerName, transactionName);
+        }
+
+        public static DummyModuleManager GetManager(string providerName)
+        {
+            return ManagerBase<DummyModuleDataProvider>.GetManager<DummyModuleManager>(providerName);
+        }
+    }
+}
