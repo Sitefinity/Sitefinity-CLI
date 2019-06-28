@@ -16,7 +16,7 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            var moduleFolderPath = Path.Combine(this.ProjectRootPath, Constants.DynamicModuleFolderName);
+            var moduleFolderPath = Path.Combine(this.ProjectRootPath, Constants.ModuleFolderName);
 
             if (this.IsSitefinityProject)
             {
@@ -33,7 +33,7 @@ namespace Sitefinity_CLI.Commands
 
             this.AddToSitefinity(this.fileModels, config);
 
-            Utils.WriteLine(string.Format(Constants.DynamicModuleCreatedMessage, this.Name), ConsoleColor.Green);
+            Utils.WriteLine(string.Format(Constants.ModuleCreatedMessage, this.Name), ConsoleColor.Green);
             if (filesAddedToCsProjResult == null || !filesAddedToCsProjResult.Success)
             {
                 if (filesAddedToCsProjResult != null && !string.IsNullOrEmpty(filesAddedToCsProjResult.Message))
