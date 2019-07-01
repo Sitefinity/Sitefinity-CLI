@@ -1,6 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Sitefinity_CLI.Model;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -14,9 +13,9 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
-        public override int OnExecute(CommandLineApplication config)
+        protected override IEnumerable<FileModel> GetFileModels()
         {
-            this.fileModels = new List<FileModel>()
+            var models = new List<FileModel>()
             {
                 new FileModel()
                 {
@@ -65,7 +64,7 @@ namespace Sitefinity_CLI.Commands
                 }
             };
 
-            return base.OnExecute(config);
+            return models;
         }
     }
 }

@@ -31,7 +31,9 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            this.AddToSitefinity(this.fileModels, config);
+            this.FileModels = this.GetFileModels();
+
+            this.AddToSitefinity(config);
 
             Utils.WriteLine(string.Format(Constants.ModuleCreatedMessage, this.Name), ConsoleColor.Green);
             if (filesAddedToCsProjResult == null || !filesAddedToCsProjResult.Success)
@@ -62,10 +64,10 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
-        protected int AddToSitefinity(IEnumerable<FileModel> fileModels, CommandLineApplication config)
+        protected int AddToSitefinity(CommandLineApplication config)
         {
             this.createdFiles = new List<string>();
-            foreach (var fileModel in fileModels)
+            foreach (var fileModel in this.FileModels)
             {
                 var folderPath = Path.GetDirectoryName(fileModel.FilePath);
 
@@ -95,6 +97,8 @@ namespace Sitefinity_CLI.Commands
 
             return 0;
         }
+
+        protected abstract IEnumerable<FileModel> GetFileModels();
 
         protected void DeleteFiles()
         {
@@ -129,6 +133,6 @@ namespace Sitefinity_CLI.Commands
 
         protected CsProjModifierResult filesAddedToCsProjResult;
 
-        protected IEnumerable<FileModel> fileModels { get; set; }
+        protected IEnumerable<FileModel> FileModels { get; set; }
     }
 }

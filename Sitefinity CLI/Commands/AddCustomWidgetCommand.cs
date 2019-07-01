@@ -3,7 +3,6 @@ using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.Commands
@@ -15,7 +14,18 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
-        public override int OnExecute(CommandLineApplication config)
+        protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
+        {
+            if (base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
+            {
+                throw new Exception(string.Format("An error occured while creating an item from template. Path: {0}", filePath));
+            }
+
+            this.createdFiles.Add(filePath);
+            return 0;
+        }
+
+        protected override IEnumerable<FileModel> GetFileModels()
         {
             var mvcFolderPath = Path.Combine(this.ProjectRootPath, Constants.MVCFolderName);
             var viewsFolderPath = Path.Combine(mvcFolderPath, Constants.ViewsFolderName);
@@ -27,7 +37,7 @@ namespace Sitefinity_CLI.Commands
 
             var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.CustomWidgetTemplatesFolderName, this.TemplateName);
 
-            this.fileModels = new List<FileModel>()
+            var models = new List<FileModel>()
             {
                 new FileModel()
                 {
@@ -56,18 +66,7 @@ namespace Sitefinity_CLI.Commands
                 },
             };
 
-            return base.OnExecute(config);
-        }
-
-        protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
-        {
-            if (base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
-            {
-                throw new Exception(string.Format("An error occured while creating an item from template. Path: {0}", filePath));
-            }
-
-            this.createdFiles.Add(filePath);
-            return 0;
+            return models;
         }
     }
 }
