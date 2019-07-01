@@ -13,6 +13,12 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
+        protected override string FolderPath => Constants.ModuleFolderName;
+
+        protected override string CreatedMessage => Constants.ModuleCreatedMessage;
+
+        protected override string TemplatesFolder => Constants.ModuleTemplatesFolderName;
+
         protected override IEnumerable<FileModel> GetFileModels()
         {
             var models = new List<FileModel>()

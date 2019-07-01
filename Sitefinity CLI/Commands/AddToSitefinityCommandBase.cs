@@ -9,6 +9,14 @@ namespace Sitefinity_CLI.Commands
 {
     internal abstract class AddToSitefinityCommandBase : CommandBase
     {
+        protected IEnumerable<FileModel> FileModels { get; set; }
+
+        protected abstract string FolderPath { get; }
+
+        protected abstract string CreatedMessage { get; }
+
+        protected abstract string TemplatesFolder { get; }
+
         public override int OnExecute(CommandLineApplication config)
         {
             if (base.OnExecute(config) == 1)
@@ -16,26 +24,37 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            var moduleFolderPath = Path.Combine(this.ProjectRootPath, Constants.ModuleFolderName);
+            var folderPath = Path.Combine(this.ProjectRootPath, this.FolderPath);
 
-            if (this.IsSitefinityProject)
+             if (this.IsSitefinityProject)
             {
-                Directory.CreateDirectory(moduleFolderPath);
+                Directory.CreateDirectory(folderPath);
             }
             else
             {
-                if (!Directory.Exists(moduleFolderPath))
+                if (!Directory.Exists(folderPath))
                 {
-                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, moduleFolderPath), ConsoleColor.Red);
+                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath), ConsoleColor.Red);
                     return 1;
                 }
             }
 
+            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.CustomWidgetTemplatesFolderName, this.TemplateName);
+
+            if (!Directory.Exists(templatePath))
+            {
+                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath), ConsoleColor.Red);
+                return 1;
+            }
+
             this.FileModels = this.GetFileModels();
 
-            this.AddToSitefinity(config);
+            if (this.AddToSitefinity(config) == 1)
+            {
+                return 1;
+            }          
 
-            Utils.WriteLine(string.Format(Constants.ModuleCreatedMessage, this.Name), ConsoleColor.Green);
+            Utils.WriteLine(string.Format(this.CreatedMessage, this.Name), ConsoleColor.Green);
             if (filesAddedToCsProjResult == null || !filesAddedToCsProjResult.Success)
             {
                 if (filesAddedToCsProjResult != null && !string.IsNullOrEmpty(filesAddedToCsProjResult.Message))
@@ -67,33 +86,35 @@ namespace Sitefinity_CLI.Commands
         protected int AddToSitefinity(CommandLineApplication config)
         {
             this.createdFiles = new List<string>();
-            foreach (var fileModel in this.FileModels)
+
+            try
             {
-                var folderPath = Path.GetDirectoryName(fileModel.FilePath);
-
-                var data = this.GetTemplateData(Path.GetDirectoryName(fileModel.TemplatePath));
-                data["toolName"] = Constants.CLIName;
-                data["version"] = this.AssemblyVersion;
-                data["name"] = this.Name;
-
-                if (!Directory.Exists(folderPath))
+                foreach (var fileModel in this.FileModels)
                 {
-                    Directory.CreateDirectory(folderPath);
-                }
+                    var folderPath = Path.GetDirectoryName(fileModel.FilePath);
 
-                try
-                {
+                    var data = this.GetTemplateData(Path.GetDirectoryName(fileModel.TemplatePath));
+                    data["toolName"] = Constants.CLIName;
+                    data["version"] = this.AssemblyVersion;
+                    data["name"] = this.Name;
+
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+
                     this.CreateFileFromTemplate(fileModel.FilePath, fileModel.TemplatePath, config.FullName, data);
                 }
-                catch (Exception)
-                {
-                    this.DeleteFiles();
-                    this.RemoveFilesFromCsproj();
-                    return 1;
-                }
+
+                this.AddFilesToCsProj();
+            }
+            catch (Exception)
+            {
+                this.DeleteFiles();
+                this.RemoveFilesFromCsproj();
+                return 1;
             }
 
-            this.filesAddedToCsProjResult = this.AddFilesToCsProj();
 
             return 0;
         }
@@ -132,7 +153,5 @@ namespace Sitefinity_CLI.Commands
         protected List<string> createdFiles;
 
         protected CsProjModifierResult filesAddedToCsProjResult;
-
-        protected IEnumerable<FileModel> FileModels { get; set; }
     }
 }

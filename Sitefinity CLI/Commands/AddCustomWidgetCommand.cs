@@ -14,6 +14,12 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
+        protected override string FolderPath => Constants.MVCFolderName;
+
+        protected override string CreatedMessage => Constants.CustomWidgetCreatedMessage;
+
+        protected override string TemplatesFolder => Constants.CustomWidgetTemplatesFolderName;
+
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
             if (base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
