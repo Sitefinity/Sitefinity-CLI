@@ -31,16 +31,21 @@ namespace Sitefinity_CLI
 
         private static CsProjModifierResult ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
         {
-            var result = new CsProjModifierResult { Success = true };
+            CsProjModifierResult result = new CsProjModifierResult { Success = true };
             FileAttributes initialAttributes = FileAttributeModifier.GetFileAttributes(csProjFilePath);
             try
             {
                 // if file has one of these attributes, unathorized exception is thrown, so they are removed
                 FileAttributeModifier.RemoveAttributesFromFile(csProjFilePath, FileAttributes.ReadOnly | FileAttributes.Hidden);
                 XDocument doc = XDocument.Load(csProjFilePath);
-                foreach (var filePath in filePaths)
+                foreach (string filePath in filePaths)
                 {
-                    modifyFileAction(doc, filePath);
+                    string relativeFilePath = filePath;
+                    if (Path.IsPathRooted(filePath))
+                    {
+                        relativeFilePath = GetRelativePath(filePath, csProjFilePath);
+                    }
+                    modifyFileAction(doc, relativeFilePath);
                 }
 
                 doc.Save(csProjFilePath);
@@ -131,6 +136,22 @@ namespace Sitefinity_CLI
                             && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(elementType)));
 
             return parent;
+        }
+
+        private static string GetRelativePath(string destination, string origin)
+        {
+            origin = Path.GetDirectoryName(origin);
+
+            if (!origin.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                origin += Path.DirectorySeparatorChar;
+            }
+
+            Uri folderUri = new Uri(origin);
+            Uri pathUri = new Uri(destination);
+
+            string result = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+            return result;
         }
     }
 }
