@@ -28,7 +28,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
         [TestMethod]
         public void SuccessfullyAddNewCompileFile_When_CsProjDoesNotHaveOtherCompileElements()
         {
-            CsProjModifierResult result = CsProjModifier.AddFiles(CsProjWithoutElementsPath, new List<string> { CsharpDummyFile });
+            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithoutElementsPath, new List<string> { CsharpDummyFile });
             Assert.IsTrue(result.Success);
 
             XDocument resultCsproj = XDocument.Load(CsProjWithoutElementsPath);
@@ -40,7 +40,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
         [TestMethod]
         public void SuccessfullyAddNewContentFile_When_CsProjDoesNotHaveOtherContentElements()
         {
-            CsProjModifierResult result = CsProjModifier.AddFiles(CsProjWithoutElementsPath, new List<string> { JavascriptDummyFile });
+            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithoutElementsPath, new List<string> { JavascriptDummyFile });
             Assert.IsTrue(result.Success);
 
             XDocument resultCsproj = XDocument.Load(CsProjWithoutElementsPath);
@@ -52,7 +52,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
         [TestMethod]
         public void SuccessfullyAddNewCompileFile_When_CsProjHasOtherCompileElements()
         {
-            CsProjModifierResult result = CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { CsharpDummyFile });
+            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { CsharpDummyFile });
             Assert.IsTrue(result.Success);
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
@@ -70,7 +70,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
         [TestMethod]
         public void SuccessfullyAddNewContentFile_When_CsProjHasOtherContentElements()
         {
-            CsProjModifierResult result = CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { JavascriptDummyFile });
+            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { JavascriptDummyFile });
             Assert.IsTrue(result.Success);
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
@@ -125,7 +125,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             IEnumerable<XElement> compileElementsBeforeRemove = _initialCsprojWithElements.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
             string firstCompileElementIncludeValue = compileElementsBeforeRemove.First().Attribute(Constants.IncludeAttribute).Value;
 
-            CsProjModifierResult result = CsProjModifier.RemoveFiles(CsProjWithElementsPath, new List<string> { firstCompileElementIncludeValue });
+            FileModifierResult result = CsProjModifier.RemoveFiles(CsProjWithElementsPath, new List<string> { firstCompileElementIncludeValue });
             Assert.IsTrue(result.Success);
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
@@ -143,7 +143,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             IEnumerable<XElement> contentElementsBeforeRemove = _initialCsprojWithElements.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.ContentElem));
             string firstContentElementIncludeValue = contentElementsBeforeRemove.First().Attribute(Constants.IncludeAttribute).Value;
 
-            CsProjModifierResult result = CsProjModifier.RemoveFiles(CsProjWithElementsPath, new List<string> { firstContentElementIncludeValue });
+            FileModifierResult result = CsProjModifier.RemoveFiles(CsProjWithElementsPath, new List<string> { firstContentElementIncludeValue });
             Assert.IsTrue(result.Success);
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);

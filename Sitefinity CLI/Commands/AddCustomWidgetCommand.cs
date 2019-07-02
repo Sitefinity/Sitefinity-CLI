@@ -10,10 +10,6 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.AddCustomWidgetCommandName, Description = "Adds a new custom widget to the current project.", FullName = Constants.AddCustomWidgetCommandFullName)]
     internal class AddCustomWidgetCommand : AddToSitefinityCommandBase
     {
-        [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
-        [DefaultValue(Constants.DefaultSourceTemplateName)]
-        public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
-
         protected override string FolderPath => Constants.MVCFolderName;
 
         protected override string CreatedMessage => Constants.CustomWidgetCreatedMessage;

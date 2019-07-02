@@ -2,6 +2,7 @@
 using Sitefinity_CLI.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -17,6 +18,10 @@ namespace Sitefinity_CLI.Commands
 
         protected abstract string TemplatesFolder { get; }
 
+        [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
+        [DefaultValue(Constants.DefaultSourceTemplateName)]
+        public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
+
         public override int OnExecute(CommandLineApplication config)
         {
             if (base.OnExecute(config) == 1)
@@ -26,7 +31,7 @@ namespace Sitefinity_CLI.Commands
 
             var folderPath = Path.Combine(this.ProjectRootPath, this.FolderPath);
 
-             if (this.IsSitefinityProject)
+            if (this.IsSitefinityProject)
             {
                 Directory.CreateDirectory(folderPath);
             }
@@ -52,7 +57,7 @@ namespace Sitefinity_CLI.Commands
             if (this.AddToSitefinity(config) == 1)
             {
                 return 1;
-            }          
+            }
 
             Utils.WriteLine(string.Format(this.CreatedMessage, this.Name), ConsoleColor.Green);
             if (filesAddedToCsProjResult == null || !filesAddedToCsProjResult.Success)
@@ -129,10 +134,10 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        protected CsProjModifierResult AddFilesToCsProj()
+        protected FileModifierResult AddFilesToCsProj()
         {
             string csprojFilePath = GetCsprojFilePath();
-            CsProjModifierResult result = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
+            FileModifierResult result = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
 
             return result;
         }
@@ -152,6 +157,6 @@ namespace Sitefinity_CLI.Commands
 
         protected List<string> createdFiles;
 
-        protected CsProjModifierResult filesAddedToCsProjResult;
+        protected FileModifierResult filesAddedToCsProjResult;
     }
 }

@@ -9,10 +9,6 @@ namespace Sitefinity_CLI.Commands
     [Command(Name = Constants.AddModuleCommandName, Description = "Adds a new module to the current project.", FullName = Constants.AddModuleCommandFullName)]
     internal class AddModuleCommand : AddToSitefinityCommandBase
     {
-        [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
-        [DefaultValue(Constants.DefaultSourceTemplateName)]
-        public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
-
         protected override string FolderPath => Constants.ModuleFolderName;
 
         protected override string CreatedMessage => Constants.ModuleCreatedMessage;

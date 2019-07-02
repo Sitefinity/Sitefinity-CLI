@@ -21,6 +21,12 @@ namespace Sitefinity_CLI
         public const string PageTemplateTemplatesFolderName = "PageTemplate";
         public const string CustomWidgetTemplatesFolderName = "CustomWidget";
         public const string ModuleTemplatesFolderName = "Module";
+        public const string IntegrationTestsTemplateFolderName = "IntegrationTests";
+        public const string IntegrationTestsFolderName = "SitefinityWebApp.Tests.Integration";
+        public const string AssemblyInfoFileName = "AssemblyInfo";
+        public const string IntegrationTestClassName = "DemoTests";
+        public const string PackagesFileName = "packages";
+        public const string CsProjTemplateName = "csproj";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
@@ -48,6 +54,7 @@ namespace Sitefinity_CLI
         public const string FileCreatedMessage = "File \"{0}\" created! Path: \"{1}\"";
         public const string ResourcePackageCreatedMessage = "Resource package \"{0}\" created! Path: \"{1}\"";
         public const string ModuleCreatedMessage = "Module \"{0}\" created!";
+        public const string IntegrationTestsCreatedMessage = "Integration tests project \"{0}\" created!";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
@@ -64,6 +71,7 @@ namespace Sitefinity_CLI
         public const string VBFileExtension = ".vb";
         public const string JavaScriptFileExtension = ".js";
         public const string CsprojFileExtension = ".csproj";
+        public const string ConfigFileExtension = ".config";
 
         // Command names
         public const string AddCommandName = "add";
@@ -77,6 +85,8 @@ namespace Sitefinity_CLI
         public const string AddCustomWidgetCommandFullName = "Widget";
         public const string AddModuleCommandName = "module";
         public const string AddModuleCommandFullName = "Module";
+        public const string AddIntegrationTestsCommandName = "tests";
+        public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
 
         public const string DefaultResourcePackageName_VersionsBefore12_0 = "Bootstrap";
@@ -87,6 +97,7 @@ namespace Sitefinity_CLI
         // cs proj modifier constants
         public const string ItemGroupElem = "ItemGroup";
         public const string CompileElem = "Compile";
+        public const string NoneElem = "None";
         public const string ContentElem = "Content";
         public const string ProjectElem = "Project";
         public const string IncludeAttribute = "Include";
