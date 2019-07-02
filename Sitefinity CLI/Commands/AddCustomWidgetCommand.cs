@@ -2,7 +2,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.Commands
@@ -27,8 +26,9 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
-        protected override IEnumerable<FileModel> GetFileModels()
+        protected override ICollection<FileModel> GetFileModels()
         {
+            var models = base.GetFileModels();
             var mvcFolderPath = Path.Combine(this.ProjectRootPath, Constants.MVCFolderName);
             var viewsFolderPath = Path.Combine(mvcFolderPath, Constants.ViewsFolderName);
             var scriptsFolderPath = Path.Combine(mvcFolderPath, Constants.ScriptsFolderName);
@@ -39,34 +39,31 @@ namespace Sitefinity_CLI.Commands
 
             var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.CustomWidgetTemplatesFolderName, this.TemplateName);
 
-            var models = new List<FileModel>()
+            models.Add(new FileModel()
             {
-                new FileModel()
-                {
-                    FilePath = Path.Combine(controllersFolderPath, string.Format("{0}{1}{2}", this.Name, "Controller", Constants.CSharpFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, "Controller.Template")
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(modelsFolderPath, string.Format("{0}{1}{2}", this.Name, "Model", Constants.CSharpFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, "Model.Template")
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "Index", Constants.RazorFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, "View.Template")
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(scriptsWidgetFolderPath, string.Format("{0}{1}", "designerview-simple", Constants.JavaScriptFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, "Designer.Template")
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, "DesignerView.Template")
-                },
-            };
+                FilePath = Path.Combine(controllersFolderPath, string.Format("{0}{1}{2}", this.Name, "Controller", Constants.CSharpFileExtension)),
+                TemplatePath = Path.Combine(templatePath, "Controller.Template")
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(modelsFolderPath, string.Format("{0}{1}{2}", this.Name, "Model", Constants.CSharpFileExtension)),
+                TemplatePath = Path.Combine(templatePath, "Model.Template")
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "Index", Constants.RazorFileExtension)),
+                TemplatePath = Path.Combine(templatePath, "View.Template")
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(scriptsWidgetFolderPath, string.Format("{0}{1}", "designerview-simple", Constants.JavaScriptFileExtension)),
+                TemplatePath = Path.Combine(templatePath, "Designer.Template")
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(viewsWidgetFolderPath, string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension)),
+                TemplatePath = Path.Combine(templatePath, "DesignerView.Template")
+            });
 
             return models;
         }

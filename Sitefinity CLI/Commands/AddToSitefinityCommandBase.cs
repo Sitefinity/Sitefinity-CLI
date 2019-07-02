@@ -124,7 +124,10 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
-        protected abstract IEnumerable<FileModel> GetFileModels();
+        protected virtual ICollection<FileModel> GetFileModels()
+        {
+            return new List<FileModel>();
+        }
 
         protected void DeleteFiles()
         {

@@ -24,35 +24,34 @@ namespace Sitefinity_CLI.Commands
 
         protected string BinFolder { get; set; }
 
-        protected override IEnumerable<FileModel> GetFileModels()
+        protected override ICollection<FileModel> GetFileModels()
         {
+            var models = base.GetFileModels();
+
             var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.IntegrationTestsTemplateFolderName, this.TemplateName);
 
-            var models = new List<FileModel>()
+            models.Add(new FileModel()
             {
-                new FileModel()
-                {
-                    FilePath = Path.Combine(this.ProjectRootPath, "Properties", string.Concat(Constants.AssemblyInfoFileName, Constants.CSharpFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, string.Concat(Constants.AssemblyInfoFileName, ".Template"))
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.IntegrationTestsFolderName, Constants.CsprojFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, string.Concat( Constants.CsProjTemplateName, ".Template"))
+                FilePath = Path.Combine(this.ProjectRootPath, "Properties", string.Concat(Constants.AssemblyInfoFileName, Constants.CSharpFileExtension)),
+                TemplatePath = Path.Combine(templatePath, string.Concat(Constants.AssemblyInfoFileName, ".Template"))
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.IntegrationTestsFolderName, Constants.CsprojFileExtension)),
+                TemplatePath = Path.Combine(templatePath, string.Concat(Constants.CsProjTemplateName, ".Template"))
 
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.IntegrationTestClassName, Constants.CSharpFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, string.Concat(Constants.IntegrationTestClassName, ".Template"))
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.IntegrationTestClassName, Constants.CSharpFileExtension)),
+                TemplatePath = Path.Combine(templatePath, string.Concat(Constants.IntegrationTestClassName, ".Template"))
 
-                },
-                new FileModel()
-                {
-                    FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.PackagesFileName, Constants.ConfigFileExtension)),
-                    TemplatePath = Path.Combine(templatePath, string.Concat(Constants.PackagesFileName, Constants.ConfigFileExtension, ".Template"))
-                },
-            };
+            });
+            models.Add(new FileModel()
+            {
+                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.PackagesFileName, Constants.ConfigFileExtension)),
+                TemplatePath = Path.Combine(templatePath, string.Concat(Constants.PackagesFileName, Constants.ConfigFileExtension, ".Template"))
+            });
 
             return models;
         }
