@@ -37,9 +37,8 @@ namespace Sitefinity_CLI.Commands
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(Constants.IntegrationTestsFolderName, Constants.CsprojFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(this.Name, Constants.CsprojFileExtension)),
                 TemplatePath = Path.Combine(templatePath, string.Concat(Constants.CsProjTemplateName, ".Template"))
-
             });
             models.Add(new FileModel()
             {
@@ -75,6 +74,8 @@ namespace Sitefinity_CLI.Commands
         {
             var currentPath = Path.GetDirectoryName(this.ProjectRootPath);
 
+            var webAppProjectName = Path.GetFileName(this.ProjectRootPath);
+
             while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
             {
                 currentPath = Directory.GetParent(currentPath)?.ToString();
@@ -88,7 +89,7 @@ namespace Sitefinity_CLI.Commands
             var webApp = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
             this.SolutionPath = webApp;
 
-            this.ProjectRootPath = Path.Combine(currentPath, Constants.IntegrationTestsFolderName);
+            this.ProjectRootPath = Path.Combine(currentPath, this.Name);
 
             Directory.CreateDirectory(this.ProjectRootPath);
 
@@ -114,7 +115,7 @@ namespace Sitefinity_CLI.Commands
 
             var project = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
 
-            var slnAddResult = SlnModifier.AddFile(this.SolutionPath, project, this.ProjectGuid);
+            var slnAddResult = SlnModifier.AddFile(this.SolutionPath, project, this.ProjectGuid, webAppProjectName);
 
             if (slnAddResult.Success)
             {
