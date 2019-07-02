@@ -51,8 +51,18 @@ namespace Sitefinity_CLI
 
             solutionContents = solutionContents.Insert(endGlobalSectionIndex, globalSection);
 
-            File.WriteAllText(slnFilePath, solutionContents);
-
+            try
+            {
+                File.WriteAllText(slnFilePath, solutionContents);
+            }
+            catch
+            {
+                return new FileModifierResult()
+                {
+                    Message = Constants.AddFilesInsufficientPrivilegesMessage,
+                    Success = false
+                };
+            }
             return new FileModifierResult()
             {
                 Message = string.Empty,

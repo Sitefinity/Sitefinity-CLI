@@ -60,11 +60,11 @@ namespace Sitefinity_CLI.Commands
             }
 
             Utils.WriteLine(string.Format(this.CreatedMessage, this.Name), ConsoleColor.Green);
-            if (filesAddedToCsProjResult == null || !filesAddedToCsProjResult.Success)
+            if (this.filesAddedToCsProjResult == null || !this.filesAddedToCsProjResult.Success)
             {
-                if (filesAddedToCsProjResult != null && !string.IsNullOrEmpty(filesAddedToCsProjResult.Message))
+                if (this.filesAddedToCsProjResult != null && !string.IsNullOrEmpty(this.filesAddedToCsProjResult.Message))
                 {
-                    Utils.WriteLine(filesAddedToCsProjResult.Message, ConsoleColor.Yellow);
+                    Utils.WriteLine(this.filesAddedToCsProjResult.Message, ConsoleColor.Yellow);
                 }
 
                 Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
@@ -111,7 +111,7 @@ namespace Sitefinity_CLI.Commands
                     this.CreateFileFromTemplate(fileModel.FilePath, fileModel.TemplatePath, config.FullName, data);
                 }
 
-                this.AddFilesToCsProj();
+                this.filesAddedToCsProjResult = this.AddFilesToCsProj();
             }
             catch (Exception)
             {

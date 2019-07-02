@@ -112,9 +112,29 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-            SlnModifier.AddFile(this.SolutionPath, this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension)), this.ProjectGuid);
+            var project = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
+
+            var slnAddResult = SlnModifier.AddFile(this.SolutionPath, project, this.ProjectGuid);
+
+            if (slnAddResult.Success)
+            {
+                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
+            }
+            else if (slnAddResult.Message != null)
+            {
+                Utils.WriteLine(slnAddResult.Message, ConsoleColor.Yellow);
+            }
+            else
+            {
+                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionFailureMessage, project), ConsoleColor.Yellow);
+            }
 
             return 0;
+        }
+
+        protected override string GetAssemblyPath()
+        {
+            return Directory.EnumerateFiles(Path.GetDirectoryName(this.SolutionPath), "Telerik.Sitefinity.dll", SearchOption.AllDirectories).FirstOrDefault();
         }
     }
 }

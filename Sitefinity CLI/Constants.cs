@@ -47,6 +47,7 @@ namespace Sitefinity_CLI
         public const string AddFilesToProjectMessage = "The file(s) should be added to the project manually.";
         public const string FilesAddedToProjectMessage = "The file(s) are added to the project successfully.";
         public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add the file(s) to the project.";
+        public const string AddFilesToSolutionFailureMessage = "File \"{0}\" unable to be added to solution!";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
@@ -55,6 +56,7 @@ namespace Sitefinity_CLI
         public const string ResourcePackageCreatedMessage = "Resource package \"{0}\" created! Path: \"{1}\"";
         public const string ModuleCreatedMessage = "Module \"{0}\" created!";
         public const string IntegrationTestsCreatedMessage = "Integration tests project \"{0}\" created!";
+        public const string AddFilesToSolutionSuccessMessage = "File \"{0}\" succesfully added to solution!";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
