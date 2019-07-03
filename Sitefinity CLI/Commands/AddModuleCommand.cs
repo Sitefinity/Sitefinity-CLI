@@ -63,6 +63,10 @@ namespace Sitefinity_CLI.Commands
                 FilePath = Path.Combine(this.ProjectRootPath, Constants.ModuleFolderName, this.Name, string.Format("{0}{1}", $"OpenAccess{this.Name}ModuleProvider", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ModuleTemplatesFolderName, this.TemplateName, "OpenAccessModuleProvider.Template")
             });
+            //if (this.Version < "12.0")
+            //{
+            //    models.Add(Installer)
+            //}
 
             return models;
         }

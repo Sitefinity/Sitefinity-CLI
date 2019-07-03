@@ -1,0 +1,40 @@
+﻿/* {{> sign}} */
+
+using MbUnit.Framework;
+
+namespace SitefinityWebApp.Tests.Integration
+{
+    [TestFixture]
+    [Description("Integration tests project")]
+    [Author("Sitefinity CLI")]
+    public class DemoTests
+    {
+        [Test]
+        [Category("Demo Tests")]
+        [Description("This test should pass")]
+        [Author("Sitefinity CLI")]
+        public void Test_ShouldPass()
+        {
+            Assert.IsTrue(true);
+        }
+
+        [Test]
+        [Category("Demo Tests")]
+        [Description("This test should NOT pass")]
+        [Author("Sitefinity CLI")]
+        public void Test_ShouldNotPass()
+        {
+            Assert.IsTrue(false);
+        }
+
+        [Ignore]
+        [Test]
+        [Category("Demo Tests")]
+        [Description("This test should not run")]
+        [Author("Sitefinity CLI")]
+        public void Test_ShouldNotRun()
+        {
+            Assert.IsTrue(true);
+        }
+    }
+}

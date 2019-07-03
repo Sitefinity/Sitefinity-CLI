@@ -72,9 +72,14 @@ namespace Sitefinity_CLI.Commands
 
         public override int OnExecute(CommandLineApplication config)
         {
-            var currentPath = Path.GetDirectoryName(this.ProjectRootPath);
+            var currentPath = this.ProjectRootPath;
 
-            var webAppProjectName = Path.GetFileName(this.ProjectRootPath);
+            if (!Directory.Exists(currentPath))
+            {
+                currentPath = Path.GetDirectoryName(currentPath);
+            }
+
+            var webAppProjectName = Path.GetFileName(Directory.EnumerateFiles(currentPath, "*.csproj", SearchOption.TopDirectoryOnly).FirstOrDefault());
 
             while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
             {
@@ -98,6 +103,7 @@ namespace Sitefinity_CLI.Commands
 
             if (string.IsNullOrEmpty(binFolder))
             {
+                Utils.WriteLine(Constants.ProjectNotFound);
                 return 1;
             }
 
