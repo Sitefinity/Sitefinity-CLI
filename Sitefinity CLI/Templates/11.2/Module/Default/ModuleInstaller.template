@@ -1,13 +1,9 @@
-﻿using SitefinityWebApp.Modules.{{name}};
-using System;
-using System.Web;
+﻿using System;
 using Telerik.Sitefinity.Abstractions;
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Services;
 
-[assembly: PreApplicationStartMethod(typeof({{name}}ModuleInstaller), "PreApplicationStart")]
-
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     public class {{name}}ModuleInstaller
     {

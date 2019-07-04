@@ -2,7 +2,7 @@
 
 using Telerik.Sitefinity.Localization;
 
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     internal class {{name}}ModuleResources : Resource
     {

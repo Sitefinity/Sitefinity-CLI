@@ -7,7 +7,7 @@ using Telerik.Sitefinity.Security;
 using Telerik.Sitefinity.Security.Configuration;
 using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     internal class {{name}}ModuleConfig : ContentModuleConfigBase
     {

@@ -3,7 +3,7 @@
 using System;
 using Telerik.Sitefinity.Data;
 
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     public class {{name}}ModuleDataProvider : DataProviderBase
     {

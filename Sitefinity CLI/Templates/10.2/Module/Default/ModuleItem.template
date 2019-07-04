@@ -4,7 +4,7 @@ using System;
 using Telerik.Sitefinity;
 using Telerik.Sitefinity.Workflow.Model.Tracking;
 
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     internal class {{name}}ModuleItem : IWorkflowItem
     {

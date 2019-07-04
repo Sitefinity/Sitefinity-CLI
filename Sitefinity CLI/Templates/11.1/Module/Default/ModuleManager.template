@@ -3,7 +3,7 @@
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Data;
 
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     public class {{name}}ModuleManager : ManagerBase<{{name}}ModuleDataProvider>
     {

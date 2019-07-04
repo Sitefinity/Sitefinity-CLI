@@ -1,6 +1,5 @@
 /* {{> sign}} */
 
-using SitefinityWebApp.Modules.{{name}};
 using System;
 using System.Text.RegularExpressions;
 using Telerik.Sitefinity;
@@ -9,7 +8,7 @@ using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Fluent.Modules;
 using Telerik.Sitefinity.Services;
 
-namespace SitefinityWebApp.Modules.{{name}}
+namespace {{name}}
 {
     public class {{name}}Module : ModuleBase
     {

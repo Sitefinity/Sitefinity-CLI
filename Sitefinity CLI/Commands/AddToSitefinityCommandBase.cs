@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -21,6 +22,14 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
+
+        protected string CamelCaseName
+        {
+            get
+            {
+                return this.ToPascalCase(this.Name);
+            }
+        }
 
         public override int OnExecute(CommandLineApplication config)
         {
@@ -156,6 +165,15 @@ namespace Sitefinity_CLI.Commands
         {
             string csProjFilePath = GetCsprojFilePath();
             CsProjModifier.RemoveFiles(csProjFilePath, this.createdFiles);
+        }
+
+        private string ToPascalCase(string s)
+        {
+            s = Regex.Replace(s, @"[^\-\!\$\(\)\=\@\d_\']+", " ", RegexOptions.IgnoreCase);
+
+            var words = s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1));
+
+            return string.Concat(words);
         }
 
         protected List<string> createdFiles;
