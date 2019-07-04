@@ -61,11 +61,13 @@ namespace Sitefinity_CLI
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
+        public const string DescriptionOptionDescription = "The description of your module";
         public const string ResourcePackageOptionDescription = "The name of the resource package where you want to add the generated resource. Default value: ";
         public const string ProjectRoothPathOptionDescription = "The path to the root of the project where the command will execute.";
         public const string VersionOptionDescription = "Sitefinity version which is compatible with the resource you want to generate.";
         public const string NameArgumentDescription = "The name of the resource you want to add to the current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
+        public const string DescriptionOptionTemplate = "-d|--description";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";

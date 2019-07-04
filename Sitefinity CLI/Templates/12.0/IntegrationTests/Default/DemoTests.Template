@@ -2,7 +2,7 @@
 
 using MbUnit.Framework;
 
-namespace SitefinityWebApp.Tests.Integration
+namespace {{name}}
 {
     [TestFixture]
     [Description("Integration tests project")]

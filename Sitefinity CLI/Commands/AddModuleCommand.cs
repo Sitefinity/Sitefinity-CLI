@@ -1,5 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Sitefinity_CLI.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -9,11 +10,32 @@ namespace Sitefinity_CLI.Commands
     [Command(Name = Constants.AddModuleCommandName, Description = "Adds a new module to the current project.", FullName = Constants.AddModuleCommandFullName)]
     internal class AddModuleCommand : AddToSitefinityCommandBase
     {
+        [Option(Constants.DescriptionOptionTemplate, Constants.DescriptionOptionDescription, CommandOptionType.SingleValue)]
+        [DefaultValue("")]
+        public string Description { get; set; }
+
         protected override string FolderPath => Constants.ModuleFolderName;
 
         protected override string CreatedMessage => Constants.ModuleCreatedMessage;
 
         protected override string TemplatesFolder => Constants.ModuleTemplatesFolderName;
+
+        protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
+        {
+            if (data is IDictionary<string, string> dictionary)
+            {
+                var date = DateTime.Today.ToString("yyyy/MM/dd");
+
+                dictionary["date"] = date;
+                dictionary["description"] = this.Description;
+            }
+            else
+            {
+                return 1;
+            }
+
+            return base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data);
+        }
 
         protected override ICollection<FileModel> GetFileModels()
         {
@@ -63,10 +85,19 @@ namespace Sitefinity_CLI.Commands
                 FilePath = Path.Combine(this.ProjectRootPath, Constants.ModuleFolderName, this.Name, string.Format("{0}{1}", $"OpenAccess{this.Name}ModuleProvider", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ModuleTemplatesFolderName, this.TemplateName, "OpenAccessModuleProvider.Template")
             });
-            //if (this.Version < "12.0")
-            //{
-            //    models.Add(Installer)
-            //}
+
+            var currentVersion = System.Version.Parse(this.Version);
+            var targetVersion = System.Version.Parse("12.0");
+
+            if (currentVersion < targetVersion)
+            {
+                models.Add(new FileModel()
+                {
+                    FilePath = Path.Combine(this.ProjectRootPath, Constants.ModuleFolderName, this.Name, string.Format("{0}{1}", $"{this.Name}ModuleInstaller", Constants.CSharpFileExtension)),
+                    TemplatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ModuleTemplatesFolderName, this.TemplateName, "ModuleInstaller.Template")
+                });
+            }
+
 
             return models;
         }

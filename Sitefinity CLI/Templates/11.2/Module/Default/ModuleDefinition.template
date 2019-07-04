@@ -7,7 +7,7 @@ using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
 namespace SitefinityWebApp.Modules.{{name}}
 {
-    internal static class {{name}}ModuleDefinitions
+    internal static class {{name}}ModuleDefinition
     {
         internal static ContentViewControlElement Define{{name}}BackendContentView(ConfigElement parent)
         {
@@ -15,22 +15,22 @@ namespace SitefinityWebApp.Modules.{{name}}
             var fluentContentView = App.WorkWith().Module({{name}}Module.moduleName).DefineContainer(parent, BackendDefinitionName, typeof({{name}}ModuleItem));
             var backendContentView = fluentContentView.Get();
 
-            backendContentView.ViewsConfig.AddLazy({{name}}ModuleDefinitions.BackendListViewName, () => DefineNewsBackendListView(fluentContentView));
+            backendContentView.ViewsConfig.AddLazy({{name}}ModuleDefinition.BackendListViewName, () => DefineNewsBackendListView(fluentContentView));
             return backendContentView;
         }
 
         private static ConfigElement DefineNewsBackendListView(ContentViewControlDefinitionFacade fluentContentView)
         {
             var fluentMasterView = fluentContentView
-                .AddMasterView({{name}}ModuleDefinitions.BackendListViewName)
+                .AddMasterView({{name}}ModuleDefinition.BackendListViewName)
                 .LocalizeUsing<{{name}}ModuleResources>()
-                .SetTitle("{{name}}Title")
+                .SetTitle("{{name}}")
                 .SetServiceBaseUrl("~/Sitefinity/Services/Content/{{name}}ItemService.svc/");
             var newsGridView = fluentMasterView.Get();
             return newsGridView;
         }
 
-        public const string BackendDefinitionName = "DummModuleBackend";
-        public const string BackendListViewName = "DummModuleBackendList";
+        public const string BackendDefinitionName = "{{name}}ModuleBackend";
+        public const string BackendListViewName = "{{name}}ModuleBackendList";
     }
 }

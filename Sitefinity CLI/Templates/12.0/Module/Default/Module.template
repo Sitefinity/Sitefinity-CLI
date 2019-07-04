@@ -2,13 +2,14 @@
 
 using SitefinityWebApp.Modules.{{name}};
 using System;
+using System.Text.RegularExpressions;
 using Telerik.Sitefinity;
 using Telerik.Sitefinity.Abstractions;
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Fluent.Modules;
 using Telerik.Sitefinity.Services;
 
-[assembly: SitefinityModule({{name}}Module.moduleName, typeof({{name}}Module), "{{name}}ModuleTitle", "{{name}}ModuleDescription", StartupType.OnApplicationStart)]
+// [assembly: SitefinityModule({{name}}Module.moduleName, typeof({{name}}Module), "{{name}}", "{{description}}", StartupType.OnApplicationStart)]
 namespace SitefinityWebApp.Modules.{{name}}
 {
     public class {{name}}Module : ModuleBase
@@ -30,27 +31,28 @@ namespace SitefinityWebApp.Modules.{{name}}
 
         public override void Install(SiteInitializer initializer)
         {
+			var urlName = Regex.Replace("{{name}}", @"[^\-\!\$\(\)\=\@\d_\']+", "-", RegexOptions.IgnoreCase).ToLower();
             initializer.Installer
                 .CreateModuleGroupPage(groupPageId, "{{name}}")
                     .PlaceUnder(CommonNode.TypesOfContent)
                     .LocalizeUsing<{{name}}ModuleResources>()
                     .SetTitleLocalized("PageGroupNodeTitle")
-                    .SetUrlName("{{name}}")
+                    .SetUrlName(urlName)
                     .SetDescriptionLocalized("PageGroupNodeDescription")
-                    .AddChildPage({{name}}Module.homePageId, "{{name}}Home")
+                    .AddChildPage({{name}}Module.homePageId, "{{name}} Home")
                         .LocalizeUsing<{{name}}ModuleResources>()
                         .SetTitleLocalized("{{name}}Title")
                         .SetHtmlTitleLocalized("{{name}}Title")
-                        .SetUrlName("{{name}}home")
-                        .SetDescriptionLocalized("{{name}}Description")
-                        .AddContentView({{name}}ModuleDefinitions.BackendDefinitionName, "{{name}}BackendView")
+                        .SetUrlName("{{urlName}}-home")
+                        .SetDescriptionLocalized("{{description}}")
+                        .AddContentView({{name}}ModuleDefinition.BackendDefinitionName, "{{name}}BackendView")
                         .Done()
                     .Done()
             .PageToolbox()
                 .ContentSection()
-                    .LoadOrAddWidget<{{name}}ModuleView>("{{name}}View")
-                        .SetTitle("{{name}}ViewTitle")
-                        .SetDescription("{{name}}ViewDescription")
+                    .LoadOrAddWidget<{{name}}ModuleView>("{{name}} View")
+                        .SetTitle("{{name}} View")
+                        .SetDescription("{{description}} View")
                         .LocalizeUsing<{{name}}ModuleResources>()
                         .SetCssClass("sf{{name}}ViewIcn")
                         .Done()
@@ -80,6 +82,6 @@ namespace SitefinityWebApp.Modules.{{name}}
 
         internal static Guid groupPageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3971");
         internal static Guid homePageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3972");
-        internal const string moduleName = "{{name}}Module";
+        internal const string moduleName = "{{name}}";
     }
 }

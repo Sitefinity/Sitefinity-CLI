@@ -1,0 +1,42 @@
+﻿using SitefinityWebApp.Modules.{{name}};
+using System;
+using System.Web;
+using Telerik.Sitefinity.Abstractions;
+using Telerik.Sitefinity.Configuration;
+using Telerik.Sitefinity.Services;
+
+[assembly: PreApplicationStartMethod(typeof({{name}}ModuleInstaller), "PreApplicationStart")]
+
+namespace SitefinityWebApp.Modules.{{name}}
+{
+    public class {{name}}ModuleInstaller
+    {
+        public static void PreApplicationStart()
+        {
+            Bootstrapper.Initialized += Bootstrapper_Initializing;
+        }
+
+        public static void Bootstrapper_Initializing(object sender, EventArgs e)
+        {
+            var moduleName = {{name}}Module.moduleName;
+
+            if (!Config.Get<SystemConfig>().ApplicationModules.ContainsKey(moduleName))
+            {
+                var configManager = ConfigManager.GetManager();
+                var modulesConfig = configManager.GetSection<SystemConfig>().ApplicationModules;
+
+                var moduleSettings = new AppModuleSettings(modulesConfig)
+                {
+                    Name = moduleName,
+                    Type = typeof({{name}}Module).AssemblyQualifiedName,
+                    Title = moduleName,
+                    Description = "{{description}}",
+                    StartupType = StartupType.OnApplicationStart
+                };
+
+                modulesConfig.Add(moduleName, moduleSettings);
+                configManager.SaveSection(modulesConfig.Section);
+            }
+        }
+    }
+}

@@ -13,8 +13,8 @@ namespace SitefinityWebApp.Modules.{{name}}
     {
         protected override void InitializeDefaultViews(ConfigElementDictionary<string, ContentViewControlElement> contentViewControls)
         {
-            contentViewControls.Add({{name}}ModuleDefinitions.BackendDefinitionName,
-                {{name}}ModuleDefinitions.Define{{name}}BackendContentView(contentViewControls));
+            contentViewControls.Add({{name}}ModuleDefinition.BackendDefinitionName,
+                {{name}}ModuleDefinition.Define{{name}}BackendContentView(contentViewControls));
 
         }
 
@@ -27,7 +27,6 @@ namespace SitefinityWebApp.Modules.{{name}}
                 ProviderType = typeof(OpenAccess{{name}}ModuleProvider),
                 Parameters = new NameValueCollection() { { "applicationName", "/{{name}}" } }
             });
-
         }
 
         protected override void OnPropertiesInitialized()
