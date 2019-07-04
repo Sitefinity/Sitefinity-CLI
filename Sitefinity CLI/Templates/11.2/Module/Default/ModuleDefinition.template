@@ -5,32 +5,32 @@ using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Fluent.Definitions;
 using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    internal static class {{name}}ModuleDefinition
+    internal static class {{pascalCaseName}}ModuleDefinition
     {
-        internal static ContentViewControlElement Define{{name}}BackendContentView(ConfigElement parent)
+        internal static ContentViewControlElement Define{{pascalCaseName}}BackendContentView(ConfigElement parent)
         {
             // define content view control
-            var fluentContentView = App.WorkWith().Module({{name}}Module.moduleName).DefineContainer(parent, BackendDefinitionName, typeof({{name}}ModuleItem));
+            var fluentContentView = App.WorkWith().Module({{pascalCaseName}}Module.moduleName).DefineContainer(parent, BackendDefinitionName, typeof({{pascalCaseName}}ModuleItem));
             var backendContentView = fluentContentView.Get();
 
-            backendContentView.ViewsConfig.AddLazy({{name}}ModuleDefinition.BackendListViewName, () => DefineNewsBackendListView(fluentContentView));
+            backendContentView.ViewsConfig.AddLazy({{pascalCaseName}}ModuleDefinition.BackendListViewName, () => DefineNewsBackendListView(fluentContentView));
             return backendContentView;
         }
 
         private static ConfigElement DefineNewsBackendListView(ContentViewControlDefinitionFacade fluentContentView)
         {
             var fluentMasterView = fluentContentView
-                .AddMasterView({{name}}ModuleDefinition.BackendListViewName)
-                .LocalizeUsing<{{name}}ModuleResources>()
+                .AddMasterView({{pascalCaseName}}ModuleDefinition.BackendListViewName)
+                .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
                 .SetTitle("{{name}}")
-                .SetServiceBaseUrl("~/Sitefinity/Services/Content/{{name}}ItemService.svc/");
+                .SetServiceBaseUrl("~/Sitefinity/Services/Content/{{pascalCaseName}}ItemService.svc/");
             var newsGridView = fluentMasterView.Get();
             return newsGridView;
         }
 
-        public const string BackendDefinitionName = "{{name}}ModuleBackend";
-        public const string BackendListViewName = "{{name}}ModuleBackendList";
+        public const string BackendDefinitionName = "{{pascalCaseName}}ModuleBackend";
+        public const string BackendListViewName = "{{pascalCaseName}}ModuleBackendList";
     }
 }

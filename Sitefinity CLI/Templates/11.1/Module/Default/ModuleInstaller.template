@@ -3,9 +3,9 @@ using Telerik.Sitefinity.Abstractions;
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Services;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    public class {{name}}ModuleInstaller
+    public class {{pascalCaseName}}ModuleInstaller
     {
         public static void PreApplicationStart()
         {
@@ -14,7 +14,7 @@ namespace {{name}}
 
         public static void Bootstrapper_Initializing(object sender, EventArgs e)
         {
-            var moduleName = {{name}}Module.moduleName;
+            var moduleName = {{pascalCaseName}}Module.moduleName;
 
             if (!Config.Get<SystemConfig>().ApplicationModules.ContainsKey(moduleName))
             {
@@ -23,8 +23,8 @@ namespace {{name}}
 
                 var moduleSettings = new AppModuleSettings(modulesConfig)
                 {
-                    Name = moduleName,
-                    Type = typeof({{name}}Module).AssemblyQualifiedName,
+                    Name = {{pascalCaseName}},
+                    Type = typeof({{pascalCaseName}}Module).AssemblyQualifiedName,
                     Title = moduleName,
                     Description = "{{description}}",
                     StartupType = StartupType.OnApplicationStart

@@ -50,52 +50,52 @@ namespace Sitefinity_CLI.Commands
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(this.Name, Constants.CsprojFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, string.Concat(this.PascalCaseName, Constants.CsprojFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, string.Concat(Constants.CsProjTemplateName, ".Template"))
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "Module", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "Module", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "Module.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleConfig", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleConfig", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleConfig.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleDataProvider", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleDataProvider", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleDataProvider.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleDefinition", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleDefinition", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleDefinition.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleItem", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleItem", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleItem.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleManager", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleManager", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleManager.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleResources", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleResources", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleResources.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}{2}", this.Name, "ModuleView", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}{2}", this.PascalCaseName, "ModuleView", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleView.Template")
             });
             models.Add(new FileModel()
             {
-                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}", $"OpenAccess{this.Name}ModuleProvider", Constants.CSharpFileExtension)),
+                FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}", $"OpenAccess{this.PascalCaseName}ModuleProvider", Constants.CSharpFileExtension)),
                 TemplatePath = Path.Combine(this.CurrentPath, templatePath, "OpenAccessModuleProvider.Template")
             });
 
@@ -106,7 +106,7 @@ namespace Sitefinity_CLI.Commands
             {
                 models.Add(new FileModel()
                 {
-                    FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.Name, string.Format("{0}{1}", $"{this.Name}ModuleInstaller", Constants.CSharpFileExtension)),
+                    FilePath = Path.Combine(this.ProjectRootPath, /* Constants.ModuleFolderName, */this.PascalCaseName, string.Format("{0}{1}", $"{this.PascalCaseName}ModuleInstaller", Constants.CSharpFileExtension)),
                     TemplatePath = Path.Combine(this.CurrentPath, templatePath, "ModuleInstaller.Template")
                 });
             }

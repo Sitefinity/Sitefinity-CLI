@@ -2,9 +2,9 @@
 
 using Telerik.Sitefinity.Web.UI.ContentUI;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    internal class {{name}}ModuleView : ContentView
+    internal class {{pascalCaseName}}ModuleView : ContentView
     {
 
     }

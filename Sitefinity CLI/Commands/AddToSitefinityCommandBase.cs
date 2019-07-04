@@ -23,11 +23,15 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
-        protected string CamelCaseName
+        protected string PascalCaseName
         {
             get
             {
-                return this.ToPascalCase(this.Name);
+                if (string.IsNullOrEmpty(this.pascalCaseName))
+                {
+                    this.pascalCaseName = this.ToPascalCase(this.Name);
+                }
+                return this.pascalCaseName;
             }
         }
 
@@ -111,6 +115,7 @@ namespace Sitefinity_CLI.Commands
                     data["toolName"] = Constants.CLIName;
                     data["version"] = this.AssemblyVersion;
                     data["name"] = this.Name;
+                    data["pascalCaseName"] = this.PascalCaseName;
 
                     if (!Directory.Exists(folderPath))
                     {
@@ -169,12 +174,14 @@ namespace Sitefinity_CLI.Commands
 
         private string ToPascalCase(string s)
         {
-            s = Regex.Replace(s, @"[^\-\!\$\(\)\=\@\d_\']+", " ", RegexOptions.IgnoreCase);
+            s = Regex.Replace(s, @"[\!\$\(\)\=\@\d_`\'\-\.\,\&\;\:\""\\\|\/\?\>\<]+", " ", RegexOptions.IgnoreCase);
 
-            var words = s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1));
+            var words = s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1)).ToArray();
 
             return string.Concat(words);
         }
+
+        private string pascalCaseName;
 
         protected List<string> createdFiles;
 

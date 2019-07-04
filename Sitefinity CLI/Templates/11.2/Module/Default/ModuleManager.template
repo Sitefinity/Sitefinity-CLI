@@ -3,53 +3,53 @@
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Data;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    public class {{name}}ModuleManager : ManagerBase<{{name}}ModuleDataProvider>
+    public class {{pascalCaseName}}ModuleManager : ManagerBase<{{pascalCaseName}}ModuleDataProvider>
     {
-        public {{name}}ModuleManager()
+        public {{pascalCaseName}}ModuleManager()
             : this(null)
         {
         }
 
-        public {{name}}ModuleManager(string providerName)
+        public {{pascalCaseName}}ModuleManager(string providerName)
             : base(providerName)
         {
         }
 
-        public {{name}}ModuleManager(string providerName, string transactionName)
+        public {{pascalCaseName}}ModuleManager(string providerName, string transactionName)
             : base(providerName, transactionName)
         {
         }
 
         protected override GetDefaultProvider DefaultProviderDelegate
         {
-            get { return () => Config.Get<{{name}}ModuleConfig>().DefaultProvider; }
+            get { return () => Config.Get<{{pascalCaseName}}ModuleConfig>().DefaultProvider; }
         }
 
         public override string ModuleName
         {
-            get { return {{name}}Module.moduleName; }
+            get { return {{pascalCaseName}}Module.moduleName; }
         }
 
         protected override ConfigElementDictionary<string, DataProviderSettings> ProvidersSettings
         {
-            get { return Config.Get<{{name}}ModuleConfig>().Providers; }
+            get { return Config.Get<{{pascalCaseName}}ModuleConfig>().Providers; }
         }
 
-        public static {{name}}ModuleManager GetManager()
+        public static {{pascalCaseName}}ModuleManager GetManager()
         {
-            return ManagerBase<{{name}}ModuleDataProvider>.GetManager<{{name}}ModuleManager>();
+            return ManagerBase<{{pascalCaseName}}ModuleDataProvider>.GetManager<{{pascalCaseName}}ModuleManager>();
         }
 
-        public static {{name}}ModuleManager GetManager(string providerName, string transactionName)
+        public static {{pascalCaseName}}ModuleManager GetManager(string providerName, string transactionName)
         {
-            return ManagerBase<{{name}}ModuleDataProvider>.GetManager<{{name}}ModuleManager>(providerName, transactionName);
+            return ManagerBase<{{pascalCaseName}}ModuleDataProvider>.GetManager<{{pascalCaseName}}ModuleManager>(providerName, transactionName);
         }
 
-        public static {{name}}ModuleManager GetManager(string providerName)
+        public static {{pascalCaseName}}ModuleManager GetManager(string providerName)
         {
-            return ManagerBase<{{name}}ModuleDataProvider>.GetManager<{{name}}ModuleManager>(providerName);
+            return ManagerBase<{{pascalCaseName}}ModuleDataProvider>.GetManager<{{pascalCaseName}}ModuleManager>(providerName);
         }
     }
 }

@@ -2,9 +2,9 @@
 
 using Telerik.Sitefinity.Localization;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    internal class {{name}}ModuleResources : Resource
+    internal class {{pascalCaseName}}ModuleResources : Resource
     {
         [ResourceEntry(
             "PageGroupNodeTitle",
@@ -29,47 +29,47 @@ namespace {{name}}
         }
 
         [ResourceEntry(
-            "{{name}}Title",
+            "{{pascalCaseName}}Title",
             Value = "{{name}}",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{name}}Title
+        public string {{pascalCaseName}}Title
         {
-            get { return this["{{name}}Title"]; }
+            get { return this["{{pascalCaseName}}Title"]; }
         }
 
         [ResourceEntry(
-            "{{name}}Description",
+            "{{pascalCaseName}}Description",
             Value = "{{name}} Description",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{name}}Description
+        public string {{pascalCaseName}}Description
         {
-            get { return this["{{name}}Description"]; }
+            get { return this["{{pascalCaseName}}Description"]; }
         }
 
         [ResourceEntry(
-            "{{name}}ViewTitle",
+            "{{pascalCaseName}}ViewTitle",
             Value = "{{name}} View",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{name}}ViewTitle
+        public string {{pascalCaseName}}ViewTitle
         {
-            get { return this["{{name}}ViewTitle"]; }
+            get { return this["{{pascalCaseName}}ViewTitle"]; }
         }
 
         [ResourceEntry(
-            "{{name}}ViewDescription",
+            "{{pascalCaseName}}ViewDescription",
             Value = "{{name}} View Frontend Control",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{name}}ViewDescription
+        public string {{pascalCaseName}}ViewDescription
         {
-            get { return this["{{name}}ViewDescription"]; }
+            get { return this["{{pascalCaseName}}ViewDescription"]; }
         }
     }
 }

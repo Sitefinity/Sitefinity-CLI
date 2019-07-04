@@ -4,9 +4,9 @@ using Telerik.OpenAccess.Metadata;
 using Telerik.Sitefinity.Data;
 using Telerik.Sitefinity.Model;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    public class OpenAccess{{name}}ModuleProvider : {{name}}ModuleDataProvider, IOpenAccessDataProvider
+    public class OpenAccess{{pascalCaseName}}ModuleProvider : {{pascalCaseName}}ModuleDataProvider, IOpenAccessDataProvider
     {
         public OpenAccessProviderContext Context
         {

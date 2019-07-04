@@ -1,4 +1,4 @@
-﻿using {{name}};
+﻿using {{pascalCaseName}};
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Web;
@@ -6,11 +6,11 @@ using System.Web;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("{{name}}")]
+[assembly: AssemblyTitle("{{pascalCaseName}}")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("{{name}}")]
+[assembly: AssemblyProduct("{{pascalCaseName}}")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -35,4 +35,4 @@ using System.Web;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: PreApplicationStartMethod(typeof({{name}}ModuleInstaller), "PreApplicationStart")]
+[assembly: PreApplicationStartMethod(typeof({{pascalCaseName}}ModuleInstaller), "PreApplicationStart")]

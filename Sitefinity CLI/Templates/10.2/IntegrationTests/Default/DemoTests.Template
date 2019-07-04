@@ -2,7 +2,7 @@
 
 using MbUnit.Framework;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
     [TestFixture]
     [Description("Integration tests project")]

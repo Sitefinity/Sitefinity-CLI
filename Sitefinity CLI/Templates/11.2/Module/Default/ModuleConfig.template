@@ -7,14 +7,14 @@ using Telerik.Sitefinity.Security;
 using Telerik.Sitefinity.Security.Configuration;
 using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    internal class {{name}}ModuleConfig : ContentModuleConfigBase
+    internal class {{pascalCaseName}}ModuleConfig : ContentModuleConfigBase
     {
         protected override void InitializeDefaultViews(ConfigElementDictionary<string, ContentViewControlElement> contentViewControls)
         {
-            contentViewControls.Add({{name}}ModuleDefinition.BackendDefinitionName,
-                {{name}}ModuleDefinition.Define{{name}}BackendContentView(contentViewControls));
+            contentViewControls.Add({{pascalCaseName}}ModuleDefinition.BackendDefinitionName,
+                {{pascalCaseName}}ModuleDefinition.Define{{pascalCaseName}}BackendContentView(contentViewControls));
 
         }
 
@@ -24,8 +24,8 @@ namespace {{name}}
             {
                 Name = "OpenAccessDataProvider",
                 Description = "A provider that stores {{name}} module data in database using OpenAccess ORM.",
-                ProviderType = typeof(OpenAccess{{name}}ModuleProvider),
-                Parameters = new NameValueCollection() { { "applicationName", "/{{name}}" } }
+                ProviderType = typeof(OpenAccess{{pascalCaseName}}ModuleProvider),
+                Parameters = new NameValueCollection() { { "applicationName", "/{{pascalCaseName}}" } }
             });
         }
 
@@ -40,7 +40,7 @@ namespace {{name}}
         {
             var permission = new Permission(Permissions)
             {
-                Name = "{{name}}",
+                Name = "{{pascalCaseName}}",
                 Title = "{{name}}",
             };
             Permissions.Add(permission);
@@ -49,7 +49,7 @@ namespace {{name}}
             {
                 Name = "View",
                 Type = SecurityActionTypes.View,
-                Title = "View{{name}}",
+                Title = "View {{name}}",
             });
 
             var customPermissionsDisplaySettings = CustomPermissionsDisplaySettings;
@@ -61,7 +61,7 @@ namespace {{name}}
 
             var newsCustomActions = new SecuredObjectCustomPermissionSet(generalCustomSet.SecuredObjectCustomPermissionSets)
             {
-                TypeName = typeof({{name}}ModuleItem).FullName
+                TypeName = typeof({{pascalCaseName}}ModuleItem).FullName
             };
             generalCustomSet.SecuredObjectCustomPermissionSets.Add(newsCustomActions);
 

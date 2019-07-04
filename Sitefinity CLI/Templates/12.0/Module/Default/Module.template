@@ -1,6 +1,5 @@
 /* {{> sign}} */
 
-using {{name}};
 using System;
 using System.Text.RegularExpressions;
 using Telerik.Sitefinity;
@@ -9,10 +8,9 @@ using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Fluent.Modules;
 using Telerik.Sitefinity.Services;
 
-[assembly: SitefinityModule(PeshoModule.moduleName, typeof(PeshoModule), PeshoModule.moduleName, "{{description}}", StartupType.OnApplicationStart)]
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    public class {{name}}Module : ModuleBase
+    public class {{pascalCaseName}}Module : ModuleBase
     {
         public override Guid LandingPageId
         {
@@ -25,43 +23,43 @@ namespace {{name}}
 
             App.WorkWith().Module(Name)
                 .Initialize()
-                    .Configuration<{{name}}ModuleConfig>()
-                    .Localization<{{name}}ModuleResources>();
+                    .Configuration<{{pascalCaseName}}ModuleConfig>()
+                    .Localization<{{pascalCaseName}}ModuleResources>();
         }
 
         public override void Install(SiteInitializer initializer)
         {
-			var urlName = Regex.Replace("{{name}}", @"[^\-\!\$\(\)\=\@\d_\']+", "-", RegexOptions.IgnoreCase).ToLower();
+			var urlName = Regex.Replace("{{name}}", @"[\-\!\$\(\)\=\@\d_\']+", "-", RegexOptions.IgnoreCase).ToLower();
             initializer.Installer
                 .CreateModuleGroupPage(groupPageId, "{{name}}")
                     .PlaceUnder(CommonNode.TypesOfContent)
-                    .LocalizeUsing<{{name}}ModuleResources>()
+                    .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
                     .SetTitleLocalized("PageGroupNodeTitle")
                     .SetUrlName(urlName)
                     .SetDescriptionLocalized("PageGroupNodeDescription")
-                    .AddChildPage({{name}}Module.homePageId, "{{name}} Home")
-                        .LocalizeUsing<{{name}}ModuleResources>()
-                        .SetTitleLocalized("{{name}}Title")
-                        .SetHtmlTitleLocalized("{{name}}Title")
-                        .SetUrlName("{{urlName}}-home")
+                    .AddChildPage({{pascalCaseName}}Module.homePageId, "{{name}} Home")
+                        .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
+                        .SetTitleLocalized("{{name}}")
+                        .SetHtmlTitleLocalized("{{name}}")
+                        .SetUrlName(urlName + "-home")
                         .SetDescriptionLocalized("{{description}}")
-                        .AddContentView({{name}}ModuleDefinition.BackendDefinitionName, "{{name}}BackendView")
+                        .AddContentView({{pascalCaseName}}ModuleDefinition.BackendDefinitionName, "{{pascalCaseName}}BackendView")
                         .Done()
                     .Done()
             .PageToolbox()
                 .ContentSection()
-                    .LoadOrAddWidget<{{name}}ModuleView>("{{name}} View")
+                    .LoadOrAddWidget<{{pascalCaseName}}ModuleView>("{{name}} View")
                         .SetTitle("{{name}} View")
                         .SetDescription("{{description}} View")
-                        .LocalizeUsing<{{name}}ModuleResources>()
-                        .SetCssClass("sf{{name}}ViewIcn")
+                        .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
+                        .SetCssClass("sf{{pascalCaseName}}ViewIcn")
                         .Done()
                     .Done()
                 .Done()
-            .AddWorkflowType<{{name}}ModuleItem>()
-                .SetTitle("{{name}}Title")
-                .SetServiceUrl("~/Workflows/{{name}}Workflow.xamlx")
-                .LocalizeUsing<{{name}}ModuleResources>()
+            .AddWorkflowType<{{pascalCaseName}}ModuleItem>()
+                .SetTitle("{{name}}")
+                .SetServiceUrl("~/Workflows/{{pascalCaseName}}Workflow.xamlx")
+                .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
                 .Done();
 
         }
@@ -72,12 +70,12 @@ namespace {{name}}
 
         protected override ConfigSection GetModuleConfig()
         {
-            return Config.Get<{{name}}ModuleConfig>();
+            return Config.Get<{{pascalCaseName}}ModuleConfig>();
         }
 
         public override Type[] Managers
         {
-            get { return new Type[] { typeof({{name}}ModuleManager) }; }
+            get { return new Type[] { typeof({{pascalCaseName}}ModuleManager) }; }
         }
 
         internal static Guid groupPageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3971");

@@ -5,7 +5,7 @@ using Telerik.Sitefinity.Mvc;
 
 namespace SitefinityWebApp.Mvc.Models
 {
-	public class {{name}}Model
+	public class {{pascalCaseName}}Model
 	{
 		public string Message { get; set; }
 	}

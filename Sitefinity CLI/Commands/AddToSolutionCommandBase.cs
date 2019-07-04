@@ -53,7 +53,7 @@ namespace Sitefinity_CLI.Commands
             var webApp = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
             this.SolutionPath = webApp;
 
-            this.ProjectRootPath = Path.Combine(currentPath, this.Name);
+            this.ProjectRootPath = Path.Combine(currentPath, this.PascalCaseName);
 
             Directory.CreateDirectory(this.ProjectRootPath);
 

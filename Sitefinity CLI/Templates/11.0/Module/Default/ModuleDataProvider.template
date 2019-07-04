@@ -3,18 +3,18 @@
 using System;
 using Telerik.Sitefinity.Data;
 
-namespace {{name}}
+namespace {{pascalCaseName}}
 {
-    public class {{name}}ModuleDataProvider : DataProviderBase
+    public class {{pascalCaseName}}ModuleDataProvider : DataProviderBase
     {
         public override Type[] GetKnownTypes()
         {
-            return new Type[] { typeof({{name}}ModuleItem) };
+            return new Type[] { typeof({{pascalCaseName}}ModuleItem) };
         }
 
         public override string RootKey
         {
-            get { return "{{name}}Module"; }
+            get { return "{{pascalCaseName}}Module"; }
         }
     }
 }
