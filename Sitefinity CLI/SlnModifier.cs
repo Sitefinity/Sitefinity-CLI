@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Sitefinity_CLI
 {
-    internal static class SlnModifier
+    public static class SlnModifier
     {
         public static FileModifierResult AddFile(string slnFilePath, string csProjFilePath, Guid projectGuid, string webAppName)
         {
