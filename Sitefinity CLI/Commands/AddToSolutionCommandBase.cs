@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
-    internal abstract class AddToSolutionCommandBase : AddToSitefinityCommandBase
+    internal abstract class AddToSolutionCommandBase : AddToProjectCommandBase
     {
         protected Guid ProjectGuid { get; set; } = Guid.NewGuid();
 

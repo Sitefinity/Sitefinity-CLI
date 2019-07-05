@@ -23,7 +23,7 @@ namespace {{pascalCaseName}}
 
                 var moduleSettings = new AppModuleSettings(modulesConfig)
                 {
-                    Name = {{pascalCaseName}},
+                    Name = "{{pascalCaseName}}",
                     Type = typeof({{pascalCaseName}}Module).AssemblyQualifiedName,
                     Title = moduleName,
                     Description = "{{description}}",

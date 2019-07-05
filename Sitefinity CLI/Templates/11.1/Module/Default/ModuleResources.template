@@ -29,47 +29,47 @@ namespace {{pascalCaseName}}
         }
 
         [ResourceEntry(
-            "{{pascalCaseName}}Title",
+            "ModuleTitle",
             Value = "{{name}}",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{pascalCaseName}}Title
+        public string ModuleTitle
         {
-            get { return this["{{pascalCaseName}}Title"]; }
+            get { return this["ModuleTitle"]; }
         }
 
         [ResourceEntry(
-            "{{pascalCaseName}}Description",
+            "ModuleDescription",
             Value = "{{name}} Description",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{pascalCaseName}}Description
+        public string ModuleDescription
         {
-            get { return this["{{pascalCaseName}}Description"]; }
+            get { return this["ModuleDescription"]; }
         }
 
         [ResourceEntry(
-            "{{pascalCaseName}}ViewTitle",
+            "ModuleViewTitle",
             Value = "{{name}} View",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{pascalCaseName}}ViewTitle
+        public string ModuleViewTitle
         {
-            get { return this["{{pascalCaseName}}ViewTitle"]; }
+            get { return this["ModuleViewTitle"]; }
         }
 
         [ResourceEntry(
-            "{{pascalCaseName}}ViewDescription",
+            "ModuleViewDescription",
             Value = "{{name}} View Frontend Control",
             Description = "",
             LastModified = "{{today}}")
         ]
-        public string {{pascalCaseName}}ViewDescription
+        public string ModuleViewDescription
         {
-            get { return this["{{pascalCaseName}}ViewDescription"]; }
+            get { return this["ModuleViewDescription"]; }
         }
     }
 }

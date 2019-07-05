@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace Sitefinity_CLI.Commands
 {
-    internal abstract class AddToSitefinityCommandBase : CommandBase
+    internal abstract class AddToProjectCommandBase : CommandBase
     {
         protected IEnumerable<FileModel> FileModels { get; set; }
 
@@ -174,7 +174,7 @@ namespace Sitefinity_CLI.Commands
 
         private string ToPascalCase(string s)
         {
-            s = Regex.Replace(s, @"[\!\$\(\)\=\@\d_`\'\-\.\,\&\;\:\""\\\|\/\?\>\<]+", " ", RegexOptions.IgnoreCase);
+            s = Regex.Replace(s, @"[^A-Za-z]", " ", RegexOptions.IgnoreCase);
 
             var words = s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1)).ToArray();
 
