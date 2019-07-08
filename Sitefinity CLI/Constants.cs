@@ -37,7 +37,8 @@ namespace Sitefinity_CLI
         public const string FileExistsMessage = "File \"{0}\" already exists. Path: \"{1}\"";
         public const string TemplateNotFoundMessage = "The {0} you want to replicate is not found. Path: \"{1}\"";
         public const string ResourceExistsMessage = "{0} with name {1} already exists. Path: \"{2}\"";
-        public const string ProjectNotFound = "Unable to find csproj";
+        public const string ProjectNotFound = "Unable to find csproj file";
+        public const string SolutionNotFoundMessage = "Unable to find sln file";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";

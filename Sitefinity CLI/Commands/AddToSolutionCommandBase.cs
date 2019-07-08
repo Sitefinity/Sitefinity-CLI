@@ -45,24 +45,19 @@ namespace Sitefinity_CLI.Commands
                 currentPath = Directory.GetParent(currentPath)?.ToString();
                 if (string.IsNullOrEmpty(currentPath))
                 {
+                    Utils.WriteLine(Constants.SolutionNotFoundMessage, ConsoleColor.Red);
                     return 1;
                 }
             }
 
-            // TODO: refactor
-            var webApp = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
-            this.SolutionPath = webApp;
-
-            this.ProjectRootPath = Path.Combine(currentPath, this.PascalCaseName);
-
-            Directory.CreateDirectory(this.ProjectRootPath);
+            this.SolutionPath = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
 
             var sitefinityPath = Directory.EnumerateFiles(currentPath, "Telerik.Sitefinity.dll", SearchOption.AllDirectories).FirstOrDefault();
             var binFolder = Path.GetDirectoryName(sitefinityPath);
 
             if (string.IsNullOrEmpty(binFolder))
             {
-                Utils.WriteLine(Constants.ProjectNotFound);
+                Utils.WriteLine(Constants.ProjectNotFound, ConsoleColor.Red);
                 return 1;
             }
 
@@ -72,6 +67,9 @@ namespace Sitefinity_CLI.Commands
             }
 
             this.BinFolder = binFolder;
+
+            this.ProjectRootPath = Path.Combine(currentPath, this.PascalCaseName);
+            Directory.CreateDirectory(this.ProjectRootPath);
 
             if (base.OnExecute(config) == 1)
             {

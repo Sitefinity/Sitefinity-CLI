@@ -105,7 +105,7 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddCustomWidgetTest()
+        public void AddWidgetTest()
         {
             var resourceName = "Test";
 
@@ -276,7 +276,7 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddCustomWidgetWithSameNameTest()
+        public void AddWidgetWithSameNameTest()
         {
             var resourceName = "Test";
 
@@ -570,6 +570,108 @@ namespace Sitefinity_CLI.Tests
             }
         }
 
+        //[TestMethod]
+        public void AddModuleTest()
+        {
+            var resourceName = "Test";
+            var resourceDescription = "Custom module for testing";
+
+            foreach (var templatesVersion in testedTemplateVersions)
+            {
+                this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+
+                // first create folder
+                var moduleFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
+
+                var process = ExecuteCommand(
+                    commandName: Constants.AddModuleCommandName,
+                    resourceName: resourceName,
+                    description: resourceDescription,
+                    templatesVersion: templatesVersion,
+                    templateName: Constants.DefaultSourceTemplateName);
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                var fileName = string.Format("{0}{1}{2}{3}", "OpenAccess", resourceName, "ModuleProvider", Constants.CSharpFileExtension);
+                var folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "Module", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleConfig", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleDataProvider", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleDefinition", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleInstaller", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleItem", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleManager", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleResources", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleView", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", resourceName, Constants.CsprojFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", "AssemblyInfo", Constants.CSharpFileExtension);
+                folderPath = Path.Combine(moduleFolderPath, "Properties");
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                expectedOutputString.AppendLine(string.Format(Constants.ModuleCreatedMessage, resourceName));
+                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
+                Assert.AreEqual(expectedOutputString.ToString(), outputString);
+            }
+        }
+
+        private void CreateDummySolution(string folderPath)
+        {
+            var slnPath = Path.Combine(folderPath, "Test.sln");
+            var slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.sln");
+            File.WriteAllText(slnPath, slnContents);
+
+            var webAppFolderPath = Path.Combine(folderPath, "WebAppProject");
+            Directory.CreateDirectory(webAppFolderPath);
+
+            var webAppProjPath = Path.Combine(webAppFolderPath, "WebAppProject.csproj");
+            var webAppProjContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\CsProjModifierTests\\Data\\WithElements.csproj");
+            File.WriteAllText(webAppProjPath, webAppProjContents);
+
+            var binaryFolderPath = Path.Combine(webAppFolderPath, "bin");
+            Directory.CreateDirectory(binaryFolderPath);
+
+            var binaryFilesPath = Path.Combine(binaryFolderPath, "Telerik.Sitefinity.dll");
+            File.Create(binaryFilesPath);
+        }
+
         private string GetDefaulResourcetPackage(string version)
         {
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
@@ -710,7 +812,7 @@ namespace Sitefinity_CLI.Tests
             };
         }
 
-        private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion = null, string templateName = null, string resourcePackageName = null)
+        private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion = null, string templateName = null, string resourcePackageName = null, string description = null)
         {
             var process = this.CreateNewProcess();
 
@@ -730,6 +832,11 @@ namespace Sitefinity_CLI.Tests
             if (resourcePackageName != null)
             {
                 args = AddOptionToArguments(args, "-p", resourcePackageName);
+            }
+
+            if (description != null)
+            {
+                args = AddOptionToArguments(args, "-d", description);
             }
 
             process.StartInfo.Arguments = args;
