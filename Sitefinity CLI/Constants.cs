@@ -50,6 +50,7 @@ namespace Sitefinity_CLI
         public const string FilesAddedToProjectMessage = "The file(s) are added to the project successfully.";
         public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add the file(s) to the project.";
         public const string AddFilesToSolutionFailureMessage = "File \"{0}\" unable to be added to solution!";
+        public const string SolutionNotReadable = "Unable to read solution";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";

@@ -23,12 +23,21 @@ namespace Sitefinity_CLI
             {
                 return new FileModifierResult()
                 {
-                    Message = "Unable to read solution",
+                    Message = Constants.SolutionNotReadable,
                     Success = false
                 };
             }
 
             var fileName = Path.GetFileName(csProjFilePath);
+
+            if (string.IsNullOrEmpty(webAppName))
+            {
+                return new FileModifierResult()
+                {
+                    Message = "Unable to read solution",
+                    Success = false
+                };
+            }
 
             var fileIndex = solutionContents.IndexOf(webAppName);
 

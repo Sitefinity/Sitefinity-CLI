@@ -11,7 +11,7 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.AddIntegrationTestsCommandName, Description = "Adds a new custom widget to the current project.", FullName = Constants.AddIntegrationTestsCommandFullName)]
     internal class AddIntegrationTestsCommand : AddToSolutionCommandBase
     {
-        protected override string FolderPath => Constants.IntegrationTestsFolderName;
+        protected override string FolderPath => string.Empty;
 
         protected override string CreatedMessage => Constants.IntegrationTestsCreatedMessage;
 
