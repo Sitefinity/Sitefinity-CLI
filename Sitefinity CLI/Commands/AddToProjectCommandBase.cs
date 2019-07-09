@@ -174,7 +174,7 @@ namespace Sitefinity_CLI.Commands
 
         private string ToPascalCase(string s)
         {
-            s = Regex.Replace(s, @"[^A-Za-z]", " ", RegexOptions.IgnoreCase);
+            s = Regex.Replace(s, @"[^A-Za-z.]", " ", RegexOptions.IgnoreCase);
 
             var words = s.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w.Substring(0, 1).ToUpper() + w.Substring(1)).ToArray();
 

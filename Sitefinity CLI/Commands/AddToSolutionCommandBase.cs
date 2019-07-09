@@ -61,6 +61,8 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
+            this.ProjectRootPath = Path.Combine(currentPath, this.PascalCaseName);
+
             if (Path.IsPathRooted(binFolder))
             {
                 binFolder = Path.GetRelativePath(this.ProjectRootPath, binFolder);
@@ -68,7 +70,6 @@ namespace Sitefinity_CLI.Commands
 
             this.BinFolder = binFolder;
 
-            this.ProjectRootPath = Path.Combine(currentPath, this.PascalCaseName);
             Directory.CreateDirectory(this.ProjectRootPath);
 
             if (base.OnExecute(config) == 1)

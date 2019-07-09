@@ -14,7 +14,7 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue("")]
         public string Description { get; set; }
 
-        protected override string FolderPath => /*Constants.ModuleFolderName*/ string.Empty;
+        protected override string FolderPath => string.Empty;
 
         protected override string CreatedMessage => Constants.ModuleCreatedMessage;
 
