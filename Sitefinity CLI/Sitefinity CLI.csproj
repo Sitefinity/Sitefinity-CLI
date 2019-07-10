@@ -34,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\10.2\CustomWidget\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\10.2\IntegrationTests\Default\AssemblyInfo.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -80,6 +83,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\10.2\Module\Default\OpenAccessModuleProvider.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\Module\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\CustomWidget\Default\templates.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.0\IntegrationTests\Default\AssemblyInfo.Template">
@@ -130,6 +139,12 @@
     <None Update="Templates\11.0\Module\Default\OpenAccessModuleProvider.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\11.0\Module\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\CustomWidget\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\11.1\IntegrationTests\Default\AssemblyInfo.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -178,6 +193,12 @@
     <None Update="Templates\11.1\Module\Default\OpenAccessModuleProvider.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\11.1\Module\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\CustomWidget\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\11.2\IntegrationTests\Default\AssemblyInfo.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -188,6 +209,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.2\IntegrationTests\Default\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\Module\Default\AssemblyInfo.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.2\Module\Default\csproj.template">
@@ -205,6 +229,9 @@
     <None Update="Templates\11.2\Module\Default\ModuleDefinition.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\11.2\Module\Default\ModuleInstaller.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\11.2\Module\Default\ModuleItem.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -220,6 +247,12 @@
     <None Update="Templates\11.2\Module\Default\OpenAccessModuleProvider.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\11.2\Module\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\12.0\CustomWidget\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\12.0\IntegrationTests\Default\AssemblyInfo.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -230,6 +263,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\12.0\IntegrationTests\Default\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\12.0\IntegrationTests\Default\templates.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\12.0\Module\Default\Module.template">

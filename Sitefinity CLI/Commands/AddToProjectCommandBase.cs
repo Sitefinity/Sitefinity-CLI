@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Newtonsoft.Json;
 using Sitefinity_CLI.Model;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ namespace Sitefinity_CLI.Commands
         protected abstract string CreatedMessage { get; }
 
         protected abstract string TemplatesFolder { get; }
+
+        protected string TargetFolder => Path.Combine(this.ProjectRootPath, this.FolderPath);
 
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
@@ -138,9 +141,21 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
-        protected virtual ICollection<FileModel> GetFileModels()
+        protected virtual IEnumerable<FileModel> GetFileModels()
         {
-            return new List<FileModel>();
+            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, this.TemplatesFolder, this.TemplateName);
+
+            var templatesModelsJson = File.ReadAllText(Path.Combine(templatePath, "templates.json"));
+
+            var models = JsonConvert.DeserializeObject<IEnumerable<FileModel>>(templatesModelsJson);
+
+            foreach (var model in models)
+            {
+                model.FilePath = Path.Combine(this.TargetFolder, string.Format(model.FilePath, this.PascalCaseName));
+                model.TemplatePath = Path.Combine(templatePath, model.TemplatePath);
+            }
+
+            return models;
         }
 
         protected void DeleteFiles()

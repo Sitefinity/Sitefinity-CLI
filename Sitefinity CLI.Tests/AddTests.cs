@@ -107,7 +107,7 @@ namespace Sitefinity_CLI.Tests
 
         [TestMethod]
         public void AddGridWidgetTest()
-        {
+         {
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceToResourcePackage(Constants.AddGridWidgetCommandName, Constants.DefaultGridWidgetName, Constants.HtmlFileExtension, Constants.GridWidgetPath, templatesVersion);
