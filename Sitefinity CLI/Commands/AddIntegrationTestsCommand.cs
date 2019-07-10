@@ -15,13 +15,13 @@ namespace Sitefinity_CLI.Commands
 
         protected override string CreatedMessage => Constants.IntegrationTestsCreatedMessage;
 
-        protected override string TemplatesFolder => Constants.TemplatesFolderName;
+        protected override string TemplatesFolder => Constants.IntegrationTestsTemplateFolderName;
 
         protected override ICollection<FileModel> GetFileModels()
         {
             var models = base.GetFileModels();
 
-            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.IntegrationTestsTemplateFolderName, this.TemplateName);
+            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, this.TemplatesFolder, this.TemplateName);
 
             models.Add(new FileModel()
             {
