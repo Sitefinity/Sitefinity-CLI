@@ -624,6 +624,17 @@ namespace Sitefinity_CLI.Tests
                 folderPath = moduleFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
+                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll");
+                var binFolderRelativePath = Path.GetDirectoryName(sitefinityDllRelativePath);
+                var csProjContents = File.ReadAllText(Path.Combine(folderPath, fileName));
+
+                var outputPathCount = this.CountStringOccurrences(csProjContents, $"<OutputPath>{binFolderRelativePath}</OutputPath>");
+
+                Assert.AreEqual(2, outputPathCount);
+                Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(binFolderRelativePath, "Telerik.OpenAccess.dll")}</HintPath>"));
+                Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(sitefinityDllRelativePath)}</HintPath>"));
+                Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(binFolderRelativePath, "Telerik.Sitefinity.Model.dll")}</HintPath>"));
+
                 fileName = string.Format("{0}{1}{2}", resourceName, "Module", Constants.CSharpFileExtension);
                 folderPath = moduleFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
@@ -833,6 +844,14 @@ namespace Sitefinity_CLI.Tests
                 fileName = string.Format("{0}{1}", resourceName, Constants.CsprojFileExtension);
                 folderPath = testsFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll");
+                var binFolderRelativePath = Path.GetDirectoryName(sitefinityDllRelativePath);
+                var csProjContents = File.ReadAllText(Path.Combine(folderPath, fileName));
+
+                var outputPathCount = this.CountStringOccurrences(csProjContents, $"<OutputPath>{binFolderRelativePath}</OutputPath>");
+
+                Assert.AreEqual(2, outputPathCount);
 
                 fileName = string.Format("{0}{1}", "DemoTests", Constants.CSharpFileExtension);
                 folderPath = testsFolderPath;
@@ -1218,6 +1237,42 @@ namespace Sitefinity_CLI.Tests
             }
 
             return versions;
+        }
+
+        private string GetSolutionRelativePath(string relativeTo, string fileName)
+        {
+            var currentPath = relativeTo;
+            while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
+            {
+                currentPath = Directory.GetParent(currentPath)?.ToString();
+            }
+
+            if (string.IsNullOrEmpty(currentPath))
+            {
+                throw new FileNotFoundException("Unable to find sln file");
+            }
+
+            var path = Directory.EnumerateFiles(currentPath, fileName, SearchOption.AllDirectories).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new FileNotFoundException($"Unable to find {fileName}");
+            }
+
+            return Path.GetRelativePath(relativeTo, path);
+        }
+
+        private int CountStringOccurrences(string text, string pattern)
+        {
+            // Loop through all instances of the string 'text'.
+            int count = 0;
+            int i = 0;
+            while ((i = text.IndexOf(pattern, i)) != -1)
+            {
+                i += pattern.Length;
+                count++;
+            }
+            return count;
         }
     }
 }
