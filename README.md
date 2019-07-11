@@ -54,6 +54,16 @@ You can use the add command with the following subcommands:
 * To create a new **Widget**, execute the following command:
 
   ```sf add widget "CustomWidget"```
+  
+* To create a new **Integration Tests Project**, execute the following command:
+
+  ```sf add tests "Sitefinity.Tests.Integration" -t Default```
+  or
+  ```sf add tests "Sitefinity.Tests.Integration" -t Sample```
+  
+* To create a new **Custom Module**, execute the following command:
+
+  ```sf add module "Custom Module" -d "Description of the custom module"```
 
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 
