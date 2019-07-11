@@ -119,3 +119,9 @@ You can easily create custom templates. To do this, create a file with extension
 ]
 ```
 **NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
+
+## Known issues
+#### Visual Studio freeze/crash bug
+When Sitefinity VSIX is installed for the first time or there is a newer version of Sitefinity CLI, Visual Studio freezes until CLI is downloaded and unzipped and in some cases crashes. 
+
+After Sitefinity CLI is downloaded and unzipped Visual Studio restores it's normal behaviour
