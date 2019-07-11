@@ -4,6 +4,9 @@ using Telerik.Sitefinity.Web.UI.ContentUI;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents module view.
+    /// </summary>
     internal class {{pascalCaseName}}ModuleView : ContentView
     {
 

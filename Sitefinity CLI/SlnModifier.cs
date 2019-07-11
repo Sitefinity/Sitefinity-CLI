@@ -3,8 +3,19 @@ using System.IO;
 
 namespace Sitefinity_CLI
 {
+    /// <summary>
+    /// A class used to modify the contents of a sln file
+    /// </summary>
     public static class SlnModifier
     {
+        /// <summary>
+        /// Adds reference to a csproj file in a solution. 
+        /// </summary>
+        /// <param name="slnFilePath">The solution file path</param>
+        /// <param name="csProjFilePath">The csproj file path</param>
+        /// <param name="projectGuid">The guid of the project</param>
+        /// <param name="webAppName">The name of the SitefinityWebAWpp</param>
+        /// <returns></returns>
         public static FileModifierResult AddFile(string slnFilePath, string csProjFilePath, Guid projectGuid, string webAppName)
         {
             if (!File.Exists(slnFilePath))

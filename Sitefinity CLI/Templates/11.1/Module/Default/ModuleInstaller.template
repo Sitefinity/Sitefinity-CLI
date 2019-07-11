@@ -5,14 +5,25 @@ using Telerik.Sitefinity.Services;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents the module installer.
+    /// </summary>
     public class {{pascalCaseName}}ModuleInstaller
     {
+		/// <summary>
+		/// Called prior to the application start
+		/// </summary>
         public static void PreApplicationStart()
         {
-            Bootstrapper.Initialized += Bootstrapper_Initializing;
+            Bootstrapper.Initialized += Bootstrapper_Initialized;
         }
 
-        public static void Bootstrapper_Initializing(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the Initialized event of the Bootstrapper.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        public static void Bootstrapper_Initialized(object sender, EventArgs e)
         {
             var moduleName = {{pascalCaseName}}Module.moduleName;
 

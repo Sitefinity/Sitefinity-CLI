@@ -9,14 +9,34 @@ namespace Sitefinity_CLI.Commands
 {
     internal abstract class AddToSolutionCommandBase : AddToProjectCommandBase
     {
+        /// <summary>
+        /// The guid of the project to be added to solution
+        /// </summary>
         protected Guid ProjectGuid { get; set; } = Guid.NewGuid();
 
+        /// <summary>
+        /// The solution path
+        /// </summary>
         protected string SolutionPath { get; set; }
 
+        /// <summary>
+        /// The folder containing the binaries
+        /// </summary>
         protected string BinFolder { get; set; }
 
+        /// <summary>
+        /// The version of Sitefinity
+        /// </summary>
         protected string SitefinityVersion { get; set; }
 
+        /// <summary>
+        /// Creates a file from a template.
+        /// </summary>
+        /// <param name="filePath">The target file path</param>
+        /// <param name="templatePath">The path of the template</param>
+        /// <param name="resourceFullName">The name of the resource</param>
+        /// <param name="data">The handlbars data</param>
+        /// <returns>0 for success; 1 for failure</returns>
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
             if (data is IDictionary<string, string> dictionary)
@@ -33,6 +53,11 @@ namespace Sitefinity_CLI.Commands
             return base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data);
         }
 
+        /// <summary>
+        /// A method containing the logic of the command
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns>0 for success; 1 for failure</returns>
         public override int OnExecute(CommandLineApplication config)
         {
             var currentPath = this.ProjectRootPath;
@@ -103,6 +128,10 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
+        /// <summary>
+        /// Gets the absolute path of Telerik.Sitefinity.dll
+        /// </summary>
+        /// <returns>The path</returns>
         protected override string GetAssemblyPath()
         {
             return Directory.EnumerateFiles(Path.GetDirectoryName(this.SolutionPath), "Telerik.Sitefinity.dll", SearchOption.AllDirectories).FirstOrDefault();

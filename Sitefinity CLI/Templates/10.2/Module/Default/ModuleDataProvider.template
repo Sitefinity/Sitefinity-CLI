@@ -5,13 +5,24 @@ using Telerik.Sitefinity.Data;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents module data provider.
+    /// </summary>
     public class {{pascalCaseName}}ModuleDataProvider : DataProviderBase
     {
+        /// <summary>
+        /// Get a list of types served by this provider
+        /// </summary>
+        /// <returns></returns>
         public override Type[] GetKnownTypes()
         {
             return new Type[] { typeof({{pascalCaseName}}ModuleItem) };
         }
 
+        /// <summary>
+        /// Gets a unique key for module data provider.
+        /// </summary>
+        /// <value></value>
         public override string RootKey
         {
             get { return "{{pascalCaseName}}Module"; }

@@ -6,14 +6,23 @@ using Telerik.Sitefinity.Model;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents open access module data provider.
+    /// </summary>
     public class OpenAccess{{pascalCaseName}}ModuleProvider : {{pascalCaseName}}ModuleDataProvider, IOpenAccessDataProvider
     {
+	    /// <summary>
+		/// Gets or sets the open access provider context.
+		/// </summary>
         public OpenAccessProviderContext Context
         {
             get;
             set;
         }
 
+		/// <summary>
+		/// Gets the metadatasource.
+		/// </summary>
         public MetadataSource GetMetaDataSource(IDatabaseMappingContext context)
         {
             return null;

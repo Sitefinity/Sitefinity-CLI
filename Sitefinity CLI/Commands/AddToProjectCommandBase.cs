@@ -10,22 +10,46 @@ using System.Text.RegularExpressions;
 
 namespace Sitefinity_CLI.Commands
 {
+    /// <summary>
+    /// Creates files and adds them to a project
+    /// </summary>
     internal abstract class AddToProjectCommandBase : CommandBase
     {
+        /// <summary>
+        /// Gets or sets the models that are used to create the files.
+        /// </summary>
         protected IEnumerable<FileModel> FileModels { get; set; }
 
+        /// <summary>
+        /// Path of the folder relative to the project root.
+        /// </summary>
         protected abstract string FolderPath { get; }
 
+        /// <summary>
+        /// Gets the success message that will be displayed on the console
+        /// </summary>
         protected abstract string CreatedMessage { get; }
 
+        /// <summary>
+        /// Gets the folder containing the file templates
+        /// </summary>
         protected abstract string TemplatesFolder { get; }
 
+        /// <summary>
+        /// Gets the folder where the files will be created
+        /// </summary>
         protected string TargetFolder => Path.Combine(this.ProjectRootPath, this.FolderPath);
 
+        /// <summary>
+        /// Gets or sets The name of the template. Defa
+        /// </summary>
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
+        /// <summary>
+        /// Gets the file friendly/class friendly name
+        /// </summary>
         protected string PascalCaseName
         {
             get
@@ -38,6 +62,11 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
+        /// <summary>
+        /// A method containing the logic of the command
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns>0 for success; 1 for failure</returns>
         public override int OnExecute(CommandLineApplication config)
         {
             if (base.OnExecute(config) == 1)
@@ -93,6 +122,14 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
+        /// <summary>
+        /// Creates a file from a template.
+        /// </summary>
+        /// <param name="filePath">The target file path</param>
+        /// <param name="templatePath">The path of the template</param>
+        /// <param name="resourceFullName">The name of the resource</param>
+        /// <param name="data">The handlbars data</param>
+        /// <returns>0 for success; 1 for failure</returns>
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
             if (base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
@@ -104,6 +141,11 @@ namespace Sitefinity_CLI.Commands
             return 0;
         }
 
+        /// <summary>
+        /// Contains the logic to add files to sitefinity
+        /// </summary>
+        /// <param name="config">The configuration</param>
+        /// <returns>0 for success, 1 for failure</returns>
         protected int AddToSitefinity(CommandLineApplication config)
         {
             this.createdFiles = new List<string>();
@@ -137,10 +179,13 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
-
             return 0;
         }
 
+        /// <summary>
+        /// Converts the file models from the json configuration
+        /// </summary>
+        /// <returns>The file models</returns>
         protected virtual IEnumerable<FileModel> GetFileModels()
         {
             var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, this.TemplatesFolder, this.TemplateName);
@@ -158,6 +203,9 @@ namespace Sitefinity_CLI.Commands
             return models;
         }
 
+        /// <summary>
+        /// Deletes files
+        /// </summary>
         protected void DeleteFiles()
         {
             foreach (var filePath in this.createdFiles)
@@ -166,6 +214,10 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
+        /// <summary>
+        /// Adds files to csproj
+        /// </summary>
+        /// <returns>The result of the operation</returns>
         protected FileModifierResult AddFilesToCsProj()
         {
             string csprojFilePath = GetCsprojFilePath();
@@ -174,6 +226,10 @@ namespace Sitefinity_CLI.Commands
             return result;
         }
 
+        /// <summary>
+        /// Gets the absolute csproj file path
+        /// </summary>
+        /// <returns>The path</returns>
         protected string GetCsprojFilePath()
         {
             string path = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
@@ -181,12 +237,20 @@ namespace Sitefinity_CLI.Commands
             return path;
         }
 
+        /// <summary>
+        /// Removes files from the csproj file
+        /// </summary>
         protected void RemoveFilesFromCsproj()
         {
             string csProjFilePath = GetCsprojFilePath();
             CsProjModifier.RemoveFiles(csProjFilePath, this.createdFiles);
         }
 
+        /// <summary>
+        /// Converts string to PascalCase
+        /// </summary>
+        /// <param name="s">The string</param>
+        /// <returns>TheString</returns>
         private string ToPascalCase(string s)
         {
             s = Regex.Replace(s, @"[^A-Za-z.]", " ", RegexOptions.IgnoreCase);

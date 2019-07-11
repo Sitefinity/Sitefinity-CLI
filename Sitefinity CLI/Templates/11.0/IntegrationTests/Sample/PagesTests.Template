@@ -12,20 +12,22 @@ using Telerik.Sitefinity.Workflow;
 
 namespace {{pascalCaseName}}.Pages
 {
+    /// <summary>
+    /// Represents a class with sample tests for pages
+    /// </summary>
     [TestFixture]
     [Description("Tests pages basic CRUD operations")]
     [Author(TestAuthors.SitefinityCLI)]
     public class PagesTests
     {
-        [SetUp]
-        public void SetUp()
-        {
-            this.manager = PageManager.GetManager();
-        }
-
+		/// <summary>
+		/// This method is called after all tests in this fixture have run.
+		/// </summary>
         [TearDown]
         public void TearDown()
         {
+            this.manager = PageManager.GetManager();
+
             var pageNode = this.manager.GetPageNodes().FirstOrDefault(x => x.Id == this.pageNodeId);
 
             if (pageNode != null)
@@ -43,12 +45,17 @@ namespace {{pascalCaseName}}.Pages
             this.manager.SaveChanges();
         }
 
+		/// <summary>
+		/// Tests the creation of pages.
+		/// </summary>
         [Test]
         [Category(TestCategories.Pages)]
         [Description("Tests creating page")]
         [Author(TestAuthors.SitefinityCLI)]
         public void CreateAndPublishPageTest()
         {
+            this.manager = PageManager.GetManager();
+
             this.CreateAndPublishPage();
 
             var actualPageNode = this.manager.GetPageNode(this.pageNodeId);
@@ -60,12 +67,17 @@ namespace {{pascalCaseName}}.Pages
             Assert.IsNotNull(actualPageData);
         }
 
+		/// <summary>
+		/// Tests the modifying of pages.
+		/// </summary>
         [Test]
         [Category(TestCategories.Pages)]
         [Description("Tests modifying page")]
         [Author(TestAuthors.SitefinityCLI)]
         public void ModifyPageTest()
         {
+            this.manager = PageManager.GetManager();
+
             this.CreateAndPublishPage();
 
             var pageData = this.manager.GetPageData(this.pageDataId);
@@ -86,12 +98,17 @@ namespace {{pascalCaseName}}.Pages
             Assert.AreEqual(description, actualPageData.Description.ToString());
         }
 
+		/// <summary>
+		/// Tests the deletion of pages.
+		/// </summary>
         [Test]
         [Category(TestCategories.Pages)]
         [Description("Tests deletion page")]
         [Author(TestAuthors.SitefinityCLI)]
         public void DeletePageTest()
         {
+            this.manager = PageManager.GetManager();
+
             this.CreateAndPublishPage();
 
             var pageNode = this.manager.GetPageNode(this.pageNodeId);
@@ -117,6 +134,9 @@ namespace {{pascalCaseName}}.Pages
             Assert.IsNull(actualPageData);
         }
 
+		/// <summary>
+		/// Helper method that creates and publishes a page.
+		/// </summary>
         private void CreateAndPublishPage()
         {
             var parentPageNodeId = SiteInitializer.CurrentFrontendRootNodeId;

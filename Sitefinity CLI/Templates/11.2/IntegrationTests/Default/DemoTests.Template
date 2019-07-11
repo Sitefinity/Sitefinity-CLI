@@ -4,11 +4,17 @@ using MbUnit.Framework;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents sample integration text to demonstrate the usage of some attributes.
+    /// </summary>
     [TestFixture]
     [Description("Integration tests project")]
     [Author("Sitefinity CLI")]
     public class DemoTests
     {
+		/// <summary>
+		/// This test is designed to pass
+		/// </summary>
         [Test]
         [Category("Demo Tests")]
         [Description("This test should pass")]
@@ -18,6 +24,9 @@ namespace {{pascalCaseName}}
             Assert.IsTrue(true);
         }
 
+		/// <summary>
+		/// This test is designed to fail
+		/// </summary>
         [Test]
         [Category("Demo Tests")]
         [Description("This test should NOT pass")]
@@ -27,6 +36,9 @@ namespace {{pascalCaseName}}
             Assert.IsTrue(false);
         }
 
+		/// <summary>
+		/// This test will be ignored by the test runner as it is decorated with the Ignore attribute
+		/// </summary>
         [Ignore]
         [Test]
         [Category("Demo Tests")]

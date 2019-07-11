@@ -4,6 +4,9 @@ using Telerik.Sitefinity.Localization;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents string resources for UI labels.
+    /// </summary>
     internal class {{pascalCaseName}}ModuleResources : Resource
     {
         [ResourceEntry(

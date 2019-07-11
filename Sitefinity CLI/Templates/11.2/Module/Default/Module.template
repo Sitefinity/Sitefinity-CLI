@@ -10,13 +10,24 @@ using Telerik.Sitefinity.Services;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Represents generic content module.
+    /// </summary>
     public class {{pascalCaseName}}Module : ModuleBase
     {
+        /// <summary>
+        /// Gets the landing page id for the module.
+        /// </summary>
+        /// <value>The landing page id.</value>
         public override Guid LandingPageId
         {
             get { return homePageId; }
         }
 
+        /// <summary>
+        /// Initializes the service with specified settings.
+        /// </summary>
+        /// <param name="settings">The settings.</param>
         public override void Initialize(ModuleSettings settings)
         {
             base.Initialize(settings);
@@ -27,6 +38,10 @@ namespace {{pascalCaseName}}
                     .Localization<{{pascalCaseName}}ModuleResources>();
         }
 
+        /// <summary>
+        /// Installs the pages.
+        /// </summary>
+        /// <param name="initializer">The initializer.</param>
         public override void Install(SiteInitializer initializer)
         {
 			var urlName = Regex.Replace(moduleName, @"[\-\!\$\(\)\=\@\d_\']+", "-", RegexOptions.IgnoreCase).ToLower();
@@ -64,15 +79,28 @@ namespace {{pascalCaseName}}
 
         }
 
+        /// <summary>
+        /// Upgrades this module from the specified version.
+        /// </summary>
+        /// <param name="initializer">The Site Initializer. A helper class for installing Sitefinity modules.</param>
+        /// <param name="upgradeFrom">The version this module us upgrading from.</param>
         public override void Upgrade(SiteInitializer initializer, Version upgradeFrom)
         {
         }
 
+        /// <summary>
+        /// Gets the module config.
+        /// </summary>
+        /// <returns></returns>
         protected override ConfigSection GetModuleConfig()
         {
             return Config.Get<{{pascalCaseName}}ModuleConfig>();
         }
 
+        /// <summary>
+        /// Gets the CLR types of all data managers provided by this module.
+        /// </summary>
+        /// <value>An array of <see cref="Type"/> objects.</value>
         public override Type[] Managers
         {
             get { return new Type[] { typeof({{pascalCaseName}}ModuleManager) }; }

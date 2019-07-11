@@ -9,8 +9,15 @@ using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
 namespace {{pascalCaseName}}
 {
+    /// <summary>
+    /// Defines module configuration settings.
+    /// </summary>
     internal class {{pascalCaseName}}ModuleConfig : ContentModuleConfigBase
     {
+        /// <summary>
+        /// Initializes the default views.
+        /// </summary>
+        /// <param name="contentViewControls"></param>
         protected override void InitializeDefaultViews(ConfigElementDictionary<string, ContentViewControlElement> contentViewControls)
         {
             contentViewControls.Add({{pascalCaseName}}ModuleDefinition.BackendDefinitionName,
@@ -18,6 +25,10 @@ namespace {{pascalCaseName}}
 
         }
 
+        /// <summary>
+        /// Initializes the default providers.
+        /// </summary>
+        /// <param name="providers"></param>
         protected override void InitializeDefaultProviders(ConfigElementDictionary<string, DataProviderSettings> providers)
         {
             providers.Add(new DataProviderSettings(providers)
@@ -29,6 +40,10 @@ namespace {{pascalCaseName}}
             });
         }
 
+        /// <summary>
+        /// Called after the properties of this instance have been initialized.
+        /// Load default values here.
+        /// </summary>
         protected override void OnPropertiesInitialized()
         {
             base.OnPropertiesInitialized();
@@ -36,6 +51,9 @@ namespace {{pascalCaseName}}
             InitializeDefaultPermissions();
         }
 
+        /// <summary>
+        /// Initializes the default permissions.
+        /// </summary>
         protected virtual void InitializeDefaultPermissions()
         {
             var permission = new Permission(Permissions)
