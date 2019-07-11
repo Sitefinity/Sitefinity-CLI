@@ -49,6 +49,33 @@
     <None Update="Templates\10.2\IntegrationTests\Default\packages.config.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\10.2\IntegrationTests\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\AssemblyInfo.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\csproj.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\NewsTests.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\PagesTests.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\TestAuthors.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\10.2\IntegrationTests\Sample\TestCategories.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\10.2\Module\Default\AssemblyInfo.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -101,6 +128,33 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.0\IntegrationTests\Default\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\AssemblyInfo.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\csproj.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\NewsTests.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\PagesTests.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\TestAuthors.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.0\IntegrationTests\Sample\TestCategories.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.0\Module\Default\AssemblyInfo.template">
@@ -157,6 +211,33 @@
     <None Update="Templates\11.1\IntegrationTests\Default\packages.config.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\11.1\IntegrationTests\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\AssemblyInfo.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\csproj.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\NewsTests.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\PagesTests.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\TestAuthors.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.1\IntegrationTests\Sample\TestCategories.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\11.1\Module\Default\AssemblyInfo.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -209,6 +290,33 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.2\IntegrationTests\Default\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Default\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\AssemblyInfo.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\csproj.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\NewsTests.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\packages.config.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\PagesTests.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\templates.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\TestAuthors.Template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\11.2\IntegrationTests\Sample\TestCategories.Template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\11.2\Module\Default\AssemblyInfo.template">

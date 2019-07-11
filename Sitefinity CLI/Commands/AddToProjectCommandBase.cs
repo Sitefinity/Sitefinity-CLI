@@ -60,7 +60,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.CustomWidgetTemplatesFolderName, this.TemplateName);
+            var templatePath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, this.TemplatesFolder, this.TemplateName);
 
             if (!Directory.Exists(templatePath))
             {

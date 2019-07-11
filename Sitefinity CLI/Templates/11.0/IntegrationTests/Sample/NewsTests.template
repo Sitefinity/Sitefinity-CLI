@@ -1,0 +1,117 @@
+﻿/* {{> sign}} */
+
+using MbUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Telerik.Sitefinity.Modules.News;
+using Telerik.Sitefinity.News.Model;
+using Telerik.Sitefinity.Workflow;
+
+namespace {{pascalCaseName}}.News
+{
+    [TestFixture]
+    [Description("Tests news items basic CRUD operations")]
+    [Author(TestAuthors.SitefinityCLI)]
+    public class NewsTests
+    {
+        [FixtureSetUp]
+        public void FixtureSetUp()
+        {
+            manager = NewsManager.GetManager();
+        }
+
+        [FixtureTearDown]
+        public void FixtureTearDown()
+        {
+            this.DeleteAllNews();
+        }
+
+        [Test]
+        [Category(TestCategories.News)]
+        [Description("Tests creating news item")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void CreateNewsItem()
+        {
+            this.CreateNews("test-news-1");
+            NewsItem news = manager.GetNewsItems().Where(n => n.Title == "test-news-1").FirstOrDefault();
+            Assert.IsNotNull(news);
+        }
+
+        [Test]
+        [Category(TestCategories.News)]
+        [Description("Tests publishing news item")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void PublishNewsItem()
+        {
+            Guid newsId = this.CreateNews("test-news-2");
+            this.PublishNews(newsId);
+
+            NewsItem newsItem = manager.GetNewsItem(newsId);
+            Assert.AreEqual("Published", newsItem.ApprovalWorkflowState.ToString());
+        }
+
+        [Test]
+        [Category(TestCategories.News)]
+        [Description("Tests deleting news item")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void DeleteNewsItem()
+        {
+            Guid newsId = this.CreateNews("test-news-3");
+            this.DeleteNews(newsId);
+
+            NewsItem news = manager.GetNewsItems().Where(n => n.Title == "test-news-3").FirstOrDefault();
+            Assert.IsNull(news);
+        }
+
+        private Guid CreateNews(string title)
+        {
+            NewsItem newsItem = manager.CreateNewsItem();
+
+            newsItem.Title = title;
+            newsItem.UrlName = Regex.Replace(title.ToLower(), @"[^\w\-\!\$\'\(\)\=\@\d_]+", "-"); ;
+
+            manager.SaveChanges();
+
+            return newsItem.Id;
+        }
+
+        private void PublishNews(Guid newsId)
+        {
+            Dictionary<string, string> bag = new Dictionary<string, string>
+            {
+                { "ContentType", typeof(NewsItem).FullName }
+            };
+            var currentCulture = Thread.CurrentThread.CurrentUICulture;
+            bag.Add("Language", currentCulture.Name);
+            WorkflowManager.MessageWorkflow(newsId, typeof(NewsItem), null, "Publish", false, bag);
+        }
+
+        private void DeleteNews(Guid newsId)
+        {
+            NewsItem newsItem = manager.GetNewsItem(newsId);
+
+            if (newsItem != null)
+            {
+                manager.Delete(newsItem);
+                manager.SaveChanges();
+            }
+        }
+
+        private void DeleteAllNews()
+        {
+            IQueryable<NewsItem> news = manager.GetNewsItems();
+
+            foreach (var item in news)
+            {
+                manager.Delete(item);
+            }
+
+            manager.SaveChanges();
+        }
+
+        private static NewsManager manager;
+    }
+}

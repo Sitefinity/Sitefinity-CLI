@@ -1,0 +1,10 @@
+﻿/* {{> sign}} */
+
+namespace {{pascalCaseName}}
+{
+    internal class TestCategories
+    {
+        public const string Pages = "Pages";
+        public const string News = "News";
+    }
+}

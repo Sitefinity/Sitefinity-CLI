@@ -1,0 +1,30 @@
+﻿[
+  {
+    "FilePath": "Properties\\AssemblyInfo.cs",
+    "TemplatePath": "AssemblyInfo.Template"
+  },
+  {
+    "FilePath": "{0}.csproj",
+    "TemplatePath": "csproj.Template"
+  },
+  {
+    "FilePath": "News\\NewsTests.cs",
+    "TemplatePath": "NewsTests.Template"
+  },
+  {
+    "FilePath": "packages.config",
+    "TemplatePath": "packages.config.Template"
+  },
+  {
+    "FilePath": "Pages\\PagesTests.cs",
+    "TemplatePath": "PagesTests.Template"
+  },
+  {
+    "FilePath": "TestAuthors.cs",
+    "TemplatePath": "TestAuthors.Template"
+  },
+  {
+    "FilePath": "TestCategories.cs",
+    "TemplatePath": "TestCategories.Template"
+  }
+]

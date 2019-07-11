@@ -1,6 +1,7 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -14,12 +15,15 @@ namespace Sitefinity_CLI.Commands
 
         protected string BinFolder { get; set; }
 
+        protected string SitefinityVersion { get; set; }
+
         protected override int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)
         {
             if (data is IDictionary<string, string> dictionary)
             {
                 dictionary["binFolder"] = this.BinFolder;
                 dictionary["projectGuid"] = this.ProjectGuid.ToString();
+                dictionary["sitefinityVersion"] = this.SitefinityVersion;
             }
             else
             {
@@ -53,6 +57,7 @@ namespace Sitefinity_CLI.Commands
             this.SolutionPath = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
 
             var sitefinityPath = Directory.EnumerateFiles(currentPath, "Telerik.Sitefinity.dll", SearchOption.AllDirectories).FirstOrDefault();
+
             var binFolder = Path.GetDirectoryName(sitefinityPath);
 
             if (string.IsNullOrEmpty(binFolder))
@@ -61,6 +66,7 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
+            this.SitefinityVersion = FileVersionInfo.GetVersionInfo(sitefinityPath).ProductVersion;
             this.ProjectRootPath = Path.Combine(currentPath, this.PascalCaseName);
 
             if (Path.IsPathRooted(binFolder))

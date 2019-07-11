@@ -1,0 +1,159 @@
+﻿/* {{> sign}} */
+
+using MbUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Telerik.Sitefinity.Abstractions;
+using Telerik.Sitefinity.Modules.Pages;
+using Telerik.Sitefinity.Pages.Model;
+using Telerik.Sitefinity.Workflow;
+
+namespace {{pascalCaseName}}.Pages
+{
+    [TestFixture]
+    [Description("Tests pages basic CRUD operations")]
+    [Author(TestAuthors.SitefinityCLI)]
+    public class PagesTests
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            this.manager = PageManager.GetManager();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            var pageNode = this.manager.GetPageNodes().FirstOrDefault(x => x.Id == this.pageNodeId);
+
+            if (pageNode != null)
+            {
+                this.manager.Delete(pageNode);
+            }
+
+            var pageData = this.manager.GetPageDataList().FirstOrDefault(x => x.Id == this.pageDataId);
+
+            if (pageData != null)
+            {
+                this.manager.Delete(pageData);
+            }
+
+            this.manager.SaveChanges();
+        }
+
+        [Test]
+        [Category(TestCategories.Pages)]
+        [Description("Tests creating page")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void CreateAndPublishPageTest()
+        {
+            this.CreateAndPublishPage();
+
+            var actualPageNode = this.manager.GetPageNode(this.pageNodeId);
+
+            Assert.IsNotNull(actualPageNode);
+
+            var actualPageData = this.manager.GetPageData(this.pageDataId);
+
+            Assert.IsNotNull(actualPageData);
+        }
+
+        [Test]
+        [Category(TestCategories.Pages)]
+        [Description("Tests modifying page")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void ModifyPageTest()
+        {
+            this.CreateAndPublishPage();
+
+            var pageData = this.manager.GetPageData(this.pageDataId);
+
+            Assert.IsNotNull(pageData);
+
+            var htmlTitle = pageData.HtmlTitle + "modified";
+            var description = pageData.Description + "modified";
+
+            pageData.HtmlTitle = htmlTitle;
+            pageData.Description = description;
+
+            this.manager.SaveChanges();
+
+            var actualPageData = this.manager.GetPageData(this.pageDataId);
+
+            Assert.AreEqual(htmlTitle, actualPageData.HtmlTitle.ToString());
+            Assert.AreEqual(description, actualPageData.Description.ToString());
+        }
+
+        [Test]
+        [Category(TestCategories.Pages)]
+        [Description("Tests deletion page")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void DeletePageTest()
+        {
+            this.CreateAndPublishPage();
+
+            var pageNode = this.manager.GetPageNode(this.pageNodeId);
+            var pageData = this.manager.GetPageData(this.pageDataId);
+
+            this.manager.Delete(pageNode);
+            this.manager.Delete(pageData);
+
+            this.manager.SaveChanges();
+
+            PageNode actualPageNode;
+
+            Assert.Throws<Exception>(() => actualPageNode = this.manager.GetPageNode(this.pageNodeId));
+            actualPageNode = this.manager.GetPageNodes().FirstOrDefault(x => x.Id == this.pageNodeId);
+
+            PageData actualPageData;
+
+            Assert.Throws<Exception>(() => actualPageData = this.manager.GetPageData(this.pageDataId));
+
+            actualPageData = this.manager.GetPageDataList().FirstOrDefault(x => x.Id == this.pageDataId);
+
+            Assert.IsNull(actualPageNode);
+            Assert.IsNull(actualPageData);
+        }
+
+        private void CreateAndPublishPage()
+        {
+            var parentPageNodeId = SiteInitializer.CurrentFrontendRootNodeId;
+
+            var parent = this.manager.GetPageNode(parentPageNodeId);
+
+            //Create the page node
+            var pageNode = this.manager.CreatePage(parent, this.pageNodeId, NodeType.Standard);
+
+            //Create the PageData and set its properties
+            var pageData = pageNode.GetPageData();
+
+            this.pageDataId = pageData.Id;
+
+            var pageName = "Test page";
+            pageData.HtmlTitle = pageName;
+
+            //Set Page properties
+            pageNode.Name = pageName;
+            pageNode.Description = pageName;
+            pageNode.Title = pageName;
+            pageNode.UrlName = Regex.Replace(pageName.ToLower(), @"[^\w\-\!\$\'\(\)\=\@\d_]+", "-");
+            pageNode.DateCreated = DateTime.UtcNow;
+            pageNode.LastModified = DateTime.UtcNow;
+            pageNode.ApprovalWorkflowState = "Published";
+
+            //Commit the page to DB
+            this.manager.SaveChanges();
+
+            //Publish the page via workflow
+            var bag = new Dictionary<string, string>();
+            bag.Add("ContentType", typeof(PageNode).FullName);
+            WorkflowManager.MessageWorkflow(pageNode.Id, typeof(PageNode), null, "Publish", false, bag);
+        }
+
+        private PageManager manager;
+        private Guid pageNodeId = new Guid("D01BA350-5990-4069-A912-DAE1A57F251A");
+        private Guid pageDataId;
+    }
+}
