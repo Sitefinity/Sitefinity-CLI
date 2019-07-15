@@ -59,10 +59,6 @@ You can use the add command with the following subcommands:
 
   ```sf add tests "Sitefinity.Tests.Integration" -t Default```
   
-  or
-  
-  ```sf add tests "Sitefinity.Tests.Integration" -t Sample```
-  
 * To create a new **Custom Module**, execute the following command:
 
   ```sf add module "Custom Module" -d "Description of the custom module"```
