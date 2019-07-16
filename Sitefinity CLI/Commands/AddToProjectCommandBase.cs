@@ -56,7 +56,7 @@ namespace Sitefinity_CLI.Commands
             {
                 if (string.IsNullOrEmpty(this.pascalCaseName))
                 {
-                    this.pascalCaseName = this.ToPascalCase(this.Name);
+                    this.pascalCaseName = this.GetPascalCase(this.Name);
                 }
                 return this.pascalCaseName;
             }
@@ -99,7 +99,7 @@ namespace Sitefinity_CLI.Commands
 
             this.FileModels = this.GetFileModels();
 
-            if (this.AddToSitefinity(config) == 1)
+            if (this.AddToProject(config) == 1)
             {
                 return 1;
             }
@@ -146,7 +146,7 @@ namespace Sitefinity_CLI.Commands
         /// </summary>
         /// <param name="config">The configuration</param>
         /// <returns>0 for success, 1 for failure</returns>
-        protected int AddToSitefinity(CommandLineApplication config)
+        protected int AddToProject(CommandLineApplication config)
         {
             this.createdFiles = new List<string>();
 
@@ -251,7 +251,7 @@ namespace Sitefinity_CLI.Commands
         /// </summary>
         /// <param name="s">The string</param>
         /// <returns>TheString</returns>
-        private string ToPascalCase(string s)
+        private string GetPascalCase(string s)
         {
             s = Regex.Replace(s, @"[^A-Za-z.]", " ", RegexOptions.IgnoreCase);
 
