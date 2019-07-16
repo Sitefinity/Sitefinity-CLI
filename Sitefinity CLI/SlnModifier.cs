@@ -111,11 +111,19 @@ namespace Sitefinity_CLI
             {
                 File.WriteAllText(slnFilePath, solutionContents);
             }
-            catch
+            catch (UnauthorizedAccessException)
             {
                 return new FileModifierResult()
                 {
                     Message = Constants.AddFilesInsufficientPrivilegesMessage,
+                    Success = false
+                };
+            }
+            catch
+            {
+                return new FileModifierResult()
+                {
+                    Message = Constants.AddFilesToSolutionFailureMessage,
                     Success = false
                 };
             }
