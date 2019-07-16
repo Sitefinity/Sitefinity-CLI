@@ -59,10 +59,6 @@ You can use the add command with the following subcommands:
 
   ```sf add tests "Sitefinity.Tests.Integration" -t Default```
   
-  or
-  
-  ```sf add tests "Sitefinity.Tests.Integration" -t Sample```
-  
 * To create a new **Custom Module**, execute the following command:
 
   ```sf add module "Custom Module" -d "Description of the custom module"```
@@ -121,7 +117,6 @@ You can easily create custom templates. To do this, create a file with extension
 **NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
 
 ## Known issues
-#### Visual Studio freeze/crash bug
-When Sitefinity VSIX is installed for the first time or there is a newer version of Sitefinity CLI, Visual Studio freezes until CLI is downloaded and unzipped and in some cases crashes. 
-
-After Sitefinity CLI is downloaded and unzipped Visual Studio restores it's normal behaviour
+#### Visual Studio 2015 integration
+Sitefinity VSIX/CLI correctly updates the csproj and sln files but Visual Studio 2015 won't refresh the solution correctly. 
+The workaround is to reopen the solution
