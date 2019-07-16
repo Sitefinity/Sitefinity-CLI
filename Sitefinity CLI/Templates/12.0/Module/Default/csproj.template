@@ -37,17 +37,15 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Telerik.OpenAccess">
-      <HintPath>{{binFolder}}\Telerik.OpenAccess.dll</HintPath>
-    </Reference>
     <Reference Include="Telerik.Sitefinity">
       <HintPath>{{binFolder}}\Telerik.Sitefinity.dll</HintPath>
     </Reference>
-    <Reference Include="Telerik.Sitefinity.Model">
-      <HintPath>{{binFolder}}\Telerik.Sitefinity.Model.dll</HintPath>
+    <Reference Include="Telerik.Sitefinity.Services.Events">
+      <HintPath>{{binFolder}}\Telerik.Sitefinity.Services.Events.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
