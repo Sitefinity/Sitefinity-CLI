@@ -1,52 +1,66 @@
 ﻿/* {{> sign}} */
 
 using MbUnit.Framework;
+using System;
 
 namespace {{pascalCaseName}}
 {
     /// <summary>
-    /// Represents sample integration text to demonstrate the usage of some attributes.
+    /// Represents sample integration tests class to demonstrate the usage of some attributes.
+	/// For more information on creating and running integration tests with Sitefinity CMS web test runner see the Sitefinity documentation: https://www.progress.com/documentation/sitefinity-cms/tutorial-create-integration-tests-with-sitefinity-web-test-runner
+    /// For sample integration tests see this project in the Sitefinity GitHub repo: https://github.com/Sitefinity/Telerik.Sitefinity.Samples.IntegrationTests
+    /// For more information on the integration tests infrastructure and framework see the MbUnit documentation: http://www.gallio.org/doku-id-mbunit-documentation/
     /// </summary>
     [TestFixture]
     [Description("Integration tests project")]
-    [Author("Sitefinity CLI")]
+    [Author(TestAuthors.SitefinityCLI)]
     public class DemoTests
     {
-		/// <summary>
-		/// This test is designed to pass
-		/// </summary>
-        [Test]
-        [Category("Demo Tests")]
-        [Description("This test should pass")]
-        [Author("Sitefinity CLI")]
-        public void Test_ShouldPass()
+        /// <summary>
+        /// This method is invoked once prior to executing any tests in the fixture.
+        /// </summary>
+        [FixtureSetUp]
+        public void FixtureSetUp()
         {
-            Assert.IsTrue(true);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// This method is invoked once after all tests in the fixture have been executed.
+        /// </summary>
+        [FixtureTearDown]
+        public void FixtureTearDown()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// This method is invoked just before each test method is executed.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// This method is invoked after each test method.
+        /// </summary>
+        public void TearDown()
+        {
+            throw new NotImplementedException();
         }
 
 		/// <summary>
-		/// This test is designed to fail
+		/// Write your integration test
 		/// </summary>
         [Test]
-        [Category("Demo Tests")]
-        [Description("This test should NOT pass")]
-        [Author("Sitefinity CLI")]
-        public void Test_ShouldNotPass()
+        [Category(TestCategories.Demo)]
+        [Description("Write your integration test")]
+        [Author(TestAuthors.SitefinityCLI)]
+        public void Test()
         {
-            Assert.IsTrue(false);
-        }
-
-		/// <summary>
-		/// This test will be ignored by the test runner as it is decorated with the Ignore attribute
-		/// </summary>
-        [Ignore]
-        [Test]
-        [Category("Demo Tests")]
-        [Description("This test should not run")]
-        [Author("Sitefinity CLI")]
-        public void Test_ShouldNotRun()
-        {
-            Assert.IsTrue(true);
+            throw new NotImplementedException();
         }
     }
 }

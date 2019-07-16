@@ -1,14 +1,20 @@
 ﻿using System;
+using System.Web;
 using Telerik.Sitefinity.Abstractions;
 using Telerik.Sitefinity.Configuration;
+using Telerik.Sitefinity.Data;
 using Telerik.Sitefinity.Services;
+
+using {{pascalCaseName}};
+
+[assembly: PreApplicationStartMethod(typeof({{pascalCaseName}}Installer), "PreApplicationStart")]
 
 namespace {{pascalCaseName}}
 {
     /// <summary>
     /// Represents the module installer.
     /// </summary>
-    public class {{pascalCaseName}}ModuleInstaller
+    public class {{pascalCaseName}}Installer
     {
 		/// <summary>
 		/// Called prior to the application start
@@ -23,25 +29,37 @@ namespace {{pascalCaseName}}
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        public static void Bootstrapper_Initialized(object sender, EventArgs e)
+        public static void Bootstrapper_Initialized(object sender, ExecutedEventArgs e)
         {
-            var moduleName = {{pascalCaseName}}Module.moduleName;
+            if (e.CommandName == "RegisterRoutes")
+            {
+                // We have to register the module at a very early stage when sitefinity is initializing
+                RegisterModule(
+                    "{{pascalCaseName}}",
+                    (moduleName, parentConfig) =>
+                    {
+                        return new AppModuleSettings(parentConfig)
+                        {
+                            Name = moduleName,
+                            Type = "{{pascalCaseName}}.{{pascalCaseName}}Module, {{pascalCaseName}}",
+                            Title = "{{name}}",
+                            Description = "{{description}}",
+                            StartupType = StartupType.OnApplicationStart
+                        };
+                    });
+            }
+        }
 
+        /// <summary>
+        /// Registers the module if it is not already registered.
+        /// </summary>
+        private static void RegisterModule(string moduleName, Func<string, ConfigElement, AppModuleSettings> createFunction)
+        {
             if (!Config.Get<SystemConfig>().ApplicationModules.ContainsKey(moduleName))
             {
                 var configManager = ConfigManager.GetManager();
                 var modulesConfig = configManager.GetSection<SystemConfig>().ApplicationModules;
-
-                var moduleSettings = new AppModuleSettings(modulesConfig)
-                {
-                    Name = "{{pascalCaseName}}",
-                    Type = typeof({{pascalCaseName}}Module).AssemblyQualifiedName,
-                    Title = moduleName,
-                    Description = "{{description}}",
-                    StartupType = StartupType.OnApplicationStart
-                };
-
-                modulesConfig.Add(moduleName, moduleSettings);
+                modulesConfig.Add(moduleName, createFunction(moduleName, modulesConfig));
                 configManager.SaveSection(modulesConfig.Section);
             }
         }

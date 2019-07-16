@@ -12,35 +12,7 @@
     "TemplatePath": "Module.Template"
   },
   {
-    "FilePath": "{0}ModuleConfig.cs",
+    "FilePath": "{0}Config.cs",
     "TemplatePath": "ModuleConfig.Template"
-  },
-  {
-    "FilePath": "{0}ModuleDataProvider.cs",
-    "TemplatePath": "ModuleDataProvider.Template"
-  },
-  {
-    "FilePath": "{0}ModuleDefinition.cs",
-    "TemplatePath": "ModuleDefinition.Template"
-  },
-  {
-    "FilePath": "{0}ModuleItem.cs",
-    "TemplatePath": "ModuleItem.Template"
-  },
-  {
-    "FilePath": "{0}ModuleManager.cs",
-    "TemplatePath": "ModuleManager.Template"
-  },
-  {
-    "FilePath": "{0}ModuleResources.cs",
-    "TemplatePath": "ModuleResources.Template"
-  },
-  {
-    "FilePath": "{0}ModuleView.cs",
-    "TemplatePath": "ModuleView.Template"
-  },
-  {
-    "FilePath": "OpenAccess{0}ModuleProvider.cs",
-    "TemplatePath": "OpenAccessModuleProvider.Template"
-  },
+  }
 ]

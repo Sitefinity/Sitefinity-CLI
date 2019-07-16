@@ -8,10 +8,25 @@ using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Fluent.Modules;
 using Telerik.Sitefinity.Services;
 
+using {{pascalCaseName}};
+
+[assembly: SitefinityModule("{{pascalCaseName}}", 
+							typeof({{pascalCaseName}}Module), 
+							"{{name}}", 
+							"{{description}}", 
+							StartupType.OnApplicationStart)]
+
 namespace {{pascalCaseName}}
 {
     /// <summary>
-    /// Represents generic content module.
+    /// Represents custom module. 
+    /// For more information on custom modules see our documentation: https://www.progress.com/documentation/sitefinity-cms/overview-custom-modules
+    /// For sample custom module project see this project in the Sitefinity GitHub repo: https://github.com/Sitefinity/Telerik.Sitefinity.Samples.Sitemap
+    /// For custom module with page the following has to be done:
+    /// - Uncomment the commented code in public method Install(SiteInitializer initializer);
+    /// - Generate a Guid in private read only property GroupPageId in this class;
+    /// - Generate a Guid in private read only property HomePageId in this class;
+    /// - Generate a Guid in public readonly property LandingPageId in this class;
     /// </summary>
     public class {{pascalCaseName}}Module : ModuleBase
     {
@@ -21,7 +36,57 @@ namespace {{pascalCaseName}}
         /// <value>The landing page id.</value>
         public override Guid LandingPageId
         {
-            get { return homePageId; }
+            get
+            {
+                //// For custom module with page uncomment the following line and generate a new Guid between the double quotes below. Example: return new Guid("C1A050DC-4D02-45FA-9205-41D69E71C489");
+                // return new Guid("");
+                return Guid.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the group page id for the module
+        /// </summary>
+        private Guid GroupPageId
+        {
+            get
+            {
+                //// For custom module with page uncomment the following line and generate a new Guid between the double quotes below. Example: return new Guid("C1A050DC-4D02-45FA-9205-41D69E71C489");
+                // return new Guid("");
+                throw new NotImplementedException();
+            }
+        }
+
+        private Guid HomePageId
+        {
+            get
+            {
+                //// For custom module with page uncomment the following line and generate a new Guid between the double quotes below. Example: return new Guid("C1A050DC-4D02-45FA-9205-41D69E71C489");
+                // return new Guid("");
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Installs the module.
+        /// </summary>
+        /// <param name="initializer">The initializer. A helper class for installing Sitefinity modules.</param>
+        public override void Install(SiteInitializer initializer)
+        {
+            //// For custom module with page uncomment the following lines
+            //var urlName = Regex.Replace("{{name}}", @"[\s\-\!\$\(\)\=\@\d_\']+", "-", RegexOptions.IgnoreCase).ToLower();
+            //initializer.Installer
+            //    .CreateModuleGroupPage(this.GroupPageId, "{{pascalCaseName}}")
+            //    .PlaceUnder(Telerik.Sitefinity.Fluent.Modules.CommonNode.Pages)
+            //    .SetTitle("{{name}}")
+            //    .SetUrlName(urlName)
+            //    .SetDescription("{{description}}")
+            //    .AddChildPage(this.HomePageId, "{{pascalCaseName}}")
+            //        .SetTitle("{{name}} Home")
+            //        .SetDescription("{{description}} Home Page")
+            //        .SetUrlName($"{urlName}-home")
+            //        .Done()
+            //    .Done();
         }
 
         /// <summary>
@@ -34,58 +99,7 @@ namespace {{pascalCaseName}}
 
             App.WorkWith().Module(Name)
                 .Initialize()
-                    .Configuration<{{pascalCaseName}}ModuleConfig>()
-                    .Localization<{{pascalCaseName}}ModuleResources>();
-        }
-
-        /// <summary>
-        /// Installs the pages.
-        /// </summary>
-        /// <param name="initializer">The initializer.</param>
-        public override void Install(SiteInitializer initializer)
-        {
-			var urlName = Regex.Replace(moduleName, @"[\-\!\$\(\)\=\@\d_\']+", "-", RegexOptions.IgnoreCase).ToLower();
-            initializer.Installer
-                .CreateModuleGroupPage(groupPageId, moduleName)
-                    .PlaceUnder(CommonNode.TypesOfContent)
-                    .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
-                    .SetTitleLocalized("PageGroupNodeTitle")
-                    .SetUrlName(urlName)
-                    .SetDescriptionLocalized("PageGroupNodeDescription")
-                    .AddChildPage({{pascalCaseName}}Module.homePageId, "Home")
-                        .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
-                        .SetTitleLocalized("ModuleTitle")
-                        .SetHtmlTitleLocalized("ModuleTitle")
-                        .SetUrlName(urlName + "-home")
-                        .SetDescriptionLocalized("ModuleDescription")
-                        .AddContentView({{pascalCaseName}}ModuleDefinition.BackendDefinitionName, "{{pascalCaseName}}BackendView")
-                        .Done()
-                    .Done()
-            .PageToolbox()
-                .ContentSection()
-                    .LoadOrAddWidget<{{pascalCaseName}}ModuleView>("ModuleViewTitle")
-                        .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
-                        .SetTitle("ModuleViewTitle")
-                        .SetDescription("ModuleViewDescription")
-                        .SetCssClass("sf{{pascalCaseName}}ViewIcn")
-                        .Done()
-                    .Done()
-                .Done()
-            .AddWorkflowType<{{pascalCaseName}}ModuleItem>()
-                .SetTitle(moduleName)
-                .SetServiceUrl("~/Workflows/{{pascalCaseName}}Workflow.xamlx")
-                .LocalizeUsing<{{pascalCaseName}}ModuleResources>()
-                .Done();
-
-        }
-
-        /// <summary>
-        /// Upgrades this module from the specified version.
-        /// </summary>
-        /// <param name="initializer">The Site Initializer. A helper class for installing Sitefinity modules.</param>
-        /// <param name="upgradeFrom">The version this module us upgrading from.</param>
-        public override void Upgrade(SiteInitializer initializer, Version upgradeFrom)
-        {
+                    .Configuration<{{pascalCaseName}}Config>();
         }
 
         /// <summary>
@@ -94,7 +108,7 @@ namespace {{pascalCaseName}}
         /// <returns></returns>
         protected override ConfigSection GetModuleConfig()
         {
-            return Config.Get<{{pascalCaseName}}ModuleConfig>();
+            return Config.Get<{{pascalCaseName}}Config>();
         }
 
         /// <summary>
@@ -103,11 +117,7 @@ namespace {{pascalCaseName}}
         /// <value>An array of <see cref="Type"/> objects.</value>
         public override Type[] Managers
         {
-            get { return new Type[] { typeof({{pascalCaseName}}ModuleManager) }; }
+            get { return new Type[0]; }
         }
-
-        internal static Guid groupPageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3971");
-        internal static Guid homePageId = new Guid("AB45CA65-B763-4C8A-84F1-442F701D3972");
-        internal const string moduleName = "{{name}}";
     }
 }

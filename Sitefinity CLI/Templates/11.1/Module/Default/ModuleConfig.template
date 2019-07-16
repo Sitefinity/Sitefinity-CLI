@@ -1,130 +1,13 @@
 ﻿/* {{> sign}} */
 
-using System.Collections.Specialized;
 using Telerik.Sitefinity.Configuration;
-using Telerik.Sitefinity.Modules.GenericContent.Configuration;
-using Telerik.Sitefinity.Security;
-using Telerik.Sitefinity.Security.Configuration;
-using Telerik.Sitefinity.Web.UI.ContentUI.Config;
 
 namespace {{pascalCaseName}}
 {
     /// <summary>
     /// Defines module configuration settings.
     /// </summary>
-    internal class {{pascalCaseName}}ModuleConfig : ContentModuleConfigBase
+    internal class {{pascalCaseName}}Config : ConfigSection
     {
-        /// <summary>
-        /// Initializes the default views.
-        /// </summary>
-        /// <param name="contentViewControls"></param>
-        protected override void InitializeDefaultViews(ConfigElementDictionary<string, ContentViewControlElement> contentViewControls)
-        {
-            contentViewControls.Add({{pascalCaseName}}ModuleDefinition.BackendDefinitionName,
-                {{pascalCaseName}}ModuleDefinition.Define{{pascalCaseName}}BackendContentView(contentViewControls));
-
-        }
-
-        /// <summary>
-        /// Initializes the default providers.
-        /// </summary>
-        /// <param name="providers"></param>
-        protected override void InitializeDefaultProviders(ConfigElementDictionary<string, DataProviderSettings> providers)
-        {
-            providers.Add(new DataProviderSettings(providers)
-            {
-                Name = "OpenAccessDataProvider",
-                Description = "A provider that stores {{name}} module data in database using OpenAccess ORM.",
-                ProviderType = typeof(OpenAccess{{pascalCaseName}}ModuleProvider),
-                Parameters = new NameValueCollection() { { "applicationName", "/{{pascalCaseName}}" } }
-            });
-        }
-
-        /// <summary>
-        /// Called after the properties of this instance have been initialized.
-        /// Load default values here.
-        /// </summary>
-        protected override void OnPropertiesInitialized()
-        {
-            base.OnPropertiesInitialized();
-
-            InitializeDefaultPermissions();
-        }
-
-        /// <summary>
-        /// Initializes the default permissions.
-        /// </summary>
-        protected virtual void InitializeDefaultPermissions()
-        {
-            var permission = new Permission(Permissions)
-            {
-                Name = "{{pascalCaseName}}",
-                Title = "{{name}}",
-            };
-            Permissions.Add(permission);
-
-            permission.Actions.Add(new SecurityAction(permission.Actions)
-            {
-                Name = "View",
-                Type = SecurityActionTypes.View,
-                Title = "View {{name}}",
-            });
-
-            var customPermissionsDisplaySettings = CustomPermissionsDisplaySettings;
-            var generalCustomSet = new CustomPermissionsDisplaySettingsConfig(customPermissionsDisplaySettings)
-            {
-                SetName = SecurityConstants.Sets.General.SetName
-            };
-            customPermissionsDisplaySettings.Add(generalCustomSet);
-
-            var newsCustomActions = new SecuredObjectCustomPermissionSet(generalCustomSet.SecuredObjectCustomPermissionSets)
-            {
-                TypeName = typeof({{pascalCaseName}}ModuleItem).FullName
-            };
-            generalCustomSet.SecuredObjectCustomPermissionSets.Add(newsCustomActions);
-
-            var newsCreateAction = new CustomSecurityAction(newsCustomActions.CustomSecurityActions)
-            {
-                Name = SecurityConstants.Sets.General.Create,
-                ShowActionInList = false
-            };
-            newsCustomActions.CustomSecurityActions.Add(newsCreateAction);
-
-            var newsModifyAction = new CustomSecurityAction(newsCustomActions.CustomSecurityActions)
-            {
-                Name = SecurityConstants.Sets.General.Modify,
-                ShowActionInList = true,
-                Title = "ModifyThisItem",
-                ResourceClassId = typeof(SecurityResources).Name
-            };
-            newsCustomActions.CustomSecurityActions.Add(newsModifyAction);
-
-            var newsViewAction = new CustomSecurityAction(newsCustomActions.CustomSecurityActions)
-            {
-                Name = SecurityConstants.Sets.General.View,
-                ShowActionInList = true,
-                Title = "ViewThisItem",
-                ResourceClassId = typeof(SecurityResources).Name
-            };
-            newsCustomActions.CustomSecurityActions.Add(newsViewAction);
-
-            var newsDeleteAction = new CustomSecurityAction(newsCustomActions.CustomSecurityActions)
-            {
-                Name = SecurityConstants.Sets.General.Delete,
-                ShowActionInList = true,
-                Title = "DeleteThisItem",
-                ResourceClassId = typeof(SecurityResources).Name
-            };
-            newsCustomActions.CustomSecurityActions.Add(newsDeleteAction);
-
-            var newsChangeOwnerAction = new CustomSecurityAction(newsCustomActions.CustomSecurityActions)
-            {
-                Name = SecurityConstants.Sets.General.ChangeOwner,
-                ShowActionInList = true,
-                Title = "ChangeOwnerOfThisItem",
-                ResourceClassId = typeof(SecurityResources).Name
-            };
-            newsCustomActions.CustomSecurityActions.Add(newsChangeOwnerAction);
-        }
     }
 }

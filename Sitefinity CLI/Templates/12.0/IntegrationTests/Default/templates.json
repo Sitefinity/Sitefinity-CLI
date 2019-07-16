@@ -14,5 +14,13 @@
   {
     "FilePath": "packages.config",
     "TemplatePath": "packages.config.Template"
+  },
+  {
+    "FilePath": "TestAuthors.cs",
+    "TemplatePath": "TestAuthors.Template"
+  },
+  {
+    "FilePath": "TestCategories.cs",
+    "TemplatePath": "TestCategories.Template"
   }
 ]
