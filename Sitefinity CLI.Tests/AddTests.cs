@@ -631,49 +631,19 @@ namespace Sitefinity_CLI.Tests
                 var outputPathCount = this.CountStringOccurrences(csProjContents, $"<OutputPath>{binFolderRelativePath}</OutputPath>");
 
                 Assert.AreEqual(2, outputPathCount);
-                Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(binFolderRelativePath, "Telerik.OpenAccess.dll")}</HintPath>"));
                 Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(sitefinityDllRelativePath)}</HintPath>"));
-                Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(binFolderRelativePath, "Telerik.Sitefinity.Model.dll")}</HintPath>"));
 
                 fileName = string.Format("{0}{1}{2}", resourceName, "Module", Constants.CSharpFileExtension);
                 folderPath = moduleFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleConfig", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleDataProvider", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleDefinition", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleItem", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleManager", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleResources", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}", resourceName, "ModuleView", Constants.CSharpFileExtension);
-                folderPath = moduleFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                fileName = string.Format("{0}{1}{2}{3}", "OpenAccess", resourceName, "ModuleProvider", Constants.CSharpFileExtension);
+                fileName = string.Format("{0}{1}{2}", resourceName, "Config", Constants.CSharpFileExtension);
                 folderPath = moduleFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
                 if (Version.Parse(templatesVersion) < Version.Parse("12.0"))
                 {
-                    fileName = string.Format("{0}{1}{2}", resourceName, "ModuleInstaller", Constants.CSharpFileExtension);
+                    fileName = string.Format("{0}{1}{2}", resourceName, "Installer", Constants.CSharpFileExtension);
                     folderPath = moduleFolderPath;
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
@@ -858,6 +828,14 @@ namespace Sitefinity_CLI.Tests
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
                 fileName = string.Format("{0}{1}", Constants.PackagesFileName, Constants.ConfigFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", "TestAuthors", Constants.CSharpFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
                 folderPath = testsFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
