@@ -41,17 +41,7 @@ namespace Sitefinity_CLI.Tests
         {
             foreach (var templatesVersion in testedTemplateVersions)
             {
-                for (int i = 0; i < 1000; i++)
-                {
-                    try
-                    {
-                        Directory.Delete(this.testFolderPaths[templatesVersion], true);
-                        break;
-                    }
-                    catch
-                    {
-                    }
-                }
+                Directory.Delete(this.testFolderPaths[templatesVersion], true);
             }
         }
 
@@ -107,7 +97,7 @@ namespace Sitefinity_CLI.Tests
 
         [TestMethod]
         public void AddGridWidgetTest()
-         {
+        {
             foreach (var templatesVersion in testedTemplateVersions)
             {
                 this.AddResourceToResourcePackage(Constants.AddGridWidgetCommandName, Constants.DefaultGridWidgetName, Constants.HtmlFileExtension, Constants.GridWidgetPath, templatesVersion);
