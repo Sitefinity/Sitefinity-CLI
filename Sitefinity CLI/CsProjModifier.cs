@@ -9,9 +9,9 @@ namespace Sitefinity_CLI
 {
     public static class CsProjModifier
     {
-        public static FileModifierResult AddFiles(string csProjFilePath, IEnumerable<string> filePaths)
+        public static CsProjModifierResult AddFiles(string csProjFilePath, IEnumerable<string> filePaths)
         {
-            FileModifierResult result = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
+            CsProjModifierResult result = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
             {
                 AddFile(doc, filePath);
             });
@@ -19,9 +19,9 @@ namespace Sitefinity_CLI
             return result;
         }
 
-        public static FileModifierResult RemoveFiles(string csProjFilePath, IEnumerable<string> filePaths)
+        public static CsProjModifierResult RemoveFiles(string csProjFilePath, IEnumerable<string> filePaths)
         {
-            FileModifierResult result = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
+            CsProjModifierResult result = ModifyFiles(csProjFilePath, filePaths, (doc, filePath) =>
             {
                 RemoveFile(doc, filePath);
             });
@@ -29,9 +29,9 @@ namespace Sitefinity_CLI
             return result;
         }
 
-        private static FileModifierResult ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
+        private static CsProjModifierResult ModifyFiles(string csProjFilePath, IEnumerable<string> filePaths, Action<XDocument, string> modifyFileAction)
         {
-            FileModifierResult result = new FileModifierResult { Success = true };
+            CsProjModifierResult result = new CsProjModifierResult { Success = true };
             FileAttributes initialAttributes = FileAttributeModifier.GetFileAttributes(csProjFilePath);
             try
             {
@@ -43,7 +43,7 @@ namespace Sitefinity_CLI
                     string relativeFilePath = filePath;
                     if (Path.IsPathRooted(filePath))
                     {
-                        relativeFilePath = Utils.GetRelativePath(filePath, csProjFilePath);
+                        relativeFilePath = GetRelativePath(filePath, csProjFilePath);
                     }
                     modifyFileAction(doc, relativeFilePath);
                 }
@@ -75,11 +75,6 @@ namespace Sitefinity_CLI
 
         private static void AddFile(XDocument doc, string filePath)
         {
-            if (Path.GetExtension(filePath).Equals(Constants.CsprojFileExtension))
-            {
-                return;
-            }
-
             string elementType = GetXElementType(filePath);
             XElement element = GetXElementByAttributeValue(doc, filePath, elementType);
 
@@ -120,10 +115,6 @@ namespace Sitefinity_CLI
             {
                 return Constants.CompileElem;
             }
-            if (fileExtension.Equals(Constants.ConfigFileExtension))
-            {
-                return Constants.NoneElem;
-            }
 
             return Constants.ContentElem;
         }
@@ -145,6 +136,22 @@ namespace Sitefinity_CLI
                             && x.Descendants().Any(desc => desc.Name.ToString().EndsWith(elementType)));
 
             return parent;
+        }
+
+        private static string GetRelativePath(string destination, string origin)
+        {
+            origin = Path.GetDirectoryName(origin);
+
+            if (!origin.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                origin += Path.DirectorySeparatorChar;
+            }
+
+            Uri folderUri = new Uri(origin);
+            Uri pathUri = new Uri(destination);
+
+            string result = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+            return result;
         }
     }
 }

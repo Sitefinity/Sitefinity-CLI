@@ -7,13 +7,13 @@ using Telerik.Sitefinity.Personalization;
 
 namespace SitefinityWebApp.Mvc.Controllers
 {
-	[ControllerToolboxItem(Name = "{{pascalCaseName}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
-	public class {{pascalCaseName}}Controller : Controller, IPersonalizable
+	[ControllerToolboxItem(Name = "{{name}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
+	public class {{name}}Controller : Controller, IPersonalizable
 	{
 		// GET: {{name}}
 		public ActionResult Index()
 		{
-			var model = new {{pascalCaseName}}Model();
+			var model = new {{name}}Model();
 			model.Message = this.Message;
 			return View(model);
 		}

@@ -19,21 +19,5 @@ namespace Sitefinity_CLI
                 Console.ResetColor();
             }
         }
-
-        public static string GetRelativePath(string destination, string origin)
-        {
-            origin = Path.GetDirectoryName(origin);
-
-            if (!origin.EndsWith(Path.DirectorySeparatorChar.ToString()))
-            {
-                origin += Path.DirectorySeparatorChar;
-            }
-
-            Uri folderUri = new Uri(origin);
-            Uri pathUri = new Uri(destination);
-
-            string result = Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
-            return result;
-        }
     }
 }
