@@ -20,7 +20,7 @@ namespace {{pascalCaseName}}
     /// <summary>
     /// Represents custom module. 
     /// For more information on custom modules see our documentation: https://www.progress.com/documentation/sitefinity-cms/overview-custom-modules
-    /// For sample custom module project see this project in the Sitefinity GitHub repo: https://github.com/Sitefinity/Telerik.Sitefinity.Samples.Sitemap
+    /// For sample custom module project see this project in the Sitefinity GitHub repo: https://github.com/Sitefinity/Database-diagnostic-module
     /// </summary>
     public class {{pascalCaseName}}Module : ModuleBase
     {
