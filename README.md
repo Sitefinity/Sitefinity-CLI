@@ -61,7 +61,7 @@ You can use the add command with the following subcommands:
   
 * To create a new **Custom Module**, execute the following command:
 
-  ```sf add module "Custom Module" -d "Description of the custom module"```
+  ```sf add module "Custom Module"```
 
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 
