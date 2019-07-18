@@ -58,8 +58,7 @@ namespace Sitefinity_CLI.Commands
                 this.ProjectRootPath = Environment.CurrentDirectory;
             }
 
-            var assemblyName = Path.GetFileName(this.ProjectRootPath);
-            var assemblyPath = Path.Combine(this.ProjectRootPath, "bin", "Telerik.Sitefinity.dll");
+            var assemblyPath = this.GetAssemblyPath();
             if (!File.Exists(assemblyPath))
             {
                 var proceed = Prompt.GetYesNo(Constants.SitefinityNotRecognizedMessage, false, promptColor: ConsoleColor.Yellow);
@@ -106,6 +105,11 @@ namespace Sitefinity_CLI.Commands
             }
 
             return 0;
+        }
+
+        protected virtual string GetAssemblyPath()
+        {
+            return Path.Combine(this.ProjectRootPath, "bin", "Telerik.Sitefinity.dll");
         }
 
         protected void AddSignToFile(string filePath)

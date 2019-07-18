@@ -1,0 +1,22 @@
+﻿[
+  {
+    "FilePath": "Controllers\\{0}Controller.cs",
+    "TemplatePath": "Controller.Template"
+  },
+  {
+    "FilePath": "Models\\{0}Model.cs",
+    "TemplatePath": "Model.Template"
+  },
+  {
+    "FilePath": "Views\\{0}\\Index.cshtml",
+    "TemplatePath": "View.Template"
+  },
+  {
+    "FilePath": "Scripts\\{0}\\designerview-simple.js",
+    "TemplatePath": "Designer.Template"
+  },
+  {
+    "FilePath": "Views\\{0}\\DesignerView.Simple.cshtml",
+    "TemplatePath": "DesignerView.Template"
+  }
+]

@@ -105,7 +105,7 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddCustomWidgetTest()
+        public void AddWidgetTest()
         {
             var resourceName = "Test";
 
@@ -276,7 +276,7 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddCustomWidgetWithSameNameTest()
+        public void AddWidgetWithSameNameTest()
         {
             var resourceName = "Test";
 
@@ -570,6 +570,419 @@ namespace Sitefinity_CLI.Tests
             }
         }
 
+        [TestMethod]
+        public void AddModuleTest()
+        {
+            var resourceName = "Test";
+            var resourceDescription = "Custom module for testing";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var testFolderPath = this.testFolderPaths[templatesVersion];
+
+                var moduleFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
+
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                Process process;
+                try
+                {
+                    process = ExecuteCommand(
+                                commandName: Constants.AddModuleCommandName,
+                                resourceName: resourceName,
+                                description: resourceDescription,
+                                templatesVersion: templatesVersion,
+                                templateName: Constants.DefaultSourceTemplateName);
+                }
+                finally
+                {
+                    this.testFolderPaths[templatesVersion] = testFolderPath;
+                }
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                var fileName = string.Format("{0}{1}", "AssemblyInfo", Constants.CSharpFileExtension);
+                var folderPath = Path.Combine(moduleFolderPath, "Properties");
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", resourceName, Constants.CsprojFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll");
+                var binFolderRelativePath = Path.GetDirectoryName(sitefinityDllRelativePath);
+                var csProjContents = File.ReadAllText(Path.Combine(folderPath, fileName));
+
+                var outputPathCount = this.CountStringOccurrences(csProjContents, $"<OutputPath>{binFolderRelativePath}</OutputPath>");
+
+                Assert.AreEqual(2, outputPathCount);
+                Assert.IsTrue(csProjContents.Contains($"<HintPath>{Path.Combine(sitefinityDllRelativePath)}</HintPath>"));
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "Module", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}{2}", resourceName, "Config", Constants.CSharpFileExtension);
+                folderPath = moduleFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                if (Version.Parse(templatesVersion) < Version.Parse("12.0"))
+                {
+                    fileName = string.Format("{0}{1}{2}", resourceName, "Installer", Constants.CSharpFileExtension);
+                    folderPath = moduleFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
+                }
+
+                expectedOutputString.AppendLine(string.Format(Constants.ModuleCreatedMessage, resourceName));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
+                Assert.AreEqual(expectedOutputString.ToString(), outputString);
+            }
+        }
+
+        [TestMethod]
+        public void AddModuleWithSameNameTest()
+        {
+            var resourceName = "Test";
+            var resourceDescription = "Custom module for testing";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var testFolderPath = this.testFolderPaths[templatesVersion];
+
+                var moduleFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
+
+                Directory.CreateDirectory(moduleFolderPath);
+
+                var filePath = Path.Combine(moduleFolderPath, $"{resourceName}Module{Constants.CSharpFileExtension}");
+
+                using (File.Create(filePath))
+                {
+                }
+
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                Process process;
+                try
+                {
+                    process = ExecuteCommand(
+                                commandName: Constants.AddModuleCommandName,
+                                resourceName: resourceName,
+                                description: resourceDescription,
+                                templatesVersion: templatesVersion,
+                                templateName: Constants.DefaultSourceTemplateName);
+                }
+                finally
+                {
+                    this.testFolderPaths[templatesVersion] = testFolderPath;
+                }
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath));
+                Assert.IsTrue(outputString.Contains(expectedOutputString.ToString()));
+            }
+        }
+
+        [TestMethod]
+        public void AddModuleNoProject()
+        {
+            var resourceName = "Test";
+            var resourceDescription = "Custom module for testing";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var process = ExecuteCommand(
+                                    commandName: Constants.AddModuleCommandName,
+                                    resourceName: resourceName,
+                                    description: resourceDescription,
+                                    templatesVersion: templatesVersion,
+                                    templateName: Constants.DefaultSourceTemplateName);
+
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                expectedOutputString.AppendLine(Constants.ProjectNotFound);
+                Assert.AreEqual(expectedOutputString.ToString(), outputString);
+            }
+        }
+
+        [TestMethod]
+        public void AddModuleInvalidSolution()
+        {
+            var resourceName = "Test";
+            var resourceDescription = "Custom module for testing";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var testFolderPath = this.testFolderPaths[templatesVersion];
+
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], false);
+
+                Process process;
+                try
+                {
+                    process = ExecuteCommand(
+                                commandName: Constants.AddModuleCommandName,
+                                resourceName: resourceName,
+                                description: resourceDescription,
+                                templatesVersion: templatesVersion,
+                                templateName: Constants.DefaultSourceTemplateName);
+                }
+                finally
+                {
+                    this.testFolderPaths[templatesVersion] = testFolderPath;
+                }
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                expectedOutputString.AppendLine(Constants.SolutionNotReadable);
+                Assert.IsTrue(outputString.Contains(expectedOutputString.ToString()));
+            }
+        }
+
+        [TestMethod]
+        public void AddTestsTest()
+        {
+            var resourceName = "Test";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var testFolderPath = this.testFolderPaths[templatesVersion];
+
+                var testsFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
+
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                Process process;
+                try
+                {
+                    process = ExecuteCommand(
+                                commandName: Constants.AddIntegrationTestsCommandName,
+                                resourceName: resourceName,
+                                templatesVersion: templatesVersion,
+                                templateName: Constants.DefaultSourceTemplateName);
+                }
+                finally
+                {
+                    this.testFolderPaths[templatesVersion] = testFolderPath;
+                }
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                var fileName = string.Format("{0}{1}", "AssemblyInfo", Constants.CSharpFileExtension);
+                var folderPath = Path.Combine(testsFolderPath, "Properties");
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", resourceName, Constants.CsprojFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll");
+                var binFolderRelativePath = Path.GetDirectoryName(sitefinityDllRelativePath);
+                var csProjContents = File.ReadAllText(Path.Combine(folderPath, fileName));
+
+                var outputPathCount = this.CountStringOccurrences(csProjContents, $"<OutputPath>{binFolderRelativePath}</OutputPath>");
+
+                Assert.AreEqual(2, outputPathCount);
+
+                fileName = string.Format("{0}{1}", "DemoTests", Constants.CSharpFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", Constants.PackagesFileName, Constants.ConfigFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", "TestAuthors", Constants.CSharpFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
+                folderPath = testsFolderPath;
+                AssertFileCreated(folderPath, fileName, expectedOutputString);
+
+                expectedOutputString.AppendLine(string.Format(Constants.IntegrationTestsCreatedMessage, resourceName));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
+                Assert.AreEqual(expectedOutputString.ToString(), outputString);
+            }
+        }
+
+        [TestMethod]
+        public void AddTestsWithSameNameTest()
+        {
+            var resourceName = "Test";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var testFolderPath = this.testFolderPaths[templatesVersion];
+
+                var testsFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
+
+                Directory.CreateDirectory(testsFolderPath);
+
+                var filePath = Path.Combine(testsFolderPath, $"DemoTests{Constants.CSharpFileExtension}");
+
+                using (File.Create(filePath))
+                {
+                }
+
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                Process process;
+                try
+                {
+                    process = ExecuteCommand(
+                                commandName: Constants.AddIntegrationTestsCommandName,
+                                resourceName: resourceName,
+                                templatesVersion: templatesVersion,
+                                templateName: Constants.DefaultSourceTemplateName);
+                }
+                finally
+                {
+                    this.testFolderPaths[templatesVersion] = testFolderPath;
+                }
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath));
+                Assert.IsTrue(outputString.Contains(expectedOutputString.ToString()));
+            }
+        }
+
+        [TestMethod]
+        public void AddTestsNoProject()
+        {
+            var resourceName = "Test";
+
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+
+                var process = ExecuteCommand(
+                                    commandName: Constants.AddIntegrationTestsCommandName,
+                                    resourceName: resourceName,
+                                    templatesVersion: templatesVersion,
+                                    templateName: Constants.DefaultSourceTemplateName);
+
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                expectedOutputString.AppendLine(Constants.ProjectNotFound);
+                Assert.AreEqual(expectedOutputString.ToString(), outputString);
+            }
+        }
+
+        [TestMethod]
+        public void AddTestsInvalidSolution()
+        {
+            var resourceName = "Test";
+            foreach (var templatesVersion in this.testedTemplateVersions)
+            {
+                var testFolderPath = this.testFolderPaths[templatesVersion];
+
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], false);
+
+                Process process;
+                try
+                {
+                    process = ExecuteCommand(
+                                commandName: Constants.AddIntegrationTestsCommandName,
+                                resourceName: resourceName,
+                                templatesVersion: templatesVersion,
+                                templateName: Constants.DefaultSourceTemplateName);
+
+                }
+                finally
+                {
+                    this.testFolderPaths[templatesVersion] = testFolderPath;
+                }
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                process.WaitForExit();
+
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+
+                expectedOutputString.AppendLine(Constants.SolutionNotReadable);
+                Assert.IsTrue(outputString.Contains(expectedOutputString.ToString()));
+            }
+        }
+
+        private string CreateDummySolution(string folderPath, bool valid = true)
+        {
+            var slnPath = Path.Combine(folderPath, "Test.sln");
+            string slnContents;
+
+            if (valid)
+            {
+                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.template");
+            }
+            else
+            {
+                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithoutElements.template");
+            }
+
+            File.WriteAllText(slnPath, slnContents);
+
+            var webAppFolderPath = Path.Combine(folderPath, "SitefinityWebApp");
+            Directory.CreateDirectory(webAppFolderPath);
+
+            var webAppProjPath = Path.Combine(webAppFolderPath, "SitefinityWebApp.csproj");
+            var webAppProjContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\CsProjModifierTests\\Data\\WithElements.csproj");
+            File.WriteAllText(webAppProjPath, webAppProjContents);
+
+            var binaryFolderPath = Path.Combine(webAppFolderPath, "bin");
+            Directory.CreateDirectory(binaryFolderPath);
+
+            var binaryFilesPath = Path.Combine(binaryFolderPath, "Telerik.Sitefinity.dll");
+            using (File.Create(binaryFilesPath))
+            {
+            }
+
+            return webAppFolderPath;
+        }
+
         private string GetDefaulResourcetPackage(string version)
         {
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
@@ -710,7 +1123,7 @@ namespace Sitefinity_CLI.Tests
             };
         }
 
-        private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion = null, string templateName = null, string resourcePackageName = null)
+        private Process ExecuteCommand(string commandName, string resourceName, string templatesVersion = null, string templateName = null, string resourcePackageName = null, string description = null)
         {
             var process = this.CreateNewProcess();
 
@@ -730,6 +1143,11 @@ namespace Sitefinity_CLI.Tests
             if (resourcePackageName != null)
             {
                 args = AddOptionToArguments(args, "-p", resourcePackageName);
+            }
+
+            if (description != null)
+            {
+                args = AddOptionToArguments(args, "-d", description);
             }
 
             process.StartInfo.Arguments = args;
@@ -787,6 +1205,42 @@ namespace Sitefinity_CLI.Tests
             }
 
             return versions;
+        }
+
+        private string GetSolutionRelativePath(string relativeTo, string fileName)
+        {
+            var currentPath = relativeTo;
+            while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
+            {
+                currentPath = Directory.GetParent(currentPath)?.ToString();
+            }
+
+            if (string.IsNullOrEmpty(currentPath))
+            {
+                throw new FileNotFoundException("Unable to find sln file");
+            }
+
+            var path = Directory.EnumerateFiles(currentPath, fileName, SearchOption.AllDirectories).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new FileNotFoundException($"Unable to find {fileName}");
+            }
+
+            return Path.GetRelativePath(relativeTo, path);
+        }
+
+        private int CountStringOccurrences(string text, string pattern)
+        {
+            // Loop through all instances of the string 'text'.
+            int count = 0;
+            int i = 0;
+            while ((i = text.IndexOf(pattern, i)) != -1)
+            {
+                i += pattern.Length;
+                count++;
+            }
+            return count;
         }
     }
 }

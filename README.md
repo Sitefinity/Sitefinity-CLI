@@ -54,6 +54,14 @@ You can use the add command with the following subcommands:
 * To create a new **Widget**, execute the following command:
 
   ```sf add widget "CustomWidget"```
+  
+* To create a new **Integration Tests Project**, execute the following command:
+
+  ```sf add tests "Sitefinity.Tests.Integration"```
+  
+* To create a new **Custom Module**, execute the following command:
+
+  ```sf add module "Custom Module"```
 
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 
@@ -107,3 +115,8 @@ You can easily create custom templates. To do this, create a file with extension
 ]
 ```
 **NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
+
+## Known issues
+#### Visual Studio 2015 integration
+Sitefinity VSIX/CLI correctly updates the csproj and sln files but Visual Studio 2015 won't refresh the solution correctly. 
+The workaround is to reopen the solution
