@@ -956,11 +956,11 @@ namespace Sitefinity_CLI.Tests
 
             if (valid)
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.sln");
+                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.template");
             }
             else
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithoutElements.sln");
+                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithoutElements.template");
             }
 
             File.WriteAllText(slnPath, slnContents);

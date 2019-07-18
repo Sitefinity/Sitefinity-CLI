@@ -24,10 +24,10 @@
     <None Include="CsProjModifierTests\Data\WithElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SlnModifierTests\Data\WithElements.sln">
+    <None Include="SlnModifierTests\Data\WithElements.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SlnModifierTests\Data\WithoutElements.sln">
+    <None Include="SlnModifierTests\Data\WithoutElements.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

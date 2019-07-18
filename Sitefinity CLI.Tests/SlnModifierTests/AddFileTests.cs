@@ -9,74 +9,28 @@ namespace Sitefinity_CLI.Tests.SlnModifierTests
     {
         private string slnFilePathWithElements = $"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.sln";
         private string slnFilePathWithoutElements = $"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithoutElements.sln";
+        private string slnFilePathWithElementsSource = $"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.template";
+        private string slnFilePathWithoutElementsSource = $"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithoutElements.template";
         private string incorrectSlnFilePath = $"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\Pesho.sln";
         private string csProjFilePath = $"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\SomeProj\\SomeProj.csproj";
         private Guid projectGuid = Guid.NewGuid();
         private string correctWebAppName = "SitefinityWebApp";
         private string incorrectWebAppName = "Pesho";
-        private const string WithElementsContents = @"Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
-MinimumVisualStudioVersion = 10.0.40219.1
-Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""SitefinityWebApp"", ""SitefinityWebApp.csproj"", ""{3E598CFC-83B2-494A-A97F-32EB24D797C6}""
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release Pro|Any CPU = Release Pro|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3E598CFC-83B2-494A-A97F-32EB24D797C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E598CFC-83B2-494A-A97F-32EB24D797C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E598CFC-83B2-494A-A97F-32EB24D797C6}.Release Pro|Any CPU.ActiveCfg = Release Pro|Any CPU
-		{3E598CFC-83B2-494A-A97F-32EB24D797C6}.Release Pro|Any CPU.Build.0 = Release Pro|Any CPU
-		{3E598CFC-83B2-494A-A97F-32EB24D797C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E598CFC-83B2-494A-A97F-32EB24D797C6}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D9283185-5D9B-471E-9D2A-F9F0C6DB4292}
-	EndGlobalSection
-EndGlobal
-";
-        private const string WithoutElementsContents = @"Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
-MinimumVisualStudioVersion = 10.0.40219.1
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release Pro|Any CPU = Release Pro|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D9283185-5D9B-471E-9D2A-F9F0C6DB4292}
-	EndGlobalSection
-EndGlobal
-";
+        private string WithElementsContents => File.ReadAllText(this.slnFilePathWithElementsSource);
+        private string WithoutElementsContents => File.ReadAllText(this.slnFilePathWithoutElementsSource);
 
         [TestInitialize]
         public void SetUp()
         {
-            this.CleanSolutionFiles();
+            File.WriteAllText(this.slnFilePathWithElements, this.WithElementsContents);
+            File.WriteAllText(this.slnFilePathWithoutElements, this.WithoutElementsContents);
         }
 
         [TestCleanup]
         public void TearDown()
         {
-            this.CleanSolutionFiles();
-        }
-
-        private void CleanSolutionFiles()
-        {
-            File.WriteAllText(this.slnFilePathWithElements, WithElementsContents);
-            File.WriteAllText(this.slnFilePathWithoutElements, WithoutElementsContents);
+            File.Delete(this.slnFilePathWithElements);
+            File.Delete(this.slnFilePathWithoutElements);
         }
 
         [TestMethod]
