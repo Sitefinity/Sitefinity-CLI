@@ -12,7 +12,7 @@ namespace Sitefinity_CLI.Commands
     /// <summary>
     /// Adds an integration tests project with sample test to the solution
     /// </summary>
-    [Command(Constants.AddIntegrationTestsCommandName, Description = "Adds a new custom widget to the current project.", FullName = Constants.AddIntegrationTestsCommandFullName)]
+    [Command(Constants.AddIntegrationTestsCommandName, Description = "Adds a new integration test project to the current solution.", FullName = Constants.AddIntegrationTestsCommandFullName)]
     internal class AddIntegrationTestsCommand : AddToSolutionCommandBase
     {
         /// <summary>
