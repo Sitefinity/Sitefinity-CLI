@@ -1,0 +1,46 @@
+﻿/* {{> sign}} */
+
+using SitefinityWebApp.Mvc.Models;
+using System;
+using System.Web.Mvc;
+using Telerik.Sitefinity.Mvc;
+using Telerik.Sitefinity.Personalization;
+
+namespace SitefinityWebApp.Mvc.Controllers
+{
+	public enum Enumeration
+    {
+        Value1,
+        Value2,
+        Value3
+    }
+
+	[ControllerToolboxItem(Name = "{{pascalCaseName}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
+	public class {{pascalCaseName}}Controller : Controller, IPersonalizable
+	{
+		// GET: {{name}}
+		public ActionResult Index()
+		{
+			var model = new {{pascalCaseName}}Model()
+			{
+                Message = this.Message,
+                Number = this.Number,
+                Check = this.Check,
+                MyDate = this.MyDate,
+                MyEnum = this.MyEnum
+            };
+			return View(model);
+		}
+		
+        protected override void HandleUnknownAction(string actionName)
+        {
+            this.ActionInvoker.InvokeAction(this.ControllerContext, "Index");
+        }
+
+		public string Message { get; set; }
+		public int Number {get; set; }
+		public bool Check {get; set; }
+        public DateTime? MyDate { get; set; }
+        public Enumeration MyEnum { get; set; }
+	}
+}

@@ -1,0 +1,4 @@
+{
+	"priority": 1,
+	"components" : ["sf-date-time-picker"]
+}

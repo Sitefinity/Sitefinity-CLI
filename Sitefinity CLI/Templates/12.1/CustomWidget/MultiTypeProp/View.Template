@@ -1,0 +1,24 @@
+﻿@* {{> sign}} *@
+
+@model SitefinityWebApp.Mvc.Models.{{pascalCaseName}}Model
+<div>
+    @Model.Message
+</div>
+<div>
+    @Model.Number
+</div>
+<div>
+    @Model.Check
+</div>
+<div>
+    @Model.MyEnum
+</div>
+
+@if (Model.MyDate.HasValue)
+{
+    <div>@Model.MyDate.Value.ToString("F")</div>
+}
+else
+{
+    <div style="color: red;">Please select a date!</div>
+}

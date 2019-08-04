@@ -1,0 +1,71 @@
+﻿/* {{> sign}} */
+
+var designerModule = angular.module('designer');
+designerModule.requires.push('sfSelectors');
+
+designerModule.directive('stringToInt', function () {
+    return {
+        require: 'ngModel',
+        link: function (scope, element, attrs, ngModel) {
+            ngModel.$parsers.push(function (value) {
+                return parseInt(value);
+            });
+            ngModel.$formatters.push(function (value) {
+                return parseInt(value);
+            });
+        }
+    };
+})
+    .directive('stringToBool', function () {
+        return {
+            require: 'ngModel',
+            link: function (scope, element, attrs, ngModel) {
+                ngModel.$parsers.push(function (value) {
+                    var returnValue = false;
+                    if (value) {
+                        if (value === true || value === 'true') {
+                            returnValue = true;
+                        }
+                    }
+                    return returnValue;
+                });
+                ngModel.$formatters.push(function (value) {
+                    var retValue = false;
+                    if (value !== undefined && value === 'True') {
+                        retValue = true;
+                    }
+                    return retValue;
+                });
+            }
+        };
+    })
+designerModule.controller('SimpleCtrl', ['$scope', 'propertyService', function ($scope, propertyService) {
+    $scope.feedback.showLoadingIndicator = true;
+
+    propertyService.get()
+        .then(function (data) {
+            if (data) {
+                $scope.properties = propertyService.toAssociativeArray(data.Items);
+            }
+        },
+            function (data) {
+                $scope.feedback.showError = true;
+                if (data)
+                    $scope.feedback.errorMessage = data.Detail;
+            })
+        .finally(function () {
+            $scope.feedback.showLoadingIndicator = false;
+        });
+
+    $scope.$watch('properties.MyDate.PropertyValue', function (newValue, oldValue) {
+        if (newValue) {
+            $scope.date = new Date(newValue);
+        }
+    }, true);
+
+    $scope.$watch('date', function (newValue, oldValue) {
+        if (newValue) {
+            $scope.properties.MyDate.PropertyValue = newValue.toUTCString();
+        }
+    }, true);
+}]);

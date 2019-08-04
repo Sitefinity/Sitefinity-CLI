@@ -1,0 +1,25 @@
+﻿@* {{> sign}} *@
+
+<div>
+    <label>Your New Message: </label>
+    <input type="text" ng-model="properties.Message.PropertyValue" />
+</div>
+<div>
+    <label>Your New Number: </label>
+    <input type="number" string-to-int ng-model="properties.Number.PropertyValue" />
+</div>
+<div>
+    <label>Your New Check: </label>
+    <input type="checkbox" string-to-bool ng-model="properties.Check.PropertyValue" />
+</div>
+
+<sf-date-time-picker ng-model="date" sf-show-meridian="true" sf-hour-step="1" sf-minute-step="5"></sf-date-time-picker>
+
+<p>
+    <label for="enum">Enum</label>
+    <select id="enum" ng-model="properties.MyEnum.PropertyValue">
+        <option value="Value1">Value 1</option>
+        <option value="Value2">Value 2</option>
+        <option value="Value3">Value 3</option>
+    </select>
+</p>
