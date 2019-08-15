@@ -575,7 +575,6 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
                 var testFolderPath = this.testFolderPaths[templatesVersion];
@@ -649,7 +648,6 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
                 var testFolderPath = this.testFolderPaths[templatesVersion];
@@ -697,7 +695,6 @@ namespace Sitefinity_CLI.Tests
         {
             var resourceName = "Test";
 
-
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
                 var process = ExecuteCommand(
@@ -724,7 +721,6 @@ namespace Sitefinity_CLI.Tests
         public void AddModuleInvalidSolution()
         {
             var resourceName = "Test";
-
 
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
