@@ -14,13 +14,6 @@ namespace Sitefinity_CLI.Commands
     internal class AddModuleCommand : AddToSolutionCommandBase
     {
         /// <summary>
-        /// The description of the module, visible in Sitefinity / Modules and Services
-        /// </summary>
-        [Option(Constants.DescriptionOptionTemplate, Constants.DescriptionOptionDescription, CommandOptionType.SingleValue)]
-        [DefaultValue("")]
-        public string Description { get; set; }
-
-        /// <summary>
         /// Path of the folder relative to the project root.
         /// </summary>
         protected override string FolderPath => string.Empty;
@@ -50,7 +43,6 @@ namespace Sitefinity_CLI.Commands
                 var date = DateTime.Today.ToString("yyyy/MM/dd");
 
                 dictionary["date"] = date;
-                dictionary["description"] = this.Description;
             }
             else
             {

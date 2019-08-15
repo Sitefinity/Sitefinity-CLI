@@ -574,7 +574,7 @@ namespace Sitefinity_CLI.Tests
         public void AddModuleTest()
         {
             var resourceName = "Test";
-            var resourceDescription = "Custom module for testing";
+
 
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
@@ -589,7 +589,6 @@ namespace Sitefinity_CLI.Tests
                     process = ExecuteCommand(
                                 commandName: Constants.AddModuleCommandName,
                                 resourceName: resourceName,
-                                description: resourceDescription,
                                 templatesVersion: templatesVersion,
                                 templateName: Constants.DefaultSourceTemplateName);
                 }
@@ -649,7 +648,7 @@ namespace Sitefinity_CLI.Tests
         public void AddModuleWithSameNameTest()
         {
             var resourceName = "Test";
-            var resourceDescription = "Custom module for testing";
+
 
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
@@ -672,7 +671,6 @@ namespace Sitefinity_CLI.Tests
                     process = ExecuteCommand(
                                 commandName: Constants.AddModuleCommandName,
                                 resourceName: resourceName,
-                                description: resourceDescription,
                                 templatesVersion: templatesVersion,
                                 templateName: Constants.DefaultSourceTemplateName);
                 }
@@ -698,14 +696,13 @@ namespace Sitefinity_CLI.Tests
         public void AddModuleNoProject()
         {
             var resourceName = "Test";
-            var resourceDescription = "Custom module for testing";
+
 
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
                 var process = ExecuteCommand(
                                     commandName: Constants.AddModuleCommandName,
                                     resourceName: resourceName,
-                                    description: resourceDescription,
                                     templatesVersion: templatesVersion,
                                     templateName: Constants.DefaultSourceTemplateName);
 
@@ -727,7 +724,7 @@ namespace Sitefinity_CLI.Tests
         public void AddModuleInvalidSolution()
         {
             var resourceName = "Test";
-            var resourceDescription = "Custom module for testing";
+
 
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
@@ -741,7 +738,6 @@ namespace Sitefinity_CLI.Tests
                     process = ExecuteCommand(
                                 commandName: Constants.AddModuleCommandName,
                                 resourceName: resourceName,
-                                description: resourceDescription,
                                 templatesVersion: templatesVersion,
                                 templateName: Constants.DefaultSourceTemplateName);
                 }
