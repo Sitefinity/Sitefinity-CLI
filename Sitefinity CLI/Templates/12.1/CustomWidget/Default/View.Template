@@ -1,0 +1,6 @@
+﻿@* {{> sign}} *@
+
+@model SitefinityWebApp.Mvc.Models.{{pascalCaseName}}Model
+<div>
+	@Model.Message
+</div>

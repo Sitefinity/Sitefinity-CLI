@@ -14,12 +14,29 @@ namespace Sitefinity_CLI.Commands
     [HelpOption]
     internal abstract class CommandBase
     {
+        private string _projectRoothPath = string.Empty;
+
         [Argument(0, Description = Constants.NameArgumentDescription)]
         [Required(ErrorMessage = "You must specify the name of the resource!")]
         public string Name { get; set; }
 
         [Option("-r|--root", Constants.ProjectRoothPathOptionDescription, CommandOptionType.SingleValue)]
-        public string ProjectRootPath { get; set; }
+        public string ProjectRootPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this._projectRoothPath))
+                {
+                    this._projectRoothPath = Environment.CurrentDirectory;
+                }
+
+                return this._projectRoothPath;
+            }
+            set
+            {
+                this._projectRoothPath = value;
+            }
+        }
 
         public abstract string TemplateName { get; set; }
 
@@ -53,11 +70,6 @@ namespace Sitefinity_CLI.Commands
 
         public virtual int OnExecute(CommandLineApplication config)
         {
-            if (this.ProjectRootPath == null)
-            {
-                this.ProjectRootPath = Environment.CurrentDirectory;
-            }
-
             var assemblyPath = this.GetAssemblyPath();
             if (!File.Exists(assemblyPath))
             {
