@@ -91,9 +91,9 @@ namespace Sitefinity_CLI
         public const string AddCustomWidgetCommandName = "widget";
         public const string AddCustomWidgetCommandFullName = "Widget";
         public const string AddModuleCommandName = "module";
-        public const string AddModuleCommandFullName = "Module";
+        public const string AddModuleCommandFullName = "Module project";
         public const string AddIntegrationTestsCommandName = "tests";
-        public const string AddIntegrationTestsCommandFullName = "Integration tests";
+        public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
 
         public const string DefaultResourcePackageName_VersionsBefore12_0 = "Bootstrap";
