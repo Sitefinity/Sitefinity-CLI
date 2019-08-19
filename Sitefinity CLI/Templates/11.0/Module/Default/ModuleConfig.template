@@ -14,7 +14,7 @@ namespace {{pascalCaseName}}
         ///// <summary>
         ///// Sample property demonstrating the usage of ConfigurationPropertyAttribute
         ///// </summary>
-        //[ConfigurationProperty("Sample Property", DefaultValue = "Default value")]
+        //[ConfigurationProperty("PropNames.SampleProperty", DefaultValue = "Default value")]
         //public virtual string SampleProperty
         //{
         //    get
