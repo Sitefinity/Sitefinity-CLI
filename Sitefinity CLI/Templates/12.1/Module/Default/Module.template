@@ -12,7 +12,7 @@ using {{pascalCaseName}};
 [assembly: SitefinityModule("{{pascalCaseName}}", 
 							typeof({{pascalCaseName}}Module), 
 							"{{name}}", 
-							"{{description}}", 
+							/* Enter the module description here */ "", 
 							StartupType.OnApplicationStart)]
 
 namespace {{pascalCaseName}}
