@@ -78,10 +78,19 @@ namespace Sitefinity_CLI.Commands
                     config.Add(commandModel);
                 }
             }
-            
+
             var content = JsonConvert.SerializeObject(config);
             var configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
-            File.WriteAllText(configFilePath, content);
+            try
+            {
+                File.WriteAllText(configFilePath, content);
+            }
+            catch
+            {
+                Utils.WriteLine(string.Format(Constants.ConfigFileNotCreatedMessage, configFilePath), ConsoleColor.Red);
+                return 1;
+            }
+
             Utils.WriteLine(string.Format(Constants.ConfigFileCreatedMessage, configFilePath), ConsoleColor.Green);
             return 0;
         }
