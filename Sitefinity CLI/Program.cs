@@ -1,6 +1,7 @@
 ﻿using Sitefinity_CLI.Commands;
 using McMaster.Extensions.CommandLineUtils;
 using System;
+using Sitefinity_CLI.Enums;
 
 namespace Sitefinity_CLI
 {
@@ -10,17 +11,17 @@ namespace Sitefinity_CLI
     [Subcommand(Constants.GenerateConfigCommandName, typeof(GenerateConfigCommand))]
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            // Should be uncommented for release versions
-            //try
-            //{
-                CommandLineApplication.Execute<Program>(args);
-            //}
-            //catch (System.Exception e)
-            //{
-            //    Utils.WriteLine(e.Message, ConsoleColor.Red);
-            //}
+            try
+            {
+                return CommandLineApplication.Execute<Program>(args);
+            }
+            catch (Exception e)
+            {
+                Utils.WriteLine(e.Message, ConsoleColor.Red);
+                return (int)ExitCode.GeneralError;
+            }
         }
 
         protected int OnExecute(CommandLineApplication app)

@@ -39,6 +39,8 @@ namespace Sitefinity_CLI
         public const string ResourceExistsMessage = "{0} with name {1} already exists. Path: \"{2}\"";
         public const string ProjectNotFound = "Unable to find csproj file";
         public const string SolutionNotFoundMessage = "Unable to find sln file";
+        public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
+        public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
@@ -91,9 +93,9 @@ namespace Sitefinity_CLI
         public const string AddCustomWidgetCommandName = "widget";
         public const string AddCustomWidgetCommandFullName = "Widget";
         public const string AddModuleCommandName = "module";
-        public const string AddModuleCommandFullName = "Module";
+        public const string AddModuleCommandFullName = "Module project";
         public const string AddIntegrationTestsCommandName = "tests";
-        public const string AddIntegrationTestsCommandFullName = "Integration tests";
+        public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
 
         public const string DefaultResourcePackageName_VersionsBefore12_0 = "Bootstrap";

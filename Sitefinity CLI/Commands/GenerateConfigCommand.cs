@@ -1,5 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
+using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Model;
 using System;
 using System.Collections.Generic;
@@ -78,12 +79,26 @@ namespace Sitefinity_CLI.Commands
                     config.Add(commandModel);
                 }
             }
-            
+
             var content = JsonConvert.SerializeObject(config);
             var configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
-            File.WriteAllText(configFilePath, content);
+            try
+            {
+                File.WriteAllText(configFilePath, content);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Utils.WriteLine(string.Format(Constants.ConfigFileNotCreatedPermissionsMessage, configFilePath), ConsoleColor.Red);
+                return (int)ExitCode.InsufficientPermissions;
+            }
+            catch
+            {
+                Utils.WriteLine(string.Format(Constants.ConfigFileNotCreatedMessage, configFilePath), ConsoleColor.Red);
+                return (int)ExitCode.GeneralError;
+            }
+
             Utils.WriteLine(string.Format(Constants.ConfigFileCreatedMessage, configFilePath), ConsoleColor.Green);
-            return 0;
+            return (int)ExitCode.OK;
         }
     }
 }

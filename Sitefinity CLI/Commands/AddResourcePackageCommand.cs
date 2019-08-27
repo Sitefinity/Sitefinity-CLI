@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Sitefinity_CLI.Enums;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -28,13 +29,13 @@ namespace Sitefinity_CLI.Commands
             if (!Directory.Exists(templatePackageFolderPath))
             {
                 Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePackageFolderPath), ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             if (Directory.Exists(newResourcePackagePath))
             {
                 Utils.WriteLine(string.Format(Constants.ResourceExistsMessage, config.FullName, this.Name, newResourcePackagePath), ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             var directortyInfo = Directory.CreateDirectory(newResourcePackagePath);
@@ -52,7 +53,7 @@ namespace Sitefinity_CLI.Commands
             Utils.WriteLine(string.Format(Constants.ResourcePackageCreatedMessage, directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);
             Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
 
-            return 0;
+            return (int)ExitCode.OK;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace {{pascalCaseName}}
                             Name = moduleName,
                             Type = "{{pascalCaseName}}.{{pascalCaseName}}Module, {{pascalCaseName}}",
                             Title = "{{name}}",
-                            Description = "{{description}}",
+                            Description = /* Enter the module description here */ "",
                             StartupType = StartupType.OnApplicationStart
                         };
                     });
