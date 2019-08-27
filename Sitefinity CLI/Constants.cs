@@ -40,6 +40,7 @@ namespace Sitefinity_CLI
         public const string ProjectNotFound = "Unable to find csproj file";
         public const string SolutionNotFoundMessage = "Unable to find sln file";
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
+        public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";

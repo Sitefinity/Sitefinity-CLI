@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Sitefinity_CLI.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -47,7 +48,7 @@ namespace Sitefinity_CLI.Commands
             }
             else
             {
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             return base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data);
@@ -75,7 +76,7 @@ namespace Sitefinity_CLI.Commands
                 if (string.IsNullOrEmpty(currentPath))
                 {
                     Utils.WriteLine(Constants.SolutionNotFoundMessage, ConsoleColor.Red);
-                    return 1;
+                    return (int)ExitCode.GeneralError;
                 }
             }
 
@@ -88,7 +89,7 @@ namespace Sitefinity_CLI.Commands
             if (string.IsNullOrEmpty(binFolder))
             {
                 Utils.WriteLine(Constants.ProjectNotFound, ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             this.SitefinityVersion = FileVersionInfo.GetVersionInfo(sitefinityPath).ProductVersion;
@@ -105,7 +106,7 @@ namespace Sitefinity_CLI.Commands
 
             if (base.OnExecute(config) == 1)
             {
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             var project = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
@@ -125,7 +126,7 @@ namespace Sitefinity_CLI.Commands
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionFailureMessage, project), ConsoleColor.Yellow);
             }
 
-            return 0;
+            return (int)ExitCode.OK;
         }
 
         /// <summary>

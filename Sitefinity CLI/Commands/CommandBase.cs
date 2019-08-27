@@ -1,5 +1,6 @@
 ﻿using HandlebarsDotNet;
 using McMaster.Extensions.CommandLineUtils;
+using Sitefinity_CLI.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -80,7 +81,7 @@ namespace Sitefinity_CLI.Commands
                 }
                 else
                 {
-                    return 1;
+                    return (int)ExitCode.GeneralError;
                 }
             }
 
@@ -116,7 +117,7 @@ namespace Sitefinity_CLI.Commands
                 this.TemplateName = Prompt.GetString(promptMessage, promptColor: ConsoleColor.Yellow, defaultValue: defaultValue);
             }
 
-            return 0;
+            return (int)ExitCode.OK;
         }
 
         protected virtual string GetAssemblyPath()
@@ -152,13 +153,13 @@ namespace Sitefinity_CLI.Commands
             if (File.Exists(filePath))
             {
                 Utils.WriteLine(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             if (!File.Exists(templatePath))
             {
                 Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, resourceFullName, templatePath), ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             var templateSource = File.ReadAllText(templatePath);
@@ -168,7 +169,7 @@ namespace Sitefinity_CLI.Commands
             File.WriteAllText(filePath, result);
             Utils.WriteLine(string.Format(Constants.FileCreatedMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Green);
 
-            return 0;
+            return (int)ExitCode.OK;
         }
 
         private string GetLatestTemplatesVersion()

@@ -1,5 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
+using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Model;
 using System;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace Sitefinity_CLI.Commands
         {
             if (base.OnExecute(config) == 1)
             {
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             var folderPath = Path.Combine(this.ProjectRootPath, this.FolderPath);
@@ -85,7 +86,7 @@ namespace Sitefinity_CLI.Commands
                 if (!Directory.Exists(folderPath))
                 {
                     Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath), ConsoleColor.Red);
-                    return 1;
+                    return (int)ExitCode.GeneralError;
                 }
             }
 
@@ -94,14 +95,14 @@ namespace Sitefinity_CLI.Commands
             if (!Directory.Exists(templatePath))
             {
                 Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath), ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             this.FileModels = this.GetFileModels();
 
             if (this.AddToProject(config) == 1)
             {
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             Utils.WriteLine(string.Format(this.CreatedMessage, this.Name), ConsoleColor.Green);
@@ -119,7 +120,7 @@ namespace Sitefinity_CLI.Commands
                 Utils.WriteLine(Constants.FilesAddedToProjectMessage, ConsoleColor.Green);
             }
 
-            return 0;
+            return (int)ExitCode.OK;
         }
 
         /// <summary>
@@ -138,7 +139,7 @@ namespace Sitefinity_CLI.Commands
             }
 
             this.createdFiles.Add(filePath);
-            return 0;
+            return (int)ExitCode.OK;
         }
 
         /// <summary>
@@ -176,10 +177,10 @@ namespace Sitefinity_CLI.Commands
             {
                 this.DeleteFiles();
                 this.RemoveFilesFromCsproj();
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
-            return 0;
+            return (int)ExitCode.OK;
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Sitefinity_CLI.Commands;
 using McMaster.Extensions.CommandLineUtils;
 using System;
+using Sitefinity_CLI.Enums;
 
 namespace Sitefinity_CLI
 {
@@ -19,7 +20,7 @@ namespace Sitefinity_CLI
             catch (Exception e)
             {
                 Utils.WriteLine(e.Message, ConsoleColor.Red);
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
         }
 
