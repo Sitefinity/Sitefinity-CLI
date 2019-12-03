@@ -10,13 +10,5 @@
   {
     "FilePath": "Views\\{0}\\Index.cshtml",
     "TemplatePath": "View.Template"
-  },
-  {
-    "FilePath": "Scripts\\{0}\\designerview-simple.js",
-    "TemplatePath": "Designer.Template"
-  },
-  {
-    "FilePath": "Views\\{0}\\DesignerView.Simple.cshtml",
-    "TemplatePath": "DesignerView.Template"
   }
 ]
