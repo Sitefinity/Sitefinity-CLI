@@ -1,4 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.VisualStudio;
 using Sitefinity_CLI.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,11 @@ namespace Sitefinity_CLI.Commands
 {
     internal abstract class AddToSolutionCommandBase : AddToProjectCommandBase
     {
+        public AddToSolutionCommandBase(ICsProjectFileEditor csProjectFileEditor, ILogger<AddToSolutionCommandBase> logger)
+            : base(csProjectFileEditor, logger)
+        {
+        }
+
         /// <summary>
         /// The guid of the project to be added to solution
         /// </summary>
@@ -111,19 +118,16 @@ namespace Sitefinity_CLI.Commands
 
             var project = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
 
-            var slnAddResult = SlnModifier.AddFile(this.SolutionPath, project, this.ProjectGuid, webAppProjectName);
-
-            if (slnAddResult.Success)
+            try
             {
+                SolutionProject solutionProject = new SolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.WebProject);
+                SolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
+
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
             }
-            else if (slnAddResult.Message != null)
+            catch(Exception ex)
             {
-                Utils.WriteLine(slnAddResult.Message, ConsoleColor.Yellow);
-            }
-            else
-            {
-                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionFailureMessage, project), ConsoleColor.Yellow);
+                Utils.WriteLine(ex.Message, ConsoleColor.Yellow);
             }
 
             return (int)ExitCode.OK;

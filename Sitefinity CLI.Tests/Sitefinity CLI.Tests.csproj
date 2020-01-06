@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -18,16 +18,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="CsProjModifierTests\Data\WithoutElements.csproj">
+    <None Include="CsProjectFileEditorTests\Data\WithoutElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="CsProjModifierTests\Data\WithElements.csproj">
+    <None Include="CsProjectFileEditorTests\Data\WithElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SlnModifierTests\Data\WithElements.template">
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SolutionFileEditorTests\Data\WithElements.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SlnModifierTests\Data\WithoutElements.template">
+    <None Update="SolutionFileEditorTests\Data\WithoutElements.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

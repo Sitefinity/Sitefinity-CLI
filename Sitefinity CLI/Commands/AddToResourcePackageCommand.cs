@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -11,6 +12,10 @@ namespace Sitefinity_CLI.Commands
         [Option("-p|--package", Constants.ResourcePackageOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultResourcePackageName)]
         public string ResourcePackage { get; set; }
+
+        public AddToResourcePackageCommand(ILogger<object> logger) : base(logger)
+        {
+        }
 
         public int AddFileToResourcePackage(CommandLineApplication config, string destinationPath, string templateType, string fileExtension)
         {
@@ -28,7 +33,7 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
             {
-                Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath)), ConsoleColor.Red);
+                this.Logger.LogError(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath)));
                 return 1;
             }
 

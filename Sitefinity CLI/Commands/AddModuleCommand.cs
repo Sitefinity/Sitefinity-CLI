@@ -1,5 +1,7 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.VisualStudio;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,6 +29,11 @@ namespace Sitefinity_CLI.Commands
         /// The folder containing the file templates
         /// </summary>
         protected override string TemplatesFolder => Constants.ModuleTemplatesFolderName;
+
+        public AddModuleCommand(ICsProjectFileEditor csProjectFileEditor, ILogger<AddModuleCommand> logger)
+            : base(csProjectFileEditor, logger)
+        {
+        }
 
         /// <summary>
         /// Creates a file from a template.

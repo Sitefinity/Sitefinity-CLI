@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
@@ -9,6 +10,10 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
+
+        public AddPageTemplateCommand(ILogger<object> logger) : base(logger)
+        {
+        }
 
         public override int OnExecute(CommandLineApplication config)
         {

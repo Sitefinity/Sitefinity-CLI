@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using McMaster.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
-using Sitefinity_CLI.Model;
+﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.VisualStudio;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -29,5 +24,10 @@ namespace Sitefinity_CLI.Commands
         /// The folder containing the file templates
         /// </summary>
         protected override string TemplatesFolder => Constants.IntegrationTestsTemplateFolderName;
+
+        public AddIntegrationTestsCommand(ICsProjectFileEditor csProjectFileEditor, ILogger<AddIntegrationTestsCommand> logger)
+            : base(csProjectFileEditor, logger)
+        {
+        }
     }
 }

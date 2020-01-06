@@ -2,18 +2,37 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>sf</AssemblyName>
     <RootNamespace>Sitefinity_CLI</RootNamespace>
     <AssemblyVersion>1.1.0.4</AssemblyVersion>
     <Version>1.1.0</Version>
     <FileVersion>1.1.0.4</FileVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <Optimize>false</Optimize>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <OutputPath>bin\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="PowerShell\Updater.ps1" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\NOTICE.txt" Link="NOTICE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="PowerShell\Updater.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -23,8 +42,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="EnvDTE" Version="8.0.2" />
     <PackageReference Include="Handlebars.Net" Version="1.9.0" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.1.1" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
+    <PackageReference Include="McMaster.Extensions.Hosting.CommandLine" Version="2.3.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
+    <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
@@ -35,6 +62,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="PackageManagement\NuGet.Config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PackageManagement\nuget.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\10.2\CustomWidget\Default\templates.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -228,7 +261,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <Target Name="SfConfig" AfterTargets="_PublishNoBuildAlternative">
     <Exec Command="dotnet &quot;$(PublishDir)sf.dll&quot; config" />
   </Target>

@@ -29,7 +29,6 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ComponentsGenerated.wxs" />
     <Compile Include="Directories.wxs" />
     <Compile Include="Product.wxs" />
   </ItemGroup>

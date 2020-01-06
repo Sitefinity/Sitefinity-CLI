@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 
 namespace Sitefinity_CLI.Commands
@@ -9,6 +10,10 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultGridWidgetName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultGridWidgetName)]
         public override string TemplateName { get; set; } = Constants.DefaultGridWidgetName;
+
+        public AddGridWidgetCommand(ILogger<object> logger) : base(logger)
+        {
+        }
 
         public override int OnExecute(CommandLineApplication config)
         {

@@ -79,7 +79,7 @@ namespace Sitefinity_CLI.Commands
                     config.Add(commandModel);
                 }
             }
-
+            
             var content = JsonConvert.SerializeObject(config);
             var configFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
             try
