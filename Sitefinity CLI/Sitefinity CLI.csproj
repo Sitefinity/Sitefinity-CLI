@@ -65,9 +65,6 @@
     <None Update="PackageManagement\NuGet.Config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="PackageManagement\nuget.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Templates\10.2\CustomWidget\Default\templates.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

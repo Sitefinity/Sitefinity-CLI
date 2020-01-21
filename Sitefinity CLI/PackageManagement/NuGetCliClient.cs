@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -31,12 +32,15 @@ namespace Sitefinity_CLI.PackageManagement
 
         private void RunProcess(string arguments)
         {
+            var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "PackageManagement", NuGetExeFileName);
+            this.EnsureNugetExecutable(nugetFileLocation);
+
             using (Process process = new Process())
             {
                 var startInfo = new ProcessStartInfo()
                 {
                     UseShellExecute = false,
-                    FileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "PackageManagement", NuGetExeFileName),
+                    FileName = nugetFileLocation,
                     Arguments = arguments,
                     CreateNoWindow = true,
                     RedirectStandardOutput = true
@@ -53,8 +57,20 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
+        private void EnsureNugetExecutable(string nugetFileLocation)
+        {
+            if (!File.Exists(nugetFileLocation))
+            {
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile(NuGetExeDownloadUrl, nugetFileLocation);
+                }
+            }
+        }
+
         private readonly ILogger logger;
 
         private const string NuGetExeFileName = "nuget.exe";
+        private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
     }
 }
