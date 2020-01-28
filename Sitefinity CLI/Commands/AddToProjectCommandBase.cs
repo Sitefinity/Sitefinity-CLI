@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -162,6 +163,7 @@ namespace Sitefinity_CLI.Commands
                     data["version"] = this.AssemblyVersion;
                     data["name"] = this.Name;
                     data["pascalCaseName"] = this.PascalCaseName;
+                    data["projectDefaultNamespace"] = this.GetProjectDefaultNamespace();
 
                     if (!Directory.Exists(folderPath))
                     {
@@ -236,6 +238,23 @@ namespace Sitefinity_CLI.Commands
             string path = Directory.GetFiles(this.ProjectRootPath, $"*{Constants.CsprojFileExtension}").FirstOrDefault();
 
             return path;
+        }
+
+        /// <summary>
+        /// Gets the prject default namespace
+        /// </summary>
+        /// <returns>The csproj file name</returns>
+        protected string GetProjectDefaultNamespace()
+        {
+            var csProjFilePath = this.GetCsprojFilePath();
+            var doc = XDocument.Load(csProjFilePath);
+            var rootNamespaceNode = doc.Descendants().Where(p => p.Name.LocalName == "RootNamespace").FirstOrDefault();
+            if (rootNamespaceNode != null && !string.IsNullOrEmpty(rootNamespaceNode.Value))
+            {
+                return rootNamespaceNode.Value;
+            }
+
+            return Path.GetFileNameWithoutExtension(csProjFilePath);
         }
 
         /// <summary>

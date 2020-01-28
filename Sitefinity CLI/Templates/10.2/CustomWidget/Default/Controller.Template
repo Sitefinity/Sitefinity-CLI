@@ -1,11 +1,11 @@
 ﻿/* {{> sign}} */
 
-using SitefinityWebApp.Mvc.Models;
+using {{projectDefaultNamespace}}.Mvc.Models;
 using System.Web.Mvc;
 using Telerik.Sitefinity.Mvc;
 using Telerik.Sitefinity.Personalization;
 
-namespace SitefinityWebApp.Mvc.Controllers
+namespace {{projectDefaultNamespace}}.Mvc.Controllers
 {
 	[ControllerToolboxItem(Name = "{{pascalCaseName}}_MVC", Title = "{{name}}", SectionName = "CustomWidgets")]
 	public class {{pascalCaseName}}Controller : Controller, IPersonalizable
