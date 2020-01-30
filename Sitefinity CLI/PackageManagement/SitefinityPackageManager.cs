@@ -73,15 +73,25 @@ namespace Sitefinity_CLI.PackageManagement
         {
             this.logger.LogInformation(string.Format("Synchronizing packages and references for project '{0}'", projectPath));
 
-            var fullProjectPath = projectPath;
             XmlDocument doc = new XmlDocument();
-            doc.Load(fullProjectPath);
+            doc.Load(projectPath);
 
             var processedAssemblies = new HashSet<string>();
-            var projectLocation = fullProjectPath.Substring(0, fullProjectPath.LastIndexOf("\\") + 1);
+            var projectLocation = projectPath.Substring(0, projectPath.LastIndexOf("\\") + 1);
+
+            var webConfigPath = projectLocation + "web.config";
+            XmlNodeList bindingRedirectNodes = null;
+            XmlDocument webConfigDoc = null;
+            if (File.Exists(webConfigPath))
+            {
+                webConfigDoc = new XmlDocument();
+                webConfigDoc.Load(webConfigPath);
+                bindingRedirectNodes = webConfigDoc.GetElementsByTagName("dependentAssembly");
+            }
+
             var references = doc.GetElementsByTagName(Constants.ReferenceElem);
             var targetFramework = this.GetTargetFramework(doc);
-            // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones.
+            // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
             foreach (var package in packages)
             {
                 var packageDir = string.Format("{0}\\{1}\\{2}.{3}", solutionFolder, PackagesFolderName, package.Id, package.Version);
@@ -156,12 +166,66 @@ namespace Sitefinity_CLI.PackageManagement
                             referencesGroup.AppendChild(referenceNode);
                         }
                     }
+
+                    this.SyncWebConfigBindingRedirects(webConfigPath, webConfigDoc, bindingRedirectNodes, assembly.GetName().Name, assemblyVersion);
                 }
             }
 
-            doc.Save(fullProjectPath);
+            doc.Save(projectPath);
 
             this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
+        }
+
+        private void SyncWebConfigBindingRedirects(string webConfigPath, XmlDocument webConfigDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
+        {
+            if (bindingRedirectNodes != null)
+            {
+                foreach (XmlNode node in bindingRedirectNodes)
+                {
+                    XmlNode assemblyIdentity = null;
+                    XmlNode bindingRedirect = null;
+                    foreach (XmlNode childNode in node.ChildNodes)
+                    {
+                        if (childNode.Name == assemblyIdentityAttributeName)
+                            assemblyIdentity = childNode;
+
+                        if (childNode.Name == bindingRedirectAttributeName)
+                            bindingRedirect = childNode;
+                    }
+
+                    if (assemblyIdentity != null && bindingRedirect != null)
+                    {
+                        var name = assemblyIdentity.Attributes["name"]?.Value;
+                        if (name == assemblyFullName)
+                        {
+                            var oldVersionAttribute = bindingRedirect.Attributes[oldVersionAttributeName];
+                            if (oldVersionAttribute == null)
+                            {
+                                oldVersionAttribute = webConfigDoc.CreateAttribute(Constants.IncludeAttribute);
+
+                                bindingRedirect.Attributes.Append(oldVersionAttribute);
+                            }
+
+                            oldVersionAttribute.Value = string.Format("0.0.0.0-{0}", assemblyVersion);
+
+                            var newVersionAttribute = bindingRedirect.Attributes[newVersionAttributeName];
+                            if (newVersionAttribute == null)
+                            {
+                                newVersionAttribute = webConfigDoc.CreateAttribute(Constants.IncludeAttribute);
+
+                                bindingRedirect.Attributes.Append(newVersionAttribute);
+                            }
+
+                            newVersionAttribute.Value = assemblyVersion;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (webConfigDoc != null)
+                    webConfigDoc.Save(webConfigPath);
+            }
         }
 
         private string GetTargetFramework(XmlDocument doc)
@@ -268,5 +332,10 @@ namespace Sitefinity_CLI.PackageManagement
         private const string DllFilterPattern = "*.dll";
 
         private readonly Regex supportedFrameworksRegex;
+
+        private const string assemblyIdentityAttributeName = "assemblyIdentity";
+        private const string bindingRedirectAttributeName = "bindingRedirect";
+        private const string oldVersionAttributeName = "oldVersion";
+        private const string newVersionAttributeName = "newVersion";
     }
 }
