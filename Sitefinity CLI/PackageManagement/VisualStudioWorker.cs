@@ -30,9 +30,13 @@ namespace Sitefinity_CLI.PackageManagement
             DTE dte = (DTE)obj;
             dte.UserControl = false;
             dte.MainWindow.Visible = true;
+
             this.logger.LogInformation(string.Format("Oppening solution: \"{0}\"...", solutionFilePath));
             dte.Solution.Open(solutionFilePath);
             this.logger.LogInformation("Solution ready!");
+
+            this.logger.LogInformation("Waiting...");
+            System.Threading.Thread.Sleep(60000);
 
             try
             {
@@ -45,7 +49,8 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(20000);
+            System.Threading.Thread.Sleep(60000);
+
             this.logger.LogInformation("Studio is ready!");
 
             this.visualStudioInstance = dte;
