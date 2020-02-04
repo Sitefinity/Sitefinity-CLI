@@ -167,16 +167,17 @@ namespace Sitefinity_CLI.PackageManagement
                         }
                     }
 
-                    this.SyncWebConfigBindingRedirects(webConfigPath, webConfigDoc, bindingRedirectNodes, assembly.GetName().Name, assemblyVersion);
+                    this.SyncWebConfigBindingRedirects(webConfigDoc, bindingRedirectNodes, assembly.GetName().Name, assemblyVersion);
                 }
             }
 
             doc.Save(projectPath);
+            webConfigDoc?.Save(webConfigPath);
 
             this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
         }
 
-        private void SyncWebConfigBindingRedirects(string webConfigPath, XmlDocument webConfigDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
+        private void SyncWebConfigBindingRedirects(XmlDocument webConfigDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
         {
             if (bindingRedirectNodes != null)
             {
@@ -222,9 +223,6 @@ namespace Sitefinity_CLI.PackageManagement
                         }
                     }
                 }
-
-                if (webConfigDoc != null)
-                    webConfigDoc.Save(webConfigPath);
             }
         }
 

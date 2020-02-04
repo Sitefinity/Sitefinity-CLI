@@ -8,10 +8,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -99,6 +97,8 @@ namespace Sitefinity_CLI.Commands
             this.visualStudioWorker.Initialize(this.ProjectOrSolutionPath);
             this.visualStudioWorker.ExecuteScript(updaterPath);
             this.EnsureOperationSuccess();
+
+            this.visualStudioWorker.Dispose();
 
             this.EnsureProjectsReferences(projectFilePaths, Path.GetDirectoryName(this.ProjectOrSolutionPath));
 

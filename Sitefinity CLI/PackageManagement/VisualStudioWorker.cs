@@ -25,8 +25,19 @@ namespace Sitefinity_CLI.PackageManagement
 
             this.logger.LogInformation(string.Format("Visual studio installation found. Version: \"{0}\". Launching...", latestVisualStudioVersion));
 
+            var currentProcesses = System.Diagnostics.Process.GetProcessesByName(VisualStudioProcessName);
+
             Type visualStudioType = Type.GetTypeFromProgID(latestVisualStudioVersion, true);
             object obj = Activator.CreateInstance(visualStudioType, true);
+
+            foreach (var process in System.Diagnostics.Process.GetProcessesByName(VisualStudioProcessName))
+            {
+                if (!currentProcesses.Any(p => p.Id == process.Id))
+                {
+                    this.visualStudioProcess = process;
+                }
+            }
+
             DTE dte = (DTE)obj;
             dte.UserControl = false;
             dte.MainWindow.Visible = true;
@@ -53,15 +64,11 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void Dispose()
         {
-            if (this.visualStudioInstance != null)
+            if (this.visualStudioProcess != null)
             {
-                try
-                {
-                    this.logger.LogInformation("Closing Visual Studio instance...");
-                    this.visualStudioInstance.Quit();
-                    this.logger.LogInformation("Closing Visual Studio instance closed.");
-                }
-                catch { }
+                this.logger.LogInformation("Closing Visual Studio instance...");
+                visualStudioProcess.Kill();
+                this.logger.LogInformation("Closing Visual Studio instance closed.");
             }
         }
 
@@ -82,7 +89,9 @@ namespace Sitefinity_CLI.PackageManagement
 
         private ILogger logger;
         private DTE visualStudioInstance;
+        private System.Diagnostics.Process visualStudioProcess;
         private const string VisualStudioRegistryPrefix = "VisualStudio.DTE.";
         private const string PackageManagerConsoleCommand = "View.PackageManagerConsole";
+        private const string VisualStudioProcessName = "devenv";
     }
 }
