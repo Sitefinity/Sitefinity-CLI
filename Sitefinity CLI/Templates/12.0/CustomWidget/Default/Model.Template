@@ -3,7 +3,7 @@
 using System.Web.Mvc;
 using Telerik.Sitefinity.Mvc;
 
-namespace SitefinityWebApp.Mvc.Models
+namespace {{projectDefaultNamespace}}.Mvc.Models
 {
 	public class {{pascalCaseName}}Model
 	{
