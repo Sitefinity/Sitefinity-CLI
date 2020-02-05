@@ -247,14 +247,19 @@ namespace Sitefinity_CLI.Commands
         protected string GetProjectDefaultNamespace()
         {
             var csProjFilePath = this.GetCsprojFilePath();
-            var doc = XDocument.Load(csProjFilePath);
-            var rootNamespaceNode = doc.Descendants().Where(p => p.Name.LocalName == "RootNamespace").FirstOrDefault();
-            if (rootNamespaceNode != null && !string.IsNullOrEmpty(rootNamespaceNode.Value))
+            if (File.Exists(csProjFilePath))
             {
-                return rootNamespaceNode.Value;
+                var doc = XDocument.Load(csProjFilePath);
+                var rootNamespaceNode = doc.Descendants().Where(p => p.Name.LocalName == "RootNamespace").FirstOrDefault();
+                if (rootNamespaceNode != null && !string.IsNullOrEmpty(rootNamespaceNode.Value))
+                {
+                    return rootNamespaceNode.Value;
+                }
+
+                return Path.GetFileNameWithoutExtension(csProjFilePath);
             }
 
-            return Path.GetFileNameWithoutExtension(csProjFilePath);
+            return this.PascalCaseName;
         }
 
         /// <summary>
