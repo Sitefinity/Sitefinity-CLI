@@ -148,15 +148,18 @@ namespace Sitefinity_CLI.Tests
                 folderPath = Path.Combine(mvcFolderPath, Constants.ViewsFolderName, resourceName);
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                // assert designer
-                fileName = string.Format("{0}{1}", "designerview-simple", Constants.JavaScriptFileExtension);
-                folderPath = Path.Combine(mvcFolderPath, Constants.ScriptsFolderName, resourceName);
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
+                if (Version.Parse(templatesVersion) < Version.Parse("12.2"))
+                {
+                    // assert designer
+                    fileName = string.Format("{0}{1}", "designerview-simple", Constants.JavaScriptFileExtension);
+                    folderPath = Path.Combine(mvcFolderPath, Constants.ScriptsFolderName, resourceName);
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                // assert designer view
-                fileName = string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension);
-                folderPath = Path.Combine(mvcFolderPath, Constants.ViewsFolderName, resourceName);
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
+                    // assert designer view
+                    fileName = string.Format("{0}{1}", "DesignerView.Simple", Constants.RazorFileExtension);
+                    folderPath = Path.Combine(mvcFolderPath, Constants.ViewsFolderName, resourceName);
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
+                }
 
                 expectedOutputString.AppendLine(string.Format(Constants.CustomWidgetCreatedMessage, resourceName));
                 expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
