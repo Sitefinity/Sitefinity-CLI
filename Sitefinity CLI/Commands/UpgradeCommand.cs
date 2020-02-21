@@ -97,7 +97,7 @@ namespace Sitefinity_CLI.Commands
 
             this.EnsureProjectsReferences(projectFilePaths, Path.GetDirectoryName(this.ProjectOrSolutionPath));
 
-            this.logger.LogInformation(string.Format("Successfully updated '{0}' from version '{1}' to version '{2}'", this.ProjectOrSolutionPath, this.VersionFrom, this.VersionTo));
+            this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.ProjectOrSolutionPath, this.VersionTo));
         }
 
         private string DetectFromVersion(string sitefinityProjectPath)
