@@ -113,7 +113,7 @@ namespace Sitefinity_CLI.Commands
                 return versionMatch.Groups[1].Value;
             }
 
-            return null;
+            throw null;
         }
 
         private bool IncludeContainsSitefinityRefKeyword(CsProjectFileReference projectReference)
@@ -203,6 +203,12 @@ namespace Sitefinity_CLI.Commands
 
                 // detect sf version of current project
                 var versionFrom = this.DetectFromVersion(projectFilePath);
+
+                if (string.IsNullOrEmpty(versionFrom))
+                {
+                    this.logger.LogInformation(string.Format("Skip upgrade for project: \"{0}\". From version was not detected.", projectFilePath));
+                    continue;
+                }
 
                 NuGetPackage currentSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(versionFrom);
 
