@@ -44,6 +44,7 @@ namespace Sitefinity_CLI
         public const string FileNotFoundMessage = "File \"{0}\" not found";
         public const string FileNotProjectOrSolutionMessage = "File \"{0}\" is not a csproj or sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
+        public const string ErrorDetectingSitefinityFromVersion = "Current sitefinity version can'be detected. Please specify it explicitly with --from option";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
@@ -68,6 +69,7 @@ namespace Sitefinity_CLI
         public const string AddFilesToSolutionSuccessMessage = "File \"{0}\" succesfully added to solution!";
         public const string NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage = "{0} projects with Sitefinity references found";
         public const string StartUpgradeSuccessMessage = "Starting upgrade of project \"{0}\"...";
+        public const string DetectedCurrentVersionMessage = "Detected current sitefinity version: \"{0}\"...";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
@@ -79,12 +81,13 @@ namespace Sitefinity_CLI
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
-        public const string VersionFromOptionDescription = "The current Sitefinity version.";
+        public const string VersionFromOptionDescription = "The current Sitefinity version. Specify it with -f or --from. If omitted it will be automatcally detected";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
+        public const string UpgradeCommandFromVersionParameter = "-f|--from";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
