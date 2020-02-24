@@ -210,6 +210,7 @@ namespace Sitefinity_CLI.Commands
                     continue;
                 }
 
+                this.logger.LogInformation(string.Format("Detected sitefinity version for \"{0}\" - \"{1}\"", projectFilePath, versionFrom));
                 NuGetPackage currentSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(versionFrom);
 
                 this.IteratePackages(projectFilePath, currentSitefinityPackage, newSitefinityPackage, (package) =>
