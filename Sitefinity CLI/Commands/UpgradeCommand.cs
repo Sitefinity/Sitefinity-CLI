@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -21,11 +22,7 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = "You must specify a path to project or solution file.")]
         public string ProjectOrSolutionPath { get; set; }
 
-        [Argument(1, Description = Constants.VersionFromOptionDescription)]
-        [Required(ErrorMessage = "You must specify the current Sitefinity version.")]
-        public string VersionFrom { get; set; }
-
-        [Argument(2, Description = Constants.VersionToOptionDescription)]
+        [Argument(1, Description = Constants.VersionToOptionDescription)]
         [Required(ErrorMessage = "You must specify the Sitefinity version to upgrade to.")]
         public string VersionTo { get; set; }
 
@@ -83,16 +80,14 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, projectFilePaths.Count()));
 
-            this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.VersionFrom));
-            NuGetPackage currentSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.VersionFrom);
-
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.VersionTo));
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.VersionTo);
+
             await this.sitefinityPackageManager.Restore(this.ProjectOrSolutionPath);
             await this.sitefinityPackageManager.InstallForSolution(newSitefinityPackage.Id, newSitefinityPackage.Version, this.ProjectOrSolutionPath);
 
-            this.GeneratePowershellConfig(projectFilePaths, currentSitefinityPackage, newSitefinityPackage);
-            
+            await this.GeneratePowershellConfig(projectFilePaths, newSitefinityPackage);
+
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.ProjectOrSolutionPath);
             this.visualStudioWorker.ExecuteScript(updaterPath);
@@ -102,7 +97,28 @@ namespace Sitefinity_CLI.Commands
 
             this.EnsureProjectsReferences(projectFilePaths, Path.GetDirectoryName(this.ProjectOrSolutionPath));
 
-            this.logger.LogInformation(string.Format("Successfully updated '{0}' from version '{1}' to version '{2}'", this.ProjectOrSolutionPath, this.VersionFrom, this.VersionTo));
+            this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.ProjectOrSolutionPath, this.VersionTo));
+        }
+
+        private string DetectFromVersion(string sitefinityProjectPath)
+        {
+            var sitefinityProjectInclude = this.csProjectFileEditor.GetReferences(sitefinityProjectPath)
+                .FirstOrDefault(r => this.IncludeContainsSitefinityRefKeyword(r) && r.Include.Contains($"PublicKeyToken={PublicKeyToken}"));
+
+            if (sitefinityProjectInclude != null)
+            {
+                string versionPattern = @"Version=(.*?),";
+                Match versionMatch = Regex.Match(sitefinityProjectInclude.Include, versionPattern);
+
+                return versionMatch.Groups[1].Value;
+            }
+
+            throw null;
+        }
+
+        private bool IncludeContainsSitefinityRefKeyword(CsProjectFileReference projectReference)
+        {
+            return projectReference.Include.Contains(TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(ProgressSitefinityReferenceKeyWords);
         }
 
         private void EnsureOperationSuccess()
@@ -139,7 +155,7 @@ namespace Sitefinity_CLI.Commands
                     System.Threading.Thread.Sleep(waitStep);
                     continue;
                 }
-                
+
                 System.Threading.Thread.Sleep(waitStep);
                 var result = this.ReadAllTextFromFile(resultFile);
                 if (result != "success")
@@ -163,7 +179,7 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private void GeneratePowershellConfig(IEnumerable<string> projectFilePaths, NuGetPackage currentSitefinityPackage, NuGetPackage newSitefinityPackage)
+        private async Task GeneratePowershellConfig(IEnumerable<string> projectFilePaths, NuGetPackage newSitefinityPackage)
         {
             this.logger.LogInformation("Exporting powershell config...");
 
@@ -182,7 +198,23 @@ namespace Sitefinity_CLI.Commands
                 powerShellXmlConfigNode.AppendChild(projectNode);
 
                 packagesPerProject[projectFilePath] = new List<NuGetPackage>();
-                this.IteratePackages(projectFilePath, currentSitefinityPackage, newSitefinityPackage, (package) => {
+
+                this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for \"{0}\"...", projectFilePath));
+
+                // detect sf version of current project
+                var versionFrom = this.DetectFromVersion(projectFilePath);
+
+                if (string.IsNullOrEmpty(versionFrom))
+                {
+                    this.logger.LogInformation(string.Format("Skip upgrade for project: \"{0}\". From version was not detected.", projectFilePath));
+                    continue;
+                }
+
+                this.logger.LogInformation(string.Format("Detected sitefinity version for \"{0}\" - \"{1}\"", projectFilePath, versionFrom));
+                NuGetPackage currentSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(versionFrom);
+
+                this.IteratePackages(projectFilePath, currentSitefinityPackage, newSitefinityPackage, (package) =>
+                {
                     var packageNode = powerShellXmlConfig.CreateElement("package");
                     var nameAttr = powerShellXmlConfig.CreateAttribute("name");
                     nameAttr.Value = package.Id;
@@ -289,7 +321,7 @@ namespace Sitefinity_CLI.Commands
         private bool HasSitefinityReferences(string projectFilePath)
         {
             IEnumerable<CsProjectFileReference> references = this.csProjectFileEditor.GetReferences(projectFilePath);
-            bool hasSitefinityReferences = references.Any(r => r.Include.Contains(TelerikSitefinityReferenceKeyWords) || r.Include.Contains(ProgressSitefinityReferenceKeyWords));
+            bool hasSitefinityReferences = references.Any(r => this.IncludeContainsSitefinityRefKeyword(r));
 
             return hasSitefinityReferences;
         }
@@ -309,7 +341,8 @@ namespace Sitefinity_CLI.Commands
         private const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
 
         private const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
-        
+
         private const string PowershellFolderName = "PowerShell";
+        private const string PublicKeyToken = "b28c218413bdf563";
     }
 }
