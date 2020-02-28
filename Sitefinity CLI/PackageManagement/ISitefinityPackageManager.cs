@@ -5,7 +5,7 @@ namespace Sitefinity_CLI.PackageManagement
 {
     internal interface ISitefinityPackageManager
     {
-        Task InstallForSolution(string packageId, string version, string solutionFilePath);
+        Task Install(string packageId, string version, string solutionFilePath);
 
         Task Restore(string solutionFilePath);
 

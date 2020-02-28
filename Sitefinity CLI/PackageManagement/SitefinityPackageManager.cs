@@ -29,7 +29,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
         }
 
-        public async Task InstallForSolution(string packageId, string version, string solutionFilePath)
+        public async Task Install(string packageId, string version, string solutionFilePath)
         {
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
