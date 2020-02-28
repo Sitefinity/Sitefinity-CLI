@@ -292,27 +292,16 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private IEnumerable<string> GetProjectsToUpgrade(string projectOrSolutionPath)
+        private IEnumerable<string> GetProjectsToUpgrade(string solutionPath)
         {
-            IList<string> projectFiles = new List<string>();
-
-            if (projectOrSolutionPath.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase))
+            if (!solutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                projectFiles.Add(projectOrSolutionPath);
-            }
-            else if (projectOrSolutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
-            {
-                projectFiles = SolutionFileEditor.GetProjects(projectOrSolutionPath)
-                    .Select(sp => sp.AbsolutePath)
-                    .Where(ap => ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase))
-                    .ToList();
-            }
-            else
-            {
-                throw new Exception(string.Format(Constants.FileNotProjectOrSolutionMessage, projectOrSolutionPath));
+                throw new Exception(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
             }
 
-            projectFiles = projectFiles.Where(pf => this.HasSitefinityReferences(pf)).ToList();
+            IEnumerable<string> projectFiles = SolutionFileEditor.GetProjects(solutionPath)
+                .Select(sp => sp.AbsolutePath)
+                .Where(ap => ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) && this.HasSitefinityReferences(ap));
 
             return projectFiles;
         }

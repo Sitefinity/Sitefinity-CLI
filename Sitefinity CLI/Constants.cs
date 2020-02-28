@@ -42,7 +42,7 @@ namespace Sitefinity_CLI
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
         public const string FileNotFoundMessage = "File \"{0}\" not found";
-        public const string FileNotProjectOrSolutionMessage = "File \"{0}\" is not a csproj or sln file";
+        public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
 
         // Warning messages
