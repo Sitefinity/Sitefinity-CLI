@@ -229,7 +229,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        private string SetTargetFramework(XmlDocument doc, string targetFramework)
+        private void SetTargetFramework(XmlDocument doc, string targetFramework)
         {
             var targetFrameworkVersionElems = doc.GetElementsByTagName(Constants.TargetFrameworkVersionElem);
             if (targetFrameworkVersionElems.Count == 1)
