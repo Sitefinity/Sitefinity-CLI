@@ -235,6 +235,7 @@ namespace Sitefinity_CLI.PackageManagement
             if (targetFrameworkVersionElems.Count == 1)
             {
                 targetFrameworkVersionElems[0].InnerText = targetFramework;
+                return;
             }
 
             throw new InvalidOperationException("Unable to set the target framework");
