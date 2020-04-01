@@ -90,7 +90,10 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             var references = doc.GetElementsByTagName(Constants.ReferenceElem);
-            var targetFramework = this.GetTargetFramework(doc);
+            var sitefinityVersion = packages.First().Version;
+            var targetFramework =  this.GetTargetFrameworkForVersion(sitefinityVersion);
+
+            this.SetTargetFramework(doc, targetFramework);
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
             foreach (var package in packages)
             {
@@ -226,12 +229,38 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        private string GetTargetFramework(XmlDocument doc)
+        private void SetTargetFramework(XmlDocument doc, string targetFramework)
         {
             var targetFrameworkVersionElems = doc.GetElementsByTagName(Constants.TargetFrameworkVersionElem);
             if (targetFrameworkVersionElems.Count == 1)
             {
-                return targetFrameworkVersionElems[0].InnerText;
+                targetFrameworkVersionElems[0].InnerText = targetFramework;
+                return;
+            }
+
+            throw new InvalidOperationException("Unable to set the target framework");
+        }
+
+        private string GetTargetFrameworkForVersion(string version)
+        {
+            var versionWithoutSeperator = version.Replace(".", string.Empty).Substring(0, 3);
+            var versionAsInt = int.Parse(versionWithoutSeperator);
+
+            if (versionAsInt < 100)
+            {
+                return "v4.0";
+            }
+            else if (versionAsInt >= 100 && versionAsInt <= 102)
+            {
+                return "v4.5";
+            }
+            else if (versionAsInt >= 110 && versionAsInt <= 112)
+            {
+                return "v4.7.1";
+            }
+            else if (versionAsInt >= 120)
+            {
+                return "v4.7.2";
             }
 
             return string.Empty;
