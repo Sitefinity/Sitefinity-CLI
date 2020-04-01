@@ -26,8 +26,8 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = "You must specify the Sitefinity version to upgrade to.")]
         public string Version { get; set; }
 
-        [Option(Constants.AcceptEULA, Description = Constants.AcceptEULADescription)]
-        public bool AcceptEULA { get; set; }
+        [Option(Constants.AcceptLicense, Description = Constants.AcceptEULADescription)]
+        public bool AcceptLicense { get; set; }
 
         public UpgradeCommand(
             ISitefinityPackageManager sitefinityPackageManager,
@@ -83,10 +83,9 @@ namespace Sitefinity_CLI.Commands
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version);
 
             await this.sitefinityPackageManager.Restore(this.SolutionPath);
-            // is install correctly named??
             await this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath);
 
-            if (!this.AcceptEULA)
+            if (!this.AcceptLicense)
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
                 this.logger.LogInformation(licenseContent);
@@ -115,7 +114,7 @@ namespace Sitefinity_CLI.Commands
 
         private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage)
         {
-            var pathToPackagesFolder = Path.Combine(this.SolutionPath.Substring(0, this.SolutionPath.LastIndexOf("\\") + 1), Constants.PackagesFolderName);
+            var pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
             var pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", Constants.LicenseAgreementsFolderName, "License.txt");
             var licenseContent = await File.ReadAllTextAsync(pathToTheLicense);
 

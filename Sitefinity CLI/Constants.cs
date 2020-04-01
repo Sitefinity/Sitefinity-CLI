@@ -88,7 +88,7 @@ namespace Sitefinity_CLI
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
-        public const string AcceptEULA = "--acceptEULA";
+        public const string AcceptLicense = "-a|--acceptLicense";
         public const string AcceptEULADescription = "If executed with true you will automatically accept the EULA";
 
         // File extensions
