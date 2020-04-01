@@ -27,6 +27,8 @@ namespace Sitefinity_CLI
         public const string IntegrationTestClassName = "DemoTests";
         public const string PackagesFileName = "packages";
         public const string CsProjTemplateName = "csproj";
+        public const string PackagesFolderName = "packages";
+        public const string LicenseAgreementsFolderName = "LicenseAgreements";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
@@ -57,6 +59,7 @@ namespace Sitefinity_CLI
         public const string AddFilesToSolutionFailureMessage = "File \"{0}\" unable to be added to solution!";
         public const string SolutionNotReadable = "Unable to read solution";
         public const string NoProjectsFoundToUpgradeWarningMessage = "No projects with Sitefinity references found to upgrade.";
+        public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
@@ -68,6 +71,7 @@ namespace Sitefinity_CLI
         public const string AddFilesToSolutionSuccessMessage = "File \"{0}\" succesfully added to solution!";
         public const string NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage = "{0} projects with Sitefinity references found";
         public const string StartUpgradeSuccessMessage = "Starting upgrade of project \"{0}\"...";
+        public const string UpgradeWasCanceled = "The upgrade was canceled.";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
@@ -84,6 +88,8 @@ namespace Sitefinity_CLI
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
+        public const string AcceptEULA = "--acceptEULA";
+        public const string AcceptEULADescription = "If executed with true you will automatically accept the EULA";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
