@@ -26,7 +26,7 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = "You must specify the Sitefinity version to upgrade to.")]
         public string Version { get; set; }
 
-        [Option(Constants.AcceptLicense, Description = Constants.AcceptEULADescription)]
+        [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseDescription)]
         public bool AcceptLicense { get; set; }
 
         public UpgradeCommand(

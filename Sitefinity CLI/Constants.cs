@@ -89,7 +89,7 @@ namespace Sitefinity_CLI
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
         public const string AcceptLicense = "-a|--acceptLicense";
-        public const string AcceptEULADescription = "If executed with true you will automatically accept the EULA";
+        public const string AcceptLicenseDescription = "If provided you automatically accept the License agreement.";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
