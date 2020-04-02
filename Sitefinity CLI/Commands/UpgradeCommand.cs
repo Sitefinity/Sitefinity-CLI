@@ -26,6 +26,9 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = "You must specify the Sitefinity version to upgrade to.")]
         public string Version { get; set; }
 
+        [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseDescription)]
+        public bool AcceptLicense { get; set; }
+
         public UpgradeCommand(
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
@@ -76,12 +79,24 @@ namespace Sitefinity_CLI.Commands
             }
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, projectFilePaths.Count()));
-
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version);
 
             await this.sitefinityPackageManager.Restore(this.SolutionPath);
             await this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath);
+
+            if (!this.AcceptLicense)
+            {
+                var licenseContent = await GetLicenseContent(newSitefinityPackage);
+                this.logger.LogInformation(licenseContent);
+                var hasUserAcceptedEULA = Prompt.GetYesNo(Constants.AcceptLicenseNotification, false);
+
+                if (!hasUserAcceptedEULA)
+                {
+                    this.logger.LogInformation(Constants.UpgradeWasCanceled);
+                    return;
+                }
+            }
 
             await this.GeneratePowershellConfig(projectFilePaths, newSitefinityPackage);
 
@@ -95,6 +110,15 @@ namespace Sitefinity_CLI.Commands
             this.SyncProjectReferencesWithPackages(projectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
             this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.SolutionPath, this.Version));
+        }
+
+        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage)
+        {
+            var pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
+            var pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", Constants.LicenseAgreementsFolderName, "License.txt");
+            var licenseContent = await File.ReadAllTextAsync(pathToTheLicense);
+
+            return licenseContent;
         }
 
         private string DetectSitefinityVersion(string sitefinityProjectPath)
