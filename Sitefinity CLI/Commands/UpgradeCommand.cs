@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Commands.Validators;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
@@ -24,6 +25,7 @@ namespace Sitefinity_CLI.Commands
 
         [Argument(1, Description = Constants.VersionToOptionDescription)]
         [Required(ErrorMessage = "You must specify the Sitefinity version to upgrade to.")]
+        [UpgradeVersionValidator]
         public string Version { get; set; }
 
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseDescription)]
