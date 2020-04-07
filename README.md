@@ -61,6 +61,10 @@ You can use the add command with the following subcommands:
 
   ```sf add module "Custom Module"```
 
+* To upgarde to a newer Sitfinity version execute the following command:
+
+   ```sf  upgrade "{{path to the solution you want to upgrade}}" "{{version you are upgrading to"```
+
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 
 ```sf add [command name] -?```
