@@ -84,13 +84,19 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version);
 
+            if (newSitefinityPackage == null)
+            {
+                this.logger.LogError(string.Format(Constants.VersionNotFound, this.Version));
+                return;
+            }
+
             await this.sitefinityPackageManager.Restore(this.SolutionPath);
             await this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath);
 
             if (!this.AcceptLicense)
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
-                this.logger.LogInformation(licenseContent);
+                this.logger.LogInformation($"{Environment.NewLine}{licenseContent}{Environment.NewLine}");
                 var hasUserAcceptedEULA = Prompt.GetYesNo(Constants.AcceptLicenseNotification, false);
 
                 if (!hasUserAcceptedEULA)

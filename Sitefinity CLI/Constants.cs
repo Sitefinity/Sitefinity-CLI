@@ -46,6 +46,7 @@ namespace Sitefinity_CLI
         public const string FileNotFoundMessage = "File \"{0}\" not found";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
+        public const string VersionNotFound = "Version: {0} was not found in https://nuget.sitefinity.com";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
