@@ -28,7 +28,7 @@ namespace Sitefinity_CLI.Commands
         [UpgradeVersionValidator]
         public string Version { get; set; }
 
-        [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseDescription)]
+        [Option(Constants.AcceptLicense, ShowInHelpText = false)]
         public bool AcceptLicense { get; set; }
 
         public UpgradeCommand(
