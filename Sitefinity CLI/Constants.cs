@@ -100,6 +100,7 @@ namespace Sitefinity_CLI
         public const string CsprojFileExtension = ".csproj";
         public const string SlnFileExtension = ".sln";
         public const string ConfigFileExtension = ".config";
+        public const string VBProjFileExtension = ".vbproj";
 
         // Command names
         public const string AddCommandName = "add";

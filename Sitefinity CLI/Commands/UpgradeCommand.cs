@@ -225,7 +225,7 @@ namespace Sitefinity_CLI.Commands
             {
                 var projectNode = powerShellXmlConfig.CreateElement("project");
                 var projectNameAttr = powerShellXmlConfig.CreateAttribute("name");
-                projectNameAttr.Value = projectFilePath.Split(new string[] { "\\", ".csproj" }, StringSplitOptions.RemoveEmptyEntries).Last();
+                projectNameAttr.Value = projectFilePath.Split(new string[] { "\\", Constants.CsprojFileExtension, Constants.VBProjFileExtension }, StringSplitOptions.RemoveEmptyEntries).Last();
                 projectNode.Attributes.Append(projectNameAttr);
                 powerShellXmlConfigNode.AppendChild(projectNode);
 
@@ -238,6 +238,8 @@ namespace Sitefinity_CLI.Commands
                     this.logger.LogInformation(string.Format("Skip upgrade for project: \"{0}\". Current Sitefinity version was not detected.", projectFilePath));
                     continue;
                 }
+
+                // todo add validation if from version is greater than the to version
 
                 this.logger.LogInformation(string.Format("Detected sitefinity version for \"{0}\" - \"{1}\"", projectFilePath, currentSitefinityVersion));
 
@@ -333,7 +335,8 @@ namespace Sitefinity_CLI.Commands
 
             IEnumerable<string> projectFiles = SolutionFileEditor.GetProjects(solutionPath)
                 .Select(sp => sp.AbsolutePath)
-                .Where(ap => ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) && this.HasSitefinityReferences(ap));
+                .Where(ap => (ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) || ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase))
+                                && this.HasSitefinityReferences(ap));
 
             return projectFiles;
         }
