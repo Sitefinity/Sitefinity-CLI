@@ -69,7 +69,7 @@ namespace Sitefinity_CLI.PackageManagement
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, sources, this.supportedFrameworksRegex);
         }
 
-        public void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages)
+        public void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion)
         {
             this.logger.LogInformation(string.Format("Synchronizing packages and references for project '{0}'", projectPath));
 
@@ -79,19 +79,18 @@ namespace Sitefinity_CLI.PackageManagement
             var processedAssemblies = new HashSet<string>();
             var projectLocation = projectPath.Substring(0, projectPath.LastIndexOf("\\") + 1);
 
-            var webConfigPath = projectLocation + "web.config";
+            var projectConfigPath = this.GetProjectConfigPath(projectLocation);
             XmlNodeList bindingRedirectNodes = null;
-            XmlDocument webConfigDoc = null;
-            if (File.Exists(webConfigPath))
+            XmlDocument projectConfig = null;
+            if (!string.IsNullOrEmpty(projectConfigPath))
             {
-                webConfigDoc = new XmlDocument();
-                webConfigDoc.Load(webConfigPath);
-                bindingRedirectNodes = webConfigDoc.GetElementsByTagName("dependentAssembly");
+                projectConfig = new XmlDocument();
+                projectConfig.Load(projectConfigPath);
+                bindingRedirectNodes = projectConfig.GetElementsByTagName("dependentAssembly");
             }
 
             var references = doc.GetElementsByTagName(Constants.ReferenceElem);
-            var sitefinityVersion = packages.First().Version;
-            var targetFramework =  this.GetTargetFrameworkForVersion(sitefinityVersion);
+            var targetFramework = this.GetTargetFrameworkForVersion(sitefinityVersion);
 
             this.SetTargetFramework(doc, targetFramework);
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
@@ -170,17 +169,34 @@ namespace Sitefinity_CLI.PackageManagement
                         }
                     }
 
-                    this.SyncWebConfigBindingRedirects(webConfigDoc, bindingRedirectNodes, assembly.GetName().Name, assemblyVersion);
+                    this.SyncBindingRedirects(projectConfig, bindingRedirectNodes, assembly.GetName().Name, assemblyVersion);
                 }
             }
 
             doc.Save(projectPath);
-            webConfigDoc?.Save(webConfigPath);
+            projectConfig?.Save(projectConfigPath);
 
             this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
         }
+       
 
-        private void SyncWebConfigBindingRedirects(XmlDocument webConfigDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
+        private string GetProjectConfigPath(string projectLocation)
+        {
+            if (string.IsNullOrEmpty(projectLocation))
+                return null;
+
+            var webConfigPath = Path.Combine(projectLocation, "web.config");
+            if (File.Exists(webConfigPath))
+                return webConfigPath;
+
+            var appConfigPath = Path.Combine(projectLocation, "app.config");
+            if (File.Exists(appConfigPath))
+                return appConfigPath;
+
+            return null;
+        }
+
+        private void SyncBindingRedirects(XmlDocument configDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
         {
             if (bindingRedirectNodes != null)
             {
@@ -205,7 +221,7 @@ namespace Sitefinity_CLI.PackageManagement
                             var oldVersionAttribute = bindingRedirect.Attributes[oldVersionAttributeName];
                             if (oldVersionAttribute == null)
                             {
-                                oldVersionAttribute = webConfigDoc.CreateAttribute(Constants.IncludeAttribute);
+                                oldVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
 
                                 bindingRedirect.Attributes.Append(oldVersionAttribute);
                             }
@@ -215,7 +231,7 @@ namespace Sitefinity_CLI.PackageManagement
                             var newVersionAttribute = bindingRedirect.Attributes[newVersionAttributeName];
                             if (newVersionAttribute == null)
                             {
-                                newVersionAttribute = webConfigDoc.CreateAttribute(Constants.IncludeAttribute);
+                                newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
 
                                 bindingRedirect.Attributes.Append(newVersionAttribute);
                             }
