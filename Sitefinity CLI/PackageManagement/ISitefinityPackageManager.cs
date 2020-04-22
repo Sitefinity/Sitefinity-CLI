@@ -13,6 +13,6 @@ namespace Sitefinity_CLI.PackageManagement
 
         Task<NuGetPackage> GetSitefinityPackageTree(string version);
 
-        void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages);
+        void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion);
     }
 }

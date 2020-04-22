@@ -322,7 +322,7 @@ namespace Sitefinity_CLI.Commands
             {
                 var packages = new List<NuGetPackage>(this.packagesPerProject[projectFilePath]);
                 packages.Reverse();
-                this.sitefinityPackageManager.SyncReferencesWithPackages(projectFilePath, solutionFolder, packages);
+                this.sitefinityPackageManager.SyncReferencesWithPackages(projectFilePath, solutionFolder, packages, this.Version);
             }
         }
 
