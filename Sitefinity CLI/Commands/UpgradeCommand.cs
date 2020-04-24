@@ -42,6 +42,7 @@ namespace Sitefinity_CLI.Commands
             this.logger = logger;
             this.visualStudioWorker = visualStudioWorker;
             this.processedPackagesPerProjectCache = new Dictionary<string, HashSet<string>>();
+            this.tempFilesPaths = new List<string>();
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -58,10 +59,18 @@ namespace Sitefinity_CLI.Commands
 
                 return 1;
             }
-            ////finally
-            ////{
-            ////    this.visualStudioWorker.Dispose();
-            ////}
+            finally
+            {
+                this.CleanTempFiles();
+            }
+        }
+
+        private void CleanTempFiles()
+        {
+            foreach (var filePath in tempFilesPaths)
+            {
+                File.Delete(filePath);
+            }
         }
 
         private async Task ExecuteUpgrade()
@@ -107,7 +116,7 @@ namespace Sitefinity_CLI.Commands
             }
 
             await this.GeneratePowershellConfig(projectFilePaths, newSitefinityPackage);
-            this.TurnOffNugetAutoBindingRedirects();
+            this.TryAddCustomNugetConfig();
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
@@ -121,29 +130,20 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.SolutionPath, this.Version));
         }
 
-        private void TurnOffNugetAutoBindingRedirects()
+        private void TryAddCustomNugetConfig()
         {
             var solutionFolder = Path.GetDirectoryName(this.SolutionPath);
             this.logger.LogInformation("Checking for nuget config in the solution folder...");
 
-            var nugetConfigPath = Path.Combine(solutionFolder, "nuget.config");
-            if (File.Exists(nugetConfigPath))
-            {
-                this.logger.LogInformation("Nuget config in the solution folder found...");
-                XmlDocument nugetConfigDocument = new XmlDocument();
-                nugetConfigDocument.Load(nugetConfigPath);
-
-                var bindingElementsElement = nugetConfigDocument.GetElementsByTagName("bindingRedirects");
-                if (bindingElementsElement.Count == 0)
-                {
-                    var configurationElement = nugetConfigDocument.DocumentElement;
-                    this.AppendBindingRedirectsSection(nugetConfigDocument, configurationElement);
-                }
-            }
-            else
+            var solutionNugetConfigPath = Path.Combine(solutionFolder, NugetConfigName);
+            if (!File.Exists(solutionNugetConfigPath))
             {
                 this.CreateNugetConfigWithTurnedOffAutoBindindRedirects(solutionFolder);
+                this.tempFilesPaths.Add(solutionNugetConfigPath);
+                return;
             }
+
+            this.logger.LogInformation("Nuget config in the solution folder found. Skipping adding custom nuget.config");
         }
 
         private void CreateNugetConfigWithTurnedOffAutoBindindRedirects(string solutionFolder)
@@ -155,9 +155,9 @@ namespace Sitefinity_CLI.Commands
 
             this.AppendBindingRedirectsSection(nugetConfigDocument, configXmlNode);
 
-            nugetConfigDocument.Save(Path.Combine(solutionFolder, "nuget.config"));
+            nugetConfigDocument.Save(Path.Combine(solutionFolder, NugetConfigName));
 
-            this.logger.LogInformation("Successfully exported nuget config!");
+            this.logger.LogInformation("Successfully exported custom nuget config!");
         }
 
         private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage)
@@ -431,5 +431,9 @@ namespace Sitefinity_CLI.Commands
         private const string PowershellFolderName = "PowerShell";
 
         private const string SitefinityPublicKeyToken = "b28c218413bdf563";
+
+        private List<string> tempFilesPaths;
+
+        private const string NugetConfigName = "nuget.config";
     }
 }
