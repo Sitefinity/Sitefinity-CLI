@@ -107,6 +107,7 @@ namespace Sitefinity_CLI.Commands
             }
 
             await this.GeneratePowershellConfig(projectFilePaths, newSitefinityPackage);
+            this.TurnOffNugetAutoBindingRedirects();
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
@@ -118,6 +119,45 @@ namespace Sitefinity_CLI.Commands
             this.SyncProjectReferencesWithPackages(projectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
             this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.SolutionPath, this.Version));
+        }
+
+        private void TurnOffNugetAutoBindingRedirects()
+        {
+            var solutionFolder = Path.GetDirectoryName(this.SolutionPath);
+            this.logger.LogInformation("Checking for nuget config in the solution folder...");
+
+            var nugetConfigPath = Path.Combine(solutionFolder, "nuget.config");
+            if (File.Exists(nugetConfigPath))
+            {
+                this.logger.LogInformation("Nuget config in the solution folder found...");
+                XmlDocument nugetConfigDocument = new XmlDocument();
+                nugetConfigDocument.Load(nugetConfigPath);
+
+                var bindingElementsElement = nugetConfigDocument.GetElementsByTagName("bindingRedirects");
+                if (bindingElementsElement.Count == 0)
+                {
+                    var configurationElement = nugetConfigDocument.DocumentElement;
+                    this.AppendBindingRedirectsSection(nugetConfigDocument, configurationElement);
+                }
+            }
+            else
+            {
+                this.CreateNugetConfigWithTurnedOffAutoBindindRedirects(solutionFolder);
+            }
+        }
+
+        private void CreateNugetConfigWithTurnedOffAutoBindindRedirects(string solutionFolder)
+        {
+            this.logger.LogInformation("Exporting nuget config...");
+            var nugetConfigDocument = new XmlDocument();
+            var configXmlNode = nugetConfigDocument.CreateElement("configuration");
+            nugetConfigDocument.AppendChild(configXmlNode);
+
+            this.AppendBindingRedirectsSection(nugetConfigDocument, configXmlNode);
+
+            nugetConfigDocument.Save(Path.Combine(solutionFolder, "nuget.config"));
+
+            this.logger.LogInformation("Successfully exported nuget config!");
         }
 
         private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage)
@@ -224,6 +264,7 @@ namespace Sitefinity_CLI.Commands
             foreach (string projectFilePath in projectFilePaths)
             {
                 var projectNode = powerShellXmlConfig.CreateElement("project");
+
                 var projectNameAttr = powerShellXmlConfig.CreateAttribute("name");
                 projectNameAttr.Value = projectFilePath.Split(new string[] { "\\", Constants.CsprojFileExtension, Constants.VBProjFileExtension }, StringSplitOptions.RemoveEmptyEntries).Last();
                 projectNode.Attributes.Append(projectNameAttr);
@@ -264,6 +305,23 @@ namespace Sitefinity_CLI.Commands
             powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "config.xml"));
 
             this.logger.LogInformation("Successfully exported powershell config!");
+        }
+
+        private void AppendBindingRedirectsSection(XmlDocument powerShellXmlConfig, XmlElement parent)
+        {
+            var bindingRedirectsNode = powerShellXmlConfig.CreateElement("bindingRedirects");
+            var skipBindingRedirectsElement = powerShellXmlConfig.CreateElement("add");
+            var keyAttribute = powerShellXmlConfig.CreateAttribute("key");
+            keyAttribute.Value = "skip";
+
+            var valueAttribute = powerShellXmlConfig.CreateAttribute("value");
+            valueAttribute.Value = "true";
+
+            skipBindingRedirectsElement.Attributes.Append(keyAttribute);
+            skipBindingRedirectsElement.Attributes.Append(valueAttribute);
+
+            bindingRedirectsNode.AppendChild(skipBindingRedirectsElement);
+            parent.AppendChild(bindingRedirectsNode);
         }
 
         private void IteratePackages(string projectFilePath, NuGetPackage currentSitefinityPackage, NuGetPackage newSitefinityPackage, Action<NuGetPackage> action)
