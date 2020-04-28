@@ -35,12 +35,14 @@ namespace Sitefinity_CLI.Commands
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
             ILogger<object> logger,
+            IProjectConfigFileEditor projectConfigFileEditor,
             IVisualStudioWorker visualStudioWorker)
         {
             this.sitefinityPackageManager = sitefinityPackageManager;
             this.csProjectFileEditor = csProjectFileEditor;
             this.logger = logger;
             this.visualStudioWorker = visualStudioWorker;
+            this.projectConfigFileEditor = projectConfigFileEditor;
             this.processedPackagesPerProjectCache = new Dictionary<string, HashSet<string>>();
         }
 
@@ -73,14 +75,17 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
-            IEnumerable<string> projectFilePaths = this.GetProjectsToUpgrade(this.SolutionPath);
+            IEnumerable<string> sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
+            IEnumerable<string> projectsWithouthSitefinityPaths = this.GetProjectsPathsFromSolution(this.SolutionPath).Except(sitefinityProjectFilePaths);
 
-            if (!projectFilePaths.Any())
+            Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
+
+            if (!sitefinityProjectFilePaths.Any())
             {
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
             }
 
-            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, projectFilePaths.Count()));
+            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version);
 
@@ -106,7 +111,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            await this.GeneratePowershellConfig(projectFilePaths, newSitefinityPackage);
+            await this.GeneratePowershellConfig(sitefinityProjectFilePaths, newSitefinityPackage);
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
@@ -115,9 +120,36 @@ namespace Sitefinity_CLI.Commands
 
             this.visualStudioWorker.Dispose();
 
-            this.SyncProjectReferencesWithPackages(projectFilePaths, Path.GetDirectoryName(this.SolutionPath));
+            // revert config changes caused by nuget for projects we are not upgrading
+            this.RestoreConfigValuesForNoSfProjects(configsWithoutSitefinity);
+
+            this.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
             this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.SolutionPath, this.Version));
+        }
+
+        private void RestoreConfigValuesForNoSfProjects(Dictionary<string, string> configsWithoutSitefinity)
+        {
+            foreach (var item in configsWithoutSitefinity)
+            {
+                File.WriteAllText(item.Key, item.Value);
+            }
+        }
+
+        private Dictionary<string, string> GetConfigsForProjectsWithoutSitefinity(IEnumerable<string> projectsWithouthSfreferencePaths)
+        {
+            var configsWithoutSitefinity = new Dictionary<string, string>();
+            foreach (var project in projectsWithouthSfreferencePaths)
+            {
+                var porjectConfigPath = this.projectConfigFileEditor.GetProjectConfigPath(project);
+                if (!string.IsNullOrEmpty(porjectConfigPath))
+                {
+                    var configValue = File.ReadAllText(porjectConfigPath);
+                    configsWithoutSitefinity.Add(porjectConfigPath, configValue);
+                }
+            }
+
+            return configsWithoutSitefinity;
         }
 
         private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage)
@@ -326,19 +358,23 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private IEnumerable<string> GetProjectsToUpgrade(string solutionPath)
+        private IEnumerable<string> GetProjectsPathsFromSolution(string solutionPath, bool onlySitefinityProjects = false)
         {
             if (!solutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new Exception(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
             }
 
-            IEnumerable<string> projectFiles = SolutionFileEditor.GetProjects(solutionPath)
+            IEnumerable<string> projectFilesAbsolutePaths = SolutionFileEditor.GetProjects(solutionPath)
                 .Select(sp => sp.AbsolutePath)
-                .Where(ap => (ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) || ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase))
-                                && this.HasSitefinityReferences(ap));
+                .Where(ap => (ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) || ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase)));
 
-            return projectFiles;
+            if (onlySitefinityProjects)
+            {
+                projectFilesAbsolutePaths = projectFilesAbsolutePaths.Where(ap => this.HasSitefinityReferences(ap));
+            }
+
+            return projectFilesAbsolutePaths;
         }
 
         private bool HasSitefinityReferences(string projectFilePath)
@@ -357,6 +393,8 @@ namespace Sitefinity_CLI.Commands
         private readonly ISitefinityPackageManager sitefinityPackageManager;
 
         private readonly ICsProjectFileEditor csProjectFileEditor;
+
+        private readonly IProjectConfigFileEditor projectConfigFileEditor;
 
         private readonly ILogger<object> logger;
 
