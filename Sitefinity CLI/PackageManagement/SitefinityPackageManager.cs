@@ -291,7 +291,16 @@ namespace Sitefinity_CLI.PackageManagement
                     int currentMaxFolderFrameworkVersion = 0;
                     foreach (var subDir in Directory.GetDirectories(libDir, DotNetPrefix + "*"))
                     {
-                        int.TryParse(subDir.Split("\\").Last().Replace(DotNetPrefix, string.Empty), out int currentFolderFrameworkVersion);
+                        var versionFromFolder = subDir.Split("\\").Last().Replace(DotNetPrefix, string.Empty);
+
+                        // The folder may have "-" in the name
+                        if (versionFromFolder.Contains("-"))
+                        {
+                            versionFromFolder = versionFromFolder.Split("-").FirstOrDefault();
+                        }
+
+                        int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
+
                         if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion <= targetVersionNumber && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
                         {
                             dllStorageDir = subDir;
