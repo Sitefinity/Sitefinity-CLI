@@ -69,6 +69,7 @@ namespace Sitefinity_CLI.PackageManagement
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, sources, this.supportedFrameworksRegex);
         }
 
+
         public void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion)
         {
             this.logger.LogInformation(string.Format("Synchronizing packages and references for project '{0}'", projectPath));
@@ -113,9 +114,13 @@ namespace Sitefinity_CLI.PackageManagement
                             var referenceElement = references[i];
                             var includeAttr = referenceElement.Attributes[Constants.IncludeAttribute];
                             var includeAttrValue = includeAttr.Value;
+
                             if (includeAttrValue.StartsWith(assemblyName + ",") || includeAttrValue == assemblyName)
                             {
-                                includeAttr.Value = assemblyFullName;
+                                var proccesorArchitecture = includeAttrValue.Split(',').FirstOrDefault(x => x.Contains(ProcessorArchitectureAttribute));
+                                var includeAttributeNewValue = string.IsNullOrEmpty(proccesorArchitecture) ? assemblyFullName : $"{assemblyFullName},{proccesorArchitecture}";
+
+                                includeAttr.Value = includeAttributeNewValue;
                                 var childNodes = referenceElement.ChildNodes;
                                 XmlNode hintPathNode = null;
                                 for (int j = 0; j < childNodes.Count; j++)
@@ -356,6 +361,8 @@ namespace Sitefinity_CLI.PackageManagement
         private const string DotNetPrefix = "net";
 
         private const string DllFilterPattern = "*.dll";
+
+        private const string ProcessorArchitectureAttribute = "processorArchitecture";
 
         private readonly Regex supportedFrameworksRegex;
 
