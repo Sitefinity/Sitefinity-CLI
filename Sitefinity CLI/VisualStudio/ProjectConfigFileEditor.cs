@@ -11,15 +11,18 @@ namespace Sitefinity_CLI.VisualStudio
 
             var projectDirectory = Path.GetDirectoryName(projectLocation);
 
-            var webConfigPath = Path.Combine(projectDirectory, "web.config");
+            var webConfigPath = Path.Combine(projectDirectory, WebConfigName);
             if (File.Exists(webConfigPath))
                 return webConfigPath;
 
-            var appConfigPath = Path.Combine(projectDirectory, "app.config");
+            var appConfigPath = Path.Combine(projectDirectory, AppConfigName);
             if (File.Exists(appConfigPath))
                 return appConfigPath;
 
             return null;
         }
+
+        private const string WebConfigName = "web.config";
+        private const string AppConfigName = "app.config";
     }
 }
