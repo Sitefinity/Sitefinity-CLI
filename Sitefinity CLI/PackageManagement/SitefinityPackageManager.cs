@@ -17,13 +17,13 @@ namespace Sitefinity_CLI.PackageManagement
             INuGetApiClient nuGetApiClient,
             INuGetCliClient nuGetCliClient,
             IPackagesConfigFileEditor packagesConfigFileEditor,
-            ICsProjectFileEditor csProjectFileEditor,
+            IProjectConfigFileEditor projectConfigFileEditor,
             ILogger<SitefinityPackageManager> logger)
         {
             this.nuGetApiClient = nuGetApiClient;
             this.nuGetCliClient = nuGetCliClient;
             this.packagesConfigFileEditor = packagesConfigFileEditor;
-            this.csProjectFileEditor = csProjectFileEditor;
+            this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
             this.sources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSource };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
@@ -79,7 +79,7 @@ namespace Sitefinity_CLI.PackageManagement
             var processedAssemblies = new HashSet<string>();
             var projectLocation = projectPath.Substring(0, projectPath.LastIndexOf("\\") + 1);
 
-            var projectConfigPath = this.GetProjectConfigPath(projectLocation);
+            var projectConfigPath = this.projectConfigFileEditor.GetProjectConfigPath(projectLocation);
             XmlNodeList bindingRedirectNodes = null;
             XmlDocument projectConfig = null;
             if (!string.IsNullOrEmpty(projectConfigPath))
@@ -177,23 +177,6 @@ namespace Sitefinity_CLI.PackageManagement
             projectConfig?.Save(projectConfigPath);
 
             this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
-        }
-       
-
-        private string GetProjectConfigPath(string projectLocation)
-        {
-            if (string.IsNullOrEmpty(projectLocation))
-                return null;
-
-            var webConfigPath = Path.Combine(projectLocation, "web.config");
-            if (File.Exists(webConfigPath))
-                return webConfigPath;
-
-            var appConfigPath = Path.Combine(projectLocation, "app.config");
-            if (File.Exists(appConfigPath))
-                return appConfigPath;
-
-            return null;
         }
 
         private void SyncBindingRedirects(XmlDocument configDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
@@ -354,7 +337,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly IPackagesConfigFileEditor packagesConfigFileEditor;
 
-        private readonly ICsProjectFileEditor csProjectFileEditor;
+        private readonly IProjectConfigFileEditor projectConfigFileEditor;
 
         private readonly ILogger logger;
 

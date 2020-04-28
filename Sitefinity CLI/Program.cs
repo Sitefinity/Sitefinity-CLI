@@ -36,6 +36,7 @@ namespace Sitefinity_CLI
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
+                    services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<ISitefinityPackageManager, SitefinityPackageManager>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
                     //services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
