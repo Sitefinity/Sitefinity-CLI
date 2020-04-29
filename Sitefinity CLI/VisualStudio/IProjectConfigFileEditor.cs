@@ -2,6 +2,6 @@
 {
     internal interface IProjectConfigFileEditor
     {
-        public string GetProjectConfigPath(string projectLocation);
+        string GetProjectConfigPath(string projectLocation);
     }
 }
