@@ -61,9 +61,13 @@ You can use the add command with the following subcommands:
 
   ```sf add module "Custom Module"```
 
-* To upgarde to a newer Sitfinity version execute the following command:
+* To **Upgrade** your project, execute the following command:
 
-   ```sf  upgrade "{{path to the solution you want to upgrade}}" "{{version you are upgrading to"```
+
+  ```sf upgrade "D:\TestProject\SitefinityWebApp.sln" "13.0.7300"```
+  
+  For more information, see [Upgrade using Sitefinity CLI](https://www.progress.com/documentation/sitefinity-cms/upgrade-using-sitefinity-cli).
+   
 
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 
