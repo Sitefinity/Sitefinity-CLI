@@ -28,6 +28,9 @@ namespace Sitefinity_CLI.Commands
         [UpgradeVersionValidator]
         public string Version { get; set; }
 
+        [Option(Constants.SkipPrompts, Description = Constants.SkipPromptsDescription)]
+        public bool SkipPrompts { get; set; }
+
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
         public bool AcceptLicense { get; set; }
 
@@ -60,10 +63,10 @@ namespace Sitefinity_CLI.Commands
 
                 return 1;
             }
-            ////finally
-            ////{
-            ////    this.visualStudioWorker.Dispose();
-            ////}
+            finally
+            {
+                this.visualStudioWorker.Dispose();
+            }
         }
 
         private async Task ExecuteUpgrade()
@@ -71,6 +74,12 @@ namespace Sitefinity_CLI.Commands
             if (!File.Exists(this.SolutionPath))
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
+            }
+
+            if (!this.SkipPrompts && !Prompt.GetYesNo(Constants.UpgradeWarning, false))
+            {
+                this.logger.LogInformation(Constants.UpgradeWasCanceled);
+                return;
             }
 
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
