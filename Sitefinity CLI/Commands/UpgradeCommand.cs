@@ -31,6 +31,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.SkipPrompts, Description = Constants.SkipPromptsDescription)]
         public bool SkipPrompts { get; set; }
 
+        [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
+        public bool AcceptLicense { get; set; }
+
         public UpgradeCommand(
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
@@ -104,7 +107,7 @@ namespace Sitefinity_CLI.Commands
             await this.sitefinityPackageManager.Restore(this.SolutionPath);
             await this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath);
 
-            if (!this.SkipPrompts)
+            if (!this.AcceptLicense)
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
                 this.logger.LogInformation($"{Environment.NewLine}{licenseContent}{Environment.NewLine}");
