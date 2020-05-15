@@ -1,5 +1,6 @@
 ﻿using HandlebarsDotNet;
 using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Enums;
 using System;
 using System.Collections.Generic;
@@ -52,10 +53,13 @@ namespace Sitefinity_CLI.Commands
 
         protected bool IsSitefinityProject { get; set; } = true;
 
-        public CommandBase()
+        protected ILogger<object> Logger { get; set; }
+
+        public CommandBase(ILogger<object> logger)
         {
             this.CurrentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             this.AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.Logger = logger;
 
             var data = new
             {
@@ -152,13 +156,13 @@ namespace Sitefinity_CLI.Commands
         {
             if (File.Exists(filePath))
             {
-                Utils.WriteLine(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Red);
+                this.Logger.LogError(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath));
                 return (int)ExitCode.GeneralError;
             }
 
             if (!File.Exists(templatePath))
             {
-                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, resourceFullName, templatePath), ConsoleColor.Red);
+                this.Logger.LogError(string.Format(Constants.TemplateNotFoundMessage, resourceFullName, templatePath));
                 return (int)ExitCode.GeneralError;
             }
 

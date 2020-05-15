@@ -1,8 +1,6 @@
-﻿using System;
-using McMaster.Extensions.CommandLineUtils;
-using System.IO;
-using System.Collections.Generic;
-using Sitefinity_CLI.Model;
+﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.VisualStudio;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -14,5 +12,10 @@ namespace Sitefinity_CLI.Commands
         protected override string CreatedMessage => Constants.CustomWidgetCreatedMessage;
 
         protected override string TemplatesFolder => Constants.CustomWidgetTemplatesFolderName;
+
+        public AddCustomWidgetCommand(ICsProjectFileEditor csProjectFileEditor, ILogger<AddCustomWidgetCommand> logger)
+            : base(csProjectFileEditor, logger)
+        {
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Enums;
 using System;
 using System.ComponentModel;
@@ -13,11 +14,15 @@ namespace Sitefinity_CLI.Commands
         [DefaultValue(Constants.DefaultResourcePackageName)]
         public override string TemplateName { get; set; } = Constants.DefaultResourcePackageName;
 
+        public AddResourcePackageCommand(ILogger<object> logger) : base(logger)
+        {
+        }
+
         public override int OnExecute(CommandLineApplication config)
         {
             if (base.OnExecute(config) == 1)
             {
-                return 1;
+                return (int)ExitCode.GeneralError;
             }
 
             var resourcePackagesFolderPath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName);
@@ -28,13 +33,13 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(templatePackageFolderPath))
             {
-                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePackageFolderPath), ConsoleColor.Red);
+                this.Logger.LogError(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePackageFolderPath));
                 return (int)ExitCode.GeneralError;
             }
 
             if (Directory.Exists(newResourcePackagePath))
             {
-                Utils.WriteLine(string.Format(Constants.ResourceExistsMessage, config.FullName, this.Name, newResourcePackagePath), ConsoleColor.Red);
+                this.Logger.LogError(string.Format(Constants.ResourceExistsMessage, config.FullName, this.Name, newResourcePackagePath));
                 return (int)ExitCode.GeneralError;
             }
 

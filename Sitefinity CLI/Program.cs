@@ -1,21 +1,48 @@
-﻿using Sitefinity_CLI.Commands;
-using McMaster.Extensions.CommandLineUtils;
-using System;
+﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Http;
+using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
+using Sitefinity_CLI.Logging;
+using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.VisualStudio;
+using System;
+using System.Threading.Tasks;
 
 namespace Sitefinity_CLI
 {
     [HelpOption]
     [Command("sf")]
-    [Subcommand(Constants.AddCommandName, typeof(AddCommand))]
-    [Subcommand(Constants.GenerateConfigCommandName, typeof(GenerateConfigCommand))]
+    [Subcommand(typeof(AddCommand))]
+    [Subcommand(typeof(UpgradeCommand))]
+    [Subcommand(typeof(GenerateConfigCommand))]
     public class Program
     {
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             try
             {
-                return CommandLineApplication.Execute<Program>(args);
+                return await new HostBuilder()
+                .ConfigureLogging((context, builder) =>
+                {
+                    builder.AddConsole();
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddHttpClient();
+                    services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
+                    services.AddTransient<INuGetApiClient, NuGetApiClient>();
+                    services.AddTransient<INuGetCliClient, NuGetCliClient>();
+                    services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
+                    services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
+                    services.AddTransient<ISitefinityPackageManager, SitefinityPackageManager>();
+                    services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
+                    //services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
+                })
+                .UseConsoleLifetime()
+                .RunCommandLineApplicationAsync<Program>(args);
             }
             catch (Exception e)
             {

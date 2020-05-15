@@ -27,6 +27,8 @@ namespace Sitefinity_CLI
         public const string IntegrationTestClassName = "DemoTests";
         public const string PackagesFileName = "packages";
         public const string CsProjTemplateName = "csproj";
+        public const string PackagesFolderName = "packages";
+        public const string LicenseAgreementsFolderName = "LicenseAgreements";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
@@ -41,6 +43,10 @@ namespace Sitefinity_CLI
         public const string SolutionNotFoundMessage = "Unable to find sln file";
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
+        public const string FileNotFoundMessage = "File \"{0}\" not found";
+        public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
+        public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
+        public const string VersionNotFound = "Version: {0} was not found in https://nuget.sitefinity.com";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
@@ -53,6 +59,9 @@ namespace Sitefinity_CLI
         public const string AddFilesInsufficientPrivilegesMessage = "Insufficient privileges to add the file(s) to the project.";
         public const string AddFilesToSolutionFailureMessage = "File \"{0}\" unable to be added to solution!";
         public const string SolutionNotReadable = "Unable to read solution";
+        public const string NoProjectsFoundToUpgradeWarningMessage = "No projects with Sitefinity references found to upgrade.";
+        public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
+        public const string UpgradeWarning = "Make sure to have your project under source controll. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instanse in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
@@ -62,6 +71,9 @@ namespace Sitefinity_CLI
         public const string ModuleCreatedMessage = "Module \"{0}\" created!";
         public const string IntegrationTestsCreatedMessage = "Integration tests project \"{0}\" created!";
         public const string AddFilesToSolutionSuccessMessage = "File \"{0}\" succesfully added to solution!";
+        public const string NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage = "{0} projects with Sitefinity references found";
+        public const string StartUpgradeSuccessMessage = "Starting upgrade of project \"{0}\"...";
+        public const string UpgradeWasCanceled = "The upgrade was canceled.";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
@@ -72,6 +84,16 @@ namespace Sitefinity_CLI
         public const string NameArgumentDescription = "The name of the resource you want to add to the current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
+        public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
+        public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
+        public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
+        public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
+        public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
+        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the licence of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
+        public const string VersionOptionTemplate = "-v|--version";
+        public const string SourceOptionTemplate = "-s|--source";
+        public const string SkipPrompts = "--skipPrompts";
+        public const string AcceptLicense = "--acceptLicense";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
@@ -80,7 +102,9 @@ namespace Sitefinity_CLI
         public const string VBFileExtension = ".vb";
         public const string JavaScriptFileExtension = ".js";
         public const string CsprojFileExtension = ".csproj";
+        public const string SlnFileExtension = ".sln";
         public const string ConfigFileExtension = ".config";
+        public const string VBProjFileExtension = ".vbproj";
 
         // Command names
         public const string AddCommandName = "add";
@@ -97,19 +121,38 @@ namespace Sitefinity_CLI
         public const string AddIntegrationTestsCommandName = "tests";
         public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
+        public const string UpgradeCommandName = "upgrade";
 
         public const string DefaultResourcePackageName_VersionsBefore12_0 = "Bootstrap";
         public const string DefaultResourcePackageName = "Bootstrap4";
         public const string DefaultGridWidgetName = "grid-6+6";
         public const string DefaultSourceTemplateName = "Default";
 
-        // cs proj modifier constants
+        // Csproj editor constants
         public const string ItemGroupElem = "ItemGroup";
         public const string CompileElem = "Compile";
+        public const string ReferenceElem = "Reference";
         public const string NoneElem = "None";
         public const string ContentElem = "Content";
         public const string ProjectElem = "Project";
+        public const string HintPathElem = "HintPath";
+        public const string TargetFrameworkVersionElem = "TargetFrameworkVersion";
         public const string IncludeAttribute = "Include";
         public const string XmlnsAttribute = "xmlns";
+
+        // Packages config editor constants
+        public const string PackagesElem = "packages";
+        public const string PackageElem = "package";
+        public const string IdAttribute = "id";
+        public const string VersionAttribute = "version";
+        public const string PackagesConfigFileName = "packages.config";
+
+        // Sitefinity package management
+        public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
+        public const string EntryElem = "entry";
+        public const string PropertiesElem = "properties";
+        public const string DependenciesElem = "Dependencies";
+        public const string VersionElem = "Version";
+        public const string TitleElem = "title";
     }
 }

@@ -1,7 +1,9 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.VisualStudio;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,6 +66,11 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
+        public AddToProjectCommandBase(ICsProjectFileEditor csProjectFileEditor, ILogger<object> logger) : base(logger)
+        {
+            this.csProjectFileEditor = csProjectFileEditor;
+        }
+
         /// <summary>
         /// A method containing the logic of the command
         /// </summary>
@@ -86,7 +93,8 @@ namespace Sitefinity_CLI.Commands
             {
                 if (!Directory.Exists(folderPath))
                 {
-                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath), ConsoleColor.Red);
+                    this.Logger.LogError(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
+
                     return (int)ExitCode.GeneralError;
                 }
             }
@@ -95,7 +103,8 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(templatePath))
             {
-                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath), ConsoleColor.Red);
+                this.Logger.LogError(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath));
+
                 return (int)ExitCode.GeneralError;
             }
 
@@ -106,20 +115,7 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            Utils.WriteLine(string.Format(this.CreatedMessage, this.Name), ConsoleColor.Green);
-            if (this.filesAddedToCsProjResult == null || !this.filesAddedToCsProjResult.Success)
-            {
-                if (this.filesAddedToCsProjResult != null && !string.IsNullOrEmpty(this.filesAddedToCsProjResult.Message))
-                {
-                    Utils.WriteLine(this.filesAddedToCsProjResult.Message, ConsoleColor.Yellow);
-                }
-
-                Utils.WriteLine(Constants.AddFilesToProjectMessage, ConsoleColor.Yellow);
-            }
-            else
-            {
-                Utils.WriteLine(Constants.FilesAddedToProjectMessage, ConsoleColor.Green);
-            }
+            this.Logger.LogInformation(string.Format(this.CreatedMessage, this.Name));
 
             return (int)ExitCode.OK;
         }
@@ -136,7 +132,7 @@ namespace Sitefinity_CLI.Commands
         {
             if (base.CreateFileFromTemplate(filePath, templatePath, resourceFullName, data) == 1)
             {
-                throw new Exception(string.Format("An error occured while creating an item from template. Path: {0}", filePath));
+                throw new Exception(string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, filePath));
             }
 
             this.createdFiles.Add(filePath);
@@ -173,12 +169,17 @@ namespace Sitefinity_CLI.Commands
                     this.CreateFileFromTemplate(fileModel.FilePath, fileModel.TemplatePath, config.FullName, data);
                 }
 
-                this.filesAddedToCsProjResult = this.AddFilesToCsProj();
+                this.AddFilesToCsProj();
+
+                this.Logger.LogInformation(Constants.FilesAddedToProjectMessage);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                this.Logger.LogError(ex.Message);
+
                 this.DeleteFiles();
                 this.RemoveFilesFromCsproj();
+
                 return (int)ExitCode.GeneralError;
             }
 
@@ -221,12 +222,14 @@ namespace Sitefinity_CLI.Commands
         /// Adds files to csproj
         /// </summary>
         /// <returns>The result of the operation</returns>
-        protected FileModifierResult AddFilesToCsProj()
+        protected void AddFilesToCsProj()
         {
             string csprojFilePath = GetCsprojFilePath();
-            FileModifierResult result = CsProjModifier.AddFiles(csprojFilePath, this.createdFiles);
 
-            return result;
+            if (csprojFilePath != null)
+            {
+                this.csProjectFileEditor.AddFiles(csprojFilePath, this.createdFiles);
+            }
         }
 
         /// <summary>
@@ -268,7 +271,9 @@ namespace Sitefinity_CLI.Commands
         protected void RemoveFilesFromCsproj()
         {
             string csProjFilePath = GetCsprojFilePath();
-            CsProjModifier.RemoveFiles(csProjFilePath, this.createdFiles);
+
+            if (!string.IsNullOrEmpty(csProjFilePath))
+                this.csProjectFileEditor.RemoveFiles(csProjFilePath, this.createdFiles);
         }
 
         /// <summary>
@@ -289,6 +294,6 @@ namespace Sitefinity_CLI.Commands
 
         protected List<string> createdFiles;
 
-        protected FileModifierResult filesAddedToCsProjResult;
+        private readonly ICsProjectFileEditor csProjectFileEditor;
     }
 }

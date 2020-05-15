@@ -3,57 +3,61 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sitefinity_CLI.VisualStudio;
 
-namespace Sitefinity_CLI.Tests.CsProjModifierTests
+namespace Sitefinity_CLI.Tests.CsProjectFileEditorTests
 {
 
     [TestClass]
     public class AddFileToCsprojTests
     {
-        private string CsProjWithElementsPath = $"{Directory.GetCurrentDirectory()}/CsProjModifierTests/Data/WithElements.csproj";
-        private string CsProjWithoutElementsPath = $"{Directory.GetCurrentDirectory()}/CsProjModifierTests/Data/WithoutElements.csproj";
-        private string CsharpDummyFile = @"D:\TestFolder\TestCsFile.cs";
-        private string JavascriptDummyFile = @"D:\TestFolder\TestJsFile.js";
+        private static string CsharpDummyFileName = "TestCsFile.cs";
+        private static string JavascriptDummyFileName = "TestJsFile.js";
+        private static string ProjectBasePath = Path.Combine(Directory.GetCurrentDirectory(), "CsProjectFileEditorTests", "Data");
+        private string CsProjWithElementsPath = Path.Combine(ProjectBasePath, "WithElements.csproj");
+        private string CsProjWithoutElementsPath = Path.Combine(ProjectBasePath, "WithoutElements.csproj");
+        private string CsharpDummyFile = Path.Combine(ProjectBasePath, CsharpDummyFileName);
+        private string JavascriptDummyFile = Path.Combine(ProjectBasePath, JavascriptDummyFileName);
 
         // save the initial state of the csproj files
         private readonly XDocument _initialCsprojWithElements;
         private readonly XDocument _initialCsprojWithoutElements;
 
+        private readonly ICsProjectFileEditor csProjectFileEditor;
+
         public AddFileToCsprojTests()
         {
             _initialCsprojWithElements = XDocument.Load(CsProjWithElementsPath);
             _initialCsprojWithoutElements = XDocument.Load(CsProjWithoutElementsPath);
+            this.csProjectFileEditor = new CsProjectFileEditor();
         }
 
         [TestMethod]
         public void SuccessfullyAddNewCompileFile_When_CsProjDoesNotHaveOtherCompileElements()
         {
-            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithoutElementsPath, new List<string> { CsharpDummyFile });
-            Assert.IsTrue(result.Success);
+            this.csProjectFileEditor.AddFiles(CsProjWithoutElementsPath, new List<string> { CsharpDummyFile });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithoutElementsPath);
             XElement compileElem = resultCsproj.Descendants().FirstOrDefault(x => x.Name.ToString().EndsWith(Constants.CompileElem));
             Assert.IsNotNull(compileElem);
-            Assert.AreEqual(CsharpDummyFile, compileElem.Attribute(Constants.IncludeAttribute).Value);
+            Assert.AreEqual(CsharpDummyFileName, compileElem.Attribute(Constants.IncludeAttribute).Value);
         }
 
         [TestMethod]
         public void SuccessfullyAddNewContentFile_When_CsProjDoesNotHaveOtherContentElements()
         {
-            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithoutElementsPath, new List<string> { JavascriptDummyFile });
-            Assert.IsTrue(result.Success);
+            this.csProjectFileEditor.AddFiles(CsProjWithoutElementsPath, new List<string> { JavascriptDummyFile });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithoutElementsPath);
             XElement contentElem = resultCsproj.Descendants().FirstOrDefault(x => x.Name.ToString().EndsWith(Constants.ContentElem));
             Assert.IsNotNull(contentElem);
-            Assert.AreEqual(JavascriptDummyFile, contentElem.Attribute(Constants.IncludeAttribute).Value);
+            Assert.AreEqual(JavascriptDummyFileName, contentElem.Attribute(Constants.IncludeAttribute).Value);
         }
 
         [TestMethod]
         public void SuccessfullyAddNewCompileFile_When_CsProjHasOtherCompileElements()
         {
-            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { CsharpDummyFile });
-            Assert.IsTrue(result.Success);
+            this.csProjectFileEditor.AddFiles(CsProjWithElementsPath, new List<string> { CsharpDummyFile });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
             IEnumerable<XElement> compileElementsAfterAdd = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
@@ -64,14 +68,13 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             Assert.AreNotEqual(compileElementsBeforeAddCount, compileElementsAfterAddCount);
 
             XElement newCompileElem = compileElementsAfterAdd.Last();
-            Assert.AreEqual(CsharpDummyFile, newCompileElem.Attribute(Constants.IncludeAttribute).Value);
+            Assert.AreEqual(CsharpDummyFileName, newCompileElem.Attribute(Constants.IncludeAttribute).Value);
         }
 
         [TestMethod]
         public void SuccessfullyAddNewContentFile_When_CsProjHasOtherContentElements()
         {
-            FileModifierResult result = CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { JavascriptDummyFile });
-            Assert.IsTrue(result.Success);
+            this.csProjectFileEditor.AddFiles(CsProjWithElementsPath, new List<string> { JavascriptDummyFile });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
             IEnumerable<XElement> contentElementsAfterAdd = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.ContentElem));
@@ -82,7 +85,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             Assert.AreNotEqual(contentElementsBeforeAddCount, contentElementsAfterAddCount);
 
             XElement newContentElem = contentElementsAfterAdd.Last();
-            Assert.AreEqual(JavascriptDummyFile, newContentElem.Attribute(Constants.IncludeAttribute).Value);
+            Assert.AreEqual(JavascriptDummyFileName, newContentElem.Attribute(Constants.IncludeAttribute).Value);
         }
 
         [TestMethod]
@@ -91,7 +94,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             IEnumerable<XElement> compileElementsBeforeAdd = _initialCsprojWithElements.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
             string firstCompileElementIncludeValue = compileElementsBeforeAdd.First().Attribute(Constants.IncludeAttribute).Value;
 
-            CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { firstCompileElementIncludeValue });
+            this.csProjectFileEditor.AddFiles(CsProjWithElementsPath, new List<string> { firstCompileElementIncludeValue });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
             IEnumerable<XElement> compileElementsAfterAdd = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
@@ -108,7 +111,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             IEnumerable<XElement> contentElementsBeforeAdd = _initialCsprojWithElements.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.ContentElem));
             string firstContentElementIncludeValue = contentElementsBeforeAdd.First().Attribute(Constants.IncludeAttribute).Value;
 
-            CsProjModifier.AddFiles(CsProjWithElementsPath, new List<string> { firstContentElementIncludeValue });
+            this.csProjectFileEditor.AddFiles(CsProjWithElementsPath, new List<string> { firstContentElementIncludeValue });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
             IEnumerable<XElement> contentElementsAfterAdd = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.ContentElem));
@@ -125,8 +128,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             IEnumerable<XElement> compileElementsBeforeRemove = _initialCsprojWithElements.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
             string firstCompileElementIncludeValue = compileElementsBeforeRemove.First().Attribute(Constants.IncludeAttribute).Value;
 
-            FileModifierResult result = CsProjModifier.RemoveFiles(CsProjWithElementsPath, new List<string> { firstCompileElementIncludeValue });
-            Assert.IsTrue(result.Success);
+            this.csProjectFileEditor.RemoveFiles(CsProjWithElementsPath, new List<string> { firstCompileElementIncludeValue });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
             IEnumerable<XElement> compileElementsAfterRemove = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.CompileElem));
@@ -143,8 +145,7 @@ namespace Sitefinity_CLI.Tests.CsProjModifierTests
             IEnumerable<XElement> contentElementsBeforeRemove = _initialCsprojWithElements.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.ContentElem));
             string firstContentElementIncludeValue = contentElementsBeforeRemove.First().Attribute(Constants.IncludeAttribute).Value;
 
-            FileModifierResult result = CsProjModifier.RemoveFiles(CsProjWithElementsPath, new List<string> { firstContentElementIncludeValue });
-            Assert.IsTrue(result.Success);
+            this.csProjectFileEditor.RemoveFiles(CsProjWithElementsPath, new List<string> { firstContentElementIncludeValue });
 
             XDocument resultCsproj = XDocument.Load(CsProjWithElementsPath);
             IEnumerable<XElement> contentElementsAfterRemove = resultCsproj.Descendants().Where(x => x.Name.ToString().EndsWith(Constants.ContentElem));

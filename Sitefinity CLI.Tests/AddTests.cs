@@ -16,13 +16,15 @@ namespace Sitefinity_CLI.Tests
 
         private Dictionary<string, string> testFolderPaths;
         private string workingDirectory;
+        private const string LoggerInfo = "info      ";
+        private const string LoggerFail = "fail      ";
 
         [TestInitialize]
         public void Initialize()
         {
             var currenPath = Directory.GetCurrentDirectory();
             var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.FullName;
-            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "Debug", "netcoreapp2.0");
+            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "netcoreapp3.0");
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             this.testedTemplateVersions = this.GetAllTemplatesVersions(cultureInfo).Select(x => x.ToString("n1", cultureInfo)).ToList();
 
@@ -161,8 +163,8 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Format(Constants.CustomWidgetCreatedMessage, resourceName));
-                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
+                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
+                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.CustomWidgetCreatedMessage, resourceName)));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -195,7 +197,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Format(Constants.ResourceExistsMessage, Constants.AddResourcePackageCommandFullName, resourceName, expectedFolderPath));
+                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ResourceExistsMessage, Constants.AddResourcePackageCommandFullName, resourceName, expectedFolderPath)));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -234,7 +236,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
+                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -273,7 +275,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
+                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -311,7 +313,9 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
+                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
+                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath)));
+                
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -423,7 +427,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
+                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.DirectoryNotFoundMessage, folderPath)));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -639,8 +643,8 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Format(Constants.ModuleCreatedMessage, resourceName));
-                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
+                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.ModuleCreatedMessage, resourceName)));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
@@ -823,9 +827,9 @@ namespace Sitefinity_CLI.Tests
                 fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
                 folderPath = testsFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
-
-                expectedOutputString.AppendLine(string.Format(Constants.IntegrationTestsCreatedMessage, resourceName));
-                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                
+                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
+                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.IntegrationTestsCreatedMessage, resourceName)));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
@@ -951,11 +955,11 @@ namespace Sitefinity_CLI.Tests
 
             if (valid)
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithElements.template");
+                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements.template");
             }
             else
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SlnModifierTests\\Data\\WithoutElements.template");
+                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements.template");
             }
 
             File.WriteAllText(slnPath, slnContents);
@@ -964,7 +968,7 @@ namespace Sitefinity_CLI.Tests
             Directory.CreateDirectory(webAppFolderPath);
 
             var webAppProjPath = Path.Combine(webAppFolderPath, "SitefinityWebApp.csproj");
-            var webAppProjContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\CsProjModifierTests\\Data\\WithElements.csproj");
+            var webAppProjContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\CsProjectFileEditorTests\\Data\\WithElements.csproj");
             File.WriteAllText(webAppProjPath, webAppProjContents);
 
             var binaryFolderPath = Path.Combine(webAppFolderPath, "bin");
@@ -1065,7 +1069,7 @@ namespace Sitefinity_CLI.Tests
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            expectedOutputString.AppendLine(string.Format(Constants.TemplateNotFoundMessage, commandFullName, expectedFolderPath));
+            expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.TemplateNotFoundMessage, commandFullName, expectedFolderPath)));
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -1093,7 +1097,7 @@ namespace Sitefinity_CLI.Tests
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
+            expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.DirectoryNotFoundMessage, folderPath)));
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -1160,7 +1164,6 @@ namespace Sitefinity_CLI.Tests
                 templateName: templateName,
                 resourcePackageName: resourcePackageName);
 
-            StreamReader myStreamReader = process.StandardOutput;
             StreamWriter myStreamWriter = process.StandardInput;
 
             // Answer to the prompt that says Sitefinity project is not recognized
