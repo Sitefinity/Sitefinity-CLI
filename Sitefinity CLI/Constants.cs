@@ -61,6 +61,7 @@ namespace Sitefinity_CLI
         public const string SolutionNotReadable = "Unable to read solution";
         public const string NoProjectsFoundToUpgradeWarningMessage = "No projects with Sitefinity references found to upgrade.";
         public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
+        public const string UpgradeWarning = "Make sure to have your project under source controll. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instanse in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";
@@ -87,10 +88,10 @@ namespace Sitefinity_CLI
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
-        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the licence of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree yo any of the terms in the license you must uninstall the product!";
+        public const string SkipPromptsDescription = "If you use this option you will automatically accept the licence of the version you are upgrading to and skip all the warning prompts. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree yo any of the terms in the license you must uninstall the product!";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
-        public const string AcceptLicense = "--acceptLicense";
+        public const string SkipPrompts = "--skipPrompts";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
