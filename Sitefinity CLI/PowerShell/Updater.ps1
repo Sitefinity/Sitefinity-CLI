@@ -1,6 +1,23 @@
 function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 {
-	return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
+	$newVersionArray = $packageVersion.Split(".")
+	$oldVersionArray = $oldPackageVersion.Split(".")
+	
+	for ($i=0; $i -lt $newVersionArray.Count; $i++) {
+		$currentNewVersion = $newVersionArray[$i]
+		$currentOldVersion = 0
+		if($i -lt $oldVersionArray.Count)
+		{
+			$currentOldVersion = $oldVersionArray[$i]
+		}
+		
+		if([int]$currentOldVersion -gt [int]$currentNewVersion)
+		{
+			return $false
+		}
+    }
+	
+	return $true
 }
 
 $basePath = $PSScriptRoot
@@ -48,7 +65,7 @@ Try
 				if($oldPackageVersion -ne $null -and $oldPackageVersion -ne $packageVersion -and $oldPackageVersion -ne ($packageVersion + '.0') -and ($oldPackageVersion + '.0') -ne $packageVersion)
 				{
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -FileConflictAction OverwriteAll"
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion"
 				}
 				else
 				{
