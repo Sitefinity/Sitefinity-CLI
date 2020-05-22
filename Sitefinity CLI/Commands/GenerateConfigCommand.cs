@@ -17,7 +17,7 @@ namespace Sitefinity_CLI.Commands
     internal class GenerateConfigCommand
     {
         private string[] optionsToSkip = { "ProjectRootPath", "Version" };
-        private string[] mainCommandsToSkip = { Constants.GenerateConfigCommandName };
+        private string[] mainCommandsToSkip = { Constants.GenerateConfigCommandName, Constants.UpgradeCommandName };
 
         protected int OnExecute(CommandLineApplication app)
         {
@@ -27,56 +27,61 @@ namespace Sitefinity_CLI.Commands
 
             foreach (SubcommandAttribute subCommandMainCommandAttribute in subCommandMainCommandAttributes)
             {
-                if (mainCommandsToSkip.Contains(subCommandMainCommandAttribute.Name))
+                foreach (var currentSubCommandType in subCommandMainCommandAttribute.Types)
                 {
-                    continue;
-                }
+                    var currentSubCommandCommandAttribute = currentSubCommandType.GetCustomAttribute(typeof(CommandAttribute)) as CommandAttribute;
 
-                var mainCommandType = subCommandMainCommandAttribute.CommandType;
-                var subCommandAttributes = mainCommandType.GetCustomAttributes(typeof(SubcommandAttribute));
-
-                foreach (SubcommandAttribute subCommandAttribute in subCommandAttributes)
-                {
-                    var commandType = subCommandAttribute.CommandType;
-
-                    var commandAttribute = commandType.GetCustomAttribute(typeof(CommandAttribute)) as CommandAttribute;
-                    var commandModel = new CommandModel();
-
-                    // title and name
-                    commandModel.Name = string.Format("{0} {1}", subCommandMainCommandAttribute.Name, commandAttribute.Name);
-                    commandModel.Title = commandAttribute.FullName;
-
-                    // arguments
-                    var argumentProps = commandType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ArgumentAttribute)));
-                    var arguments = new List<string>();
-                    foreach (var argument in argumentProps)
+                    if (mainCommandsToSkip.Contains(currentSubCommandCommandAttribute.Name))
                     {
-                        arguments.Add(argument.Name);
+                        continue;
                     }
-                    commandModel.Args = arguments;
 
-                    // options
-                    var optionProps = commandType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(OptionAttribute)));
-                    var options = new List<OptionModel>();
-                    var optionNameRegex = new Regex("(?<=[^A-Z])(?=[A-Z])");
-                    foreach (var option in optionProps)
+                    var subCommandAttributes = currentSubCommandType.GetCustomAttributes(typeof(SubcommandAttribute));
+
+                    foreach (SubcommandAttribute subCommandAttribute in subCommandAttributes)
                     {
-                        if (optionsToSkip.Contains(option.Name))
+                        foreach (var commandType in subCommandAttribute.Types)
                         {
-                            continue;
+                            var commandAttribute = commandType.GetCustomAttribute(typeof(CommandAttribute)) as CommandAttribute;
+                            var commandModel = new CommandModel();
+
+                            // title and name
+                            commandModel.Name = string.Format("{0} {1}", currentSubCommandCommandAttribute.Name, commandAttribute.Name);
+                            commandModel.Title = commandAttribute.FullName;
+
+                            // arguments
+                            var argumentProps = commandType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ArgumentAttribute)));
+                            var arguments = new List<string>();
+                            foreach (var argument in argumentProps)
+                            {
+                                arguments.Add(argument.Name);
+                            }
+                            commandModel.Args = arguments;
+
+                            // options
+                            var optionProps = commandType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(OptionAttribute)));
+                            var options = new List<OptionModel>();
+                            var optionNameRegex = new Regex("(?<=[^A-Z])(?=[A-Z])");
+                            foreach (var option in optionProps)
+                            {
+                                if (optionsToSkip.Contains(option.Name))
+                                {
+                                    continue;
+                                }
+
+                                var optionAttr = option.GetCustomAttribute(typeof(OptionAttribute)) as OptionAttribute;
+                                var defaultValueAttr = option.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
+                                var optionModel = new OptionModel();
+                                optionModel.Name = optionAttr.Template.Split('|').First();
+                                optionModel.Title = optionNameRegex.Replace(option.Name, " ");
+                                optionModel.DefaultValue = defaultValueAttr.Value.ToString();
+                                options.Add(optionModel);
+                            }
+                            commandModel.Options = options;
+
+                            config.Add(commandModel);
                         }
-
-                        var optionAttr = option.GetCustomAttribute(typeof(OptionAttribute)) as OptionAttribute;
-                        var defaultValueAttr = option.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
-                        var optionModel = new OptionModel();
-                        optionModel.Name = optionAttr.Template.Split('|').First();
-                        optionModel.Title = optionNameRegex.Replace(option.Name, " ");
-                        optionModel.DefaultValue = defaultValueAttr.Value.ToString();
-                        options.Add(optionModel);
                     }
-                    commandModel.Options = options;
-
-                    config.Add(commandModel);
                 }
             }
             
