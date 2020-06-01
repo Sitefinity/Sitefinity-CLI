@@ -120,7 +120,7 @@ namespace Sitefinity_CLI.Commands
 
             try
             {
-                SolutionProject solutionProject = new SolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.WebProject);
+                SolutionProject solutionProject = new SolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
                 SolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
 
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
