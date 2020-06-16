@@ -25,22 +25,29 @@ namespace Sitefinity_CLI.PackageManagement
             this.packagesConfigFileEditor = packagesConfigFileEditor;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
-            this.sources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSource };
+            this.defaultSources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSource };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
         }
 
-        public async Task Install(string packageId, string version, string solutionFilePath)
+        public void Install(string packageId, string version, string solutionFilePath, IEnumerable<string> nugetPackageSources)
         {
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
             this.logger.LogInformation(string.Format("[{0}] Installing package \"{1}\"...", solutionDirectory, packageId));
+            var sourcesUsed = string.Join(',', this.defaultSources);
+            this.logger.LogInformation(string.Format("Package sources used: {0}", sourcesUsed));
 
-            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, this.sources);
+            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetPackageSources);
 
             this.logger.LogInformation(string.Format("[{0}] Install for package \"{1}\" is complete", solutionDirectory, packageId));
         }
 
-        public async Task Restore(string solutionFilePath)
+        public void Install(string packageId, string version, string solutionFilePath)
+        {
+            this.Install(packageId, version, solutionFilePath, this.defaultSources);
+        }
+
+        public void Restore(string solutionFilePath)
         {
             this.logger.LogInformation(string.Format("[{0}] Restoring packages staretd...", solutionFilePath));
 
@@ -64,11 +71,16 @@ namespace Sitefinity_CLI.PackageManagement
 
         public async Task<NuGetPackage> GetSitefinityPackageTree(string version)
         {
-            IEnumerable<string> sources = new List<string>() { SitefinityPublicNuGetSource };
-
-            return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, sources, this.supportedFrameworksRegex);
+            return await this.GetSitefinityPackageTree(version, this.defaultSources);
         }
 
+        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<string> nugetPackageSources)
+        {
+            var sourcesUsed = string.Join(',', nugetPackageSources);
+            this.logger.LogInformation(string.Format("Package sources used: {0}", sourcesUsed));
+
+            return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
+        }
 
         public void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion)
         {
@@ -182,6 +194,14 @@ namespace Sitefinity_CLI.PackageManagement
             projectConfig?.Save(projectConfigPath);
 
             this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
+        }
+
+        public IEnumerable<string> DefaultPackageSource
+        {
+            get
+            {
+                return new List<string>(this.defaultSources);
+            }
         }
 
         private void SyncBindingRedirects(XmlDocument configDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
@@ -355,15 +375,13 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly ILogger logger;
 
-        private readonly IEnumerable<string> sources;
+        private readonly IEnumerable<string> defaultSources;
 
         private const string SitefinityPublicNuGetSource = "http://nuget.sitefinity.com/nuget/";
 
         private const string PublicNuGetSource = "https://nuget.org/api/v2/";
 
         private const string PackagesFolderName = "packages";
-
-        private const string ToolsFolderName = "tools";
 
         private const string LibFolderName = "lib";
 
