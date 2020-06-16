@@ -100,7 +100,6 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
             var packageSources = this.GetNugetPackageSources();
-            this.logger.LogInformation(string.Format("Package sources used: \"{0}\"...", this.Version));
 
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version, packageSources);
 
