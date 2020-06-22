@@ -34,7 +34,7 @@ namespace Sitefinity_CLI.PackageManagement
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
             this.logger.LogInformation(string.Format("[{0}] Installing package \"{1}\"...", solutionDirectory, packageId));
-            var sourcesUsed = string.Join(',', this.defaultSources);
+            var sourcesUsed = string.Join(',', nugetPackageSources);
             this.logger.LogInformation(string.Format("Package sources used: {0}", sourcesUsed));
 
             this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetPackageSources);
