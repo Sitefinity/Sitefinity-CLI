@@ -149,7 +149,7 @@ namespace Sitefinity_CLI.Commands
                 return this.sitefinityPackageManager.DefaultPackageSource;
             }
 
-            var packageSources = this.PackageSources.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ps => ps);
+            var packageSources = this.PackageSources.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ps => ps.Trim());
             return packageSources;
         }
 
