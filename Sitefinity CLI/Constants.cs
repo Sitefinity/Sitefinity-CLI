@@ -90,10 +90,12 @@ namespace Sitefinity_CLI
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
         public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the licence of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
+        public const string PackageSourcesDescription = "Provide the nuget package sources used to install the new version of sitefinity";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
+        public const string PackageSources = "-ps|--packageSources";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";

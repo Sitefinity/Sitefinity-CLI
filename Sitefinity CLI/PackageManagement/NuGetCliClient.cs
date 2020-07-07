@@ -17,7 +17,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             string source = string.Join(';', sources);
 
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -Source {source}");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -Source \"{source}\"");
         }
 
         public void Install(string configFilePath)

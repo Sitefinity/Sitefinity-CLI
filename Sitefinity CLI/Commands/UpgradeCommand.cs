@@ -34,6 +34,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
         public bool AcceptLicense { get; set; }
 
+        [Option(Constants.PackageSources, Description = Constants.PackageSourcesDescription)]
+        public string PackageSources { get; set; }
+
         public UpgradeCommand(
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
@@ -96,7 +99,9 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
-            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version);
+            var packageSources = this.GetNugetPackageSources();
+
+            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version, packageSources);
 
             if (newSitefinityPackage == null)
             {
@@ -104,8 +109,8 @@ namespace Sitefinity_CLI.Commands
                 return;
             }
 
-            await this.sitefinityPackageManager.Restore(this.SolutionPath);
-            await this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath);
+            this.sitefinityPackageManager.Restore(this.SolutionPath);
+            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
 
             if (!this.AcceptLicense)
             {
@@ -135,6 +140,17 @@ namespace Sitefinity_CLI.Commands
             this.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
             this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.SolutionPath, this.Version));
+        }
+
+        private IEnumerable<string> GetNugetPackageSources()
+        {
+            if (string.IsNullOrEmpty(this.PackageSources))
+            {
+                return this.sitefinityPackageManager.DefaultPackageSource;
+            }
+
+            var packageSources = this.PackageSources.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ps => ps.Trim());
+            return packageSources;
         }
 
         private void RestoreConfigValuesForNoSfProjects(Dictionary<string, string> configsWithoutSitefinity)
