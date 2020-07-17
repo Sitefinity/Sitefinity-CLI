@@ -131,7 +131,7 @@ namespace Sitefinity_CLI.PackageManagement
                             {
                                 var currentPackageVersion = this.ExtractPackageVersionFromIncludeAttribute(includeAttrValue);
                                 var newPackageVersion = assembly.GetName().Version;
-                                if (currentPackageVersion > newPackageVersion)
+                                if (currentPackageVersion != null && currentPackageVersion > newPackageVersion)
                                 {
                                     this.logger.LogInformation(string.Format("The {0} is on version {1}. It won't be downgraded to {2}", assemblyName, currentPackageVersion, newPackageVersion));
                                     assemblyReferenceFound = true;
@@ -216,7 +216,8 @@ namespace Sitefinity_CLI.PackageManagement
 
             if (versionChunk == null)
             {
-                throw new Exception($"Unable to get the version in {includeAttrValue}");
+                this.logger.LogInformation($"Unable to get the version in {includeAttrValue}");
+                return null;
             }
 
             var packageVersionString = versionChunk
