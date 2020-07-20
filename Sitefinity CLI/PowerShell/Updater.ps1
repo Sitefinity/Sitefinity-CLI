@@ -1,5 +1,9 @@
 function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 {
+    #handles 13.1.7340-preview or 13.1.7340-beta versions
+    $oldPackageVersion = $oldPackageVersion.split('-')[0];
+    $packageVersion = $packageVersion.split('-')[0];
+
 	return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
 }
 

@@ -127,12 +127,25 @@ namespace Sitefinity_CLI.PackageManagement
                             var includeAttr = referenceElement.Attributes[Constants.IncludeAttribute];
                             var includeAttrValue = includeAttr.Value;
 
-                            if (includeAttrValue.StartsWith(assemblyName + ",") || includeAttrValue == assemblyName)
+                            if (includeAttrValue.StartsWith(assemblyName + ",", StringComparison.OrdinalIgnoreCase) || includeAttrValue == assemblyName)
                             {
+                                var currentPackageVersion = this.ExtractPackageVersionFromIncludeAttribute(includeAttrValue);
+                                var newPackageVersion = assembly.GetName().Version;
+                                if (currentPackageVersion != null && currentPackageVersion > newPackageVersion)
+                                {
+                                    this.logger.LogInformation(string.Format("The {0} is on version {1}. It won't be downgraded to {2}", assemblyName, currentPackageVersion, newPackageVersion));
+                                    assemblyReferenceFound = true;
+                                    break;
+                                }
+
                                 var proccesorArchitecture = includeAttrValue.Split(',').FirstOrDefault(x => x.Contains(ProcessorArchitectureAttribute));
                                 var includeAttributeNewValue = string.IsNullOrEmpty(proccesorArchitecture) ? assemblyFullName : $"{assemblyFullName},{proccesorArchitecture}";
 
-                                includeAttr.Value = includeAttributeNewValue;
+                                if (!includeAttr.Value.Equals(includeAttributeNewValue, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    includeAttr.Value = includeAttributeNewValue;
+                                }
+
                                 var childNodes = referenceElement.ChildNodes;
                                 XmlNode hintPathNode = null;
                                 for (int j = 0; j < childNodes.Count; j++)
@@ -194,6 +207,26 @@ namespace Sitefinity_CLI.PackageManagement
             projectConfig?.Save(projectConfigPath);
 
             this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
+        }
+
+        private Version ExtractPackageVersionFromIncludeAttribute(string includeAttrValue)
+        {
+            var versionChunk = includeAttrValue.Split(',')
+                .FirstOrDefault(x => x.Contains("Version"));
+
+            if (versionChunk == null)
+            {
+                this.logger.LogInformation($"Unable to get the version in {includeAttrValue}");
+                return null;
+            }
+
+            var packageVersionString = versionChunk
+                .Split("=")
+                .ToList()[1];
+
+            var parsedVersion = Version.Parse(packageVersionString);
+
+            return parsedVersion;
         }
 
         public IEnumerable<string> DefaultPackageSource
