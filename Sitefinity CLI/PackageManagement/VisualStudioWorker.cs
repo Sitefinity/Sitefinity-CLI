@@ -42,7 +42,7 @@ namespace Sitefinity_CLI.PackageManagement
             dte.UserControl = false;
             dte.MainWindow.Visible = true;
 
-            this.logger.LogInformation(string.Format("Oppening solution: \"{0}\"...", solutionFilePath));
+            this.logger.LogInformation(string.Format("Opening solution: \"{0}\"...", solutionFilePath));
             dte.Solution.Open(solutionFilePath);
             this.logger.LogInformation("Solution ready!");
 
@@ -51,12 +51,12 @@ namespace Sitefinity_CLI.PackageManagement
 
             try
             {
-                this.logger.LogInformation("Oppening console...");
+                this.logger.LogInformation("Opening console...");
                 dte.ExecuteCommand(PackageManagerConsoleCommand);
             }
             catch
             {
-                this.logger.LogInformation("Oppening console failed.");
+                this.logger.LogInformation("Opening console failed.");
             }
 
             this.logger.LogInformation("Waiting...");
