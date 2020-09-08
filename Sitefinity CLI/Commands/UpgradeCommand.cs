@@ -400,13 +400,13 @@ namespace Sitefinity_CLI.Commands
             if (onlySitefinityProjects)
             {
                 projectFilesAbsolutePaths = projectFilesAbsolutePaths
-                    .Where(ap => this.HasSitefinityReferences(ap) && this.ShouldUpgrade(ap));
+                    .Where(ap => this.HasSitefinityReferences(ap) && this.ValidateSfVersion(ap));
             }
 
             return projectFilesAbsolutePaths.ToList();
         }
 
-        private bool ShouldUpgrade(string projectFilePath)
+        private bool ValidateSfVersion(string projectFilePath)
         {
             var currentSfVersionString = this.DetectSitefinityVersion(projectFilePath);
             var currentVersion = System.Version.Parse(currentSfVersionString);
