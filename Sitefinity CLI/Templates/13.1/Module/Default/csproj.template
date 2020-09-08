@@ -43,9 +43,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.Sitefinity">
       <HintPath>{{binFolder}}\Telerik.Sitefinity.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Telerik.Sitefinity.Services.Events">
       <HintPath>{{binFolder}}\Telerik.Sitefinity.Services.Events.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
