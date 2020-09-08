@@ -142,7 +142,7 @@ namespace Sitefinity_CLI.Commands
 
             this.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
-            this.logger.LogInformation(string.Format("Successfully updated '{0}' to version '{1}'", this.SolutionPath, this.Version));
+            this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 
         private IEnumerable<string> GetNugetPackageSources()
