@@ -20,5 +20,7 @@ namespace Sitefinity_CLI.PackageManagement
         void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion);
 
         IEnumerable<string> DefaultPackageSource { get; }
+
+        void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version);
     }
 }

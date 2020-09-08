@@ -51,12 +51,12 @@ namespace Sitefinity_CLI.PackageManagement
 
             try
             {
-                this.logger.LogInformation("Oppening console...");
+                this.logger.LogInformation("Opening console...");
                 dte.ExecuteCommand(PackageManagerConsoleCommand);
             }
             catch
             {
-                this.logger.LogInformation("Oppening console failed.");
+                this.logger.LogInformation("Opening console failed.");
             }
 
             this.logger.LogInformation("Waiting...");

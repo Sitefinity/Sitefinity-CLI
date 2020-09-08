@@ -105,7 +105,6 @@ namespace Sitefinity_CLI.PackageManagement
             var references = doc.GetElementsByTagName(Constants.ReferenceElem);
             var targetFramework = this.GetTargetFrameworkForVersion(sitefinityVersion);
 
-            this.SetTargetFramework(doc, targetFramework);
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
             foreach (var package in packages)
             {
@@ -319,6 +318,10 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 return "v4.7.2";
             }
+            else if (versionAsInt >= 132)
+            {
+                return "v4.8";
+            }
 
             return string.Empty;
         }
@@ -396,6 +399,25 @@ namespace Sitefinity_CLI.PackageManagement
             var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             return relativePath.Replace('/', Path.DirectorySeparatorChar);
+        }
+
+        public void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version)
+        {
+            if (string.IsNullOrEmpty(version))
+            {
+                throw new ArgumentException($"Invalid version: {version}");
+            }
+
+            var targetFramework = this.GetTargetFrameworkForVersion(version);
+
+            foreach (var projectFilePath in sitefinityProjectFilePaths)
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(projectFilePath);
+
+                this.SetTargetFramework(doc, targetFramework);
+                doc.Save(projectFilePath);
+            }
         }
 
         private readonly INuGetApiClient nuGetApiClient;
