@@ -118,8 +118,8 @@ namespace Sitefinity_CLI.Commands
             if (!this.AcceptLicense)
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
-                this.logger.LogInformation($"{Environment.NewLine}{licenseContent}{Environment.NewLine}");
-                var hasUserAcceptedEULA = Prompt.GetYesNo(Constants.AcceptLicenseNotification, false);
+                var licensePromptMessage =$"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
+                var hasUserAcceptedEULA = Prompt.GetYesNo(licensePromptMessage, false);
 
                 if (!hasUserAcceptedEULA)
                 {
