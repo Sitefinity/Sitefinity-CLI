@@ -47,6 +47,7 @@ namespace Sitefinity_CLI
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in https://nuget.sitefinity.com";
+        public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})!";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
@@ -75,6 +76,8 @@ namespace Sitefinity_CLI
         public const string NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage = "{0} projects with Sitefinity references found";
         public const string StartUpgradeSuccessMessage = "Starting upgrade of project \"{0}\"...";
         public const string UpgradeWasCanceled = "The upgrade was canceled.";
+        public const string TargetFrameworkChanged = "Target framework for {0} set to {1}";
+        public const string TargetFrameworkDoesNotNeedChanged = "Target framework for {0} does not need change ({1})";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";

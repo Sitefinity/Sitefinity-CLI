@@ -105,7 +105,6 @@ namespace Sitefinity_CLI.PackageManagement
             var references = doc.GetElementsByTagName(Constants.ReferenceElem);
             var targetFramework = this.GetTargetFrameworkForVersion(sitefinityVersion);
 
-            this.SetTargetFramework(doc, targetFramework);
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
             foreach (var package in packages)
             {
@@ -286,16 +285,21 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        private void SetTargetFramework(XmlDocument doc, string targetFramework)
+        private bool TrySetTargetFramework(XmlDocument doc, string targetFramework)
         {
             var targetFrameworkVersionElems = doc.GetElementsByTagName(Constants.TargetFrameworkVersionElem);
-            if (targetFrameworkVersionElems.Count == 1)
+            if (targetFrameworkVersionElems.Count != 1)
             {
-                targetFrameworkVersionElems[0].InnerText = targetFramework;
-                return;
+                throw new InvalidOperationException("Unable to set the target framework");
             }
 
-            throw new InvalidOperationException("Unable to set the target framework");
+            if (targetFrameworkVersionElems[0].InnerText != targetFramework)
+            {
+                targetFrameworkVersionElems[0].InnerText = targetFramework;
+                return true;
+            }
+
+            return false;
         }
 
         private string GetTargetFrameworkForVersion(string version)
@@ -318,6 +322,10 @@ namespace Sitefinity_CLI.PackageManagement
             else if (versionAsInt >= 120)
             {
                 return "v4.7.2";
+            }
+            else if (versionAsInt >= 132)
+            {
+                return "v4.8";
             }
 
             return string.Empty;
@@ -396,6 +404,33 @@ namespace Sitefinity_CLI.PackageManagement
             var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             return relativePath.Replace('/', Path.DirectorySeparatorChar);
+        }
+
+        public void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version)
+        {
+            if (string.IsNullOrEmpty(version))
+            {
+                throw new ArgumentException($"Invalid version: {version}");
+            }
+
+            var targetFramework = this.GetTargetFrameworkForVersion(version);
+
+            foreach (var projectFilePath in sitefinityProjectFilePaths)
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(projectFilePath);
+
+                if (this.TrySetTargetFramework(doc, targetFramework))
+                {
+                    doc.Save(projectFilePath);
+
+                    this.logger.LogInformation(string.Format(Constants.TargetFrameworkChanged, Path.GetFileName(projectFilePath), targetFramework));
+                }
+                else
+                {
+                    this.logger.LogInformation(string.Format(Constants.TargetFrameworkDoesNotNeedChanged, Path.GetFileName(projectFilePath), targetFramework));
+                }
+            }
         }
 
         private readonly INuGetApiClient nuGetApiClient;

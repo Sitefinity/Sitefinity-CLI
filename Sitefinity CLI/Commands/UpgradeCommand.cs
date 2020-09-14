@@ -2,6 +2,7 @@
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Commands.Validators;
+using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
@@ -87,15 +88,16 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
-            IEnumerable<string> sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
-            IEnumerable<string> projectsWithouthSitefinityPaths = this.GetProjectsPathsFromSolution(this.SolutionPath).Except(sitefinityProjectFilePaths);
-
-            Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
+            var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
+            var projectsWithouthSitefinityPaths = this.GetProjectsPathsFromSolution(this.SolutionPath).Except(sitefinityProjectFilePaths);
 
             if (!sitefinityProjectFilePaths.Any())
             {
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
+                return;
             }
+
+            Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
@@ -110,13 +112,14 @@ namespace Sitefinity_CLI.Commands
             }
 
             this.sitefinityPackageManager.Restore(this.SolutionPath);
+            this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, this.Version);
             this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
 
             if (!this.AcceptLicense)
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
-                this.logger.LogInformation($"{Environment.NewLine}{licenseContent}{Environment.NewLine}");
-                var hasUserAcceptedEULA = Prompt.GetYesNo(Constants.AcceptLicenseNotification, false);
+                var licensePromptMessage =$"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
+                var hasUserAcceptedEULA = Prompt.GetYesNo(licensePromptMessage, false);
 
                 if (!hasUserAcceptedEULA)
                 {
@@ -383,11 +386,11 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private IEnumerable<string> GetProjectsPathsFromSolution(string solutionPath, bool onlySitefinityProjects = false)
+        private IList<string> GetProjectsPathsFromSolution(string solutionPath, bool onlySitefinityProjects = false)
         {
             if (!solutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                throw new Exception(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
+                throw new UpgradeException(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
             }
 
             IEnumerable<string> projectFilesAbsolutePaths = SolutionFileEditor.GetProjects(solutionPath)
@@ -396,10 +399,26 @@ namespace Sitefinity_CLI.Commands
 
             if (onlySitefinityProjects)
             {
-                projectFilesAbsolutePaths = projectFilesAbsolutePaths.Where(ap => this.HasSitefinityReferences(ap));
+                projectFilesAbsolutePaths = projectFilesAbsolutePaths
+                    .Where(ap => this.HasSitefinityReferences(ap) && this.ValidateSfVersion(ap));
             }
 
-            return projectFilesAbsolutePaths;
+            return projectFilesAbsolutePaths.ToList();
+        }
+
+        private bool ValidateSfVersion(string projectFilePath)
+        {
+            var currentSfVersionString = this.DetectSitefinityVersion(projectFilePath);
+            var currentVersion = System.Version.Parse(currentSfVersionString);
+            var versionToUpgrade = System.Version.Parse(this.Version);
+
+            var projectName = Path.GetFileName(projectFilePath);
+            if (versionToUpgrade <= currentVersion)
+            {
+                throw new UpgradeException(string.Format(Constants.VersionIsGreaterThanOrEqual, projectName, currentSfVersionString, versionToUpgrade));
+            }
+
+            return true;
         }
 
         private bool HasSitefinityReferences(string projectFilePath)
