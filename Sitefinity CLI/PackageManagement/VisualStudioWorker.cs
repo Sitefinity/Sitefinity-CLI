@@ -88,7 +88,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             var rootRegistry = Registry.ClassesRoot;
             var visualStudioSubKeys = rootRegistry.GetSubKeyNames().Where(s => s.StartsWith(VisualStudioRegistryPrefix));
-            var latestVersion = visualStudioSubKeys.LastOrDefault();
+            var latestVersion = visualStudioSubKeys.OrderBy(key => Version.Parse(key.Substring(VisualStudioRegistryPrefix.Length))).LastOrDefault();
             return latestVersion;
         }
 
