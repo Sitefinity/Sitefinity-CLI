@@ -319,7 +319,7 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 return "v4.7.1";
             }
-            else if (versionAsInt >= 120)
+            else if (versionAsInt >= 120 && versionAsInt < 132)
             {
                 return "v4.7.2";
             }
