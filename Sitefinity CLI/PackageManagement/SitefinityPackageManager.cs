@@ -292,20 +292,6 @@ namespace Sitefinity_CLI.PackageManagement
         
         private bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
         {
-            ////var oldVersionChunks = oldAssemblyVersion.Split('.');
-            ////var newVersionChunks = newAssemblyVersion.Split('.');
-            ////var length = Math.Min(oldVersionChunks.Length, newVersionChunks.Length);
-            ////for (int i = 0; i < length; i++)
-            ////{
-            ////    if (int.Parse(oldVersionChunks[i]) < int.Parse(newVersionChunks[i]))
-            ////        return true;
-            ////}
-
-            ////if (oldVersionChunks.Length < newVersionChunks.Length)
-            ////    return true;
-
-            ////return false;
-
             var oldVersion = Version.Parse(oldAssemblyVersion);
             var newVersion = Version.Parse(newAssemblyVersion);
 
