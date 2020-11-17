@@ -258,6 +258,21 @@ namespace Sitefinity_CLI.PackageManagement
                         var name = assemblyIdentity.Attributes["name"]?.Value;
                         if (name == assemblyFullName)
                         {
+                            var newVersionAttribute = bindingRedirect.Attributes[newVersionAttributeName];
+                            if (newVersionAttribute != null && !this.ShouldUpdateBindingRedirect(newVersionAttribute.Value, assemblyVersion))
+                            {
+                                break;
+                            }
+
+                            if (newVersionAttribute == null)
+                            {
+                                newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
+
+                                bindingRedirect.Attributes.Append(newVersionAttribute);
+                            }
+
+                            newVersionAttribute.Value = assemblyVersion;
+
                             var oldVersionAttribute = bindingRedirect.Attributes[oldVersionAttributeName];
                             if (oldVersionAttribute == null)
                             {
@@ -268,21 +283,19 @@ namespace Sitefinity_CLI.PackageManagement
 
                             oldVersionAttribute.Value = string.Format("0.0.0.0-{0}", assemblyVersion);
 
-                            var newVersionAttribute = bindingRedirect.Attributes[newVersionAttributeName];
-                            if (newVersionAttribute == null)
-                            {
-                                newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
-
-                                bindingRedirect.Attributes.Append(newVersionAttribute);
-                            }
-
-                            newVersionAttribute.Value = assemblyVersion;
-
                             break;
                         }
                     }
                 }
             }
+        }
+        
+        private bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
+        {
+            var oldVersion = Version.Parse(oldAssemblyVersion);
+            var newVersion = Version.Parse(newAssemblyVersion);
+
+            return newVersion > oldVersion;
         }
 
         private bool TrySetTargetFramework(XmlDocument doc, string targetFramework)
@@ -319,7 +332,7 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 return "v4.7.1";
             }
-            else if (versionAsInt >= 120)
+            else if (versionAsInt >= 120 && versionAsInt < 132)
             {
                 return "v4.7.2";
             }
