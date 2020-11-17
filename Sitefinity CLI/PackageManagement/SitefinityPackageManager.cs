@@ -258,6 +258,21 @@ namespace Sitefinity_CLI.PackageManagement
                         var name = assemblyIdentity.Attributes["name"]?.Value;
                         if (name == assemblyFullName)
                         {
+                            var newVersionAttribute = bindingRedirect.Attributes[newVersionAttributeName];
+                            if (newVersionAttribute != null && !this.ShouldUpdateBindingRedirect(newVersionAttribute.Value, assemblyVersion))
+                            {
+                                break;
+                            }
+
+                            if (newVersionAttribute == null)
+                            {
+                                newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
+
+                                bindingRedirect.Attributes.Append(newVersionAttribute);
+                            }
+
+                            newVersionAttribute.Value = assemblyVersion;
+
                             var oldVersionAttribute = bindingRedirect.Attributes[oldVersionAttributeName];
                             if (oldVersionAttribute == null)
                             {
@@ -268,21 +283,28 @@ namespace Sitefinity_CLI.PackageManagement
 
                             oldVersionAttribute.Value = string.Format("0.0.0.0-{0}", assemblyVersion);
 
-                            var newVersionAttribute = bindingRedirect.Attributes[newVersionAttributeName];
-                            if (newVersionAttribute == null)
-                            {
-                                newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
-
-                                bindingRedirect.Attributes.Append(newVersionAttribute);
-                            }
-
-                            newVersionAttribute.Value = assemblyVersion;
-
                             break;
                         }
                     }
                 }
             }
+        }
+        
+        private bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
+        {
+            var oldVersionChunks = oldAssemblyVersion.Split('.');
+            var newVersionChunks = newAssemblyVersion.Split('.');
+            var length = Math.Min(oldVersionChunks.Length, newVersionChunks.Length);
+            for (int i = 0; i < length; i++)
+            {
+                if (int.Parse(oldVersionChunks[i]) < int.Parse(newVersionChunks[i]))
+                    return true;
+            }
+
+            if (oldVersionChunks.Length < newVersionChunks.Length)
+                return true;
+
+            return false;
         }
 
         private bool TrySetTargetFramework(XmlDocument doc, string targetFramework)
