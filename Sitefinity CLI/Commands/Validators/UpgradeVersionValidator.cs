@@ -8,7 +8,7 @@ namespace Sitefinity_CLI.Commands.Validators
         {
             string versionAsString = value as string;
 
-            if (!string.IsNullOrEmpty(versionAsString))
+            if (!string.IsNullOrEmpty(versionAsString) && versionAsString.Contains('.'))
             {
                 string majorVersion = versionAsString.Substring(0, versionAsString.IndexOf('.'));
                 int majorVersionNumber;
