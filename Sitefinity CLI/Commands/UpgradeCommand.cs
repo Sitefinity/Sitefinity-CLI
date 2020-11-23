@@ -410,7 +410,9 @@ namespace Sitefinity_CLI.Commands
         {
             var currentSfVersionString = this.DetectSitefinityVersion(projectFilePath);
             var currentVersion = System.Version.Parse(currentSfVersionString);
-            var versionToUpgrade = System.Version.Parse(this.Version);
+            System.Version versionToUpgrade;
+            if (!System.Version.TryParse(this.Version, out versionToUpgrade))
+                throw new UpgradeException(string.Format("The version '{0}' you are trying to upgrade to is not valid.", this.Version));
 
             var projectName = Path.GetFileName(projectFilePath);
             if (versionToUpgrade <= currentVersion)
