@@ -410,8 +410,10 @@ namespace Sitefinity_CLI.Commands
         {
             var currentSfVersionString = this.DetectSitefinityVersion(projectFilePath);
             var currentVersion = System.Version.Parse(currentSfVersionString);
+
+            // The new version can be preview one, or similar. That's why we split by '-' and get the first part for validation.
             System.Version versionToUpgrade;
-            if (!System.Version.TryParse(this.Version, out versionToUpgrade))
+            if (string.IsNullOrEmpty(this.Version) || !System.Version.TryParse(this.Version.Split('-').First(), out versionToUpgrade))
                 throw new UpgradeException(string.Format("The version '{0}' you are trying to upgrade to is not valid.", this.Version));
 
             var projectName = Path.GetFileName(projectFilePath);
