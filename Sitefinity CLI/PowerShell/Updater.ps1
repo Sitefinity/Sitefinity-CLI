@@ -9,6 +9,7 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 
 $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
+$upgradeTraceLog = $basePath + '\upgradetrace.log'
 $progressLogFile = $basePath + "\progress.log"
 
 if (Test-Path $logFileName) 
@@ -52,7 +53,7 @@ Try
 				if($oldPackageVersion -ne $null -and $oldPackageVersion -ne $packageVersion -and $oldPackageVersion -ne ($packageVersion + '.0') -and ($oldPackageVersion + '.0') -ne $packageVersion)
 				{
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -FileConflictAction OverwriteAll"
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -verbose -FileConflictAction OverwriteAll"
 				}
 				else
 				{

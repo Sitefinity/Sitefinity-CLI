@@ -47,7 +47,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger.LogInformation("Solution ready!");
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(60000);
+            System.Threading.Thread.Sleep(10000);
 
             try
             {
@@ -60,7 +60,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(60000);
+            System.Threading.Thread.Sleep(10000);
 
             this.logger.LogInformation("Studio is ready!");
 
