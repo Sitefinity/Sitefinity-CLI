@@ -42,7 +42,7 @@ namespace Sitefinity_CLI.Commands
             IPromptService promptService,
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
-            ILogger<object> logger,
+            ILogger<UpgradeCommand> logger,
             IProjectConfigFileEditor projectConfigFileEditor,
             IVisualStudioWorker visualStudioWorker)
         {
@@ -59,7 +59,11 @@ namespace Sitefinity_CLI.Commands
         {
             try
             {
-                await this.ExecuteUpgrade();
+                using (this.logger.BeginScope("Upgrade"))
+                {
+                    await this.ExecuteUpgrade();
+                }
+
 
                 return 0;
             }
@@ -77,6 +81,15 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
+            for (int i = 0; i < 10; i++)
+            {
+                this.logger.LogInformation(new EventId(1,"test"),"axax");
+                this.logger.LogError($"{i}Test2");
+                this.logger.LogInformation("Test3");
+                this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
+            }
+            //
+            return;
             if (!File.Exists(this.SolutionPath))
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));

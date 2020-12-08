@@ -1,11 +1,9 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
-using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
@@ -28,9 +26,13 @@ namespace Sitefinity_CLI
             try
             {
                 return await new HostBuilder()
-                .ConfigureLogging((context, builder) =>
+                .ConfigureLogging((context, logging) =>
                 {
-                    builder.AddConsole();
+                    logging.AddConsole(x=>
+                    {
+                        x.IncludeScopes = false;
+                    });
+                    //builder.AddConsoleFormatter<ConsoleFormatter, ConsoleFormatterOptions>(s=);
                 })
                 .ConfigureServices((context, services) =>
                 {

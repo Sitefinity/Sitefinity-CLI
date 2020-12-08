@@ -10,7 +10,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
     internal class UpgradeCommandSut : UpgradeCommand
     {
         public UpgradeCommandSut(IPromptService promptService, ISitefinityPackageManager sitefinityPackageManager, ICsProjectFileEditor csProjectFileEditor, ILogger<object> logger, IProjectConfigFileEditor projectConfigFileEditor, IVisualStudioWorker visualStudioWorker)
-            : base(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, visualStudioWorker)
+            : base(promptService, sitefinityPackageManager, csProjectFileEditor, null, projectConfigFileEditor, visualStudioWorker)
         {
         }
 
