@@ -2,8 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
+using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
@@ -28,11 +30,14 @@ namespace Sitefinity_CLI
                 return await new HostBuilder()
                 .ConfigureLogging((context, logging) =>
                 {
-                    logging.AddConsole(x=>
-                    {
-                        x.IncludeScopes = false;
-                    });
-                    //builder.AddConsoleFormatter<ConsoleFormatter, ConsoleFormatterOptions>(s=);
+                    //logging.AddJsonConsole(options =>
+                    //{
+                    //    options.IncludeScopes = false;
+                    //    options.TimestampFormat = "hh:mm:ss ";
+                    //});
+                    logging.AddConsole(options => options.FormatterName = "customName")
+                        .AddConsoleFormatter<CustomFormatter, ConsoleFormatterOptions>();
+                    //logging.AddConsole();
                 })
                 .ConfigureServices((context, services) =>
                 {

@@ -81,13 +81,8 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
-            for (int i = 0; i < 10; i++)
-            {
-                this.logger.LogInformation(new EventId(1,"test"),"axax");
-                this.logger.LogError($"{i}Test2");
-                this.logger.LogInformation("Test3");
-                this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
-            }
+            this.logger.LogInformation("Test3");
+            this.logger.LogError("Searching the provided project/s for Sitefinity references...");
             //
             return;
             if (!File.Exists(this.SolutionPath))
