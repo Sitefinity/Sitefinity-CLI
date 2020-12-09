@@ -118,7 +118,7 @@ namespace Sitefinity_CLI.Commands
             if (!this.AcceptLicense)
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
-                var licensePromptMessage =$"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
+                var licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
                 var hasUserAcceptedEULA = Prompt.GetYesNo(licensePromptMessage, false);
 
                 if (!hasUserAcceptedEULA)
@@ -201,7 +201,8 @@ namespace Sitefinity_CLI.Commands
 
                 if (versionMatch.Success)
                 {
-                    return versionMatch.Groups[1].Value;
+                    var sitefinityVersionWithoutRevision = System.Version.Parse(versionMatch.Groups[1].Value).ToString(3);
+                    return sitefinityVersionWithoutRevision;
                 }
             }
 
