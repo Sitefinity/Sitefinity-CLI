@@ -201,6 +201,7 @@ namespace Sitefinity_CLI.Commands
 
                 if (versionMatch.Success)
                 {
+                    // 13.2.7500.76032 .ToString(3) will return 13.2.7500 - we need the version without the revision
                     var sitefinityVersionWithoutRevision = System.Version.Parse(versionMatch.Groups[1].Value).ToString(3);
                     return sitefinityVersionWithoutRevision;
                 }
