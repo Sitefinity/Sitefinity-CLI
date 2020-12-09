@@ -1,0 +1,11 @@
+﻿/* {{> sign}} */
+
+using MbUnit.Framework;
+
+namespace {{pascalCaseName}}
+{
+    public class TestCategories
+    {
+        public const string Demo = "Demo";
+    }
+}
