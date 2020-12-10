@@ -289,7 +289,7 @@ namespace Sitefinity_CLI.PackageManagement
                 }
             }
         }
-        
+
         private bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
         {
             var oldVersion = Version.Parse(oldAssemblyVersion);
@@ -348,7 +348,7 @@ namespace Sitefinity_CLI.PackageManagement
         /// Gets the dlls that should be referenced for the current package
         /// Check https://docs.microsoft.com/en-us/nuget/create-packages/supporting-multiple-target-frameworks for more info
         /// </summary>
-        private IEnumerable<string> GetPackageDlls(string packagePath, string targetVersion)
+        internal IEnumerable<string> GetPackageDlls(string packagePath, string targetVersion)
         {
             // Target framework convention looks like v4.7.2
             var versionPart = targetVersion.Replace(".", string.Empty).Replace("v", string.Empty);
@@ -362,30 +362,13 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 if (Directory.GetDirectories(libDir).Any())
                 {
-                    int currentMaxFolderFrameworkVersion = 0;
-                    foreach (var subDir in Directory.GetDirectories(libDir, DotNetPrefix + "*"))
+                    // we check for the highest possible .net framework version of the dll
+                    dllStorageDir = GetDllStoragePathForNetFramework(targetVersionNumber, libDir);
+
+                    if (string.IsNullOrEmpty(dllStorageDir))
                     {
-                        var versionFromFolder = subDir.Split("\\").Last().Replace(DotNetPrefix, string.Empty);
-
-                        // The folder may have "-" in the name
-                        if (versionFromFolder.Contains("-"))
-                        {
-                            versionFromFolder = versionFromFolder.Split("-").FirstOrDefault();
-                        }
-
-                        // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
-                        if (versionPart.Length < versionFromFolder.Length)
-                        {
-                            targetVersionNumber *= 10;
-                        }
-
-                        int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
-
-                        if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion <= targetVersionNumber && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
-                        {
-                            dllStorageDir = subDir;
-                            currentMaxFolderFrameworkVersion = currentFolderFrameworkVersion;
-                        }
+                        // if there is no .net framework dll we check for .netstandard
+                        dllStorageDir = GetDllStoragePathForNetStandart(libDir);
                     }
                 }
                 else
@@ -399,6 +382,76 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             return dllStorageDir != null && Directory.Exists(dllStorageDir) ? Directory.GetFiles(dllStorageDir, DllFilterPattern) : new string[] { };
+        }
+
+        private string GetDllStoragePathForNetStandart(string libDir)
+        {
+            string dllStorageDir = null;
+            int currentMaxFolderFrameworkVersion = 0;
+
+            var netStandardDirNames = Directory.GetDirectories(libDir, DotNetStandardPrefix + "*");
+            foreach (var subDir in netStandardDirNames)
+            {
+                // netstandard2.0 => 2.0 => 20
+                var versionFromFolder = subDir
+                    .Split("\\")
+                    .Last()
+                    .Replace(DotNetStandardPrefix, string.Empty)
+                    .Replace(".", string.Empty);
+
+                int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
+
+                if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
+                {
+                    dllStorageDir = subDir;
+                    currentMaxFolderFrameworkVersion = currentFolderFrameworkVersion;
+                }
+            }
+
+            return dllStorageDir;
+        }
+
+        private string GetDllStoragePathForNetFramework(int targetVersionNumber, string libDir)
+        {
+            if (targetVersionNumber.ToString().Length == 2)
+            {
+                // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
+                targetVersionNumber *= 10;
+            }
+
+            string dllStorageDir = null;
+
+            int currentMaxFolderFrameworkVersion = 0;
+
+            var netFrameworkDirNames = Directory.GetDirectories(libDir)
+                .Where(dirName => dirName.Contains(DotNetPrefix) && !dirName.Contains(DotNetStandardPrefix));
+
+            foreach (var subDir in netFrameworkDirNames)
+            {
+                var versionFromFolder = subDir.Split("\\").Last().Replace(DotNetPrefix, string.Empty);
+
+                // The folder may have "-" in the name
+                if (versionFromFolder.Contains("-"))
+                {
+                    versionFromFolder = versionFromFolder.Split("-").FirstOrDefault();
+                }
+
+                int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
+
+                if (currentFolderFrameworkVersion.ToString().Length == 2)
+                {
+                    // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
+                    currentFolderFrameworkVersion *= 10;
+                }
+
+                if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion <= targetVersionNumber && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
+                {
+                    dllStorageDir = subDir;
+                    currentMaxFolderFrameworkVersion = currentFolderFrameworkVersion;
+                }
+            }
+
+            return dllStorageDir;
         }
 
         private string GetPackagesConfigFilePathForProject(string projectFilePath)
@@ -473,6 +526,8 @@ namespace Sitefinity_CLI.PackageManagement
         private const string LibFolderName = "lib";
 
         private const string DotNetPrefix = "net";
+
+        private const string DotNetStandardPrefix = "netstandard";
 
         private const string DllFilterPattern = "*.dll";
 

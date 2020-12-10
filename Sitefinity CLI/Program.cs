@@ -9,7 +9,10 @@ using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleToAttribute("Sitefinity CLI.Tests")]
 
 namespace Sitefinity_CLI
 {
