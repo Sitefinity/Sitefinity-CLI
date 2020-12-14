@@ -49,7 +49,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void Restore(string solutionFilePath)
         {
-            this.logger.LogInformation(string.Format("[{0}] Restoring packages staretd...", solutionFilePath));
+            this.logger.LogInformation(string.Format("[{0}] Restoring packages started...", solutionFilePath));
 
             this.nuGetCliClient.Restore(solutionFilePath);
 

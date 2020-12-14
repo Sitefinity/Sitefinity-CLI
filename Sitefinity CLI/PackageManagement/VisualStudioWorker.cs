@@ -42,7 +42,7 @@ namespace Sitefinity_CLI.PackageManagement
             dte.UserControl = false;
             dte.MainWindow.Visible = true;
 
-            this.logger.LogInformation(string.Format("Oppening solution: \"{0}\"...", solutionFilePath));
+            this.logger.LogInformation(string.Format("Opening solution: \"{0}\"...", solutionFilePath));
             dte.Solution.Open(solutionFilePath);
             this.logger.LogInformation("Solution ready!");
 
