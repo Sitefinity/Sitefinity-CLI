@@ -11,6 +11,7 @@ $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
 $upgradeTraceLog = $basePath + '\upgradetrace.log'
 $progressLogFile = $basePath + "\progress.log"
+$powerShellLogFileName = $basePath + "\updater.log"
 
 if (Test-Path $logFileName) 
 {
@@ -23,7 +24,7 @@ if (Test-Path $progressLogFile)
 
 Try
 {
-	Start-Transcript -Path "C:\transcripts\transcript0.txt"
+	Start-Transcript -Path $powerShellLogFileName
 
 	$xml = [xml](Get-Content ($basePath + '\config.xml'))
 
@@ -88,5 +89,6 @@ Finally
 	{
 		Remove-Item $progressLogFile
 	}
+
 	Stop-Transcript
 }

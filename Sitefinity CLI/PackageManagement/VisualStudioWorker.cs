@@ -47,7 +47,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger.LogInformation("Solution ready!");
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(10000);
+            System.Threading.Thread.Sleep(WaitTime);
 
             try
             {
@@ -60,7 +60,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(10000);
+            System.Threading.Thread.Sleep(WaitTime);
 
             this.logger.LogInformation("Studio is ready!");
 
@@ -98,5 +98,6 @@ namespace Sitefinity_CLI.PackageManagement
         private const string VisualStudioRegistryPrefix = "VisualStudio.DTE.";
         private const string PackageManagerConsoleCommand = "View.PackageManagerConsole";
         private const string VisualStudioProcessName = "devenv";
+        private const int WaitTime = 10000;
     }
 }
