@@ -63,7 +63,7 @@ namespace Sitefinity_CLI
         public const string NoProjectsFoundToUpgradeWarningMessage = "No projects with Sitefinity references found to upgrade.";
         public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
         public const string UpgradeWarning = "Make sure to have your project under source control. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instanse in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
-        public const string UpgradeSuccessMessage = "Successfully updated '{0}' to version '{1}'. Make sure to REBUILD your solution before starting up the site!";
+        public static string UpgradeSuccessMessage = "Successfully updated '{0}' to version '{1}'." + Environment.NewLine + "Make sure to REBUILD your solution before starting up the site!";
 
         // Success messages
         public const string ConfigFileCreatedMessage = "Configuration file created successfully! Path: \"{0}\"";

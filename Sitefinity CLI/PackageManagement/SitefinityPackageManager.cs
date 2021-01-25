@@ -373,6 +373,12 @@ namespace Sitefinity_CLI.PackageManagement
                             versionFromFolder = versionFromFolder.Split("-").FirstOrDefault();
                         }
 
+                        // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
+                        if (versionPart.Length < versionFromFolder.Length)
+                        {
+                            targetVersionNumber *= 10;
+                        }
+
                         int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
 
                         if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion <= targetVersionNumber && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
