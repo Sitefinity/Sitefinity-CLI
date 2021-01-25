@@ -23,6 +23,8 @@ if (Test-Path $progressLogFile)
 
 Try
 {
+	Start-Transcript -Path "C:\transcripts\transcript0.txt"
+
 	$xml = [xml](Get-Content ($basePath + '\config.xml'))
 
 	$projectCounter = 1
@@ -53,7 +55,7 @@ Try
 				if($oldPackageVersion -ne $null -and $oldPackageVersion -ne $packageVersion -and $oldPackageVersion -ne ($packageVersion + '.0') -and ($oldPackageVersion + '.0') -ne $packageVersion)
 				{
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -verbose -FileConflictAction OverwriteAll"
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -FileConflictAction OverwriteAll"
 				}
 				else
 				{
@@ -86,4 +88,5 @@ Finally
 	{
 		Remove-Item $progressLogFile
 	}
+	Stop-Transcript
 }

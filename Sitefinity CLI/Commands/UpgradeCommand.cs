@@ -81,10 +81,6 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
-            this.logger.LogInformation("Test3");
-            this.logger.LogError("Searching the provided project/s for Sitefinity references...");
-            //
-            return;
             if (!File.Exists(this.SolutionPath))
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
