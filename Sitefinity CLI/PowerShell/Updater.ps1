@@ -22,7 +22,7 @@ if (Test-Path $progressLogFile)
 
 Try
 {
-	Start-Transcript -Path $logFileName
+	Start-Transcript -Path $upgradeTraceLog
 
 	$xml = [xml](Get-Content ($basePath + '\config.xml'))
 
