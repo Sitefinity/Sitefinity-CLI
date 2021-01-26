@@ -98,6 +98,6 @@ namespace Sitefinity_CLI.PackageManagement
         private const string VisualStudioRegistryPrefix = "VisualStudio.DTE.";
         private const string PackageManagerConsoleCommand = "View.PackageManagerConsole";
         private const string VisualStudioProcessName = "devenv";
-        private const int WaitTime = 10000;
+        private const int WaitTime = 60000;
     }
 }
