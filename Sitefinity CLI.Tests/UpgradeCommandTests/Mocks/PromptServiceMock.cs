@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Sitefinity_CLI;
+﻿using Sitefinity_CLI;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests.Mocks
 {
@@ -9,7 +6,9 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests.Mocks
     {
         public bool PromptYesNo(string message, bool defaultAnswer = false)
         {
-            return true;
+            return Answer;
         }
+
+        public bool Answer { get; set; }
     }
 }

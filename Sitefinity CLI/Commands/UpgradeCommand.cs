@@ -59,11 +59,7 @@ namespace Sitefinity_CLI.Commands
         {
             try
             {
-                using (this.logger.BeginScope("Upgrade"))
-                {
-                    await this.ExecuteUpgrade();
-                }
-
+                await this.ExecuteUpgrade();
 
                 return 0;
             }
