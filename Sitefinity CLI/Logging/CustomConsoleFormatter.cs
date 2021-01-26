@@ -16,7 +16,7 @@ namespace Sitefinity_CLI.Logging
 
         public CustomFormatter(IOptionsMonitor<ConsoleFormatterOptions> options)
             // Case insensitive
-            : base("customName") =>
+            : base("sitefinityCLICustomFormatter") =>
             (_optionsReloadToken, _formatterOptions) =
                 (options.OnChange(ReloadLoggerOptions), options.CurrentValue);
 

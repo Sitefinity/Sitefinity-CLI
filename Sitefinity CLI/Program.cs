@@ -30,14 +30,8 @@ namespace Sitefinity_CLI
                 return await new HostBuilder()
                 .ConfigureLogging((context, logging) =>
                 {
-                    //logging.AddJsonConsole(options =>
-                    //{
-                    //    options.IncludeScopes = false;
-                    //    options.TimestampFormat = "hh:mm:ss ";
-                    //});
-                    logging.AddConsole(options => options.FormatterName = "customName")
+                    logging.AddConsole(options => options.FormatterName = "sitefinityCLICustomFormatter")
                         .AddConsoleFormatter<CustomFormatter, ConsoleFormatterOptions>();
-                    //logging.AddConsole();
                 })
                 .ConfigureServices((context, services) =>
                 {
@@ -50,7 +44,6 @@ namespace Sitefinity_CLI
                     services.AddTransient<ISitefinityPackageManager, SitefinityPackageManager>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
                     services.AddSingleton<IPromptService, PromptService>();
-                    //services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
                 })
                 .UseConsoleLifetime()
                 .RunCommandLineApplicationAsync<Program>(args);
