@@ -52,7 +52,7 @@ Try
 				if($oldPackageVersion -ne $null -and $oldPackageVersion -ne $packageVersion -and $oldPackageVersion -ne ($packageVersion + '.0') -and ($oldPackageVersion + '.0') -ne $packageVersion)
 				{
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -FileConflictAction OverwriteAll"
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll"
 				}
 				else
 				{
