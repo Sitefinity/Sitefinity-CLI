@@ -81,6 +81,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
 
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, "Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope LocalMachine -Force");
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Concat("&'", scriptPath, "'"));
         }
 

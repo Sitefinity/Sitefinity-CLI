@@ -75,74 +75,74 @@ namespace Sitefinity_CLI.Commands
 
         private async Task ExecuteUpgrade()
         {
-            if (!File.Exists(this.SolutionPath))
-            {
-                throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
-            }
+            //if (!File.Exists(this.SolutionPath))
+            //{
+            //    throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
+            //}
 
-            if (!this.SkipPrompts && !Prompt.GetYesNo(Constants.UpgradeWarning, false))
-            {
-                this.logger.LogInformation(Constants.UpgradeWasCanceled);
-                return;
-            }
+            //if (!this.SkipPrompts && !Prompt.GetYesNo(Constants.UpgradeWarning, false))
+            //{
+            //    this.logger.LogInformation(Constants.UpgradeWasCanceled);
+            //    return;
+            //}
 
-            this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
+            //this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
-            var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
-            var projectsWithouthSitefinityPaths = this.GetProjectsPathsFromSolution(this.SolutionPath).Except(sitefinityProjectFilePaths);
+            //var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
+            //var projectsWithouthSitefinityPaths = this.GetProjectsPathsFromSolution(this.SolutionPath).Except(sitefinityProjectFilePaths);
 
-            if (!sitefinityProjectFilePaths.Any())
-            {
-                Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
-                return;
-            }
+            //if (!sitefinityProjectFilePaths.Any())
+            //{
+            //    Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
+            //    return;
+            //}
 
-            Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
+            //Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
 
-            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
-            this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
-            var packageSources = this.GetNugetPackageSources();
+            //this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
+            //this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
+            //var packageSources = this.GetNugetPackageSources();
 
-            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version, packageSources);
+            //NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version, packageSources);
 
-            if (newSitefinityPackage == null)
-            {
-                this.logger.LogError(string.Format(Constants.VersionNotFound, this.Version));
-                return;
-            }
+            //if (newSitefinityPackage == null)
+            //{
+            //    this.logger.LogError(string.Format(Constants.VersionNotFound, this.Version));
+            //    return;
+            //}
 
-            this.sitefinityPackageManager.Restore(this.SolutionPath);
-            this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, this.Version);
-            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
+            //this.sitefinityPackageManager.Restore(this.SolutionPath);
+            //this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, this.Version);
+            //this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
 
-            if (!this.AcceptLicense)
-            {
-                var licenseContent = await GetLicenseContent(newSitefinityPackage);
-                var licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
-                var hasUserAcceptedEULA = Prompt.GetYesNo(licensePromptMessage, false);
+            //if (!this.AcceptLicense)
+            //{
+            //    var licenseContent = await GetLicenseContent(newSitefinityPackage);
+            //    var licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
+            //    var hasUserAcceptedEULA = Prompt.GetYesNo(licensePromptMessage, false);
 
-                if (!hasUserAcceptedEULA)
-                {
-                    this.logger.LogInformation(Constants.UpgradeWasCanceled);
-                    return;
-                }
-            }
+            //    if (!hasUserAcceptedEULA)
+            //    {
+            //        this.logger.LogInformation(Constants.UpgradeWasCanceled);
+            //        return;
+            //    }
+            //}
 
-            await this.GeneratePowershellConfig(sitefinityProjectFilePaths, newSitefinityPackage);
+            //await this.GeneratePowershellConfig(sitefinityProjectFilePaths, newSitefinityPackage);
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
             this.visualStudioWorker.ExecuteScript(updaterPath);
-            this.EnsureOperationSuccess();
+            //this.EnsureOperationSuccess();
 
-            this.visualStudioWorker.Dispose();
+            //this.visualStudioWorker.Dispose();
 
-            // revert config changes caused by nuget for projects we are not upgrading
-            this.RestoreConfigValuesForNoSfProjects(configsWithoutSitefinity);
+            //// revert config changes caused by nuget for projects we are not upgrading
+            //this.RestoreConfigValuesForNoSfProjects(configsWithoutSitefinity);
 
-            this.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
+            //this.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
-            this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
+            //this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 
         private IEnumerable<string> GetNugetPackageSources()
