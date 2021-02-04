@@ -53,8 +53,15 @@ Try
 				$isUpdateRequired = IsUpgradeRequired $oldPackageVersion $packageVersion
 				if ($isUpdateRequired)
 				{
+					
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -FileConflictAction OverwriteAll" 
+					$errorMessage = $null;
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version 12.1.4777 -FileConflictAction OverwriteAll -ErrorVariable errorMessage" 
+					
+					if ($errorMessage -ne $null)
+					{
+						Write-Error -Message "`nError occured while upgrading $packageName. The error was: $errorMessage" -ErrorAction Stop
+					}
 				}
 				else
 				{
@@ -78,7 +85,7 @@ Try
 }
 Catch
 {
-	$text = "fail - " + $_.Exception.Message
+	$text = "fail - " + $_.Exception.Message + "Check the $upgradeTraceLog for more details"
 	New-Item -Path $basePath -Name "result.log" -ItemType "file" -Value $text
 }
 Finally

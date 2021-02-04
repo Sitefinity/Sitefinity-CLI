@@ -256,8 +256,8 @@ namespace Sitefinity_CLI.Commands
                 var result = this.ReadAllTextFromFile(resultFile);
                 if (result != "success")
                 {
-                    this.logger.LogError(string.Format("Powershell upgrade failed. {0}", result));
-                    throw new Exception("Powershell upgrade failed");
+                    this.logger.LogError(string.Format("Error occured while upgrading nuget packages. {0}", result));
+                    throw new UpgradeException("Upgrade was canceled");
                 }
 
                 break;
