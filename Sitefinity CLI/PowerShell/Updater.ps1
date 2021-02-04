@@ -56,7 +56,7 @@ Try
 					
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
 					$errorMessage = $null;
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version 12.1.4777 -FileConflictAction OverwriteAll -ErrorVariable errorMessage" 
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName $projectName -Version $packageVersion -FileConflictAction OverwriteAll -ErrorVariable errorMessage" 
 					
 					if ($errorMessage -ne $null)
 					{
