@@ -4,7 +4,7 @@ using System.Security.Principal;
 
 namespace Sitefinity_CLI.Commands.Validators
 {
-    [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     internal class AdminRightsValidator : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
