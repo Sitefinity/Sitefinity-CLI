@@ -16,8 +16,8 @@ namespace Sitefinity_CLI.Tests
 
         private Dictionary<string, string> testFolderPaths;
         private string workingDirectory;
-        private const string LoggerInfo = "info      ";
-        private const string LoggerFail = "fail      ";
+        private const string LoggerInfo = "info: ";
+        private const string LoggerFail = "fail: ";
 
         [TestInitialize]
         public void Initialize()
