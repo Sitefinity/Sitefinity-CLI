@@ -39,12 +39,14 @@ namespace Sitefinity_CLI.Commands
         public string PackageSources { get; set; }
 
         public UpgradeCommand(
+            IPromptService promptService,
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
-            ILogger<object> logger,
+            ILogger<UpgradeCommand> logger,
             IProjectConfigFileEditor projectConfigFileEditor,
             IVisualStudioWorker visualStudioWorker)
         {
+            this.promptService = promptService;
             this.sitefinityPackageManager = sitefinityPackageManager;
             this.csProjectFileEditor = csProjectFileEditor;
             this.logger = logger;
@@ -73,14 +75,14 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private async Task ExecuteUpgrade()
+        protected virtual async Task ExecuteUpgrade()
         {
             if (!File.Exists(this.SolutionPath))
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            if (!this.SkipPrompts && !Prompt.GetYesNo(Constants.UpgradeWarning, false))
+            if (!this.SkipPrompts && !this.promptService.PromptYesNo(Constants.UpgradeWarning))
             {
                 this.logger.LogInformation(Constants.UpgradeWasCanceled);
                 return;
@@ -119,7 +121,7 @@ namespace Sitefinity_CLI.Commands
             {
                 var licenseContent = await GetLicenseContent(newSitefinityPackage);
                 var licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
-                var hasUserAcceptedEULA = Prompt.GetYesNo(licensePromptMessage, false);
+                var hasUserAcceptedEULA = this.promptService.PromptYesNo(licensePromptMessage, false);
 
                 if (!hasUserAcceptedEULA)
                 {
@@ -254,8 +256,8 @@ namespace Sitefinity_CLI.Commands
                 var result = this.ReadAllTextFromFile(resultFile);
                 if (result != "success")
                 {
-                    this.logger.LogError(string.Format("Powershell upgrade failed. {0}", result));
-                    throw new Exception("Powershell upgrade failed");
+                    this.logger.LogError(string.Format("Error occured while upgrading nuget packages. {0}", result));
+                    throw new UpgradeException("Upgrade failed");
                 }
 
                 break;
@@ -439,6 +441,8 @@ namespace Sitefinity_CLI.Commands
         {
             return this.ContainsSitefinityRefKeyword(reference) && reference.Include.Contains($"PublicKeyToken={SitefinityPublicKeyToken}");
         }
+
+        private readonly IPromptService promptService;
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
 

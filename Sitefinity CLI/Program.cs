@@ -1,15 +1,18 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleToAttribute("Sitefinity CLI.Tests")]
 
 namespace Sitefinity_CLI
 {
@@ -25,9 +28,10 @@ namespace Sitefinity_CLI
             try
             {
                 return await new HostBuilder()
-                .ConfigureLogging((context, builder) =>
+                .ConfigureLogging((context, logging) =>
                 {
-                    builder.AddConsole();
+                    logging.AddConsole(options => options.FormatterName = "sitefinityCLICustomFormatter")
+                        .AddConsoleFormatter<CustomFormatter, ConsoleFormatterOptions>();
                 })
                 .ConfigureServices((context, services) =>
                 {
@@ -39,7 +43,7 @@ namespace Sitefinity_CLI
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<ISitefinityPackageManager, SitefinityPackageManager>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
-                    //services.RemoveAll<IHttpMessageHandlerBuilderFilter>();
+                    services.AddSingleton<IPromptService, PromptService>();
                 })
                 .UseConsoleLifetime()
                 .RunCommandLineApplicationAsync<Program>(args);

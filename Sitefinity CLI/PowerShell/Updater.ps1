@@ -9,8 +9,8 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 
 $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
+$upgradeTraceLog = $basePath + '\upgrade.log'
 $progressLogFile = $basePath + "\progress.log"
-
 if (Test-Path $logFileName) 
 {
 	Remove-Item $logFileName
@@ -22,6 +22,8 @@ if (Test-Path $progressLogFile)
 
 Try
 {
+	Start-Transcript -Path $upgradeTraceLog
+
 	$xml = [xml](Get-Content ($basePath + '\config.xml'))
 
 	$projectCounter = 1
@@ -45,25 +47,32 @@ Try
 			$projectPackages = Get-Package -ProjectName $projectName
 			$oldPackage = $projectPackages | Where-Object { $_.Id -eq $packageName }
 			$oldPackageVersion = if(!$oldPackage.Version) { $null } else { $oldPackage.Version.ToString() }
-			$isUpdateRequired = IsUpgradeRequired $oldPackageVersion $packageVersion
-			
-			if($isUpdateRequired)
+		
+			if($oldPackageVersion -ne $null -and $oldPackageVersion -ne $packageVersion -and $oldPackageVersion -ne ($packageVersion + '.0') -and ($oldPackageVersion + '.0') -ne $packageVersion)
 			{
-				if($oldPackageVersion -ne $null -and $oldPackageVersion -ne $packageVersion -and $oldPackageVersion -ne ($packageVersion + '.0') -and ($oldPackageVersion + '.0') -ne $packageVersion)
+				$isUpdateRequired = IsUpgradeRequired $oldPackageVersion $packageVersion
+				if ($isUpdateRequired)
 				{
+					
 					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
-					Invoke-Expression "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll"
+					$errorMessage = $null;
+					Invoke-Expression "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll -ErrorVariable errorMessage" 
+					
+					if ($errorMessage -ne $null)
+					{
+						Write-Error -Message "`nError occured while upgrading $packageName. The error was: $errorMessage" -ErrorAction Stop
+					}
 				}
 				else
 				{
-					"`npackage already on version '$packageVersion'"
+					"`npackage is on higher version '$oldPackageVersion' and will not be downgraded to '$packageVersion'"
 				}
 			}
 			else
 			{
-				"`npackage is on higher version '$oldPackageVersion' and will not be downgraded to '$packageVersion'"
+				"`npackage already on version '$packageVersion'"
 			}
-						
+			
 			$progressOut = "(" + $projectCounter + " \ " + @($projects).Count + ") --- " + $projectName + " --- " + $packageCounter.ToString() + ' / ' + $totalCount.ToString()
 			$progressOut | Out-File -FilePath $progressLogFile
 			$packageCounter = $packageCounter + 1
@@ -76,7 +85,7 @@ Try
 }
 Catch
 {
-	$text = "fail - " + $_.Exception.Message
+	$text = "fail - " + $_.Exception.Message + "Check the $upgradeTraceLog for more details"
 	New-Item -Path $basePath -Name "result.log" -ItemType "file" -Value $text
 }
 Finally
@@ -85,4 +94,6 @@ Finally
 	{
 		Remove-Item $progressLogFile
 	}
+
+	Stop-Transcript
 }
