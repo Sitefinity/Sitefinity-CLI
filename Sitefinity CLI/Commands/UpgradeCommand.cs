@@ -215,7 +215,7 @@ namespace Sitefinity_CLI.Commands
 
         private bool ContainsSitefinityRefKeyword(CsProjectFileReference projectReference)
         {
-            return projectReference.Include.Contains(TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(ProgressSitefinityReferenceKeyWords);
+            return (projectReference.Include.Contains(TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(ProgressSitefinityReferenceKeyWords)) && !projectReference.Include.Contains(ProgressSitefinityRendererReferenceKeyWords);
         }
 
         private void EnsureOperationSuccess()
@@ -462,6 +462,8 @@ namespace Sitefinity_CLI.Commands
         private const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
 
         private const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
+
+        private const string ProgressSitefinityRendererReferenceKeyWords = "Progress.Sitefinity.Renderer";
 
         private const string PowershellFolderName = "PowerShell";
 
