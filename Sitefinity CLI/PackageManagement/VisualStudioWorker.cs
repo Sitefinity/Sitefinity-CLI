@@ -1,8 +1,9 @@
-﻿using EnvDTE;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using EnvDTE;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using System;
-using System.Linq;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -47,7 +48,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger.LogInformation("Solution ready!");
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(60000);
+            System.Threading.Thread.Sleep(WaitTime);
 
             try
             {
@@ -60,7 +61,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(60000);
+            System.Threading.Thread.Sleep(WaitTime);
 
             this.logger.LogInformation("Studio is ready!");
 
@@ -79,8 +80,11 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void ExecuteScript(string scriptPath)
         {
-            this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
+            this.logger.LogInformation(Constants.SettingExecutionPolicyMessage); 
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, "Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force");
 
+            System.Threading.Thread.Sleep(5000);
+            this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Concat("&'", scriptPath, "'"));
         }
 
@@ -98,5 +102,6 @@ namespace Sitefinity_CLI.PackageManagement
         private const string VisualStudioRegistryPrefix = "VisualStudio.DTE.";
         private const string PackageManagerConsoleCommand = "View.PackageManagerConsole";
         private const string VisualStudioProcessName = "devenv";
+        private const int WaitTime = 60000;
     }
 }

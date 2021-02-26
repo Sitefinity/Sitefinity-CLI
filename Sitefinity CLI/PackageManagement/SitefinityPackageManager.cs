@@ -517,7 +517,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly IEnumerable<string> defaultSources;
 
-        private const string SitefinityPublicNuGetSource = "http://nuget.sitefinity.com/nuget/";
+        private const string SitefinityPublicNuGetSource = "https://nuget.sitefinity.com/nuget/";
 
         private const string PublicNuGetSource = "https://nuget.org/api/v2/";
 
