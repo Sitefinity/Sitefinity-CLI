@@ -114,7 +114,8 @@ namespace Sitefinity_CLI.PackageManagement
             HttpResponseMessage response = null;
             foreach (string source in sources)
             {
-                response = await this.httpClient.GetAsync($"{source}/Packages(Id='{id}',Version='{version}')");
+                string sourceUrl = source.TrimEnd('/');
+                response = await this.httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;
