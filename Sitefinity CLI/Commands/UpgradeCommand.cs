@@ -405,13 +405,13 @@ namespace Sitefinity_CLI.Commands
             if (onlySitefinityProjects)
             {
                 projectFilesAbsolutePaths = projectFilesAbsolutePaths
-                    .Where(ap => this.HasSitefinityReferences(ap) && this.ValidateSfVersion(ap));
+                    .Where(ap => this.HasSitefinityReferences(ap) && this.HasValidSitefinityVersion(ap));
             }
 
             return projectFilesAbsolutePaths.ToList();
         }
 
-        private bool ValidateSfVersion(string projectFilePath)
+        private bool HasValidSitefinityVersion(string projectFilePath)
         {
             var currentSfVersionString = this.DetectSitefinityVersion(projectFilePath);
             var currentVersion = System.Version.Parse(currentSfVersionString);
@@ -424,7 +424,9 @@ namespace Sitefinity_CLI.Commands
             var projectName = Path.GetFileName(projectFilePath);
             if (versionToUpgrade <= currentVersion)
             {
-                throw new UpgradeException(string.Format(Constants.VersionIsGreaterThanOrEqual, projectName, currentSfVersionString, versionToUpgrade));
+                this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, projectName, currentSfVersionString, versionToUpgrade));
+
+                return false;
             }
 
             return true;
