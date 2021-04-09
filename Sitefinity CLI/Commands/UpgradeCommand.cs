@@ -419,7 +419,7 @@ namespace Sitefinity_CLI.Commands
             {
                 this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, projectName, currentSfVersionString, versionToUpgrade));
 
-                //return false;
+                return false;
             }
 
             return true;
