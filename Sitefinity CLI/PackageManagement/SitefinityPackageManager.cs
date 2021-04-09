@@ -130,7 +130,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument,  IEnumerable<string> nugetPackageRelativeFileReferences)
         {
-            string packagesDir = string.Format("{0}\\{1}", solutionDir, PackagesFolderName);
+            string packagesDir = Path.Combine(solutionDir, PackagesFolderName);
             string relativePackagesDirPath = this.GetRelativePathTo(projectDir + "\\", packagesDir);
 
             XmlNodeList elementsWithIncludeAttribute = projectFileXmlDocument.SelectNodes("//*[@Include]");
@@ -241,7 +241,7 @@ namespace Sitefinity_CLI.PackageManagement
             List<string> filePaths = new List<string>();
             foreach (NuGetPackage nuGetPackage in nuGetPackages)
             {
-                string packageDir = string.Format("{0}\\{1}\\{2}.{3}", solutionDir, PackagesFolderName, nuGetPackage.Id, nuGetPackage.Version);
+                string packageDir = this.GetNuGetPackageDir(solutionDir, nuGetPackage);
                 filePaths.AddRange(Directory.GetFiles(packageDir, "*.*", SearchOption.AllDirectories));
             }
 
@@ -253,13 +253,20 @@ namespace Sitefinity_CLI.PackageManagement
             List<string> dllFilePaths = new List<string>();
             foreach (NuGetPackage nuGetPackage in nuGetPackages)
             {
-                string packageDir = string.Format("{0}\\{1}\\{2}.{3}", solutionDir, PackagesFolderName, nuGetPackage.Id, nuGetPackage.Version);
+                string packageDir = this.GetNuGetPackageDir(solutionDir, nuGetPackage);
                 dllFilePaths.AddRange(this.GetPackageDlls(packageDir, targetFramework));
             }
 
             IEnumerable<AssemblyReference> assemblyReferences = dllFilePaths.Distinct().Select(d => this.GetAssemblyReferenceFromDllFilePath(d, projectDir));
 
             return assemblyReferences;
+        }
+
+        private string GetNuGetPackageDir(string solutionDir, NuGetPackage nuGetPackage)
+        {
+            string nuGetPackageFolderName = string.Format("{0}.{1}", nuGetPackage.Id, nuGetPackage.Version);
+
+            return Path.Combine(solutionDir, PackagesFolderName, nuGetPackageFolderName);
         }
 
         private AssemblyReference GetAssemblyReferenceFromDllFilePath(string dllFilePath, string projectDir)
