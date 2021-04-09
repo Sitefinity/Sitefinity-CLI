@@ -133,7 +133,7 @@ namespace Sitefinity_CLI.Commands
 
             await this.GeneratePowershellConfig(sitefinityProjectFilePaths, newSitefinityPackage);
 
-            var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "Updater.ps1");
+            var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
             this.visualStudioWorker.ExecuteScript(updaterPath);
             this.EnsureOperationSuccess();
@@ -215,15 +215,16 @@ namespace Sitefinity_CLI.Commands
 
         private bool ContainsSitefinityRefKeyword(CsProjectFileReference projectReference)
         {
-            return (projectReference.Include.Contains(TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(ProgressSitefinityReferenceKeyWords)) && !projectReference.Include.Contains(ProgressSitefinityRendererReferenceKeyWords);
+            return (projectReference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(Constants.ProgressSitefinityReferenceKeyWords)) && 
+                !projectReference.Include.Contains(Constants.ProgressSitefinityRendererReferenceKeyWords);
         }
 
         private void EnsureOperationSuccess()
         {
             this.logger.LogInformation("Waiting for operation to complete...");
 
-            var resultFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "result.log");
-            var progressFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "progress.log");
+            var resultFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "result.log");
+            var progressFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "progress.log");
             File.Delete(resultFile);
             int waitStep = 500;
             int iterations = 0;
@@ -280,8 +281,6 @@ namespace Sitefinity_CLI.Commands
         {
             this.logger.LogInformation("Exporting powershell config...");
 
-            this.packagesPerProject = new Dictionary<string, List<NuGetPackage>>();
-
             var powerShellXmlConfig = new XmlDocument();
             var powerShellXmlConfigNode = powerShellXmlConfig.CreateElement("config");
             powerShellXmlConfig.AppendChild(powerShellXmlConfigNode);
@@ -293,8 +292,6 @@ namespace Sitefinity_CLI.Commands
                 projectNameAttr.Value = projectFilePath.Split(new string[] { "\\", Constants.CsprojFileExtension, Constants.VBProjFileExtension }, StringSplitOptions.RemoveEmptyEntries).Last();
                 projectNode.Attributes.Append(projectNameAttr);
                 powerShellXmlConfigNode.AppendChild(projectNode);
-
-                packagesPerProject[projectFilePath] = new List<NuGetPackage>();
 
                 var currentSitefinityVersion = this.DetectSitefinityVersion(projectFilePath);
 
@@ -321,12 +318,10 @@ namespace Sitefinity_CLI.Commands
                     packageNode.Attributes.Append(nameAttr);
                     packageNode.Attributes.Append(versionAttr);
                     projectNode.AppendChild(packageNode);
-
-                    packagesPerProject[projectFilePath].Add(package);
                 });
             }
 
-            powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PowershellFolderName, "config.xml"));
+            powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "config.xml"));
 
             this.logger.LogInformation("Successfully exported powershell config!");
         }
@@ -385,9 +380,7 @@ namespace Sitefinity_CLI.Commands
         {
             foreach (string projectFilePath in projectFilePaths)
             {
-                var packages = new List<NuGetPackage>(this.packagesPerProject[projectFilePath]);
-                packages.Reverse();
-                this.sitefinityPackageManager.SyncReferencesWithPackages(projectFilePath, solutionFolder, packages, this.Version);
+                this.sitefinityPackageManager.SyncReferencesWithPackages(projectFilePath, solutionFolder);
             }
         }
 
@@ -426,7 +419,7 @@ namespace Sitefinity_CLI.Commands
             {
                 this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, projectName, currentSfVersionString, versionToUpgrade));
 
-                return false;
+                //return false;
             }
 
             return true;
@@ -442,7 +435,7 @@ namespace Sitefinity_CLI.Commands
 
         private bool IsSitefinityReference(CsProjectFileReference reference)
         {
-            return this.ContainsSitefinityRefKeyword(reference) && reference.Include.Contains($"PublicKeyToken={SitefinityPublicKeyToken}");
+            return this.ContainsSitefinityRefKeyword(reference) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
         }
 
         private readonly IPromptService promptService;
@@ -458,17 +451,5 @@ namespace Sitefinity_CLI.Commands
         private readonly IVisualStudioWorker visualStudioWorker;
 
         private readonly IDictionary<string, HashSet<string>> processedPackagesPerProjectCache;
-
-        private Dictionary<string, List<NuGetPackage>> packagesPerProject;
-
-        private const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
-
-        private const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
-
-        private const string ProgressSitefinityRendererReferenceKeyWords = "Progress.Sitefinity.Renderer";
-
-        private const string PowershellFolderName = "PowerShell";
-
-        private const string SitefinityPublicKeyToken = "b28c218413bdf563";
     }
 }

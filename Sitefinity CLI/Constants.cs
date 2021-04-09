@@ -161,5 +161,10 @@ namespace Sitefinity_CLI
         public const string DependenciesElem = "Dependencies";
         public const string VersionElem = "Version";
         public const string TitleElem = "title";
+        public const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
+        public const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
+        public const string ProgressSitefinityRendererReferenceKeyWords = "Progress.Sitefinity.Renderer";
+        public const string SitefinityUpgradePowershellFolderName = "PowerShell";
+        public const string SitefinityPublicKeyToken = "b28c218413bdf563";
     }
 }

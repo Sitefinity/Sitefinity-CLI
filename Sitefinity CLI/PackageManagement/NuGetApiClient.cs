@@ -7,8 +7,6 @@ using System.Xml.Linq;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace Sitefinity_CLI.PackageManagement

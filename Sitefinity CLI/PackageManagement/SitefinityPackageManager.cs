@@ -82,17 +82,20 @@ namespace Sitefinity_CLI.PackageManagement
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
         }
 
-        public void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion)
+        public void SyncReferencesWithPackages(string projectFilePath, string solutionDir)
         {
-            this.logger.LogInformation(string.Format("Synchronizing packages and references for project '{0}'", projectPath));
+            this.logger.LogInformation(string.Format("Synchronizing packages and references for project '{0}'", projectFilePath));
 
-            XmlDocument doc = new XmlDocument();
-            doc.Load(projectPath);
+            string packagesConfigFilePath = this.GetPackagesConfigFilePathForProject(projectFilePath);
+            IEnumerable<NuGetPackage> packages = this.packagesConfigFileEditor.GetPackages(packagesConfigFilePath);
+
+            XmlDocument projectFileXmlDocument = new XmlDocument();
+            projectFileXmlDocument.Load(projectFilePath);
 
             var processedAssemblies = new HashSet<string>();
-            var projectLocation = projectPath.Substring(0, projectPath.LastIndexOf("\\") + 1);
+            var projectDir = Path.GetDirectoryName(projectFilePath);
 
-            var projectConfigPath = this.projectConfigFileEditor.GetProjectConfigPath(projectLocation);
+            var projectConfigPath = this.projectConfigFileEditor.GetProjectConfigPath(projectDir);
             XmlNodeList bindingRedirectNodes = null;
             XmlDocument projectConfig = null;
             if (!string.IsNullOrEmpty(projectConfigPath))
@@ -102,110 +105,135 @@ namespace Sitefinity_CLI.PackageManagement
                 bindingRedirectNodes = projectConfig.GetElementsByTagName("dependentAssembly");
             }
 
-            var references = doc.GetElementsByTagName(Constants.ReferenceElem);
-            var targetFramework = this.GetTargetFrameworkForVersion(sitefinityVersion);
+            XmlNodeList references = projectFileXmlDocument.GetElementsByTagName(Constants.ReferenceElem);
+            string targetFramework = this.GetTargetFramework(projectFileXmlDocument);
+
+            IEnumerable<AssemblyReference> assemblyReferences = this.AssemblyReferencesFromNuGetPackages(packages, targetFramework, projectDir, solutionDir);
+            IEnumerable<IGrouping<string, AssemblyReference>> assemblyReferenceGroups = assemblyReferences
+                .Where(ar => ar.Version != null)
+                .GroupBy(ar => ar.Name);
 
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
-            foreach (var package in packages)
+            foreach (IGrouping<string, AssemblyReference> assemblyReferenceGroup in assemblyReferenceGroups)
             {
-                var packageDir = string.Format("{0}\\{1}\\{2}.{3}", solutionFolder, PackagesFolderName, package.Id, package.Version);
-                foreach (var dllFile in this.GetPackageDlls(packageDir, targetFramework))
+                string assemblyName = assemblyReferenceGroup.Key;
+                AssemblyReference assemblyReferenceWithNewestVersion = assemblyReferenceGroup.OrderByDescending(ar => ar.Version).First();
+
+                bool assemblyReferenceFound = false;
+                for (int i = 0; i < references.Count; i++)0
                 {
-                    var assembly = Assembly.LoadFile(dllFile);
-                    string assemblyVersion = assembly.GetName().Version.ToString();
-                    var assemblyFullName = assembly.FullName;
-                    if (!processedAssemblies.Contains(assemblyFullName))
+                    var referenceElement = references[i];
+                    var includeAttr = referenceElement.Attributes[Constants.IncludeAttribute];
+                    var includeAttrValue = includeAttr.Value;
+
+                    if (includeAttrValue.StartsWith(assemblyName + ",", StringComparison.OrdinalIgnoreCase) || includeAttrValue == assemblyName)
                     {
-                        processedAssemblies.Add(assemblyFullName);
+                        Version currentAssemblyVersion = this.ExtractPackageVersionFromIncludeAttribute(includeAttrValue);
 
-                        var assemblyName = assemblyFullName.Split(",").First();
-                        bool assemblyReferenceFound = false;
-                        for (int i = 0; i < references.Count; i++)
+                        if (currentAssemblyVersion > assemblyReferenceWithNewestVersion.Version)
                         {
-                            var referenceElement = references[i];
-                            var includeAttr = referenceElement.Attributes[Constants.IncludeAttribute];
-                            var includeAttrValue = includeAttr.Value;
+                            this.logger.LogInformation(string.Format("The assembly reference '{0}' is on version '{1}'. It won't be downgraded to '{2}'.", assemblyName, currentAssemblyVersion, assemblyReferenceWithNewestVersion.Version));
+                            assemblyReferenceFound = true;
+                            break;
+                        }
 
-                            if (includeAttrValue.StartsWith(assemblyName + ",", StringComparison.OrdinalIgnoreCase) || includeAttrValue == assemblyName)
+                        var proccesorArchitecture = includeAttrValue.Split(',').FirstOrDefault(x => x.Contains(ProcessorArchitectureAttribute));
+                        var includeAttributeNewValue = string.IsNullOrEmpty(proccesorArchitecture) ? assemblyReferenceWithNewestVersion.FullName : $"{assemblyReferenceWithNewestVersion.FullName},{proccesorArchitecture}";
+
+                        if (!includeAttr.Value.Equals(includeAttributeNewValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.logger.LogInformation(string.Format("The include attribue '{0}' is updated to '{1}'.", includeAttr.Value, includeAttributeNewValue));
+                            includeAttr.Value = includeAttributeNewValue;
+                        }
+
+                        var childNodes = referenceElement.ChildNodes;
+                        XmlNode hintPathNode = null;
+                        for (int j = 0; j < childNodes.Count; j++)
+                        {
+                            var childNode = childNodes[j];
+                            if (childNode.Name == Constants.HintPathElem)
                             {
-                                var currentPackageVersion = this.ExtractPackageVersionFromIncludeAttribute(includeAttrValue);
-                                var newPackageVersion = assembly.GetName().Version;
-                                if (currentPackageVersion != null && currentPackageVersion > newPackageVersion)
-                                {
-                                    this.logger.LogInformation(string.Format("The {0} is on version {1}. It won't be downgraded to {2}", assemblyName, currentPackageVersion, newPackageVersion));
-                                    assemblyReferenceFound = true;
-                                    break;
-                                }
-
-                                var proccesorArchitecture = includeAttrValue.Split(',').FirstOrDefault(x => x.Contains(ProcessorArchitectureAttribute));
-                                var includeAttributeNewValue = string.IsNullOrEmpty(proccesorArchitecture) ? assemblyFullName : $"{assemblyFullName},{proccesorArchitecture}";
-
-                                if (!includeAttr.Value.Equals(includeAttributeNewValue, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    includeAttr.Value = includeAttributeNewValue;
-                                }
-
-                                var childNodes = referenceElement.ChildNodes;
-                                XmlNode hintPathNode = null;
-                                for (int j = 0; j < childNodes.Count; j++)
-                                {
-                                    var childNode = childNodes[j];
-                                    if (childNode.Name == Constants.HintPathElem)
-                                    {
-                                        hintPathNode = childNode;
-                                        break;
-                                    }
-                                }
-
-                                var hintPathValue = GetRelativePathTo(projectLocation, dllFile);
-
-                                // Hint path missing, so we add it
-                                if (hintPathNode == null)
-                                {
-                                    this.logger.LogInformation(string.Format("Added hint path for reference assembly '{0}'", assemblyFullName));
-
-                                    hintPathNode = doc.CreateElement(Constants.HintPathElem, doc.DocumentElement.NamespaceURI);
-                                    referenceElement.AppendChild(hintPathNode);
-                                    hintPathNode.InnerText = hintPathValue;
-                                }
-                                else if (hintPathNode.InnerText != hintPathValue)
-                                {
-                                    // TODO: we can load the currently referenced assembly and replace the hint path only if the assemblie version is different. There are cases when one dll is located in multiple packages
-                                    this.logger.LogInformation(string.Format("Fixing broken hint path for reference assembly '{0}' from '{1}' to '{2}'", assemblyFullName, hintPathNode.InnerText, hintPathValue));
-
-                                    hintPathNode.InnerText = hintPathValue;
-                                }
-
-                                assemblyReferenceFound = true;
+                                hintPathNode = childNode;
                                 break;
                             }
                         }
 
-                        // DLL reference is missing, so we add it.
-                        if (!assemblyReferenceFound)
+                        // Hint path missing, so we add it
+                        if (hintPathNode == null)
                         {
-                            this.logger.LogInformation(string.Format("Added missing assembly reference '{0}' from package '{1}'", assemblyFullName, package.Id));
+                            this.logger.LogInformation(string.Format("Added hint path for reference assembly '{0}'.", assemblyReferenceWithNewestVersion.FullName));
 
-                            var referencesGroup = doc.GetElementsByTagName(Constants.ItemGroupElem)[0];
-                            var referenceNode = doc.CreateElement(Constants.ReferenceElem, doc.DocumentElement.NamespaceURI);
-                            var includeAttr = doc.CreateAttribute(Constants.IncludeAttribute);
-                            includeAttr.Value = assemblyFullName;
-                            referenceNode.Attributes.Append(includeAttr);
-                            var hintPathNode = doc.CreateElement(Constants.HintPathElem, doc.DocumentElement.NamespaceURI);
-                            hintPathNode.InnerText = GetRelativePathTo(projectLocation, dllFile);
-                            referenceNode.AppendChild(hintPathNode);
-                            referencesGroup.AppendChild(referenceNode);
+                            hintPathNode = projectFileXmlDocument.CreateElement(Constants.HintPathElem, projectFileXmlDocument.DocumentElement.NamespaceURI);
+                            referenceElement.AppendChild(hintPathNode);
+                            hintPathNode.InnerText = assemblyReferenceWithNewestVersion.HintPath;
                         }
-                    }
+                        else if (!assemblyReferenceGroup.Any(ar => ar.HintPath.Equals(hintPathNode.InnerText, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            // TODO: we can load the currently referenced assembly and replace the hint path only if the assemblie version is different. There are cases when one dll is located in multiple packages
+                            this.logger.LogInformation(string.Format("Fixing broken hint path for reference assembly '{0}' from '{1}' to '{2}'.", assemblyReferenceWithNewestVersion.FullName, hintPathNode.InnerText, assemblyReferenceWithNewestVersion.HintPath));
 
-                    this.SyncBindingRedirects(projectConfig, bindingRedirectNodes, assembly.GetName().Name, assemblyVersion);
+                            hintPathNode.InnerText = assemblyReferenceWithNewestVersion.HintPath;
+                        }
+
+                        assemblyReferenceFound = true;
+                        break;
+                    }
                 }
+
+                // DLL reference is missing, so we add it.
+                if (!assemblyReferenceFound)
+                {
+                    this.logger.LogInformation(string.Format("Added missing assembly reference '{0}' with path '{1}'.", assemblyReferenceWithNewestVersion.FullName, assemblyReferenceWithNewestVersion.HintPath));
+
+                    XmlNode referencesGroup = projectFileXmlDocument.GetElementsByTagName(Constants.ItemGroupElem)[0];
+                    XmlElement referenceNode = projectFileXmlDocument.CreateElement(Constants.ReferenceElem, projectFileXmlDocument.DocumentElement.NamespaceURI);
+
+                    XmlAttribute includeAttr = projectFileXmlDocument.CreateAttribute(Constants.IncludeAttribute);
+                    includeAttr.Value = assemblyReferenceWithNewestVersion.FullName;
+                    referenceNode.Attributes.Append(includeAttr);
+
+                    XmlElement hintPathNode = projectFileXmlDocument.CreateElement(Constants.HintPathElem, projectFileXmlDocument.DocumentElement.NamespaceURI);
+                    hintPathNode.InnerText = assemblyReferenceWithNewestVersion.HintPath;
+
+                    referenceNode.AppendChild(hintPathNode);
+                    referencesGroup.AppendChild(referenceNode);
+                }
+
+                this.SyncBindingRedirects(projectConfig, bindingRedirectNodes, assemblyName, assemblyReferenceWithNewestVersion.Version.ToString());
             }
 
-            doc.Save(projectPath);
+            projectFileXmlDocument.Save(projectFilePath);
             projectConfig?.Save(projectConfigPath);
 
-            this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectPath));
+            this.logger.LogInformation(string.Format("Synchronization completed for project '{0}'", projectFilePath));
+        }
+
+        private IEnumerable<AssemblyReference> AssemblyReferencesFromNuGetPackages(IEnumerable<NuGetPackage> nuGetPackages, string targetFramework, string projectDir, string solutionDir)
+        {
+            List<string> dllFilePaths = new List<string>();
+            foreach (NuGetPackage nuGetPackage in nuGetPackages)
+            {
+                string packageDir = string.Format("{0}\\{1}\\{2}.{3}", solutionDir, PackagesFolderName, nuGetPackage.Id, nuGetPackage.Version);
+                dllFilePaths.AddRange(this.GetPackageDlls(packageDir, targetFramework));
+            }
+
+            IEnumerable<AssemblyReference> assemblyReferences = dllFilePaths.Distinct().Select(d => this.GetAssemblyReferenceFromDllFilePath(d, projectDir));
+
+            return assemblyReferences;
+        }
+
+        private AssemblyReference GetAssemblyReferenceFromDllFilePath(string dllFilePath, string projectDir)
+        {
+            Assembly assembly = Assembly.LoadFile(dllFilePath);
+            AssemblyName assemblyName = assembly.GetName();
+
+            AssemblyReference assemblyReference = new AssemblyReference();
+            assemblyReference.Name = assemblyName.Name;
+            assemblyReference.Version = assemblyName.Version;
+            assemblyReference.FullName = assemblyName.FullName;
+            assemblyReference.HintPath = this.GetRelativePathTo(projectDir + "\\", dllFilePath);
+
+            return assemblyReference;
         }
 
         private Version ExtractPackageVersionFromIncludeAttribute(string includeAttrValue)
@@ -309,13 +337,25 @@ namespace Sitefinity_CLI.PackageManagement
             if (targetFrameworkVersionElems[0].InnerText != targetFramework)
             {
                 targetFrameworkVersionElems[0].InnerText = targetFramework;
+
                 return true;
             }
 
             return false;
         }
 
-        private string GetTargetFrameworkForVersion(string version)
+        private string GetTargetFramework(XmlDocument doc)
+        {
+            XmlNodeList targetFrameworkVersionElems = doc.GetElementsByTagName(Constants.TargetFrameworkVersionElem);
+            if (targetFrameworkVersionElems.Count != 1)
+            {
+                throw new InvalidOperationException("Unable to get the target framework");
+            }
+
+            return targetFrameworkVersionElems[0].InnerText;
+        }
+
+        private string GetTargetFrameworkForSitefinityVersion(string version)
         {
             var versionWithoutSeperator = version.Replace(".", string.Empty).Substring(0, 3);
             var versionAsInt = int.Parse(versionWithoutSeperator);
@@ -414,7 +454,7 @@ namespace Sitefinity_CLI.PackageManagement
             return packagesConfigFilePath;
         }
 
-        private static string GetRelativePathTo(string fromPath, string toPath)
+        private string GetRelativePathTo(string fromPath, string toPath)
         {
             var fromUri = new Uri(fromPath);
             var toUri = new Uri(toPath);
@@ -432,7 +472,7 @@ namespace Sitefinity_CLI.PackageManagement
                 throw new ArgumentException($"Invalid version: {version}");
             }
 
-            var targetFramework = this.GetTargetFrameworkForVersion(version);
+            var targetFramework = this.GetTargetFrameworkForSitefinityVersion(version);
 
             foreach (var projectFilePath in sitefinityProjectFilePaths)
             {
