@@ -161,10 +161,10 @@ namespace Sitefinity_CLI.PackageManagement
 
                 if (!string.IsNullOrWhiteSpace(includeAttribute.Value) &&
                     (includeAttribute.Value.Equals(assemblyName, StringComparison.OrdinalIgnoreCase) || includeAttribute.Value.StartsWith(assemblyName + ",", StringComparison.OrdinalIgnoreCase)))
-                {
+                  {
                     Version currentAssemblyVersion = this.ExtractAssemblyVersionFromIncludeAttribute(includeAttribute.Value);
 
-                    if (currentAssemblyVersion > nugetPackageAssemblyReferenceWithNewestVersion.Version)
+                    if (currentAssemblyVersion != null && currentAssemblyVersion > nugetPackageAssemblyReferenceWithNewestVersion.Version)
                     {
                         this.logger.LogInformation(string.Format("The assembly reference '{0}' is on version '{1}'. It won't be downgraded to version '{2}'.", assemblyName, currentAssemblyVersion, nugetPackageAssemblyReferenceWithNewestVersion.Version));
                         isAssemblyReferenceFound = true;
@@ -286,20 +286,26 @@ namespace Sitefinity_CLI.PackageManagement
 
         private Version ExtractAssemblyVersionFromIncludeAttribute(string includeAttributeValue)
         {
-            var versionChunk = includeAttributeValue.Split(',')
+            string versionChunk = includeAttributeValue
+                .Split(',')
                 .FirstOrDefault(x => x.Contains("Version"));
 
-            if (versionChunk == null)
+            if (string.IsNullOrWhiteSpace(versionChunk))
             {
-                this.logger.LogInformation($"Unable to get the version in {includeAttributeValue}");
+                this.logger.LogInformation($"Unable to extract the version from '{includeAttributeValue}'.");
+
                 return null;
             }
 
-            var packageVersionString = versionChunk
+            string assemblyVersionString = versionChunk
                 .Split("=")
                 .ToList()[1];
 
-            var parsedVersion = Version.Parse(packageVersionString);
+            Version parsedVersion = null;
+            if (!Version.TryParse(assemblyVersionString, out parsedVersion))
+            {
+                this.logger.LogInformation($"Unable to parse version string '{assemblyVersionString}'.");
+            }
 
             return parsedVersion;
         }
