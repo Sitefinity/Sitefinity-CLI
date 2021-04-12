@@ -7,8 +7,6 @@ using System.Xml.Linq;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace Sitefinity_CLI.PackageManagement
@@ -114,7 +112,8 @@ namespace Sitefinity_CLI.PackageManagement
             HttpResponseMessage response = null;
             foreach (string source in sources)
             {
-                response = await this.httpClient.GetAsync($"{source}/Packages(Id='{id}',Version='{version}')");
+                string sourceUrl = source.TrimEnd('/');
+                response = await this.httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;

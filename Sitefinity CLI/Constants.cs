@@ -47,7 +47,7 @@ namespace Sitefinity_CLI
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in https://nuget.sitefinity.com";
-        public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})!";
+        public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
@@ -161,5 +161,10 @@ namespace Sitefinity_CLI
         public const string DependenciesElem = "Dependencies";
         public const string VersionElem = "Version";
         public const string TitleElem = "title";
+        public const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
+        public const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
+        public const string ProgressSitefinityRendererReferenceKeyWords = "Progress.Sitefinity.Renderer";
+        public const string SitefinityUpgradePowershellFolderName = "PowerShell";
+        public const string SitefinityPublicKeyToken = "b28c218413bdf563";
     }
 }

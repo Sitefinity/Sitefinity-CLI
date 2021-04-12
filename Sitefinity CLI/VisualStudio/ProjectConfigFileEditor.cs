@@ -4,12 +4,10 @@ namespace Sitefinity_CLI.VisualStudio
 {
     internal class ProjectConfigFileEditor : IProjectConfigFileEditor
     {
-        public string GetProjectConfigPath(string projectLocation)
+        public string GetProjectConfigPath(string projectDirectory)
         {
-            if (string.IsNullOrEmpty(projectLocation))
+            if (string.IsNullOrEmpty(projectDirectory))
                 return null;
-
-            var projectDirectory = Path.GetDirectoryName(projectLocation);
 
             var webConfigPath = Path.Combine(projectDirectory, WebConfigName);
             if (File.Exists(webConfigPath))
