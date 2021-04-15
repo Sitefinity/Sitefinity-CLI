@@ -44,6 +44,7 @@ namespace Sitefinity_CLI.PackageManagement
             nuGetPackage.Id = nuGetPackageXmlDoc
                 .Element(this.xmlns + Constants.EntryElem)
                 .Element(this.xmlns + Constants.TitleElem).Value;
+
             nuGetPackage.Version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
 
             string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
@@ -83,8 +84,6 @@ namespace Sitefinity_CLI.PackageManagement
                             }
                         }
                     }
-
-                    nuGetPackage.Dependencies = nuGetPackage.Dependencies.OrderByDescending(d => d.Id).ToList();
                 }
             }
 
