@@ -280,7 +280,7 @@ namespace Sitefinity_CLI.Commands
 
         private async Task GenerateUpgradeConfig(IEnumerable<string> projectFilePaths, NuGetPackage newSitefinityVersionPackageTree)
         {
-            this.logger.LogInformation("Exporting powershell config...");
+            this.logger.LogInformation("Exporting upgrade config...");
 
             XmlDocument powerShellXmlConfig = new XmlDocument();
             XmlElement powerShellXmlConfigNode = powerShellXmlConfig.CreateElement("config");
@@ -293,7 +293,7 @@ namespace Sitefinity_CLI.Commands
 
             powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "config.xml"));
 
-            this.logger.LogInformation("Successfully exported powershell config!");
+            this.logger.LogInformation("Successfully exported upgrade config!");
         }
 
         private async Task GenerateProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement powerShellXmlConfigNode, string projectFilePath, NuGetPackage newSitefinityVersionPackageTree)
