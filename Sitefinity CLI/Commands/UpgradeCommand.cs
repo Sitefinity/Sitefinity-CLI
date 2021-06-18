@@ -131,7 +131,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            await this.GenerateUpgradeConfig(sitefinityProjectFilePaths, newSitefinityPackage);
+            await this.GenerateUpgradeConfig(sitefinityProjectFilePaths, newSitefinityPackage, packageSources);
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
@@ -278,7 +278,7 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private async Task GenerateUpgradeConfig(IEnumerable<string> projectFilePaths, NuGetPackage newSitefinityVersionPackageTree)
+        private async Task GenerateUpgradeConfig(IEnumerable<string> projectFilePaths, NuGetPackage newSitefinityVersionPackageTree, IEnumerable<string> packageSources)
         {
             this.logger.LogInformation("Exporting upgrade config...");
 
@@ -288,7 +288,7 @@ namespace Sitefinity_CLI.Commands
 
             foreach (string projectFilePath in projectFilePaths)
             {
-                await this.GenerateProjectUpgradeConfigSection(powerShellXmlConfig, powerShellXmlConfigNode, projectFilePath, newSitefinityVersionPackageTree);
+                await this.GenerateProjectUpgradeConfigSection(powerShellXmlConfig, powerShellXmlConfigNode, projectFilePath, newSitefinityVersionPackageTree, packageSources);
             }
 
             powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "config.xml"));
@@ -296,7 +296,7 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation("Successfully exported upgrade config!");
         }
 
-        private async Task GenerateProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement powerShellXmlConfigNode, string projectFilePath, NuGetPackage newSitefinityVersionPackageTree)
+        private async Task GenerateProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement powerShellXmlConfigNode, string projectFilePath, NuGetPackage newSitefinityVersionPackageTree, IEnumerable<string> packageSources)
         {
             XmlElement projectNode = powerShellXmlConfig.CreateElement("project");
             XmlAttribute projectNameAttribute = powerShellXmlConfig.CreateAttribute("name");
@@ -315,7 +315,7 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation($"Detected sitefinity version for '{projectFilePath}' - '{currentSitefinityVersion}'.");
 
             this.logger.LogInformation($"Collecting Sitefinity NuGet package tree for '{projectFilePath}'...");
-            NuGetPackage currentSitefinityVersionPackageTree = await this.sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString());
+            NuGetPackage currentSitefinityVersionPackageTree = await this.sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString(), packageSources);
 
             this.processedPackagesPerProjectCache[projectFilePath] = new HashSet<string>();
             if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree, newSitefinityVersionPackageTree))
