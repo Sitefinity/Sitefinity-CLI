@@ -6,22 +6,35 @@ namespace Sitefinity_CLI.PackageManagement
 {
     internal class PackagesConfigFileEditor : XmlFileEditorBase, IPackagesConfigFileEditor
     {
+        public IEnumerable<NuGetPackage> GetPackages(string packagesConfigFilePath)
+        {
+            IEnumerable<NuGetPackage> nuGetPackages = null;
+
+            base.ReadFile(packagesConfigFilePath, (doc) =>
+            {
+                IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
+                    .Elements(Constants.PackageElem);
+
+                nuGetPackages = xmlPackageElements.Select(xpe => this.CreateNuGetPackageFromXmlPackageElement(xpe));
+            });
+
+            return nuGetPackages;
+        }
+
         public NuGetPackage FindPackage(string packagesConfigFilePath, string packageId)
         {
             NuGetPackage nuGetPackage = null;
 
             base.ReadFile(packagesConfigFilePath, (doc) =>
             {
-                IEnumerable<XElement> packages = doc.Element(Constants.PackagesElem)
+                IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
 
-                XElement package = packages.FirstOrDefault(p => p.Attribute(Constants.IdAttribute).Value == packageId);
+                XElement xmlPackageElement = xmlPackageElements.FirstOrDefault(p => p.Attribute(Constants.IdAttribute).Value == packageId);
 
-                if (package != null)
+                if (xmlPackageElement != null)
                 {
-                    nuGetPackage = new NuGetPackage();
-                    nuGetPackage.Id = package.Attribute(Constants.IdAttribute).Value;
-                    nuGetPackage.Version = package.Attribute(Constants.VersionAttribute).Value;
+                    nuGetPackage = this.CreateNuGetPackageFromXmlPackageElement(xmlPackageElement);
                 }
             });
 
@@ -32,14 +45,23 @@ namespace Sitefinity_CLI.PackageManagement
         {
             base.ModifyFile(packagesConfigFilePath, (doc) =>
             {
-                IEnumerable<XElement> packages = doc.Element(Constants.PackagesElem)
+                IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
 
-                XElement packageToRemove = packages.FirstOrDefault(p => p.Attribute(Constants.IdAttribute).Value == packageId);
-                packageToRemove.Remove();
+                XElement xmlPackageElementToRemove = xmlPackageElements.FirstOrDefault(p => p.Attribute(Constants.IdAttribute).Value == packageId);
+                xmlPackageElementToRemove.Remove();
 
                 return doc;
             });
+        }
+
+        private NuGetPackage CreateNuGetPackageFromXmlPackageElement(XElement xmlPackageElement)
+        {
+            NuGetPackage nuGetPackage = new NuGetPackage();
+            nuGetPackage.Id = xmlPackageElement.Attribute(Constants.IdAttribute).Value;
+            nuGetPackage.Version = xmlPackageElement.Attribute(Constants.VersionAttribute).Value;
+
+            return nuGetPackage;
         }
     }
 }

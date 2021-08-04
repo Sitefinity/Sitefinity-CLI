@@ -7,8 +7,6 @@ using System.Xml.Linq;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace Sitefinity_CLI.PackageManagement
@@ -46,6 +44,7 @@ namespace Sitefinity_CLI.PackageManagement
             nuGetPackage.Id = nuGetPackageXmlDoc
                 .Element(this.xmlns + Constants.EntryElem)
                 .Element(this.xmlns + Constants.TitleElem).Value;
+
             nuGetPackage.Version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
 
             string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
@@ -91,8 +90,6 @@ namespace Sitefinity_CLI.PackageManagement
                             }
                         }
                     }
-
-                    nuGetPackage.Dependencies = nuGetPackage.Dependencies.OrderByDescending(d => d.Id).ToList();
                 }
             }
 
@@ -120,7 +117,8 @@ namespace Sitefinity_CLI.PackageManagement
             HttpResponseMessage response = null;
             foreach (string source in sources)
             {
-                response = await this.httpClient.GetAsync($"{source}/Packages(Id='{id}',Version='{version}')");
+                string sourceUrl = source.TrimEnd('/');
+                response = await this.httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;

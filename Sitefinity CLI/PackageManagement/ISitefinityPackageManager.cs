@@ -17,7 +17,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<string> packageSources);
 
-        void SyncReferencesWithPackages(string projectPath, string solutionFolder, IEnumerable<NuGetPackage> packages, string sitefinityVersion);
+        void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 
         IEnumerable<string> DefaultPackageSource { get; }
 
