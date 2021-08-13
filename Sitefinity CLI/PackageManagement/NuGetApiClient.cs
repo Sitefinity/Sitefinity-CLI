@@ -57,6 +57,9 @@ namespace Sitefinity_CLI.PackageManagement
                 {
                     foreach (string dependencyString in dependencyStrings)
                     {
+                        // Do Not RemoveEmtpyEntires below. The entry from the framework is the last element in the dependencyString
+                        // e.g.System.ComponentModel.Annotations:4.7.0:net48 if it is missing System.ComponentModel.Annotations:4.7.0: 
+                        // If it is missing it means that the package does not depend on particular framework
                         string[] dependencyIdAndVersionAndFramework = dependencyString.Split(new char[] { ':' });
 
                         if (dependencyIdAndVersionAndFramework.Length > 0 && !string.IsNullOrWhiteSpace(dependencyIdAndVersionAndFramework[0]))
@@ -65,7 +68,10 @@ namespace Sitefinity_CLI.PackageManagement
                             if (supportedFrameworksRegex != null && dependencyIdAndVersionAndFramework.Length > 2)
                             {
                                 string framework = dependencyIdAndVersionAndFramework[2].Trim();
-                                isFrameworkSupported = supportedFrameworksRegex.IsMatch(framework);
+                                if (!string.IsNullOrEmpty(framework))
+                                {
+                                    isFrameworkSupported = supportedFrameworksRegex.IsMatch(framework);
+                                }
                             }
 
                             if (isFrameworkSupported)

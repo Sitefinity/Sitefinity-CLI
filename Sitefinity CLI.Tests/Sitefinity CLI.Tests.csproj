@@ -38,6 +38,39 @@
     <None Update="SolutionFileEditorTests\Data\WithoutElements.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetStandardOnlyAssemblies\lib\netstandard1.0\netstandard1.0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetStandardOnlyAssemblies\lib\netstandard2.0\netstandard2.0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net35\net35.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net45\net45.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net461\net461.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net461\net471.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net471\net471.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net472\net472.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\netstandard2.0\netstandard2.0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net48\net48.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetFrameworkOnlyAssemblies\lib\net48\net48.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
