@@ -27,6 +27,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger = logger;
             this.defaultSources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSource };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
+            this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
         }
 
         public void Install(string packageId, string version, string solutionFilePath, IEnumerable<string> nugetPackageSources)
@@ -110,7 +111,7 @@ namespace Sitefinity_CLI.PackageManagement
 
             IEnumerable<AssemblyReference> nugetPackageAssemblyReferences = this.GetAssemblyReferencesFromNuGetPackages(packages, targetFramework, projectDir, solutionDir);
             IEnumerable<IGrouping<string, AssemblyReference>> nuGetPackageAssemblyReferenceGroups = nugetPackageAssemblyReferences
-                .Where(ar => ar.Version != null)
+                .Where(ar => ar.Version != null && !this.systemAssembliesNotToUpdate.Contains(ar.Name))
                 .GroupBy(ar => ar.Name);
 
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
@@ -609,6 +610,8 @@ namespace Sitefinity_CLI.PackageManagement
         private readonly IEnumerable<string> defaultSources;
 
         private readonly Regex supportedFrameworksRegex;
+
+        private readonly HashSet<string> systemAssembliesNotToUpdate;
 
         private const string SitefinityPublicNuGetSource = "https://nuget.sitefinity.com/nuget/";
 
