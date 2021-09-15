@@ -262,6 +262,7 @@
 
   <ItemGroup>
     <Folder Include="Templates\13.3\ResourcePackage\" />
+    <Folder Include="Templates\14.0\" />
   </ItemGroup>
   <Target Name="SfConfig" AfterTargets="_PublishNoBuildAlternative">
     <Exec Command="dotnet &quot;$(PublishDir)sf.dll&quot; config" />
