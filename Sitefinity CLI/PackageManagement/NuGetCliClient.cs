@@ -17,7 +17,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             string source = string.Join(';', sources);
 
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -Source \"{source}\"");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -Source \"{source}\" -NoCache");
         }
 
         public void Install(string configFilePath)
@@ -27,7 +27,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void Restore(string solutionFilePath)
         {
-            this.RunProcess($"restore \"{solutionFilePath}\"");
+            this.RunProcess($"restore \"{solutionFilePath}\" -NoCache");
         }
 
         private void RunProcess(string arguments)
