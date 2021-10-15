@@ -21,6 +21,7 @@ namespace Sitefinity_CLI
     [Subcommand(typeof(AddCommand))]
     [Subcommand(typeof(UpgradeCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]
+    [Subcommand(typeof(CreateCommand))]
     public class Program
     {
         public static async Task<int> Main(string[] args)

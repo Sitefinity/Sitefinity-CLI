@@ -29,6 +29,10 @@ namespace Sitefinity_CLI
         public const string CsProjTemplateName = "csproj";
         public const string PackagesFolderName = "packages";
         public const string LicenseAgreementsFolderName = "LicenseAgreements";
+        public const string ProjectsFolderName = "Projects";
+        public const string DefaultName = "SitefinityWebApp";
+        public const string SolutionZipFileFormat = "SitefinityWebAppSolution-{0}.zip";
+        public const string SqlPackageFile = "C:\\Program Files\\Microsoft SQL Server\\150\\DAC\\bin\\SqlPackage.exe";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
@@ -48,6 +52,8 @@ namespace Sitefinity_CLI
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in https://nuget.sitefinity.com";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
+        public const string FolderNotFoundMessage = "Folder \"{0}\" not found";
+        public const string InvalidProjectNameMessage = "The project name '{0}' is invalid. It can not contain spaces, start with a number and can only use a-z A-Z 0-9 . _ - characters.";
 
         // Warning messages
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
@@ -101,6 +107,21 @@ namespace Sitefinity_CLI
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
         public const string PackageSources = "-ps|--packageSources";
+        public const string SolutionFolderTargetDescription = "The path where the solution will be installed.";
+        public const string VersionCreateOptionDescription = "The Sitefinity version to create.";
+        public const string SolutionName = "--slnName";
+        public const string ProjectName = "--projName";
+        public const string DatabaseName = "--dbName";
+        public const string CustomSourcePath = "--customSource";
+        public const string LicenseFilePath = "--licenseFile";
+        public const string SkipDbRestore = "--skipDbRestore";
+        public const string SolutionNameDescription = "Provide your own solution name.";
+        public const string ProjectNameDescription = "Provide your own project name.";
+        public const string DatabaseNameDescription = "Provide your own database name.";
+        public const string CustomSourcePathDescription = "Provide your own project templates.";
+        public const string SqlServerDescription = "Target SQL Server.";
+        public const string SkipDbRestoreDescription = "If you use this option you will skip restoring the database.";
+        public const string LicenseFilePathDescription = "Location of your Sitefinity license file. (Sitefinity.lic)";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
@@ -129,6 +150,7 @@ namespace Sitefinity_CLI
         public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
         public const string UpgradeCommandName = "upgrade";
+        public const string CreateCommandName = "create";
 
         public const string DefaultResourcePackageName_VersionsBefore12_0 = "Bootstrap";
         public const string DefaultResourcePackageName = "Bootstrap4";

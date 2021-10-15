@@ -20,6 +20,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Projects\14.0\SitefinityWebApp\App_Start\RazorGeneratorMvcStart.cs" />
+    <Compile Remove="Projects\14.0\SitefinityWebApp\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="PowerShell\Updater.ps1" />
   </ItemGroup>
 
@@ -39,6 +44,8 @@
     <None Include="..\LICENSE.md" Link="LICENSE.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Projects\14.0\SitefinityWebApp\App_Start\RazorGeneratorMvcStart.cs" />
+    <None Include="Projects\14.0\SitefinityWebApp\Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +71,9 @@
 
   <ItemGroup>
     <None Update="PackageManagement\NuGet.Config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Projects\SitefinityWebAppSolution-14.0.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\10.2\CustomWidget\Default\templates.json">
