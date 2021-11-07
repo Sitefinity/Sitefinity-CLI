@@ -109,19 +109,10 @@ namespace Sitefinity_CLI
         public const string PackageSources = "-ps|--packageSources";
         public const string SolutionFolderTargetDescription = "The path where the solution will be installed.";
         public const string VersionCreateOptionDescription = "The Sitefinity version to create.";
-        public const string SolutionName = "--slnName";
-        public const string ProjectName = "--projName";
-        public const string DatabaseName = "--dbName";
-        public const string CustomSourcePath = "--customSource";
-        public const string LicenseFilePath = "--licenseFile";
-        public const string SkipDbRestore = "--skipDbRestore";
-        public const string SolutionNameDescription = "Provide your own solution name.";
-        public const string ProjectNameDescription = "Provide your own project name.";
-        public const string DatabaseNameDescription = "Provide your own database name.";
-        public const string CustomSourcePathDescription = "Provide your own project templates.";
-        public const string SqlServerDescription = "Target SQL Server.";
-        public const string SkipDbRestoreDescription = "If you use this option you will skip restoring the database.";
-        public const string LicenseFilePathDescription = "Location of your Sitefinity license file. (Sitefinity.lic)";
+        public const string JsonConfig = "--jsonConfig";
+        public const string JsonConfigDescription = "Provide a configuration file of parameter values.";
+
+        public const string CreateWasCanceled = "The create project was canceled.";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";

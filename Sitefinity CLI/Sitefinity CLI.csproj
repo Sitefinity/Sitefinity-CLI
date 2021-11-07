@@ -26,10 +26,14 @@
 
   <ItemGroup>
     <None Remove="PowerShell\Updater.ps1" />
+    <None Remove="sitefinity-project-creation.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\NOTICE.txt" Link="NOTICE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sitefinity-project-creation.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

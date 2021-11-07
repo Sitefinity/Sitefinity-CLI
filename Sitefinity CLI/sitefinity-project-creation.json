@@ -1,0 +1,20 @@
+{
+  "targetFolder": "",
+  "version": "",
+  "sqlServer": "localhost",
+  "solutionName": "SitefinityWebapp",
+  "projectName": "SitefinityWebApp",
+  "databaseName": "SitefinityWebApp",
+  "databaseRestoreUserName": "",
+  "databaseRestorePassword": "",
+  "projectTemplatePath": "",
+  "licenseFilePath": "",
+  "packageSources": [],
+  "skipDbRestore": false,
+  "skipConfirmation": false,
+  "sfUser": "site.admin@sitefinitywebapp.com",
+  "sfPassword":  "Password01!",
+  "YourCustomStuff": {
+    "keyA": "value A"
+  }
+}

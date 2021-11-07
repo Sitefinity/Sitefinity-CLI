@@ -1254,7 +1254,7 @@
     <Content Include="AdminApp\assets\js\monaco-editor\vs\base\browser\ui\codicons\codicon\codicon.ttf" />
     <Content Include="AdminApp\assets\tree\angular-tree-component-8.5.6.tgz" />
     <Content Include="AdminApp\elements.e6f44761ba1d2550523a.bundle.js.map" />
-    <None Include="App_Data\GeoLocation\GeoLite2-City.mmdb" />
+    <Content Include="App_Data\GeoLocation\GeoLite2-City.mmdb" />
     <Content Include="App_Data\Sitefinity\Configuration\DataConfig.config" />
     <Content Include="App_Data\Sitefinity\Configuration\SecurityConfig.config" />
     <Content Include="ResourcePackages\Bootstrap4\assets\src\project\sass\adminapp\editor.scss" />
