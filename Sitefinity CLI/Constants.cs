@@ -63,7 +63,7 @@ namespace Sitefinity_CLI
         public const string NoProjectsFoundToUpgradeWarningMessage = "No projects with Sitefinity references found to upgrade.";
         public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
         public const string UpgradeWarning = "Make sure to have your project under source control. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instance in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
-        public const string SettingExecutionPolicyMessage = "Setting the execution polity for the curren process to unrestricted!";
+        public const string SettingExecutionPolicyMessage = "Setting the execution policy for the current process to unrestricted!";
         public static string UpgradeSuccessMessage = "Successfully updated '{0}' to version '{1}'." + Environment.NewLine + "Make sure to REBUILD your solution before starting up the site!";
 
         // Success messages
@@ -94,7 +94,7 @@ namespace Sitefinity_CLI
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
-        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the licence of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
+        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
         public const string PackageSourcesDescription = "Provide the nuget package sources used to install the new version of sitefinity";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
