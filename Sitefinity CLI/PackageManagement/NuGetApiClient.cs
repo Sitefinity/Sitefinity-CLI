@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
 using Newtonsoft.Json;
+using System.IO.Compression;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -129,8 +130,7 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 return null;
             }
-
-            string responseContentString = await response.Content.ReadAsStringAsync();
+            string responseContentString = await this.GetResponseContentString(response);
             if (string.IsNullOrWhiteSpace(responseContentString))
             {
                 return null;
@@ -152,6 +152,36 @@ namespace Sitefinity_CLI.PackageManagement
             return nuGetPackageXmlDoc;
         }
 
+        private async Task<string> GetResponseContentString(HttpResponseMessage response)
+        {
+            if (response.Content.Headers.ContentEncoding.Contains("gzip"))
+            {
+                byte[] decompressedBytes = this.DecompressGzip(await response.Content.ReadAsByteArrayAsync());
+                string responseText = await this.ConvertBytesToString(decompressedBytes);
+
+                return responseText;
+            }
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        private async Task<string> ConvertBytesToString(byte[] data)
+        {
+            using var ms = new MemoryStream(data);
+            using var streamReader = new StreamReader(ms);
+
+            return await streamReader.ReadToEndAsync();
+        }
+
+        private byte[] DecompressGzip(byte[] gzipedData)
+        {
+            using var compressedStream = new MemoryStream(gzipedData);
+            using var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress);
+            using var resultStream = new MemoryStream();
+            zipStream.CopyTo(resultStream);
+
+            return resultStream.ToArray();
+        }
         private string[] ParseVersionString(string versionString)
         {
             versionString = versionString.Trim(new char[] { '[', '(', ')', ']' });
