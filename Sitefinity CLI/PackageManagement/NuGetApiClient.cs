@@ -158,6 +158,7 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 byte[] decompressedBytes = this.DecompressGzip(await response.Content.ReadAsByteArrayAsync());
                 string responseText = await this.ConvertBytesToString(decompressedBytes);
+
                 return responseText;
             }
 
@@ -172,9 +173,9 @@ namespace Sitefinity_CLI.PackageManagement
             return await streamReader.ReadToEndAsync();
         }
 
-        private byte[] DecompressGzip(byte[] data)
+        private byte[] DecompressGzip(byte[] gzipedData)
         {
-            using var compressedStream = new MemoryStream(data);
+            using var compressedStream = new MemoryStream(gzipedData);
             using var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress);
             using var resultStream = new MemoryStream();
             zipStream.CopyTo(resultStream);
