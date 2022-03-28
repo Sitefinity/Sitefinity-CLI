@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Exceptions;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -43,7 +44,8 @@ namespace Sitefinity_CLI.PackageManagement
                     FileName = nugetFileLocation,
                     Arguments = arguments,
                     CreateNoWindow = true,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                 };
 
                 process.StartInfo = startInfo;
@@ -53,6 +55,12 @@ namespace Sitefinity_CLI.PackageManagement
                 {
                     string line = process.StandardOutput.ReadLine();
                     logger.LogInformation(line);
+
+                    var error = process.StandardError.ReadLine();
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        throw new UpgradeException(error);
+                    }
                 }
             }
         }
