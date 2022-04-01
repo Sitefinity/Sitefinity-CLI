@@ -20,7 +20,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<string> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null);
 
-        Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10);
+        Task<IEnumerable<string>> GetPackageVersions(string id, int versionsCount = 10);
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 

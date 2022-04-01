@@ -527,13 +527,13 @@ namespace Sitefinity_CLI.Commands
         private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion)
         {
             // get all versions
-            IEnumerable<string> versions = await this.sitefinityPackageManager.GetPackageVersions("Progress.Sitefinity.Cloud", this.GetNugetPackageSources());
+            IEnumerable<string> versions = await this.sitefinityPackageManager.GetPackageVersions(packageId);
             NuGetPackage compatiblePackage = null;
 
             foreach (string version in versions)
             {
                 NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, this.GetNugetPackageSources(), package => this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion);
-                Version currentVersion = this.GetSitefinityVersionOfDependecies(package);
+                Version currentVersion = this.GetMinimumSitefinityVersionOfDependecies(package);
                 if (currentVersion <= sitefinityVersion)
                 {
                     compatiblePackage = package;
@@ -549,7 +549,7 @@ namespace Sitefinity_CLI.Commands
             return packageId.StartsWith(Constants.TelerikSitefinityReferenceKeyWords) || packageId.StartsWith(Constants.ProgressSitefinityReferenceKeyWords);
         }
 
-        private Version GetSitefinityVersionOfDependecies(NuGetPackage package)
+        private Version GetMinimumSitefinityVersionOfDependecies(NuGetPackage package)
         {
             if (package.Id != null && package.Id.Equals("Telerik.Sitefinity.Core", StringComparison.OrdinalIgnoreCase))
             {
@@ -558,7 +558,7 @@ namespace Sitefinity_CLI.Commands
 
             if (package.Dependencies != null)
             {
-                return package.Dependencies.Select(x => this.GetSitefinityVersionOfDependecies(x)).Max();
+                return package.Dependencies.Select(x => this.GetMinimumSitefinityVersionOfDependecies(x)).Max();
             }
 
             return null;

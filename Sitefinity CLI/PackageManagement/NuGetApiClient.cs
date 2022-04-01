@@ -88,7 +88,6 @@ namespace Sitefinity_CLI.PackageManagement
         public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10)
         {
             HttpResponseMessage response = null;
-            // TODO: only nuget.sitefinity.com
             foreach (string source in sources)
             {
                 string sourceUrl = source.TrimEnd('/');

@@ -134,9 +134,9 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger.LogInformation($"Synchronization completed for project '{projectFilePath}'");
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10)
+        public async Task<IEnumerable<string>> GetPackageVersions(string id, int versionsCount = 10)
         {
-            return await this.nuGetApiClient.GetPackageVersions(id, sources, versionsCount);
+            return await this.nuGetApiClient.GetPackageVersions(id, new List<string>() { SitefinityPublicNuGetSource }, versionsCount);
         }
 
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)
