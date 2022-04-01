@@ -24,6 +24,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         private ICsProjectFileEditor csProjectFileEditor;
         private ILogger<UpgradeCommand> logger;
         private IProjectConfigFileEditor projectConfigFileEditor;
+        private IUpgradeConfigGenerator upgradeConfigGenerator;
         private IVisualStudioWorker visualStudioWorker;
         private ServiceProvider serviceProvider;
         private IPromptService promptService;
@@ -38,7 +39,8 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             services.AddTransient<INuGetCliClient, NuGetCliClient>();
             services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
             services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
-            services.AddTransient<ISitefinityPackageManager, SitefinityPackageManager>();
+            services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
+            services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
             services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
             services.AddSingleton<IPromptService, PromptServiceMock>();
 
@@ -48,6 +50,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             this.csProjectFileEditor = serviceProvider.GetService<ICsProjectFileEditor>();
             this.logger = serviceProvider.GetService<ILogger<UpgradeCommand>>();
             this.projectConfigFileEditor = serviceProvider.GetService<IProjectConfigFileEditor>();
+            this.upgradeConfigGenerator = serviceProvider.GetService<IUpgradeConfigGenerator>();
             this.visualStudioWorker = serviceProvider.GetService<IVisualStudioWorker>();
             this.promptService = serviceProvider.GetService<IPromptService>();
         }
@@ -55,7 +58,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         [TestMethod]
         public async Task Throw_When_SolutionPathIsNotFound()
         {
-            var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, visualStudioWorker);
+            var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker);
             try
             {
                 upgradeComamnd.SolutionPath = "wrongSolutionpath";

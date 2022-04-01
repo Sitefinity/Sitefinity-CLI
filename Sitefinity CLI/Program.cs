@@ -41,7 +41,8 @@ namespace Sitefinity_CLI
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
-                    services.AddTransient<ISitefinityPackageManager, SitefinityPackageManager>();
+                    services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
+                    services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
                     services.AddSingleton<IPromptService, PromptService>();
                 })
