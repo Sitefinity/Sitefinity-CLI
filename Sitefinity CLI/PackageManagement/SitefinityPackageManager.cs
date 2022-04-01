@@ -83,6 +83,11 @@ namespace Sitefinity_CLI.PackageManagement
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
         }
 
+        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<string> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        {
+            return await nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, this.supportedFrameworksRegex, shouldBreakSearch);
+        }
+
         public void SyncReferencesWithPackages(string projectFilePath, string solutionDir)
         {
             this.logger.LogInformation($"Synchronizing packages and references for project '{projectFilePath}'");
@@ -127,6 +132,11 @@ namespace Sitefinity_CLI.PackageManagement
             projectConfig?.Save(projectConfigPath);
 
             this.logger.LogInformation($"Synchronization completed for project '{projectFilePath}'");
+        }
+
+        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10)
+        {
+            return await this.nuGetApiClient.GetPackageVersions(id, sources, versionsCount);
         }
 
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.PackageManagement
@@ -16,6 +17,10 @@ namespace Sitefinity_CLI.PackageManagement
         Task<NuGetPackage> GetSitefinityPackageTree(string version);
 
         Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<string> packageSources);
+
+        Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<string> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null);
+
+        Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10);
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 
