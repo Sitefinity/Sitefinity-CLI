@@ -39,7 +39,6 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.PackageSources, Description = Constants.PackageSourcesDescription)]
         public string PackageSources { get; set; }
 
-
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
         public string AdditionalPackagesString { get; set; }
 
@@ -166,7 +165,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            var projectPathsWithSitefinityVersion = sitefinityProjectFilePaths.Select(x => new Tuple<string, Version>(x,this.DetectSitefinityVersion(x)));
+            var projectPathsWithSitefinityVersion = sitefinityProjectFilePaths.Select(x => new Tuple<string, Version>(x, this.DetectSitefinityVersion(x)));
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectPathsWithSitefinityVersion, newSitefinityPackage, packageSources, additionalPackagesToUpgrade);
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
@@ -223,7 +222,7 @@ namespace Sitefinity_CLI.Commands
         {
             var pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
             var pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", licensesFolder, "License.txt");
-            
+
             if (!File.Exists(pathToTheLicense))
             {
                 return null;
@@ -258,7 +257,7 @@ namespace Sitefinity_CLI.Commands
 
         private bool ContainsSitefinityRefKeyword(CsProjectFileReference projectReference)
         {
-            return (projectReference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(Constants.ProgressSitefinityReferenceKeyWords)) && 
+            return (projectReference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(Constants.ProgressSitefinityReferenceKeyWords)) &&
                 !projectReference.Include.Contains(Constants.ProgressSitefinityRendererReferenceKeyWords);
         }
 
@@ -389,12 +388,21 @@ namespace Sitefinity_CLI.Commands
 
             foreach (string version in versions)
             {
-                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, this.GetNugetPackageSources(), package => this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion);
-                Version currentVersion = this.GetMinimumSitefinityVersionOfDependecies(package);
-                if (currentVersion <= sitefinityVersion)
+                bool isIncompatible = false;
+                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, this.GetNugetPackageSources(), package =>
                 {
-                    compatiblePackage = package;
-                    break;
+                    isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
+                    return isIncompatible;
+                });
+
+                if (!isIncompatible)
+                {
+                    Version currentVersion = this.GetSitefinityVersionOfDependecies(package);
+                    if (currentVersion <= sitefinityVersion)
+                    {
+                        compatiblePackage = package;
+                        break;
+                    }
                 }
             }
 
@@ -406,7 +414,7 @@ namespace Sitefinity_CLI.Commands
             return packageId.StartsWith(Constants.TelerikSitefinityReferenceKeyWords) || packageId.StartsWith(Constants.ProgressSitefinityReferenceKeyWords);
         }
 
-        private Version GetMinimumSitefinityVersionOfDependecies(NuGetPackage package)
+        private Version GetSitefinityVersionOfDependecies(NuGetPackage package)
         {
             if (package.Id != null && package.Id.Equals("Telerik.Sitefinity.Core", StringComparison.OrdinalIgnoreCase))
             {
@@ -415,7 +423,7 @@ namespace Sitefinity_CLI.Commands
 
             if (package.Dependencies != null)
             {
-                return package.Dependencies.Select(x => this.GetMinimumSitefinityVersionOfDependecies(x)).Max();
+                return package.Dependencies.Select(x => this.GetSitefinityVersionOfDependecies(x)).Max();
             }
 
             return null;

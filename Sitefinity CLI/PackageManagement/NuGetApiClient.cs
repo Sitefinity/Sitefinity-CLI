@@ -91,7 +91,7 @@ namespace Sitefinity_CLI.PackageManagement
             foreach (string source in sources)
             {
                 string sourceUrl = source.TrimEnd('/');
-                using (var request = new HttpRequestMessage(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top=10"))
+                using (var request = new HttpRequestMessage(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}"))
                 {
                     request.Headers.Add("Accept", MediaTypeNames.Application.Json);
 
