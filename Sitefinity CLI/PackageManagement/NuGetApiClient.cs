@@ -180,6 +180,8 @@ namespace Sitefinity_CLI.PackageManagement
 
         private async Task<string> GetResponseContentString(HttpResponseMessage response)
         {
+            this.logger.LogInformation("Get response string");
+
             if (response.Content.Headers.ContentEncoding.Contains("gzip"))
             {
                 this.logger.LogInformation("Parsing gzip");
@@ -259,7 +261,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly IHttpClientFactory clientFactory;
 
-        private readonly ILogger logger;
+        private readonly ILogger<object> logger;
 
         private readonly HttpClient httpClient;
 
