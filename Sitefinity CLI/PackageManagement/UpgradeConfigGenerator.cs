@@ -84,10 +84,9 @@ namespace Sitefinity_CLI.PackageManagement
 
             foreach (NuGetPackage additionalPackage in additionalPackagesToUpgrade)
             {
-                bool packageExists = this.sitefinityPackageManager.PackageExists(additionalPackage.Id, projectFilePath);
-                if (packageExists)
+                if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, additionalPackage, additionalPackage))
                 {
-                    this.AddPackageNodeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, additionalPackage);
+                    await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, additionalPackage.Dependencies, additionalPackage);
                 }
             }
         }
