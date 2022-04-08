@@ -18,7 +18,6 @@ namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
     [Command(Constants.UpgradeCommandName, Description = "Upgrade Sitefinity project/s to a newer version of Sitefinity.")]
-    [AdminRightsValidator]
     internal class UpgradeCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
