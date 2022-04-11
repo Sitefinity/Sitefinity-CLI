@@ -11,16 +11,14 @@ using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Net.Mime;
 using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Logging;
 
 namespace Sitefinity_CLI.PackageManagement
 {
     internal class NuGetApiClient : INuGetApiClient
     {
-        public NuGetApiClient(IHttpClientFactory clientFactory, ILogger<NuGetApiClient> logger)
+        public NuGetApiClient(IHttpClientFactory clientFactory)
         {
             this.clientFactory = clientFactory;
-            this.logger = logger;
             this.httpClient = clientFactory.CreateClient();
             this.nuGetPackageXmlDocumentCache = new Dictionary<string, XDocument>();
             this.xmlns = "http://www.w3.org/2005/Atom";
@@ -157,11 +155,6 @@ namespace Sitefinity_CLI.PackageManagement
                 return null;
             }
 
-
-            Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LocalPackagesInfoCacheFolder));
-            Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LocalPackagesInfoCacheFolder, "Responses"));
-
-            File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LocalPackagesInfoCacheFolder, "Responses", $"{id}.txt"), responseContentString);
             XDocument nuGetPackageXmlDoc = XDocument.Parse(responseContentString);
 
             if (!nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
@@ -180,11 +173,8 @@ namespace Sitefinity_CLI.PackageManagement
 
         private async Task<string> GetResponseContentString(HttpResponseMessage response)
         {
-            this.logger.LogInformation("Get response string");
-
             if (response.Content.Headers.ContentEncoding.Contains("gzip"))
             {
-                this.logger.LogInformation("Parsing gzip");
                 byte[] decompressedBytes = this.DecompressGzip(await response.Content.ReadAsByteArrayAsync());
                 string responseText = await this.ConvertBytesToString(decompressedBytes);
 
@@ -260,8 +250,6 @@ namespace Sitefinity_CLI.PackageManagement
         }
 
         private readonly IHttpClientFactory clientFactory;
-
-        private readonly ILogger<object> logger;
 
         private readonly HttpClient httpClient;
 
