@@ -415,7 +415,7 @@ namespace Sitefinity_CLI.Commands
 
         private Version GetSitefinityVersionOfDependecies(NuGetPackage package)
         {
-            if (package.Id != null && package.Id.Equals("Telerik.Sitefinity.Core", StringComparison.OrdinalIgnoreCase))
+            if (package.Id != null && package.Id.Equals(Constants.SitefinityCoreNuGetPackageId, StringComparison.OrdinalIgnoreCase))
             {
                 return new Version(package.Version);
             }
