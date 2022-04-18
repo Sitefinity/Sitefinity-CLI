@@ -18,7 +18,6 @@ namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
     [Command(Constants.UpgradeCommandName, Description = "Upgrade Sitefinity project/s to a newer version of Sitefinity.")]
-    [AdminRightsValidator]
     internal class UpgradeCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
@@ -39,12 +38,16 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.PackageSources, Description = Constants.PackageSourcesDescription)]
         public string PackageSources { get; set; }
 
+        [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
+        public string AdditionalPackagesString { get; set; }
+
         public UpgradeCommand(
             IPromptService promptService,
             ISitefinityPackageManager sitefinityPackageManager,
             ICsProjectFileEditor csProjectFileEditor,
             ILogger<UpgradeCommand> logger,
             IProjectConfigFileEditor projectConfigFileEditor,
+            IUpgradeConfigGenerator upgradeConfigGenerator,
             IVisualStudioWorker visualStudioWorker)
         {
             this.promptService = promptService;
@@ -53,7 +56,7 @@ namespace Sitefinity_CLI.Commands
             this.logger = logger;
             this.visualStudioWorker = visualStudioWorker;
             this.projectConfigFileEditor = projectConfigFileEditor;
-            this.processedPackagesPerProjectCache = new Dictionary<string, HashSet<string>>();
+            this.upgradeConfigGenerator = upgradeConfigGenerator;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -81,6 +84,13 @@ namespace Sitefinity_CLI.Commands
             if (!File.Exists(this.SolutionPath))
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
+            }
+
+            var additionalPackagesIds = this.AdditionalPackagesString?.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+
+            if (additionalPackagesIds != null && additionalPackagesIds.Any() && additionalPackagesIds.Any(x => !this.allowedAdditionalPackagesIds.Contains(x)))
+            {
+                throw new ArgumentException($"The given additional packages cannot be upgraded. The currently supported additional packages for upgrade are: {string.Join(", ", this.allowedAdditionalPackagesIds)}");
             }
 
             if (!this.SkipPrompts && !this.promptService.PromptYesNo(Constants.UpgradeWarning))
@@ -120,18 +130,42 @@ namespace Sitefinity_CLI.Commands
 
             if (!this.AcceptLicense)
             {
-                var licenseContent = await GetLicenseContent(newSitefinityPackage);
-                var licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
-                var hasUserAcceptedEULA = this.promptService.PromptYesNo(licensePromptMessage, false);
+                var licenseContent = await GetLicenseContent(newSitefinityPackage, Constants.LicenseAgreementsFolderName);
+                bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
 
-                if (!hasUserAcceptedEULA)
+                if (!hasUserAccepted)
                 {
-                    this.logger.LogInformation(Constants.UpgradeWasCanceled);
                     return;
                 }
             }
 
-            await this.GenerateUpgradeConfig(sitefinityProjectFilePaths, newSitefinityPackage, packageSources);
+            ICollection<NuGetPackage> additionalPackagesToUpgrade = new List<NuGetPackage>();
+            if (additionalPackagesIds != null && additionalPackagesIds.Any())
+            {
+                foreach (string packageId in additionalPackagesIds)
+                {
+                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, new Version(this.Version));
+                    if (package != null)
+                    {
+                        additionalPackagesToUpgrade.Add(package);
+                        this.sitefinityPackageManager.Install(package.Id, package.Version, this.SolutionPath, packageSources);
+
+                        string licenseContent = await this.GetLicenseContent(package);
+                        if (!string.IsNullOrEmpty(licenseContent) && !this.AcceptLicense)
+                        {
+                            bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
+
+                            if (!hasUserAccepted)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var projectPathsWithSitefinityVersion = sitefinityProjectFilePaths.Select(x => new Tuple<string, Version>(x, this.DetectSitefinityVersion(x)));
+            await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectPathsWithSitefinityVersion, newSitefinityPackage, packageSources, additionalPackagesToUpgrade);
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
@@ -183,10 +217,16 @@ namespace Sitefinity_CLI.Commands
             return configsWithoutSitefinity;
         }
 
-        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage)
+        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage, string licensesFolder = "")
         {
             var pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
-            var pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", Constants.LicenseAgreementsFolderName, "License.txt");
+            var pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", licensesFolder, "License.txt");
+
+            if (!File.Exists(pathToTheLicense))
+            {
+                return null;
+            }
+
             var licenseContent = await File.ReadAllTextAsync(pathToTheLicense);
 
             return licenseContent;
@@ -216,7 +256,7 @@ namespace Sitefinity_CLI.Commands
 
         private bool ContainsSitefinityRefKeyword(CsProjectFileReference projectReference)
         {
-            return (projectReference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(Constants.ProgressSitefinityReferenceKeyWords)) && 
+            return (projectReference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) || projectReference.Include.Contains(Constants.ProgressSitefinityReferenceKeyWords)) &&
                 !projectReference.Include.Contains(Constants.ProgressSitefinityRendererReferenceKeyWords);
         }
 
@@ -276,139 +316,6 @@ namespace Sitefinity_CLI.Commands
             {
                 return textReader.ReadToEnd();
             }
-        }
-
-        private async Task GenerateUpgradeConfig(IEnumerable<string> projectFilePaths, NuGetPackage newSitefinityVersionPackageTree, IEnumerable<string> packageSources)
-        {
-            this.logger.LogInformation("Exporting upgrade config...");
-
-            XmlDocument powerShellXmlConfig = new XmlDocument();
-            XmlElement powerShellXmlConfigNode = powerShellXmlConfig.CreateElement("config");
-            powerShellXmlConfig.AppendChild(powerShellXmlConfigNode);
-
-            foreach (string projectFilePath in projectFilePaths)
-            {
-                await this.GenerateProjectUpgradeConfigSection(powerShellXmlConfig, powerShellXmlConfigNode, projectFilePath, newSitefinityVersionPackageTree, packageSources);
-            }
-
-            powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "config.xml"));
-
-            this.logger.LogInformation("Successfully exported upgrade config!");
-        }
-
-        private async Task GenerateProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement powerShellXmlConfigNode, string projectFilePath, NuGetPackage newSitefinityVersionPackageTree, IEnumerable<string> packageSources)
-        {
-            XmlElement projectNode = powerShellXmlConfig.CreateElement("project");
-            XmlAttribute projectNameAttribute = powerShellXmlConfig.CreateAttribute("name");
-            projectNameAttribute.Value = projectFilePath.Split(new string[] { "\\", Constants.CsprojFileExtension, Constants.VBProjFileExtension }, StringSplitOptions.RemoveEmptyEntries).Last();
-            projectNode.Attributes.Append(projectNameAttribute);
-            powerShellXmlConfigNode.AppendChild(projectNode);
-
-            Version currentSitefinityVersion = this.DetectSitefinityVersion(projectFilePath);
-            if (currentSitefinityVersion == null)
-            {
-                this.logger.LogInformation($"Skip upgrade for project: '{projectFilePath}'. Current Sitefinity version was not detected.");
-
-                return;
-            }
-
-            this.logger.LogInformation($"Detected sitefinity version for '{projectFilePath}' - '{currentSitefinityVersion}'.");
-
-            this.logger.LogInformation($"Collecting Sitefinity NuGet package tree for '{projectFilePath}'...");
-            NuGetPackage currentSitefinityVersionPackageTree = await this.sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString(), packageSources);
-
-            this.processedPackagesPerProjectCache[projectFilePath] = new HashSet<string>();
-            if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree, newSitefinityVersionPackageTree))
-            {
-                await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree.Dependencies, newSitefinityVersionPackageTree);
-            }
-        }
-
-        private async Task ProcessPackagesForProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, string projectFilePath, IEnumerable<NuGetPackage> currentSitefinityVersionPackages, NuGetPackage newSitefinityVersionPackageTree)
-        {
-            IList<NuGetPackage> packageTreesToProcessFurther = new List<NuGetPackage>();
-            foreach (NuGetPackage currentSitefinityVersionPackage in currentSitefinityVersionPackages)
-            {
-                bool isPackageAlreadyProcessed = this.processedPackagesPerProjectCache[projectFilePath].Contains(currentSitefinityVersionPackage.Id);
-                if (!isPackageAlreadyProcessed &&
-                    !this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackage, newSitefinityVersionPackageTree))
-                {
-                    packageTreesToProcessFurther.Add(currentSitefinityVersionPackage);
-                }
-            }
-
-            foreach (NuGetPackage packageTree in packageTreesToProcessFurther)
-            {
-                await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, packageTree.Dependencies, newSitefinityVersionPackageTree);
-            }
-        }
-
-        private bool TryAddPackageTreeToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, string projectFilePath, NuGetPackage currentSitefinityVersionPackage, NuGetPackage newSitefinityVersionPackageTree)
-        {
-            bool packageExists = this.sitefinityPackageManager.PackageExists(currentSitefinityVersionPackage.Id, projectFilePath);
-            if (!packageExists)
-            {
-                return false;
-            }
-
-            NuGetPackage newSitefinityVersionPackage = this.FindNuGetPackageByIdInDependencyTree(newSitefinityVersionPackageTree, currentSitefinityVersionPackage.Id);
-            if (newSitefinityVersionPackage == null)
-            {
-                this.logger.LogWarning($"New version for package '{currentSitefinityVersionPackage.Id}' was not found. Package will not be upgraded.");
-
-                return false;
-            }
-
-            this.AddPackageNodeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, newSitefinityVersionPackage);
-
-            // Add the NuGet package and all of its dependencies to the cache, because those packages will be upgraded as dependencies of the root package
-            this.AddNuGetPackageTreeToCache(projectFilePath, newSitefinityVersionPackage);
-
-            return true;
-        }
-
-        private void AddPackageNodeToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, NuGetPackage nuGetPackage)
-        {
-            XmlElement packageNode = powerShellXmlConfig.CreateElement("package");
-            XmlAttribute nameAttribute = powerShellXmlConfig.CreateAttribute("name");
-            nameAttribute.Value = nuGetPackage.Id;
-            XmlAttribute versionAttribute = powerShellXmlConfig.CreateAttribute("version");
-            versionAttribute.Value = nuGetPackage.Version;
-            packageNode.Attributes.Append(nameAttribute);
-            packageNode.Attributes.Append(versionAttribute);
-            projectNode.AppendChild(packageNode);
-        }
-
-        private void AddNuGetPackageTreeToCache(string projectFilePath, NuGetPackage nuGetPackage)
-        {
-            if (!this.processedPackagesPerProjectCache[projectFilePath].Contains(nuGetPackage.Id))
-            {
-                this.processedPackagesPerProjectCache[projectFilePath].Add(nuGetPackage.Id);
-            }
-
-            foreach (NuGetPackage nuGetPackageDependency in nuGetPackage.Dependencies)
-            {
-                this.AddNuGetPackageTreeToCache(projectFilePath, nuGetPackageDependency);
-            }
-        }
-
-        private NuGetPackage FindNuGetPackageByIdInDependencyTree(NuGetPackage nuGetPackageTree, string id)
-        {
-            if (nuGetPackageTree.Id.Equals(id, StringComparison.OrdinalIgnoreCase))
-            {
-                return nuGetPackageTree;
-            }
-
-            foreach (NuGetPackage nuGetPackageTreeDependency in nuGetPackageTree.Dependencies)
-            {
-                NuGetPackage nuGetPackage = this.FindNuGetPackageByIdInDependencyTree(nuGetPackageTreeDependency, id);
-                if (nuGetPackage != null)
-                {
-                    return nuGetPackage;
-                }
-            }
-
-            return null;
         }
 
         private void SyncProjectReferencesWithPackages(IEnumerable<string> projectFilePaths, string solutionFolder)
@@ -472,6 +379,68 @@ namespace Sitefinity_CLI.Commands
             return this.ContainsSitefinityRefKeyword(reference) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
         }
 
+        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion)
+        {
+            // get all versions
+            IEnumerable<string> versions = await this.sitefinityPackageManager.GetPackageVersions(packageId);
+            NuGetPackage compatiblePackage = null;
+
+            foreach (string version in versions)
+            {
+                bool isIncompatible = false;
+                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, this.GetNugetPackageSources(), package =>
+                {
+                    isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
+                    return isIncompatible;
+                });
+
+                if (!isIncompatible)
+                {
+                    Version currentVersion = this.GetSitefinityVersionOfDependecies(package);
+                    if (currentVersion <= sitefinityVersion)
+                    {
+                        compatiblePackage = package;
+                        break;
+                    }
+                }
+            }
+
+            return compatiblePackage;
+        }
+
+        private bool IsSitefinityPackage(string packageId)
+        {
+            return packageId.StartsWith(Constants.TelerikSitefinityReferenceKeyWords) || packageId.StartsWith(Constants.ProgressSitefinityReferenceKeyWords);
+        }
+
+        private Version GetSitefinityVersionOfDependecies(NuGetPackage package)
+        {
+            if (package.Id != null && package.Id.Equals(Constants.SitefinityCoreNuGetPackageId, StringComparison.OrdinalIgnoreCase))
+            {
+                return new Version(package.Version);
+            }
+
+            if (package.Dependencies != null)
+            {
+                return package.Dependencies.Select(x => this.GetSitefinityVersionOfDependecies(x)).Max();
+            }
+
+            return null;
+        }
+
+        private bool PromptAcceptLicense(string licenseContent)
+        {
+            var licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
+            var hasUserAcceptedEULA = this.promptService.PromptYesNo(licensePromptMessage, false);
+
+            if (!hasUserAcceptedEULA)
+            {
+                this.logger.LogInformation(Constants.UpgradeWasCanceled);
+            }
+
+            return hasUserAcceptedEULA;
+        }
+
         private readonly IPromptService promptService;
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
@@ -480,10 +449,12 @@ namespace Sitefinity_CLI.Commands
 
         private readonly IProjectConfigFileEditor projectConfigFileEditor;
 
+        private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
+
         private readonly ILogger<object> logger;
 
         private readonly IVisualStudioWorker visualStudioWorker;
 
-        private readonly IDictionary<string, HashSet<string>> processedPackagesPerProjectCache;
+        private readonly ICollection<string> allowedAdditionalPackagesIds = new List<string>() { "Progress.Sitefinity.Cloud" };
     }
 }

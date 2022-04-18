@@ -44,8 +44,7 @@ namespace Sitefinity_CLI.PackageManagement
                     FileName = nugetFileLocation,
                     Arguments = arguments,
                     CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
                 };
 
                 process.StartInfo = startInfo;
@@ -55,12 +54,6 @@ namespace Sitefinity_CLI.PackageManagement
                 {
                     string line = process.StandardOutput.ReadLine();
                     logger.LogInformation(line);
-
-                    var error = process.StandardError.ReadLine();
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        throw new UpgradeException(error);
-                    }
                 }
             }
         }

@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using System.IO;
 using Newtonsoft.Json;
 using System.IO.Compression;
+using System.Net.Mime;
+using Newtonsoft.Json.Linq;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -24,7 +26,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.xmlnsd = "http://schemas.microsoft.com/ado/2007/08/dataservices";
         }
 
-        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<string> sources, Regex supportedFrameworksRegex = null)
+        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<string> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             // First, try to retrieve the data from the local cache
             var packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LocalPackagesInfoCacheFolder, string.Concat(id, version));
@@ -50,46 +52,28 @@ namespace Sitefinity_CLI.PackageManagement
 
             string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
 
-            if (!string.IsNullOrWhiteSpace(dependenciesString))
+            IList<NuGetPackage> dependencies = this.ParseDependencies(dependenciesString);
+
+            if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
             {
-                string[] dependencyStrings = dependenciesString.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                nuGetPackage.Dependencies = dependencies;
+                return nuGetPackage;
+            }
 
-                if (dependencyStrings.Length > 0)
+            foreach (NuGetPackage dependency in dependencies)
+            {
+                bool isFrameworkSupported = true;
+                if (supportedFrameworksRegex != null && !string.IsNullOrEmpty(dependency.Framework))
                 {
-                    foreach (string dependencyString in dependencyStrings)
+                    isFrameworkSupported = supportedFrameworksRegex.IsMatch(dependency.Framework);
+                }
+
+                if (isFrameworkSupported)
+                {
+                    NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
+                    if (nuGetPackageDependency != null)
                     {
-                        // Do Not RemoveEmtpyEntires below. The entry from the framework is the last element in the dependencyString
-                        // e.g.System.ComponentModel.Annotations:4.7.0:net48 if it is missing System.ComponentModel.Annotations:4.7.0: 
-                        // If it is missing it means that the package does not depend on particular framework
-                        string[] dependencyIdAndVersionAndFramework = dependencyString.Split(new char[] { ':' });
-
-                        if (dependencyIdAndVersionAndFramework.Length > 0 && !string.IsNullOrWhiteSpace(dependencyIdAndVersionAndFramework[0]))
-                        {
-                            bool isFrameworkSupported = true;
-                            if (supportedFrameworksRegex != null && dependencyIdAndVersionAndFramework.Length > 2)
-                            {
-                                string framework = dependencyIdAndVersionAndFramework[2].Trim();
-                                if (!string.IsNullOrEmpty(framework))
-                                {
-                                    isFrameworkSupported = supportedFrameworksRegex.IsMatch(framework);
-                                }
-                            }
-
-                            if (isFrameworkSupported)
-                            {
-                                string dependencyId = dependencyIdAndVersionAndFramework[0].Trim();
-
-                                string dependencyVersionString = dependencyIdAndVersionAndFramework[1].Trim();
-                                string[] dependencyVersions = this.ParseVersionString(dependencyVersionString);
-                                string dependencyVersion = dependencyVersions[0];
-
-                                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependencyId, dependencyVersion, sources, supportedFrameworksRegex);
-                                if (nuGetPackageDependency != null)
-                                {
-                                    nuGetPackage.Dependencies.Add(nuGetPackageDependency);
-                                }
-                            }
-                        }
+                        nuGetPackage.Dependencies.Add(nuGetPackageDependency);
                     }
                 }
             }
@@ -99,6 +83,41 @@ namespace Sitefinity_CLI.PackageManagement
             File.WriteAllText(packageDependenciesHashFilePath, JsonConvert.SerializeObject(nuGetPackage));
 
             return nuGetPackage;
+        }
+
+        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10)
+        {
+            HttpResponseMessage response = null;
+            foreach (string source in sources)
+            {
+                string sourceUrl = source.TrimEnd('/');
+                using (var request = new HttpRequestMessage(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}"))
+                {
+                    request.Headers.Add("Accept", MediaTypeNames.Application.Json);
+
+                    response = await this.httpClient.SendAsync(request);
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (response == null)
+            {
+                return null;
+            }
+
+            string responseContentString = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(responseContentString))
+            {
+                return null;
+            }
+
+            JObject jsonObject = JObject.Parse(responseContentString);
+            var packages = (JArray)jsonObject["d"];
+            var versions = packages.Where(x => (string)x["Id"] == id).Select(x => (string)x["Version"]).ToList();
+            return versions;
         }
 
         private async Task<XDocument> GetPackageXmlDocument(string id, string version, IEnumerable<string> sources)
@@ -188,6 +207,46 @@ namespace Sitefinity_CLI.PackageManagement
             string[] dependencyVersions = versionString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
             return dependencyVersions;
+        }
+
+        private IList<NuGetPackage> ParseDependencies(string dependenciesString)
+        {
+            var dependencies = new List<NuGetPackage>();
+
+            if (!string.IsNullOrEmpty(dependenciesString))
+            {
+                string[] dependencyStrings = dependenciesString.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (dependencyStrings.Length > 0)
+                {
+                    foreach (string dependencyString in dependencyStrings)
+                    {
+                        // Do Not RemoveEmtpyEntires below. The entry from the framework is the last element in the dependencyString
+                        // e.g.System.ComponentModel.Annotations:4.7.0:net48 if it is missing System.ComponentModel.Annotations:4.7.0: 
+                        // If it is missing it means that the package does not depend on particular framework
+                        string[] dependencyIdAndVersionAndFramework = dependencyString.Split(new char[] { ':' });
+
+                        if (dependencyIdAndVersionAndFramework.Length > 0 && !string.IsNullOrWhiteSpace(dependencyIdAndVersionAndFramework[0]))
+                        {
+                            string dependencyId = dependencyIdAndVersionAndFramework[0].Trim();
+
+                            string dependencyVersionString = dependencyIdAndVersionAndFramework[1].Trim();
+                            string[] dependencyVersions = this.ParseVersionString(dependencyVersionString);
+                            string dependencyVersion = dependencyVersions[0];
+
+                            string framework = null;
+                            if (dependencyIdAndVersionAndFramework.Length > 2)
+                            {
+                                framework = dependencyIdAndVersionAndFramework[2].Trim();
+                            }
+
+                            dependencies.Add(new NuGetPackage() { Id = dependencyId, Version = dependencyVersion, Framework = framework });
+                        }
+                    }
+                }
+            }
+
+            return dependencies;
         }
 
         private readonly IHttpClientFactory clientFactory;

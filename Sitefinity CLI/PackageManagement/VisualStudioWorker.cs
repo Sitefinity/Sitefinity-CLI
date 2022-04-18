@@ -80,8 +80,8 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void ExecuteScript(string scriptPath)
         {
-            this.logger.LogInformation(Constants.SettingExecutionPolicyMessage); 
-            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, "Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process -Force");
+            this.logger.LogInformation(Constants.UnblockingUpgradeScriptMessage);
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Format("Unblock-file '{0}'", scriptPath));
 
             System.Threading.Thread.Sleep(5000);
             this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));

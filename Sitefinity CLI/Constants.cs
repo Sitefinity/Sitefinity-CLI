@@ -64,6 +64,7 @@ namespace Sitefinity_CLI
         public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
         public const string UpgradeWarning = "Make sure to have your project under source control. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instance in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
         public const string SettingExecutionPolicyMessage = "Setting the execution policy for the current process to unrestricted!";
+        public const string UnblockingUpgradeScriptMessage = "Unblocking script file.";
         public static string UpgradeSuccessMessage = "Successfully updated '{0}' to version '{1}'." + Environment.NewLine + "Make sure to REBUILD your solution before starting up the site!";
 
         // Success messages
@@ -96,11 +97,13 @@ namespace Sitefinity_CLI
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
         public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
         public const string PackageSourcesDescription = "Provide the nuget package sources used to install the new version of sitefinity";
+        public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
         public const string PackageSources = "-ps|--packageSources";
+        public const string AdditionalPackages = "--additionalPackages";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
@@ -156,6 +159,7 @@ namespace Sitefinity_CLI
 
         // Sitefinity package management
         public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
+        public const string SitefinityCoreNuGetPackageId = "Telerik.Sitefinity.Core";
         public const string EntryElem = "entry";
         public const string PropertiesElem = "properties";
         public const string DependenciesElem = "Dependencies";
