@@ -1,0 +1,26 @@
+﻿[
+  {
+    "FilePath": "Properties\\AssemblyInfo.cs",
+    "TemplatePath": "AssemblyInfo.Template"
+  },
+  {
+    "FilePath": "{0}.csproj",
+    "TemplatePath": "csproj.Template"
+  },
+  {
+    "FilePath": "DemoTests.cs",
+    "TemplatePath": "DemoTests.Template"
+  },
+  {
+    "FilePath": "packages.config",
+    "TemplatePath": "packages.config.Template"
+  },
+  {
+    "FilePath": "TestAuthors.cs",
+    "TemplatePath": "TestAuthors.Template"
+  },
+  {
+    "FilePath": "TestCategories.cs",
+    "TemplatePath": "TestCategories.Template"
+  }
+]
