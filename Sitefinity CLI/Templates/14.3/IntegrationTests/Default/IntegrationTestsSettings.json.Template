@@ -3,6 +3,6 @@
   "SitefinityClientId": "sftestrunner",
   "SitefinityClientSecret": "secret",
   "Username": "admin@test.test",
-  "Password": "admin@2",
+  "Password": "admin!23",
   "TestExecutionTimeout": "00:05:00"
 }
