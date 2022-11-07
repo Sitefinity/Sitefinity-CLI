@@ -24,7 +24,7 @@ namespace Sitefinity_CLI.Tests
         {
             var currenPath = Directory.GetCurrentDirectory();
             var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.FullName;
-            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "netcoreapp3.0");
+            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "net6.0", "win-x86");
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             this.testedTemplateVersions = this.GetAllTemplatesVersions(cultureInfo).Select(x => x.ToString("n1", cultureInfo)).ToList();
 
@@ -62,6 +62,9 @@ namespace Sitefinity_CLI.Tests
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
+
+                StreamReader myStreamReader2 = process.StandardError;
+                string errorMessage = myStreamReader2.ReadToEnd();
 
                 // Answer to the prompt that says Sitefinity project is not recognized
                 myStreamWriter.WriteLine("y");
@@ -1088,6 +1091,9 @@ namespace Sitefinity_CLI.Tests
             StreamReader myStreamReader = process.StandardOutput;
             StreamWriter myStreamWriter = process.StandardInput;
 
+            StreamReader myStreamReader2 = process.StandardError;
+            string errorMessage = myStreamReader2.ReadToEnd();
+
             // Answer to the prompt that says Sitefinity project is not recognized
             myStreamWriter.WriteLine("y");
             process.WaitForExit();
@@ -1116,6 +1122,7 @@ namespace Sitefinity_CLI.Tests
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
+                    RedirectStandardError = true,
                     CreateNoWindow = true,
                     WorkingDirectory = this.workingDirectory
                 }
@@ -1126,7 +1133,7 @@ namespace Sitefinity_CLI.Tests
         {
             var process = this.CreateNewProcess();
 
-            var args = string.Format("sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
+            var args = string.Format("sf.exe {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 
             if (templateName != null)
