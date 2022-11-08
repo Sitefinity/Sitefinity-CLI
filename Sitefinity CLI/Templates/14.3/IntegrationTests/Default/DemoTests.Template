@@ -8,9 +8,7 @@ namespace {{pascalCaseName}}
 {
     /// <summary>
     /// Represents sample integration tests class to demonstrate the usage of some attributes.
-	/// For more information on creating and running integration tests with Sitefinity CMS web test runner see the Sitefinity documentation: https://www.progress.com/documentation/sitefinity-cms/tutorial-create-integration-tests-with-sitefinity-web-test-runner
     /// For sample integration tests see this project in the Sitefinity GitHub repo: https://github.com/Sitefinity/Telerik.Sitefinity.Samples.IntegrationTests
-    /// For more information on the integration tests infrastructure and framework see the MbUnit documentation: http://www.gallio.org/doku-id-mbunit-documentation/
     /// </summary>
     [TestClass]
 	public class DemoTests : SitefinityIntegrationTestsBase
