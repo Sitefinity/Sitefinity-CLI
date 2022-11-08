@@ -23,7 +23,7 @@ namespace Sitefinity_CLI.Tests
         public void Initialize()
         {
             var currenPath = Directory.GetCurrentDirectory();
-            var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.FullName;
+            var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.Parent.FullName;
             this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "net6.0", "win-x86");
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             this.testedTemplateVersions = this.GetAllTemplatesVersions(cultureInfo).Select(x => x.ToString("n1", cultureInfo)).ToList();
@@ -62,9 +62,6 @@ namespace Sitefinity_CLI.Tests
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
-
-                StreamReader myStreamReader2 = process.StandardError;
-                string errorMessage = myStreamReader2.ReadToEnd();
 
                 // Answer to the prompt that says Sitefinity project is not recognized
                 myStreamWriter.WriteLine("y");
@@ -1091,8 +1088,6 @@ namespace Sitefinity_CLI.Tests
             StreamReader myStreamReader = process.StandardOutput;
             StreamWriter myStreamWriter = process.StandardInput;
 
-            StreamReader myStreamReader2 = process.StandardError;
-            string errorMessage = myStreamReader2.ReadToEnd();
 
             // Answer to the prompt that says Sitefinity project is not recognized
             myStreamWriter.WriteLine("y");
@@ -1118,7 +1113,7 @@ namespace Sitefinity_CLI.Tests
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "dotnet",
+                    FileName = "cmd.exe",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
@@ -1133,7 +1128,7 @@ namespace Sitefinity_CLI.Tests
         {
             var process = this.CreateNewProcess();
 
-            var args = string.Format("sf.exe {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
+            var args = string.Format("/C sf.exe {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 
             if (templateName != null)
