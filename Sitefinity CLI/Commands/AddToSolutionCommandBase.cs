@@ -52,6 +52,7 @@ namespace Sitefinity_CLI.Commands
                 dictionary["binFolder"] = this.BinFolder;
                 dictionary["projectGuid"] = this.ProjectGuid.ToString();
                 dictionary["sitefinityVersion"] = this.SitefinityVersion;
+                dictionary["sitefinityNugetVersion"] = this.SitefinityVersion.EndsWith(".0") ? this.SitefinityVersion.Remove(this.SitefinityVersion.LastIndexOf("."), 2) : this.SitefinityVersion;
             }
             else
             {
@@ -125,7 +126,7 @@ namespace Sitefinity_CLI.Commands
 
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Utils.WriteLine(ex.Message, ConsoleColor.Yellow);
             }
