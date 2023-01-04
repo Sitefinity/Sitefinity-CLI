@@ -17,8 +17,7 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         private string incorrectSlnFilePath = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\Pesho.sln";
         private string csProjFilePath = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\SomeProj\\SomeProj.csproj";
         private Guid projectGuid = Guid.NewGuid();
-        private string correctWebAppName = "SitefinityWebApp";
-        private string incorrectWebAppName = "Pesho";
+
         private string WithElementsContents => File.ReadAllText(this.slnFilePathWithElementsSource);
         private string WithoutElementsContents => File.ReadAllText(this.slnFilePathWithoutElementsSource);
 
