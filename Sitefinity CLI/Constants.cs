@@ -80,6 +80,7 @@ namespace Sitefinity_CLI
         public const string UpgradeWasCanceled = "The upgrade was canceled.";
         public const string TargetFrameworkChanged = "Target framework for {0} set to {1}";
         public const string TargetFrameworkDoesNotNeedChanged = "Target framework for {0} does not need change ({1})";
+        public const string LatestVersionFound = "Latest version for Sitefinity found: {0}";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";

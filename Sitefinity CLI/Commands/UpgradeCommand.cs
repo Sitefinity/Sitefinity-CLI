@@ -1,6 +1,8 @@
 ﻿using EnvDTE;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.Commands.Validators;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.PackageManagement;
@@ -10,6 +12,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
@@ -25,7 +29,6 @@ namespace Sitefinity_CLI.Commands
         public string SolutionPath { get; set; }
 
         [Argument(1, Description = Constants.VersionToOptionDescription)]
-        [Required(ErrorMessage = "You must specify the Sitefinity version to upgrade to.")]
         [UpgradeVersionValidator]
         public string Version { get; set; }
 
@@ -48,7 +51,8 @@ namespace Sitefinity_CLI.Commands
             ILogger<UpgradeCommand> logger,
             IProjectConfigFileEditor projectConfigFileEditor,
             IUpgradeConfigGenerator upgradeConfigGenerator,
-            IVisualStudioWorker visualStudioWorker)
+            IVisualStudioWorker visualStudioWorker,
+            IHttpClientFactory clientFactory)
         {
             this.promptService = promptService;
             this.sitefinityPackageManager = sitefinityPackageManager;
@@ -57,6 +61,7 @@ namespace Sitefinity_CLI.Commands
             this.visualStudioWorker = visualStudioWorker;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
+            this.httpClient = clientFactory.CreateClient();
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -109,6 +114,9 @@ namespace Sitefinity_CLI.Commands
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
                 return;
             }
+
+            if (string.IsNullOrEmpty(this.Version))
+                this.SetLatestVersion();
 
             Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
 
@@ -180,6 +188,24 @@ namespace Sitefinity_CLI.Commands
             this.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
+        }
+
+        private void SetLatestVersion()
+        {
+            using (var request = new HttpRequestMessage(HttpMethod.Get, SfAllNugetUrl))
+            {
+                var response = this.httpClient.Send(request);
+                var contentString = response.Content.ReadAsStringAsync().Result;
+                var jsonContent = JsonConvert.DeserializeObject(contentString);
+                var firstEntry = (jsonContent as JArray).First as JObject;
+                var latestVersion = (firstEntry["LatestVersion"]["Version"] as JValue).Value as string;
+
+                if (string.IsNullOrEmpty(latestVersion))
+                    throw new ArgumentException("Can't get the latest Sitefinity version. Please specify the upgrade version.");
+
+                this.logger.LogInformation(string.Format(Constants.LatestVersionFound, latestVersion));
+                this.Version = latestVersion;
+            }
         }
 
         private IEnumerable<string> GetNugetPackageSources()
@@ -455,6 +481,10 @@ namespace Sitefinity_CLI.Commands
 
         private readonly IVisualStudioWorker visualStudioWorker;
 
+        private readonly HttpClient httpClient;
+
         private readonly ICollection<string> allowedAdditionalPackagesIds = new List<string>() { "Progress.Sitefinity.Cloud" };
+
+        private const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
     }
 }
