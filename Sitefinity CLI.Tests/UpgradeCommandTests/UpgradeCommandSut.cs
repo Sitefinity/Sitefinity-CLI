@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI;
 using Sitefinity_CLI.Commands;
@@ -9,8 +10,8 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
     internal class UpgradeCommandSut : UpgradeCommand
     {
-        public UpgradeCommandSut(IPromptService promptService, ISitefinityPackageManager sitefinityPackageManager, ICsProjectFileEditor csProjectFileEditor, ILogger<UpgradeCommand> logger, IProjectConfigFileEditor projectConfigFileEditor, IUpgradeConfigGenerator upgradeConfigGenerator, IVisualStudioWorker visualStudioWorker)
-            : base(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker)
+        public UpgradeCommandSut(IPromptService promptService, ISitefinityPackageManager sitefinityPackageManager, ICsProjectFileEditor csProjectFileEditor, ILogger<UpgradeCommand> logger, IProjectConfigFileEditor projectConfigFileEditor, IUpgradeConfigGenerator upgradeConfigGenerator, IVisualStudioWorker visualStudioWorker, IHttpClientFactory clientFactory)
+            : base(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, clientFactory)
         {
         }
 

@@ -21,7 +21,7 @@ using System.Xml;
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.UpgradeCommandName, Description = "Upgrade Sitefinity project/s to a newer version of Sitefinity.")]
+    [Command(Constants.UpgradeCommandName, Description = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.")]
     internal class UpgradeCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
@@ -103,6 +103,9 @@ namespace Sitefinity_CLI.Commands
                 this.logger.LogInformation(Constants.UpgradeWasCanceled);
                 return;
             }
+
+            if (string.IsNullOrEmpty(this.Version))
+                this.SetLatestVersion();
 
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 

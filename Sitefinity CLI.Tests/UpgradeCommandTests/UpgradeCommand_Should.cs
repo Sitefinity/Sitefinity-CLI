@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SitefinityCLI.Tests.UpgradeCommandTests.Mocks;
 using Sitefinity_CLI.Logging;
 using Microsoft.Extensions.Logging.Console;
+using System.Net.Http;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
@@ -26,6 +27,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         private IProjectConfigFileEditor projectConfigFileEditor;
         private IUpgradeConfigGenerator upgradeConfigGenerator;
         private IVisualStudioWorker visualStudioWorker;
+        private IHttpClientFactory httpClientFactory;
         private ServiceProvider serviceProvider;
         private IPromptService promptService;
 
@@ -52,13 +54,14 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             this.projectConfigFileEditor = serviceProvider.GetService<IProjectConfigFileEditor>();
             this.upgradeConfigGenerator = serviceProvider.GetService<IUpgradeConfigGenerator>();
             this.visualStudioWorker = serviceProvider.GetService<IVisualStudioWorker>();
+            this.httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
             this.promptService = serviceProvider.GetService<IPromptService>();
         }
 
         [TestMethod]
         public async Task Throw_When_SolutionPathIsNotFound()
         {
-            var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker);
+            var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory);
             try
             {
                 upgradeComamnd.SolutionPath = "wrongSolutionpath";
