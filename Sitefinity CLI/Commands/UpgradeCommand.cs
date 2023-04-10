@@ -21,7 +21,7 @@ using System.Xml;
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.UpgradeCommandName, Description = "Upgrade Sitefinity project/s to a newer version of Sitefinity.")]
+    [Command(Constants.UpgradeCommandName, Description = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.")]
     internal class UpgradeCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
@@ -104,6 +104,9 @@ namespace Sitefinity_CLI.Commands
                 return;
             }
 
+            if (string.IsNullOrEmpty(this.Version))
+                this.SetLatestVersion();
+
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
             var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
@@ -114,9 +117,6 @@ namespace Sitefinity_CLI.Commands
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
                 return;
             }
-
-            if (string.IsNullOrEmpty(this.Version))
-                this.SetLatestVersion();
 
             Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
 
