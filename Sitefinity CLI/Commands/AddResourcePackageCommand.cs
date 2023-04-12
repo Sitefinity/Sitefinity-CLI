@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Enums;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 
 namespace Sitefinity_CLI.Commands
@@ -27,7 +28,7 @@ namespace Sitefinity_CLI.Commands
 
             var resourcePackagesFolderPath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName);
             var templatePackageFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ResourcePackageTemplatesFolderName, this.TemplateName);
-            var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.Name);
+            var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.SanitizedName);
 
             Directory.CreateDirectory(resourcePackagesFolderPath);
 
@@ -39,7 +40,7 @@ namespace Sitefinity_CLI.Commands
 
             if (Directory.Exists(newResourcePackagePath))
             {
-                this.Logger.LogError(string.Format(Constants.ResourceExistsMessage, config.FullName, this.Name, newResourcePackagePath));
+                this.Logger.LogError(string.Format(Constants.ResourceExistsMessage, config.FullName, this.SanitizedName, newResourcePackagePath));
                 return (int)ExitCode.GeneralError;
             }
 
@@ -60,5 +61,44 @@ namespace Sitefinity_CLI.Commands
 
             return (int)ExitCode.OK;
         }
+
+        internal string SanitizedName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.sanitizedName))
+                {
+                    this.sanitizedName = this.GetSanitizedName(this.Name);
+                }
+
+                return this.sanitizedName;
+            }
+        }
+
+        internal string GetSanitizedName(string name)
+        {
+            if (Char.IsDigit(name[0]))
+                name = "_" + name;
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                UnicodeCategory cat = char.GetUnicodeCategory(name[i]);
+
+                if ((cat != UnicodeCategory.UppercaseLetter) && (cat != UnicodeCategory.LowercaseLetter) &&
+                    (cat != UnicodeCategory.OtherLetter) && (cat != UnicodeCategory.ConnectorPunctuation) &&
+                    (cat != UnicodeCategory.ModifierLetter) && (cat != UnicodeCategory.NonSpacingMark) &&
+                    (cat != UnicodeCategory.SpacingCombiningMark) && (cat != UnicodeCategory.TitlecaseLetter) &&
+                    (cat != UnicodeCategory.Format) && (cat != UnicodeCategory.LetterNumber) &&
+                    (cat != UnicodeCategory.DecimalDigitNumber) &&
+                    (name[i] != '.') && (name[i] != '_'))
+                {
+                    name = name.Replace(name[i], '_');
+                }
+            }
+
+            return name;
+        }
+
+        internal string sanitizedName;
     }
 }
