@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 
 namespace Sitefinity_CLI.Commands
@@ -27,7 +29,7 @@ namespace Sitefinity_CLI.Commands
 
             var resourcePackagesFolderPath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName);
             var templatePackageFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ResourcePackageTemplatesFolderName, this.TemplateName);
-            var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.Name);
+            var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.SanitizedName);
 
             Directory.CreateDirectory(resourcePackagesFolderPath);
 
@@ -39,7 +41,7 @@ namespace Sitefinity_CLI.Commands
 
             if (Directory.Exists(newResourcePackagePath))
             {
-                this.Logger.LogError(string.Format(Constants.ResourceExistsMessage, config.FullName, this.Name, newResourcePackagePath));
+                this.Logger.LogError(string.Format(Constants.ResourceExistsMessage, config.FullName, this.SanitizedName, newResourcePackagePath));
                 return (int)ExitCode.GeneralError;
             }
 
@@ -60,5 +62,54 @@ namespace Sitefinity_CLI.Commands
 
             return (int)ExitCode.OK;
         }
+
+        private string SanitizedName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.sanitizedName))
+                {
+                    this.sanitizedName = this.GetSanitizedName(this.Name);
+                }
+
+                return this.sanitizedName;
+            }
+        }
+
+        private string GetSanitizedName(string name)
+        {
+            if (char.IsDigit(name[0]))
+                name = "_" + name;
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                UnicodeCategory cat = char.GetUnicodeCategory(name[i]);
+
+                if ((!this.allowedCharacterCategories.Contains(cat))
+                    && (name[i] != '.') && (name[i] != '_'))
+                {
+                    name = name.Replace(name[i], '_');
+                }
+            }
+
+            return name;
+        }
+
+        private List<UnicodeCategory> allowedCharacterCategories = new List<UnicodeCategory>
+        {   
+            UnicodeCategory.UppercaseLetter,
+            UnicodeCategory.LowercaseLetter,
+            UnicodeCategory.OtherLetter,
+            UnicodeCategory.ConnectorPunctuation,
+            UnicodeCategory.ModifierLetter,
+            UnicodeCategory.NonSpacingMark,
+            UnicodeCategory.SpacingCombiningMark,
+            UnicodeCategory.TitlecaseLetter,
+            UnicodeCategory.Format,
+            UnicodeCategory.LetterNumber,
+            UnicodeCategory.DecimalDigitNumber 
+        };
+
+        private string sanitizedName;
     }
 }
