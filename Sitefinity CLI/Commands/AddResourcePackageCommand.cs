@@ -85,7 +85,7 @@ namespace Sitefinity_CLI.Commands
             {
                 UnicodeCategory cat = char.GetUnicodeCategory(name[i]);
 
-                if((!this.allowedCharacterCategories.Contains(cat))
+                if ((!this.allowedCharacterCategories.Contains(cat))
                     && (name[i] != '.') && (name[i] != '_'))
                 {
                     name = name.Replace(name[i], '_');
