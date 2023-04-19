@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -62,7 +63,7 @@ namespace Sitefinity_CLI.Commands
             return (int)ExitCode.OK;
         }
 
-        internal string SanitizedName
+        private string SanitizedName
         {
             get
             {
@@ -75,22 +76,17 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        internal string GetSanitizedName(string name)
+        private string GetSanitizedName(string name)
         {
-            if (Char.IsDigit(name[0]))
+            if (char.IsDigit(name[0]))
                 name = "_" + name;
 
             for (int i = 0; i < name.Length; i++)
             {
                 UnicodeCategory cat = char.GetUnicodeCategory(name[i]);
 
-                if ((cat != UnicodeCategory.UppercaseLetter) && (cat != UnicodeCategory.LowercaseLetter) &&
-                    (cat != UnicodeCategory.OtherLetter) && (cat != UnicodeCategory.ConnectorPunctuation) &&
-                    (cat != UnicodeCategory.ModifierLetter) && (cat != UnicodeCategory.NonSpacingMark) &&
-                    (cat != UnicodeCategory.SpacingCombiningMark) && (cat != UnicodeCategory.TitlecaseLetter) &&
-                    (cat != UnicodeCategory.Format) && (cat != UnicodeCategory.LetterNumber) &&
-                    (cat != UnicodeCategory.DecimalDigitNumber) &&
-                    (name[i] != '.') && (name[i] != '_'))
+                if((!this.allowedCharacterCategories.Contains(cat))
+                    && (name[i] != '.') && (name[i] != '_'))
                 {
                     name = name.Replace(name[i], '_');
                 }
@@ -99,6 +95,21 @@ namespace Sitefinity_CLI.Commands
             return name;
         }
 
-        internal string sanitizedName;
+        private List<UnicodeCategory> allowedCharacterCategories = new List<UnicodeCategory>
+        {   
+            UnicodeCategory.UppercaseLetter,
+            UnicodeCategory.LowercaseLetter,
+            UnicodeCategory.OtherLetter,
+            UnicodeCategory.ConnectorPunctuation,
+            UnicodeCategory.ModifierLetter,
+            UnicodeCategory.NonSpacingMark,
+            UnicodeCategory.SpacingCombiningMark,
+            UnicodeCategory.TitlecaseLetter,
+            UnicodeCategory.Format,
+            UnicodeCategory.LetterNumber,
+            UnicodeCategory.DecimalDigitNumber 
+        };
+
+        private string sanitizedName;
     }
 }
