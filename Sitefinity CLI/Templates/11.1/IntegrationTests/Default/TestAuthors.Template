@@ -1,9 +1,0 @@
-﻿/* {{> sign}} */
-
-namespace {{pascalCaseName}}
-{
-    internal class TestAuthors
-    {
-        public const string SitefinityCLI = "Sitefinity CLI";
-    }
-}
