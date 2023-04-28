@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.IO;
 using Newtonsoft.Json;
-using System.IO.Compression;
-using System.Net.Mime;
 using Newtonsoft.Json.Linq;
-using Sitefinity_CLI.Model;
 using Sitefinity_CLI.Enums;
+using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.PackageManagement
 {
