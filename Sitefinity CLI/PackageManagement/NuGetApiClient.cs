@@ -43,7 +43,7 @@ namespace Sitefinity_CLI.PackageManagement
 
             IList<NuGetPackage> dependencies;
             NuGetPackage nuGetPackage = new NuGetPackage();
-            if (nuGetPackageXmlDoc.ProtocolVersion == ProtocolVersion.NuGetAPIV2)
+            if (nuGetPackageXmlDoc.ProtoVersion == ProtocolVersion.NuGetAPIV2)
             {
                 dependencies = new List<NuGetPackage>(this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage));
             }
@@ -192,7 +192,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             XDocument nuGetPackageXmlDoc = XDocument.Parse(responseContentString);
-            PackageXmlDocumentModel packageXmlDocument = new PackageXmlDocumentModel() { XDocumentData = nuGetPackageXmlDoc, ProtocolVersion = specification.ProtoVersion };
+            PackageXmlDocumentModel packageXmlDocument = new PackageXmlDocumentModel() { XDocumentData = nuGetPackageXmlDoc, ProtoVersion = specification.ProtoVersion };
 
             if (nuGetPackageXmlDocumentCache != null && !nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
             {

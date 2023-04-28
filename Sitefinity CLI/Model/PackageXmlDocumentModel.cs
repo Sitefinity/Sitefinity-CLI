@@ -6,6 +6,6 @@ namespace Sitefinity_CLI.Model
     internal class PackageXmlDocumentModel
     {
         internal XDocument XDocumentData { get; set; }
-        internal ProtocolVersion ProtocolVersion { get; set; }
+        internal ProtocolVersion ProtoVersion { get; set; }
     }
 }
