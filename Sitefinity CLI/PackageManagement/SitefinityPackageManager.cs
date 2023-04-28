@@ -25,7 +25,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.packagesConfigFileEditor = packagesConfigFileEditor;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
-            this.defaultSources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSource, PublicNuGetSourceV3 };
+            this.defaultSources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSourceV3 };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
             this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
         }
@@ -624,8 +624,6 @@ namespace Sitefinity_CLI.PackageManagement
         private readonly HashSet<string> systemAssembliesNotToUpdate;
 
         private const string SitefinityPublicNuGetSource = "https://nuget.sitefinity.com/nuget/";
-
-        private const string PublicNuGetSource = "https://nuget.org/api/v2/";
 
         private const string PublicNuGetSourceV3 = "https://api.nuget.org/v3/index.json";
 

@@ -175,6 +175,6 @@ namespace Sitefinity_CLI
         public const string DependenciesEl = "dependencies";
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
-        public const string ApiV3SourceString = "index.json";
+        public const string ApiV3Identifier = "index.json";
     }
 }
