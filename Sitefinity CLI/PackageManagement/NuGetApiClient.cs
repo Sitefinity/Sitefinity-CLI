@@ -33,26 +33,54 @@ namespace Sitefinity_CLI.PackageManagement
             if (File.Exists(packageDependenciesHashFilePath))
                 return JsonConvert.DeserializeObject<NuGetPackage>(File.ReadAllText(packageDependenciesHashFilePath));
 
-            XDocument nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources);
+            this.isV2 = true;
+            XDocument nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources, httpClient);
             if (nuGetPackageXmlDoc == null)
             {
                 return null;
             }
 
-            XElement propertiesElement = nuGetPackageXmlDoc
-                .Element(this.xmlns + Constants.EntryElem)
-                .Element(this.xmlnsm + Constants.PropertiesElem);
-
+            IList<NuGetPackage> dependencies = new List<NuGetPackage>();
             NuGetPackage nuGetPackage = new NuGetPackage();
-            nuGetPackage.Id = nuGetPackageXmlDoc
-                .Element(this.xmlns + Constants.EntryElem)
-                .Element(this.xmlns + Constants.TitleElem).Value;
+            if (this.isV2)
+            {
+                XElement propertiesElement = nuGetPackageXmlDoc
+                    .Element(this.xmlns + Constants.EntryElem)
+                    .Element(this.xmlnsm + Constants.PropertiesElem);
 
-            nuGetPackage.Version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
+                nuGetPackage.Id = nuGetPackageXmlDoc
+                    .Element(this.xmlns + Constants.EntryElem)
+                    .Element(this.xmlns + Constants.TitleElem).Value;
 
-            string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
+                nuGetPackage.Version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
 
-            IList<NuGetPackage> dependencies = this.ParseDependencies(dependenciesString);
+                string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
+
+                dependencies = this.ParseDependencies(dependenciesString);
+            }
+            else
+            {
+                var packageNamespace = nuGetPackageXmlDoc.Root.GetDefaultNamespace();
+                var elementPackage = nuGetPackageXmlDoc.Element(packageNamespace + Constants.PackageElem);
+                var metadataNamespace = elementPackage.Descendants().First().GetDefaultNamespace();
+                var elementsMetadata = elementPackage.Element(metadataNamespace + Constants.MetadataElem);
+                var groupElementsDependencies = elementsMetadata.Element(metadataNamespace + Constants.DependenciesEl);
+
+                if (groupElementsDependencies != null)
+                {
+                    var v3Regex = new Regex("^.[A-Z]{4}[a-z]{8}\\d.\\d\\b[.0-9]*$", RegexOptions.Compiled);
+                    var groupElement = groupElementsDependencies.Elements(metadataNamespace + Constants.GroupElem).FirstOrDefault(x => v3Regex.IsMatch(x.Attribute(Constants.TargetFramework).Value));
+                    if (groupElement != null)
+                    {
+                        var framework = groupElement.Attribute(Constants.TargetFramework).Value.Substring(13);
+                        var depElements = groupElement.Elements();
+                        if (depElements.Any())
+                        {
+                            dependencies = this.GetV3Dependencies(depElements, framework);
+                        }
+                    }
+                }
+            }
 
             if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
             {
@@ -120,10 +148,10 @@ namespace Sitefinity_CLI.PackageManagement
             return versions;
         }
 
-        private async Task<XDocument> GetPackageXmlDocument(string id, string version, IEnumerable<string> sources)
+        private async Task<XDocument> GetPackageXmlDocument(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
         {
             string cacheKey = string.Concat(id, version);
-            if (nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
+            if (nuGetPackageXmlDocumentCache != null && nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
             {
                 lock (lockObj)
                 {
@@ -135,13 +163,31 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             HttpResponseMessage response = null;
-            foreach (string source in sources)
+            var v3Sources = sources.Where(x => x.Contains(Constants.ApiV3SourceString));
+            var v2Sources = sources.Except(v3Sources);
+            foreach (string source in v3Sources)
             {
-                string sourceUrl = source.TrimEnd('/');
-                response = await this.httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
+                string sourceUrl = this.GetBaseAddress(httpClient, source).Result.TrimEnd('/');
+                string loweredId = id.ToLowerInvariant();
+                response = await httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
+                    this.isV2 = false;
                     break;
+                }
+            }
+
+            if (isV2)
+            {
+                foreach (string source in v2Sources)
+                {
+                    string sourceUrl = source.TrimEnd('/');
+                    response = await httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        this.isV2 = true;
+                        break;
+                    }
                 }
             }
 
@@ -157,7 +203,7 @@ namespace Sitefinity_CLI.PackageManagement
 
             XDocument nuGetPackageXmlDoc = XDocument.Parse(responseContentString);
 
-            if (!nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
+            if (nuGetPackageXmlDocumentCache != null && !nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
             {
                 lock (lockObj)
                 {
@@ -249,6 +295,44 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencies;
         }
 
+        private async Task<string> GetBaseAddress(HttpClient httpClient, string source)
+        {
+            HttpResponseMessage response = null;
+            string baseAddress = null;
+
+            using (var request = new HttpRequestMessage(HttpMethod.Get, source))
+            {
+                request.Headers.Add("Accept", MediaTypeNames.Application.Json);
+
+                response = await httpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    JObject jResponse = JObject.Parse(responseString);
+                    JArray ar = (JArray)jResponse["resources"];
+                    var tokenList = ar.Where(x => (string)x["@type"] == PackageBaseAddress).ToList();
+                    baseAddress = tokenList.FirstOrDefault().Value<string>("@id");
+                }
+            }
+
+            return baseAddress;
+        }
+
+        private IList<NuGetPackage> GetV3Dependencies(IEnumerable<XElement> depElements, string framework)
+        {
+            var dependencies = new List<NuGetPackage>();
+            foreach (var depElement in depElements)
+            {
+                var np = new NuGetPackage();
+                np.Id = depElement.Attribute("id").Value;
+                np.Version = depElement.Attribute("version").Value;
+                np.Framework = framework;
+                dependencies.Add(np);
+            }
+
+            return dependencies;
+        }
+
         private readonly IHttpClientFactory clientFactory;
 
         private readonly HttpClient httpClient;
@@ -261,7 +345,9 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly IDictionary<string, XDocument> nuGetPackageXmlDocumentCache;
 
+        private bool isV2;
         private readonly static object lockObj = new Object();
         private const string LocalPackagesInfoCacheFolder = "PackagesInfoCache";
+        private const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
     }
 }
