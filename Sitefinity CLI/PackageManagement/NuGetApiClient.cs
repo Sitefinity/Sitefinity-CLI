@@ -41,15 +41,15 @@ namespace Sitefinity_CLI.PackageManagement
                 return null;
             }
 
-            IList<NuGetPackage> dependencies;
+            List<NuGetPackage> dependencies = new List<NuGetPackage>();
             NuGetPackage nuGetPackage = new NuGetPackage();
             if (nuGetPackageXmlDoc.ProtoVersion == ProtocolVersion.NuGetAPIV2)
             {
-                dependencies = new List<NuGetPackage>(this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage));
+                dependencies = this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage);
             }
             else
             {
-                dependencies = new List<NuGetPackage>(this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage));
+                dependencies = this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage);
             }
 
             if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
