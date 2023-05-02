@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Sitefinity_CLI.Exceptions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace Sitefinity_CLI.PackageManagement
 {

@@ -171,5 +171,10 @@ namespace Sitefinity_CLI
         public const string ProgressSitefinityRendererReferenceKeyWords = "Progress.Sitefinity.Renderer";
         public const string SitefinityUpgradePowershellFolderName = "PowerShell";
         public const string SitefinityPublicKeyToken = "b28c218413bdf563";
+        public const string MetadataElem = "metadata";
+        public const string DependenciesEl = "dependencies";
+        public const string GroupElem = "group";
+        public const string TargetFramework = "targetFramework";
+        public const string ApiV3Identifier = "index.json";
     }
 }
