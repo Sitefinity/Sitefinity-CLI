@@ -116,7 +116,12 @@ namespace Sitefinity_CLI.PackageManagement
                 {
                     foreach (var ge in groupElements)
                     {
-                        var dependenciesTargetFramework = ge.Attribute(Constants.TargetFramework).Value;
+                        string dependenciesTargetFramework = null;
+                        if (ge.HasAttributes && ge.Attributes().Any(x => x.Name == Constants.TargetFramework))
+                        {
+                            dependenciesTargetFramework = ge.Attribute(Constants.TargetFramework).Value;
+                        }
+
                         var depElements = ge.Elements();
                         if (depElements.Any())
                         {
@@ -366,22 +371,30 @@ namespace Sitefinity_CLI.PackageManagement
         private IList<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements, string dependenciesTargetFramework)
         {
             var dependencies = new List<NuGetPackage>();
-
-            if (dependenciesTargetFramework.Contains(".NETFramework"))
+            if (depElements.Any())
             {
-                var frameworkVersion = dependenciesTargetFramework.Substring(13).Replace(".", string.Empty);
-
                 foreach (var depElement in depElements)
                 {
                     var np = new NuGetPackage();
                     np.Id = depElement.Attribute("id").Value;
                     np.Version = depElement.Attribute("version").Value;
-                    np.Framework = $"net{frameworkVersion}";
+                    np.Framework = this.GetFrameworkVersion(dependenciesTargetFramework);
                     dependencies.Add(np);
                 }
             }
 
             return dependencies;
+        }
+
+        private string GetFrameworkVersion(string dependenciesTargetFramework)
+        {
+            string frameworkVersion = null;
+            if (!string.IsNullOrEmpty(dependenciesTargetFramework) && dependenciesTargetFramework.Contains(".NETFramework"))
+            {
+                frameworkVersion = dependenciesTargetFramework.Substring(13).Replace(".", string.Empty);
+            }
+
+            return frameworkVersion != null ? $"net{frameworkVersion}" : string.Empty;
         }
 
         private readonly IHttpClientFactory clientFactory;
