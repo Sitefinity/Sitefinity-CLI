@@ -114,7 +114,9 @@ namespace Sitefinity_CLI.PackageManagement
                 var groupElements = groupElementsDependencies.Elements(metadataNamespace + Constants.GroupElem);
                 if (groupElements != null)
                 {
-                    foreach (var ge in groupElements)
+                    var groupElementsForTargetFramework = groupElements.Where(x => (x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework)) || !x.HasAttributes);
+
+                    foreach (var ge in groupElementsForTargetFramework)
                     {
                         string dependenciesTargetFramework = null;
                         if (ge.HasAttributes && ge.Attributes().Any(x => x.Name == Constants.TargetFramework))
@@ -125,7 +127,7 @@ namespace Sitefinity_CLI.PackageManagement
                         var depElements = ge.Elements();
                         if (depElements.Any())
                         {
-                            dependencies = new List<NuGetPackage>(this.GetDependencies(depElements, dependenciesTargetFramework));
+                            dependencies = this.GetDependencies(depElements, dependenciesTargetFramework);
                         }
                     }
                 }
@@ -368,7 +370,7 @@ namespace Sitefinity_CLI.PackageManagement
             return baseAddress;
         }
 
-        private IList<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements, string dependenciesTargetFramework)
+        private List<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements, string dependenciesTargetFramework)
         {
             var dependencies = new List<NuGetPackage>();
             if (depElements.Any())
