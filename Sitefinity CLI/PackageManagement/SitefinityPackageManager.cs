@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using Sitefinity_CLI.VisualStudio;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.VisualStudio;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -59,7 +59,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public bool PackageExists(string packageId, string projectFilePath)
         {
-            string packagesConfigFilePath = this.GetPackagesConfigFilePathForProject(projectFilePath);
+            string packagesConfigFilePath = GetPackagesConfigFilePathForProject(projectFilePath);
 
             NuGetPackage nuGetPackage = this.packagesConfigFileEditor.FindPackage(packagesConfigFilePath, packageId);
             if (nuGetPackage != null)
@@ -92,7 +92,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             this.logger.LogInformation($"Synchronizing packages and references for project '{projectFilePath}'");
 
-            string packagesConfigFilePath = this.GetPackagesConfigFilePathForProject(projectFilePath);
+            string packagesConfigFilePath = GetPackagesConfigFilePathForProject(projectFilePath);
             IEnumerable<NuGetPackage> packages = this.packagesConfigFileEditor.GetPackages(packagesConfigFilePath);
 
             XmlDocument projectFileXmlDocument = new XmlDocument();
@@ -112,7 +112,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             XmlNodeList referenceElements = projectFileXmlDocument.GetElementsByTagName(Constants.ReferenceElem);
-            string targetFramework = this.GetTargetFramework(projectFileXmlDocument);
+            string targetFramework = GetTargetFramework(projectFileXmlDocument);
 
             IEnumerable<AssemblyReference> nugetPackageAssemblyReferences = this.GetAssemblyReferencesFromNuGetPackages(packages, targetFramework, projectDir, solutionDir);
             IEnumerable<IGrouping<string, AssemblyReference>> nuGetPackageAssemblyReferenceGroups = nugetPackageAssemblyReferences
@@ -142,7 +142,7 @@ namespace Sitefinity_CLI.PackageManagement
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)
         {
             string packagesDir = Path.Combine(solutionDir, PackagesFolderName);
-            string relativePackagesDirPath = this.GetRelativePathTo(projectDir + "\\", packagesDir);
+            string relativePackagesDirPath = GetRelativePathTo(projectDir + "\\", packagesDir);
 
             XmlNodeList elementsWithIncludeAttribute = projectFileXmlDocument.SelectNodes("//*[@Include]");
             for (int i = 0; i < elementsWithIncludeAttribute.Count; i++)
@@ -257,7 +257,7 @@ namespace Sitefinity_CLI.PackageManagement
                 filePaths.AddRange(Directory.GetFiles(packageDir, "*.*", SearchOption.AllDirectories));
             }
 
-            return filePaths.Select(fp => this.GetRelativePathTo(projectDir + "\\", fp));
+            return filePaths.Select(fp => GetRelativePathTo(projectDir + "\\", fp));
         }
 
         private IEnumerable<AssemblyReference> GetAssemblyReferencesFromNuGetPackages(IEnumerable<NuGetPackage> nuGetPackages, string targetFramework, string projectDir, string solutionDir)
@@ -290,7 +290,7 @@ namespace Sitefinity_CLI.PackageManagement
             assemblyReference.Name = assemblyName.Name;
             assemblyReference.Version = assemblyName.Version;
             assemblyReference.FullName = assemblyName.FullName;
-            assemblyReference.HintPath = this.GetRelativePathTo(projectDir + "\\", dllFilePath);
+            assemblyReference.HintPath = GetRelativePathTo(projectDir + "\\", dllFilePath);
 
             return assemblyReference;
         }
@@ -352,7 +352,7 @@ namespace Sitefinity_CLI.PackageManagement
                         if (name == assemblyFullName)
                         {
                             var newVersionAttribute = bindingRedirect.Attributes[NewVersionAttributeName];
-                            if (newVersionAttribute != null && !this.ShouldUpdateBindingRedirect(newVersionAttribute.Value, assemblyVersion))
+                            if (newVersionAttribute != null && !ShouldUpdateBindingRedirect(newVersionAttribute.Value, assemblyVersion))
                             {
                                 break;
                             }
@@ -383,7 +383,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        private bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
+        private static bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
         {
             var oldVersion = Version.Parse(oldAssemblyVersion);
             var newVersion = Version.Parse(newAssemblyVersion);
@@ -391,7 +391,7 @@ namespace Sitefinity_CLI.PackageManagement
             return newVersion > oldVersion;
         }
 
-        private bool TrySetTargetFramework(XmlDocument doc, string targetFramework)
+        private static bool TrySetTargetFramework(XmlDocument doc, string targetFramework)
         {
             var targetFrameworkVersionElems = doc.GetElementsByTagName(Constants.TargetFrameworkVersionElem);
             if (targetFrameworkVersionElems.Count != 1)
@@ -409,7 +409,7 @@ namespace Sitefinity_CLI.PackageManagement
             return false;
         }
 
-        private string GetTargetFramework(XmlDocument doc)
+        private static string GetTargetFramework(XmlDocument doc)
         {
             XmlNodeList targetFrameworkVersionElems = doc.GetElementsByTagName(Constants.TargetFrameworkVersionElem);
             if (targetFrameworkVersionElems.Count != 1)
@@ -420,7 +420,7 @@ namespace Sitefinity_CLI.PackageManagement
             return targetFrameworkVersionElems[0].InnerText;
         }
 
-        private string GetTargetFrameworkForSitefinityVersion(string version)
+        private static string GetTargetFrameworkForSitefinityVersion(string version)
         {
             var versionWithoutSeperator = version.Replace(".", string.Empty).Substring(0, 3);
             var versionAsInt = int.Parse(versionWithoutSeperator);
@@ -455,13 +455,13 @@ namespace Sitefinity_CLI.PackageManagement
         /// </summary>
         internal IEnumerable<string> GetPackageDlls(string packagePath, string targetVersion)
         {
-            // Target framework convention looks like v4.7.2
+            // v4.7.2 -> 472
             string versionPart = targetVersion.Replace(".", string.Empty).Replace("v", string.Empty);
-            int.TryParse(versionPart, out int targetVersionNumber);
-            if (targetVersionNumber == 0)
+            if (!int.TryParse(versionPart, out int targetFrameworkVersion) || targetFrameworkVersion == 0)
             {
-                return new List<string>();
+                return Array.Empty<string>();
             }
+
             string libDir = Path.Combine(packagePath, LibFolderName);
             string dllStorageDir = null;
             if (Directory.Exists(libDir))
@@ -469,7 +469,7 @@ namespace Sitefinity_CLI.PackageManagement
                 if (Directory.GetDirectories(libDir).Any())
                 {
                     // we check for the highest possible .net framework version of the dll
-                    dllStorageDir = GetDllStoragePathForNetFramework(targetVersionNumber, libDir);
+                    dllStorageDir = GetDllStoragePathForNetFramework(targetFrameworkVersion, libDir);
 
                     if (string.IsNullOrEmpty(dllStorageDir))
                     {
@@ -483,80 +483,82 @@ namespace Sitefinity_CLI.PackageManagement
                 dllStorageDir = packagePath;
             }
 
-            return dllStorageDir != null && Directory.Exists(dllStorageDir) ? Directory.GetFiles(dllStorageDir, DllFilterPattern) : new string[] { };
+            return dllStorageDir != null && Directory.Exists(dllStorageDir) ? Directory.GetFiles(dllStorageDir, DllFilterPattern) : Array.Empty<string>();
         }
 
-        private string GetDllStoragePathForNetStandart(string libDir)
+        private static string GetDllStoragePathForNetStandart(string libDir)
         {
             string dllStorageDir = null;
-            int currentMaxFolderFrameworkVersion = 0;
+            int highestNetStandardDirFrameworkVersion = 0;
 
-            var netStandardDirNames = Directory.GetDirectories(libDir, DotNetStandardPrefix + "*");
-            foreach (var subDir in netStandardDirNames)
+            string[] netStandardDirNames = Directory.GetDirectories(libDir, DotNetStandardPrefix + "*");
+            foreach (string netStandardDirName in netStandardDirNames)
             {
                 // netstandard2.0 => 2.0 => 20
-                var versionFromFolder = subDir
+                string netStandardDirFrameworkVersionString = netStandardDirName
                     .Split("\\")
                     .Last()
                     .Replace(DotNetStandardPrefix, string.Empty)
                     .Replace(".", string.Empty);
 
-                int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
-
-                if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
+                if (int.TryParse(netStandardDirFrameworkVersionString, out int netStandardDirFrameworkVersion) &&
+                    netStandardDirFrameworkVersion != 0 &&
+                    netStandardDirFrameworkVersion <= 20 &&
+                    netStandardDirFrameworkVersion > highestNetStandardDirFrameworkVersion)
                 {
-                    dllStorageDir = subDir;
-                    currentMaxFolderFrameworkVersion = currentFolderFrameworkVersion;
+                    dllStorageDir = netStandardDirName;
+                    highestNetStandardDirFrameworkVersion = netStandardDirFrameworkVersion;
                 }
             }
 
             return dllStorageDir;
         }
 
-        private string GetDllStoragePathForNetFramework(int targetVersionNumber, string libDir)
+        private static string GetDllStoragePathForNetFramework(int targetFrameworkVersion, string libDir)
         {
-            if (targetVersionNumber.ToString().Length == 2)
+            if (targetFrameworkVersion.ToString().Length == 2)
             {
                 // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
-                targetVersionNumber *= 10;
+                targetFrameworkVersion *= 10;
             }
 
             string dllStorageDir = null;
-
-            int currentMaxFolderFrameworkVersion = 0;
-
-            var netFrameworkDirNames = Directory.GetDirectories(libDir)
+            int highestFolderFrameworkVersion = 0;
+            IEnumerable<string> netFrameworkDirNames = Directory.GetDirectories(libDir)
                 .Where(dirName => dirName.Contains(DotNetPrefix) && !dirName.Contains(DotNetStandardPrefix));
 
-            foreach (var subDir in netFrameworkDirNames)
+            foreach (string netFrameworkDirName in netFrameworkDirNames)
             {
-                var versionFromFolder = subDir.Split("\\").Last().Replace(DotNetPrefix, string.Empty);
+                var netFrameworkDirVersionString = netFrameworkDirName.Split("\\").Last().Replace(DotNetPrefix, string.Empty);
 
                 // The folder may have "-" in the name
-                if (versionFromFolder.Contains("-"))
+                if (netFrameworkDirVersionString.Contains('-'))
                 {
-                    versionFromFolder = versionFromFolder.Split("-").FirstOrDefault();
+                    netFrameworkDirVersionString = netFrameworkDirVersionString.Split("-").FirstOrDefault();
                 }
 
-                int.TryParse(versionFromFolder, out int currentFolderFrameworkVersion);
-
-                if (currentFolderFrameworkVersion.ToString().Length == 2)
+                if (int.TryParse(netFrameworkDirVersionString, out int netFrameworkDirVersion))
                 {
-                    // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
-                    currentFolderFrameworkVersion *= 10;
-                }
+                    if (netFrameworkDirVersion.ToString().Length == 2)
+                    {
+                        // Fix for the cases when we upgrade from versions with different length - 4.7.1 to 4.8
+                        netFrameworkDirVersion *= 10;
+                    }
 
-                if (currentFolderFrameworkVersion != 0 && currentFolderFrameworkVersion <= targetVersionNumber && currentFolderFrameworkVersion > currentMaxFolderFrameworkVersion)
-                {
-                    dllStorageDir = subDir;
-                    currentMaxFolderFrameworkVersion = currentFolderFrameworkVersion;
+                    if (netFrameworkDirVersion != 0 &&
+                        netFrameworkDirVersion <= targetFrameworkVersion &&
+                        netFrameworkDirVersion > highestFolderFrameworkVersion)
+                    {
+                        dllStorageDir = netFrameworkDirName;
+                        highestFolderFrameworkVersion = netFrameworkDirVersion;
+                    }
                 }
             }
 
             return dllStorageDir;
         }
 
-        private string GetPackagesConfigFilePathForProject(string projectFilePath)
+        private static string GetPackagesConfigFilePathForProject(string projectFilePath)
         {
             string projectDirectory = Path.GetDirectoryName(projectFilePath);
             string packagesConfigFilePath = Path.Combine(projectDirectory, Constants.PackagesConfigFileName);
@@ -569,7 +571,7 @@ namespace Sitefinity_CLI.PackageManagement
             return packagesConfigFilePath;
         }
 
-        private string GetRelativePathTo(string fromPath, string toPath)
+        private static string GetRelativePathTo(string fromPath, string toPath)
         {
             var fromUri = new Uri(fromPath);
             var toUri = new Uri(toPath);
@@ -587,14 +589,14 @@ namespace Sitefinity_CLI.PackageManagement
                 throw new ArgumentException($"Invalid version: {version}");
             }
 
-            var targetFramework = this.GetTargetFrameworkForSitefinityVersion(version);
+            var targetFramework = GetTargetFrameworkForSitefinityVersion(version);
 
             foreach (var projectFilePath in sitefinityProjectFilePaths)
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(projectFilePath);
 
-                if (this.TrySetTargetFramework(doc, targetFramework))
+                if (TrySetTargetFramework(doc, targetFramework))
                 {
                     doc.Save(projectFilePath);
 
