@@ -486,7 +486,7 @@ namespace Sitefinity_CLI.Commands
 
         private readonly HttpClient httpClient;
 
-        private readonly ICollection<string> allowedAdditionalPackagesIds = new List<string>() { "Progress.Sitefinity.Cloud" };
+        private readonly ICollection<string> allowedAdditionalPackagesIds = new List<string>() { "Progress.Sitefinity.Cloud", "Progress.Sitefinity.MOVEit", "Telerik.Sitefinity.DAM" };
 
         private const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
     }
