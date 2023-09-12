@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -13,11 +14,11 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger = logger;
         }
 
-        public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<string> sources)
+        public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<NugetPackageSource> sources)
         {
             string source = string.Join(';', sources);
 
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -Source \"{source}\" -NoCache");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache");
         }
 
         public void Install(string configFilePath)

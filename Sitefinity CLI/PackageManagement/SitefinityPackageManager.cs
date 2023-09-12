@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
 using Sitefinity_CLI.VisualStudio;
 
 namespace Sitefinity_CLI.PackageManagement
@@ -25,12 +26,16 @@ namespace Sitefinity_CLI.PackageManagement
             this.packagesConfigFileEditor = packagesConfigFileEditor;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
-            this.defaultSources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSourceV3 };
+            this.defaultSources = new List<NugetPackageSource>()
+            {
+               new NugetPackageSource(SitefinityPublicNuGetSource),
+               new NugetPackageSource(PublicNuGetSourceV3)
+            };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
             this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
         }
 
-        public void Install(string packageId, string version, string solutionFilePath, IEnumerable<string> nugetPackageSources)
+        public void Install(string packageId, string version, string solutionFilePath, IEnumerable<NugetPackageSource> nugetPackageSources)
         {
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
@@ -75,7 +80,7 @@ namespace Sitefinity_CLI.PackageManagement
             return await this.GetSitefinityPackageTree(version, this.defaultSources);
         }
 
-        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<string> nugetPackageSources)
+        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> nugetPackageSources)
         {
             var sourcesUsed = string.Join(',', nugetPackageSources);
             this.logger.LogInformation($"Package sources used: {sourcesUsed}");
@@ -83,7 +88,7 @@ namespace Sitefinity_CLI.PackageManagement
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
         }
 
-        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<string> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<NugetPackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             return await nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, this.supportedFrameworksRegex, shouldBreakSearch);
         }
@@ -136,7 +141,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public async Task<IEnumerable<string>> GetPackageVersions(string id, int versionsCount = 10)
         {
-            return await this.nuGetApiClient.GetPackageVersions(id, new List<string>() { SitefinityPublicNuGetSource }, versionsCount);
+            return await this.nuGetApiClient.GetPackageVersions(id, new List<NugetPackageSource>() { new NugetPackageSource(SitefinityPublicNuGetSource) }, versionsCount);
         }
 
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)
@@ -321,11 +326,11 @@ namespace Sitefinity_CLI.PackageManagement
             return parsedVersion;
         }
 
-        public IEnumerable<string> DefaultPackageSource
+        public IEnumerable<NugetPackageSource> DefaultPackageSource
         {
             get
             {
-                return new List<string>(this.defaultSources);
+                return new List<NugetPackageSource>(this.defaultSources);
             }
         }
 
@@ -619,7 +624,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly ILogger logger;
 
-        private readonly IEnumerable<string> defaultSources;
+        private readonly IEnumerable<NugetPackageSource> defaultSources;
 
         private readonly Regex supportedFrameworksRegex;
 

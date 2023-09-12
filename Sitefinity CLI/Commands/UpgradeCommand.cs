@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.Commands.Validators;
 using Sitefinity_CLI.Exceptions;
+using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
@@ -211,14 +212,22 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private IEnumerable<string> GetNugetPackageSources()
+        private IEnumerable<NugetPackageSource> GetNugetPackageSources()
         {
             if (string.IsNullOrEmpty(this.PackageSources))
             {
                 return this.sitefinityPackageManager.DefaultPackageSource;
             }
 
-            var packageSources = this.PackageSources.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ps => ps.Trim());
+            var packageSources = this.PackageSources
+                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(ps => ps.Trim().Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                .Select(ps => new NugetPackageSource
+                {
+                    SourceUrl = ps[0],
+                    Password = ps.Length > 1 ? ps[1] : null,
+                });
+            
             return packageSources;
         }
 

@@ -5,7 +5,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -28,7 +30,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.xmlnsd = "http://schemas.microsoft.com/ado/2007/08/dataservices";
         }
 
-        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<string> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<NugetPackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             // First, try to retrieve the data from the local cache
             var packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LocalPackagesInfoCacheFolder, string.Concat(id, version));
@@ -97,7 +99,7 @@ namespace Sitefinity_CLI.PackageManagement
             var id = nuGetPackageXmlDoc.XDocumentData
                 .Element(this.xmlns + Constants.EntryElem)
                 .Element(this.xmlns + Constants.TitleElem).Value;
-            
+
             var version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
 
             if (id != null && version != null)
@@ -147,12 +149,12 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencies;
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10)
+        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
         {
             HttpResponseMessage response = null;
-            foreach (string source in sources)
+            foreach (NugetPackageSource nugetSource in nugetSources)
             {
-                string sourceUrl = source.TrimEnd('/');
+                string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
                 using (var request = new HttpRequestMessage(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}"))
                 {
                     request.Headers.Add("Accept", MediaTypeNames.Application.Json);
@@ -182,7 +184,7 @@ namespace Sitefinity_CLI.PackageManagement
             return versions;
         }
 
-        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
             string cacheKey = string.Concat(id, version);
             if (nuGetPackageXmlDocumentCache != null && nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
@@ -226,7 +228,7 @@ namespace Sitefinity_CLI.PackageManagement
             return packageXmlDocument;
         }
 
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
             var versionInfo = ProtocolVersion.NuGetAPIV3;
             var response = await this.GetPackageSpecificationV3(id, version, sources, httpClient);
@@ -242,12 +244,12 @@ namespace Sitefinity_CLI.PackageManagement
             return new PackageSpecificationResponseModel() { SpecResponse = response, ProtoVersion = versionInfo };
         }
 
-        private async Task<HttpResponseMessage> GetPackageSpecificationV3(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<HttpResponseMessage> GetPackageSpecificationV3(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
             HttpResponseMessage response = null;
-            var apiV3Sources = sources.Where(x => x.Contains(Constants.ApiV3Identifier));
+            var apiV3Sources = sources.Where(x => x.SourceUrl.Contains(Constants.ApiV3Identifier));
 
-            foreach (string source in apiV3Sources)
+            foreach (NugetPackageSource source in apiV3Sources)
             {
                 // We fetch the base URL from the service index because it may be changed without notice
                 string sourceUrl = this.GetBaseAddress(httpClient, source).Result.TrimEnd('/');
@@ -262,14 +264,14 @@ namespace Sitefinity_CLI.PackageManagement
             return response;
         }
 
-        private async Task<HttpResponseMessage> GetPackageSpecificationV2(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<HttpResponseMessage> GetPackageSpecificationV2(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
             HttpResponseMessage response = null;
-            var apiV2Sources = sources.Where(x => !x.Contains(Constants.ApiV3Identifier));
+            var apiV2Sources = sources.Where(x => !x.SourceUrl.Contains(Constants.ApiV3Identifier));
 
-            foreach (string source in apiV2Sources)
+            foreach (NugetPackageSource source in apiV2Sources)
             {
-                string sourceUrl = source.TrimEnd('/');
+                string sourceUrl = source.SourceUrl.TrimEnd('/');
                 response = await httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -363,14 +365,17 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencies;
         }
 
-        private async Task<string> GetBaseAddress(HttpClient httpClient, string source)
+        private async Task<string> GetBaseAddress(HttpClient httpClient, NugetPackageSource nugetSource)
         {
             HttpResponseMessage response = null;
             string baseAddress = null;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, source))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, nugetSource.SourceUrl))
             {
                 request.Headers.Add("Accept", MediaTypeNames.Application.Json);
+                request.Headers.Add("Accept", MediaTypeNames.Application.Json);
+                var authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Username}:{nugetSource.Password}");
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
 
                 response = await httpClient.SendAsync(request);
                 if (response.IsSuccessStatusCode)
