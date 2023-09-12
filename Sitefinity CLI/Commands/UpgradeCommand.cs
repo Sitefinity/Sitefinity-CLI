@@ -105,9 +105,6 @@ namespace Sitefinity_CLI.Commands
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Version))
-                this.SetLatestVersion();
-
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
             var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
@@ -221,11 +218,12 @@ namespace Sitefinity_CLI.Commands
 
             var packageSources = this.PackageSources
                 .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(ps => ps.Trim().Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                .Select(ps => ps.Trim().Split(new char[] { ';' }))
                 .Select(ps => new NugetPackageSource
                 {
                     SourceUrl = ps[0],
-                    Password = ps.Length > 1 ? ps[1] : null,
+                    Username = ps.Length == 3 ? ps[1] : null,
+                    Password = ps.Length == 3 ? ps[2] : null,
                 });
             
             return packageSources;

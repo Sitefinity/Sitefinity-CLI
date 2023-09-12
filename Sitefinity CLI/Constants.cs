@@ -165,6 +165,7 @@ namespace Sitefinity_CLI
         public const string PropertiesElem = "properties";
         public const string DependenciesElem = "Dependencies";
         public const string VersionElem = "Version";
+        public const string VersionElemV3 = "version";
         public const string TitleElem = "title";
         public const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
         public const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
