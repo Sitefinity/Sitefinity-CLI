@@ -16,14 +16,19 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<NugetPackageSource> sources)
         {
-            string source = string.Join(';', sources);
+            foreach (NugetPackageSource source in sources)
+            {
+                if (source.Password != null)
+                {
+                    this.RunProcess($"sources Add -Name {source.SourceUrl} -Source {source.SourceUrl} -UserName {source.Username} -Password {source.Password}");
+                }
+                else
+                {
+                    this.RunProcess($"sources Add -Name {source.SourceUrl} -Source {source.SourceUrl}");
+                }
+            }
 
             this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache");
-        }
-
-        public void Install(string configFilePath)
-        {
-            throw new System.NotImplementedException();
         }
 
         public void Restore(string solutionFilePath)

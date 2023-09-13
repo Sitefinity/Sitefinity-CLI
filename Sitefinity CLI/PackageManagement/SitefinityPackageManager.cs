@@ -633,6 +633,7 @@ namespace Sitefinity_CLI.PackageManagement
         private const string SitefinityPublicNuGetSource = "https://nuget.sitefinity.com/nuget/";
 
         private const string PublicNuGetSourceV3 = "https://api.nuget.org/v3/index.json";
+        //private const string PublicNuGetSourceV3 = "https://www.nuget.org/api/v2";
 
         private const string PackagesFolderName = "packages";
 

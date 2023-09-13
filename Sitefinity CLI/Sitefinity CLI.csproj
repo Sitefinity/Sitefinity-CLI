@@ -64,12 +64,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="PackageManagement\NuGet.Config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Templates\13.3\ResourcePackage\" />
     <Folder Include="Templates\14.0\" />
   </ItemGroup>

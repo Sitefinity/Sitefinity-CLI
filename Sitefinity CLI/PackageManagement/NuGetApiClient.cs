@@ -411,8 +411,11 @@ namespace Sitefinity_CLI.PackageManagement
                             {
                                 framework = dependencyIdAndVersionAndFramework[2].Trim();
                             }
-
-                            if (dependencyId == null || dependencyVersion == null || !IsFrameworkSuported(supportedFrameWorkRegex, framework))//check if framework is supported)
+                            if(!IsFrameworkSuported(supportedFrameWorkRegex, framework))
+                            {
+                                continue;
+                            }
+                            if (dependencyId == null || dependencyVersion == null)//check if framework is supported)
                             {
                                 continue;
                             }
@@ -472,13 +475,12 @@ namespace Sitefinity_CLI.PackageManagement
 
         private string GetFrameworkVersion(string dependenciesTargetFramework)
         {
-            string frameworkVersion = null;
             if (!string.IsNullOrEmpty(dependenciesTargetFramework) && dependenciesTargetFramework.Contains(".NETFramework"))
             {
-                frameworkVersion = dependenciesTargetFramework.Substring(13).Replace(".", string.Empty);
+                dependenciesTargetFramework = dependenciesTargetFramework.Substring(13).Replace(".", string.Empty);
             }
 
-            return frameworkVersion != null ? $"net{frameworkVersion}" : string.Empty;
+            return dependenciesTargetFramework != null ? $"net{dependenciesTargetFramework}" : string.Empty;
         }
 
         private readonly IHttpClientFactory clientFactory;

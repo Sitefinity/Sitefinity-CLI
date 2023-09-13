@@ -7,8 +7,6 @@ namespace Sitefinity_CLI.PackageManagement
     {
         void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<NugetPackageSource> sources);
 
-        void Install(string configFilePath);
-
         void Restore(string solutionFilePath);
     }
 }
