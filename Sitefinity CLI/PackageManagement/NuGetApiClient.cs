@@ -50,11 +50,11 @@ namespace Sitefinity_CLI.PackageManagement
             NuGetPackage nuGetPackage = new NuGetPackage();
             if (nuGetPackageXmlDoc.ProtoVersion == ProtocolVersion.NuGetAPIV2)
             {
-                dependencies = this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage);
+                dependencies = this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
             }
             else
             {
-                dependencies = this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage);
+                dependencies = this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
             }
 
             if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
@@ -65,19 +65,10 @@ namespace Sitefinity_CLI.PackageManagement
 
             foreach (NuGetPackage dependency in dependencies)
             {
-                bool isFrameworkSupported = true;
-                if (supportedFrameworksRegex != null && !string.IsNullOrEmpty(dependency.Framework))
+                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
+                if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
                 {
-                    isFrameworkSupported = supportedFrameworksRegex.IsMatch(dependency.Framework);
-                }
-
-                if (isFrameworkSupported)
-                {
-                    NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
-                    if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
-                    {
-                        nuGetPackage.Dependencies.Add(nuGetPackageDependency);
-                    }
+                    nuGetPackage.Dependencies.Add(nuGetPackageDependency);
                 }
             }
 
@@ -93,7 +84,18 @@ namespace Sitefinity_CLI.PackageManagement
             return nuGetPackage;
         }
 
-        private List<NuGetPackage> ParseDependenciesV2(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage)
+        private static bool IsFrameworkSuported(Regex supportedFrameworksRegex, string framework)
+        {
+            bool isFrameworkSupported = true;
+            if (supportedFrameworksRegex != null && !string.IsNullOrEmpty(framework))
+            {
+                isFrameworkSupported = supportedFrameworksRegex.IsMatch(framework);
+            }
+
+            return isFrameworkSupported;
+        }
+
+        private List<NuGetPackage> ParseDependenciesV2(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
             XElement propertiesElement = nuGetPackageXmlDoc.XDocumentData
                 .Element(this.xmlns + Constants.EntryElem)
@@ -113,10 +115,10 @@ namespace Sitefinity_CLI.PackageManagement
 
             string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
 
-            return this.ParseDependencies(dependenciesString);
+            return this.ParseDependencies(dependenciesString, supportedFrameworksRegex);
         }
 
-        private List<NuGetPackage> ParseDependenciesV3(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage)
+        private List<NuGetPackage> ParseDependenciesV3(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
             var nugetPackageDeoebdebcies = new List<NuGetPackage>();
             var packageNamespace = nuGetPackageXmlDoc.XDocumentData.Root.GetDefaultNamespace();
@@ -140,7 +142,8 @@ namespace Sitefinity_CLI.PackageManagement
                 var groupElements = groupElementsDependencies.Elements(metadataNamespace + Constants.GroupElem);
                 if (groupElements != null && groupElements.Any())
                 {
-                    nugetPackageDeoebdebcies = ExtractedGroupedByFrameworkNugetDependencies(nugetPackageDeoebdebcies, groupElements);
+
+                    nugetPackageDeoebdebcies = ExtractedGroupedByFrameworkNugetDependencies(nugetPackageDeoebdebcies, groupElements, supportedFrameworksRegex);
                 }
                 else
                 {
@@ -152,7 +155,7 @@ namespace Sitefinity_CLI.PackageManagement
             return nugetPackageDeoebdebcies;
         }
 
-        private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDeoebdebcies, IEnumerable<XElement> groupElements)
+        private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDeoebdebcies, IEnumerable<XElement> groupElements, Regex supportedFrameworksRegex)
         {
             var groupElementsForTargetFramework = groupElements.Where(x => (x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework)) || !x.HasAttributes);
 
@@ -167,7 +170,11 @@ namespace Sitefinity_CLI.PackageManagement
                 var depElements = ge.Elements();
                 if (depElements.Any())
                 {
-                    nugetPackageDeoebdebcies = this.GetDependencies(depElements, dependenciesTargetFramework);
+                    string targetFramework = this.GetFrameworkVersion(dependenciesTargetFramework); ;
+                    if (IsFrameworkSuported(supportedFrameworksRegex, targetFramework))
+                    {
+                        nugetPackageDeoebdebcies = this.GetDependencies(depElements);
+                    }
                 }
             }
 
@@ -374,7 +381,7 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencyVersions;
         }
 
-        private List<NuGetPackage> ParseDependencies(string dependenciesString)
+        private List<NuGetPackage> ParseDependencies(string dependenciesString, Regex supportedFrameWorkRegex)
         {
             var dependencies = new List<NuGetPackage>();
 
@@ -405,12 +412,12 @@ namespace Sitefinity_CLI.PackageManagement
                                 framework = dependencyIdAndVersionAndFramework[2].Trim();
                             }
 
-                            if (dependencyId == null || dependencyVersion == null)
+                            if (dependencyId == null || dependencyVersion == null || !IsFrameworkSuported(supportedFrameWorkRegex, framework))//check if framework is supported)
                             {
                                 continue;
                             }
 
-                            dependencies.Add(new NuGetPackage() { Id = dependencyId, Version = dependencyVersion, Framework = framework });
+                            dependencies.Add(new NuGetPackage(dependencyId, dependencyVersion));
                         }
                     }
                 }
@@ -443,24 +450,24 @@ namespace Sitefinity_CLI.PackageManagement
             return baseAddress;
         }
 
-        private List<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements, string dependenciesTargetFramework = null)
+        private List<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements)
         {
             var dependencies = new List<NuGetPackage>();
+
             foreach (var depElement in depElements)
             {
-                var np = new NuGetPackage();
                 var id = depElement.Attribute(Constants.IdAttribute)?.Value;
-                var version = depElement.Attribute(Constants.VersionAttribute)?.Value;
+                var version = depElement.Attribute(Constants.VersionAttribute)?.Value
+                    .Trim(new char[] { '[', '(', ')', ']' });
+
                 if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(version))
                 {
-                    np.Id = id;
-                    np.Version = version.Trim(new char[] { '[', '(', ')', ']' });
-                    np.Framework = this.GetFrameworkVersion(dependenciesTargetFramework);
+                    var np = new NuGetPackage(id, version);
                     dependencies.Add(np);
                 }
             }
 
-            return dependencies.Any() ? dependencies : null;
+            return dependencies;
         }
 
         private string GetFrameworkVersion(string dependenciesTargetFramework)
