@@ -30,6 +30,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         private IHttpClientFactory httpClientFactory;
         private ServiceProvider serviceProvider;
         private IPromptService promptService;
+        private IPackageSourceBuilder packageSourceBuilder;
 
         [TestInitialize]
         public void Initialize()
@@ -45,6 +46,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
             services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
             services.AddSingleton<IPromptService, PromptServiceMock>();
+            services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
 
             this.serviceProvider = services.BuildServiceProvider();
 
@@ -56,12 +58,13 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             this.visualStudioWorker = serviceProvider.GetService<IVisualStudioWorker>();
             this.httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
             this.promptService = serviceProvider.GetService<IPromptService>();
+            this.packageSourceBuilder = serviceProvider.GetService<IPackageSourceBuilder>();
         }
 
         [TestMethod]
         public async Task Throw_When_SolutionPathIsNotFound()
         {
-            var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory);
+            var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
             try
             {
                 upgradeComamnd.SolutionPath = "wrongSolutionpath";
