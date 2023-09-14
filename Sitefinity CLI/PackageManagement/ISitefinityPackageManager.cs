@@ -7,9 +7,9 @@ namespace Sitefinity_CLI.PackageManagement
 {
     internal interface ISitefinityPackageManager
     {
-        void Install(string packageId, string version, string solutionFilePath);
+        void Install(string packageId, string version, string solutionFilePath, string nugetConfigFilePath);
 
-        void Install(string packageId, string version, string solutionFilePath, IEnumerable<NugetPackageSource> packageSources);
+        //void Install(string packageId, string version, string solutionFilePath, IEnumerable<NugetPackageSource> packageSources);
 
         void Restore(string solutionFilePath);
 
@@ -25,7 +25,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 
-        IEnumerable<NugetPackageSource> DefaultPackageSource { get; }
+        //IEnumerable<NugetPackageSource> DefaultPackageSource { get; }
 
         void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version);
     }

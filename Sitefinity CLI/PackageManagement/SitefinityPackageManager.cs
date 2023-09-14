@@ -35,22 +35,33 @@ namespace Sitefinity_CLI.PackageManagement
             this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
         }
 
-        public void Install(string packageId, string version, string solutionFilePath, IEnumerable<NugetPackageSource> nugetPackageSources)
+        public SitefinityPackageManager()
+        {
+        }
+
+        //public void Install(string packageId, string version, string solutionFilePath, IEnumerable<NugetPackageSource> nugetPackageSources)
+        //{
+        //    string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
+
+        //    this.logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
+        //    var sourcesUsed = string.Join(',', nugetPackageSources);
+        //    this.logger.LogInformation($"Package sources used: {sourcesUsed}");
+
+        //    this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetPackageSources);
+
+        //    this.logger.LogInformation($"[{solutionDirectory}] Install for package '{packageId}' completed");
+        //}
+
+        public void Install(string packageId, string version, string solutionFilePath, string nugetConfigFilePath)
         {
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
             this.logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
-            var sourcesUsed = string.Join(',', nugetPackageSources);
-            this.logger.LogInformation($"Package sources used: {sourcesUsed}");
+   
 
-            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetPackageSources);
+            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetConfigFilePath);
 
             this.logger.LogInformation($"[{solutionDirectory}] Install for package '{packageId}' completed");
-        }
-
-        public void Install(string packageId, string version, string solutionFilePath)
-        {
-            this.Install(packageId, version, solutionFilePath, this.defaultSources);
         }
 
         public void Restore(string solutionFilePath)

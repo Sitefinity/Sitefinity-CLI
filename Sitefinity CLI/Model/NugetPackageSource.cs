@@ -20,6 +20,8 @@ namespace Sitefinity_CLI.Model
 
         public string SourceUrl { get; set; }
 
+        public string SourceName { get; set; }
+
         public string Password { get; set; }
 
         public string Username { get; set; }

@@ -14,12 +14,17 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger = logger;
         }
 
-        public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<NugetPackageSource> sources)
+        public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            RegisterNugetSourcesForNugetExe(sources);
-
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
         }
+
+        //public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<NugetPackageSource> sources)
+        //{
+        //    RegisterNugetSourcesForNugetExe(sources);
+
+        //    this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache");
+        //}
 
         public void Restore(string solutionFilePath)
         {

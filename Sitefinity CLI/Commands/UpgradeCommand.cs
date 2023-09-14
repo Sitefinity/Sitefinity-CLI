@@ -15,9 +15,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -41,6 +43,9 @@ namespace Sitefinity_CLI.Commands
 
         [Option(Constants.PackageSources, Description = Constants.PackageSourcesDescription)]
         public string PackageSources { get; set; }
+
+        [Option("-nc|--nugetConfigPath", Description = Constants.PackageSourcesDescription)]
+        public string NugetConfigPath { get; set; } = GetDefaultNugetConfigpath();
 
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
         public string AdditionalPackagesString { get; set; }
@@ -123,7 +128,7 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
-            var packageSources = this.GetNugetPackageSources();
+            var packageSources = await this.GetNugetPackageSources();
 
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version, packageSources);
 
@@ -135,7 +140,8 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityPackageManager.Restore(this.SolutionPath);
             this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, this.Version);
-            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
+            //this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
+            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, this.NugetConfigPath);
 
             if (!this.AcceptLicense)
             {
@@ -157,7 +163,7 @@ namespace Sitefinity_CLI.Commands
                     if (package != null)
                     {
                         additionalPackagesToUpgrade.Add(package);
-                        this.sitefinityPackageManager.Install(package.Id, package.Version, this.SolutionPath, packageSources);
+                        this.sitefinityPackageManager.Install(package.Id, package.Version, this.SolutionPath, this.NugetConfigPath);
 
                         string licenseContent = await this.GetLicenseContent(package);
                         if (!string.IsNullOrEmpty(licenseContent) && !this.AcceptLicense)
@@ -209,24 +215,60 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private IEnumerable<NugetPackageSource> GetNugetPackageSources()
+        private async Task<IEnumerable<NugetPackageSource>> GetNugetPackageSources()
         {
-            if (string.IsNullOrEmpty(this.PackageSources))
+            //if (string.IsNullOrEmpty(this.NugetConfigPath))
+            //{
+            //    this.NugetConfigPath = "PackageManagementTODO";
+
+            //    return this.sitefinityPackageManager.DefaultPackageSource;
+            //}
+
+
+            var packageSourceList = new List<NugetPackageSource>();
+
+            var fileContent = await File.ReadAllTextAsync(this.NugetConfigPath);
+            XDocument nuGetPackageXmlDoc = XDocument.Parse(fileContent);
+            var xmlPackageSources = nuGetPackageXmlDoc.Root?.Element("packageSources")?.Elements().Where(e => e.Name == "add");
+            var packageSourceCredentials = nuGetPackageXmlDoc.Root?.Element("packageSourceCredentials");
+
+            foreach (var xmlPackageSource in xmlPackageSources)
             {
-                return this.sitefinityPackageManager.DefaultPackageSource;
+                string packageSourceName = xmlPackageSource.Attribute("key")?.Value;
+                string packageSourceUrl = xmlPackageSource.Attribute("value")?.Value;
+
+                if (!string.IsNullOrEmpty(packageSourceName) && !string.IsNullOrEmpty(packageSourceUrl))
+                {
+                    var nugetSource = new NugetPackageSource();
+                    nugetSource.SourceName = packageSourceName;
+                    nugetSource.SourceUrl = packageSourceUrl;
+                    var packageCredentials = packageSourceCredentials.Element(packageSourceName);
+                    if (packageCredentials != null)
+                    {
+                        var userName = packageCredentials.Descendants().FirstOrDefault(e => (string)e.Attribute("key") == "Username");
+                        var passWord = packageCredentials.Descendants().FirstOrDefault(e => (string)e.Attribute("key") == "ClearTextPassword");
+
+                        if (userName != null && passWord != null)
+                        {
+                            nugetSource.Username = userName.Value;
+                            nugetSource.Password = passWord.Value;
+                        }
+                    }
+                    packageSourceList.Add(nugetSource);
+                }
             }
 
-            var packageSources = this.PackageSources
-                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(ps => ps.Trim().Split(new char[] { ';' }))
-                .Select(ps => new NugetPackageSource
-                {
-                    SourceUrl = ps[0],
-                    Username = ps.Length == 3 ? ps[1] : null,
-                    Password = ps.Length == 3 ? ps[2] : null,
-                });
-            
-            return packageSources;
+            //var packageSources = this.PackageSources
+            //    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            //    .Select(ps => ps.Trim().Split(new char[] { ';' }))
+            //    .Select(ps => new NugetPackageSource
+            //    {
+            //        SourceUrl = ps[0],
+            //        Username = ps.Length == 3 ? ps[1] : null,
+            //        Password = ps.Length == 3 ? ps[2] : null,
+            //    });
+
+            return packageSourceList;
         }
 
         private void RestoreConfigValuesForNoSfProjects(Dictionary<string, string> configsWithoutSitefinity)
@@ -424,7 +466,7 @@ namespace Sitefinity_CLI.Commands
             foreach (string version in versions)
             {
                 bool isIncompatible = false;
-                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, this.GetNugetPackageSources(), package =>
+                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, await this.GetNugetPackageSources(), package =>
                 {
                     isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
                     return isIncompatible;
@@ -475,6 +517,14 @@ namespace Sitefinity_CLI.Commands
             }
 
             return hasUserAcceptedEULA;
+        }
+
+        private static string GetDefaultNugetConfigpath()
+        {
+            string executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string nugetConfigLocation = Path.Combine(executableLocation, "PackageManagement", "NuGet.Config");
+
+            return nugetConfigLocation;
         }
 
         private readonly IPromptService promptService;

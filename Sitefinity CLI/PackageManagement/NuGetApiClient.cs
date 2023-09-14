@@ -291,7 +291,13 @@ namespace Sitefinity_CLI.PackageManagement
                 this.AppendNugetSourceAuthHeaders(httpClient, nugetSource);
 
                 // We fetch the base URL from the service index because it may be changed without notice
-                string sourceUrl = (await this.GetBaseAddress(httpClient, nugetSource)).TrimEnd('/');
+                string sourceUrl = (await this.GetBaseAddress(httpClient, nugetSource))?.TrimEnd('/');
+                if (sourceUrl == null)
+                {
+                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
+                    throw new UpgradeException("Upgrade failed");
+                }
+
                 string loweredId = id.ToLowerInvariant();
                 response = await httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
 
@@ -411,7 +417,7 @@ namespace Sitefinity_CLI.PackageManagement
                             {
                                 framework = dependencyIdAndVersionAndFramework[2].Trim();
                             }
-                            if(!IsFrameworkSuported(supportedFrameWorkRegex, framework))
+                            if (!IsFrameworkSuported(supportedFrameWorkRegex, framework))
                             {
                                 continue;
                             }
