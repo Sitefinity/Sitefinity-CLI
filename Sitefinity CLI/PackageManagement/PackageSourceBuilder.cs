@@ -55,6 +55,12 @@ namespace Sitefinity_CLI.PackageManagement
         {
             if (packageSourceCredentials != null)
             {
+                if (packageSourceName.Any(c => char.IsWhiteSpace(c)))
+                {
+                    this.logger.LogError("The package source: {packageSource} contains white space char. If you have <packageSourceCredentials> element for it it won't be extracted", nugetSource.SourceName);
+                    return;
+                }
+
                 var packageCredentials = packageSourceCredentials.Element(packageSourceName);
                 if (packageCredentials != null)
                 {
@@ -73,6 +79,7 @@ namespace Sitefinity_CLI.PackageManagement
                         }
                     }
                 }
+
             }
         }
     }
