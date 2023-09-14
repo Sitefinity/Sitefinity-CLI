@@ -40,7 +40,7 @@ namespace Sitefinity_CLI.PackageManagement
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
             this.logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
-   
+
 
             this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetConfigFilePath);
 
@@ -76,7 +76,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> nugetPackageSources)
         {
-            var sourcesUsed = string.Join(',', nugetPackageSources);
+            var sourcesUsed = string.Join(',', nugetPackageSources?.Select(x => x.SourceUrl));
             this.logger.LogInformation($"Package sources used: {sourcesUsed}");
 
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
