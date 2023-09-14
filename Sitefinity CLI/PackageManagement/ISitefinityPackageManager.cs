@@ -9,8 +9,6 @@ namespace Sitefinity_CLI.PackageManagement
     {
         void Install(string packageId, string version, string solutionFilePath, string nugetConfigFilePath);
 
-        //void Install(string packageId, string version, string solutionFilePath, IEnumerable<NugetPackageSource> packageSources);
-
         void Restore(string solutionFilePath);
 
         bool PackageExists(string packageId, string projectFilePath);
@@ -24,8 +22,6 @@ namespace Sitefinity_CLI.PackageManagement
         Task<IEnumerable<string>> GetPackageVersions(string id, int versionsCount = 10);
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
-
-        //IEnumerable<NugetPackageSource> DefaultPackageSource { get; }
 
         void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version);
     }
