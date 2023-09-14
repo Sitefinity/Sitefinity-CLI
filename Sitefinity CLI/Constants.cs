@@ -33,6 +33,7 @@ namespace Sitefinity_CLI
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
         public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
+        public const string PackageManagement = "PackageManagement";
 
         // Error messages
         public const string DirectoryNotFoundMessage = "Directory not found. Path: \"{0}\"";

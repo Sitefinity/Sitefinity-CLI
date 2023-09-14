@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net;
 using Microsoft.Extensions.Logging;
-using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -19,13 +17,6 @@ namespace Sitefinity_CLI.PackageManagement
             this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
         }
 
-        //public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<NugetPackageSource> sources)
-        //{
-        //    RegisterNugetSourcesForNugetExe(sources);
-
-        //    this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache");
-        //}
-
         public void Restore(string solutionFilePath)
         {
             this.RunProcess($"restore \"{solutionFilePath}\" -NoCache");
@@ -33,7 +24,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private void RunProcess(string arguments)
         {
-            var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "PackageManagement", NuGetExeFileName);
+            var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.PackageManagement, NuGetExeFileName);
             this.EnsureNugetExecutable(nugetFileLocation);
 
             using (Process process = new Process())
@@ -65,21 +56,6 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        private void RegisterNugetSourcesForNugetExe(IEnumerable<NugetPackageSource> sources)
-        {
-            foreach (NugetPackageSource source in sources)
-            {
-                if (source.Password != null)
-                {
-                    this.RunProcess($"sources Add -Name {source.SourceUrl} -Source {source.SourceUrl} -UserName {source.Username} -Password {source.Password}");
-                }
-                else
-                {
-                    this.RunProcess($"sources Add -Name {source.SourceUrl} -Source {source.SourceUrl}");
-                }
-            }
-        }
-
         private void EnsureNugetExecutable(string nugetFileLocation)
         {
             if (!File.Exists(nugetFileLocation))
@@ -92,7 +68,6 @@ namespace Sitefinity_CLI.PackageManagement
         }
 
         private readonly ILogger<NuGetCliClient> logger;
-
         private const string NuGetExeFileName = "nuget.exe";
         private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
     }
