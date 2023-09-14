@@ -23,8 +23,6 @@ namespace Sitefinity_CLI.PackageManagement
 
         public string Version { get; set; }
 
-        //public string Framework { get; set; }
-
         public IList<NuGetPackage> Dependencies { get; set; }
     }
 }
