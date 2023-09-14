@@ -41,7 +41,7 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
         public bool AcceptLicense { get; set; }
 
-        [Option(Constants.NugetConfigPath, Description = Constants.PackageSourcesDescription)]
+        [Option(Constants.NugetConfigPath, Description = Constants.NugetConfigPathDescrption)]
         public string NugetConfigPath { get; set; } = GetDefaultNugetConfigpath();
 
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
