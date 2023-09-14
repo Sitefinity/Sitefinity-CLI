@@ -5,11 +5,20 @@ using System.Threading.Tasks;
 using Sitefinity_CLI.Model;
 using System.Xml.Linq;
 using System.IO;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Exceptions;
 
 namespace Sitefinity_CLI.PackageManagement
 {
     internal class PackageSourceBuilder : IPackageSourceBuilder
     {
+        private readonly ILogger<PackageSourceBuilder> logger;
+
+        public PackageSourceBuilder(ILogger<PackageSourceBuilder> logger)
+        {
+            this.logger = logger;
+        }
+
         public async Task<IEnumerable<NugetPackageSource>> GetNugetPackageSources(string nugetConfigFilePath)
         {
             if (string.IsNullOrEmpty(nugetConfigFilePath))
@@ -54,8 +63,14 @@ namespace Sitefinity_CLI.PackageManagement
 
                     if (userName != null && passWord != null)
                     {
-                        nugetSource.Username = userName.Value;
-                        nugetSource.Password = passWord.Value;
+                        nugetSource.Username = userName.Attribute("value")?.Value;
+                        nugetSource.Password = passWord.Attribute("value")?.Value;
+
+                        if (string.IsNullOrEmpty(nugetSource.Username) || string.IsNullOrEmpty(nugetSource.Password))
+                        {
+                            this.logger.LogError("Error while retrieveing credentials for source: {packageSource}.", nugetSource.SourceUrl);
+                            throw new UpgradeException("Upgrade failed due to errors reading the provided nugetConfig");
+                        }
                     }
                 }
             }
