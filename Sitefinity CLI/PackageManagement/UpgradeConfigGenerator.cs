@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,7 +24,7 @@ namespace Sitefinity_CLI.PackageManagement
         public async Task GenerateUpgradeConfig(
             IEnumerable<Tuple<string, Version>> projectFilePathsWithSitefinityVersion,
             NuGetPackage newSitefinityVersionPackageTree,
-            IEnumerable<string> packageSources,
+            IEnumerable<NugetPackageSource> packageSources,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
         {
             this.logger.LogInformation("Exporting upgrade config...");
@@ -54,7 +55,7 @@ namespace Sitefinity_CLI.PackageManagement
             XmlElement powerShellXmlConfigNode,
             string projectFilePath,
             NuGetPackage newSitefinityVersionPackageTree,
-            IEnumerable<string> packageSources,
+            IEnumerable<NugetPackageSource> packageSources,
             Version currentSitefinityVersion,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
         {

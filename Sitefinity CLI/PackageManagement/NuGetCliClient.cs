@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net;
 using Microsoft.Extensions.Logging;
@@ -13,16 +12,9 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger = logger;
         }
 
-        public void InstallPackage(string packageId, string version, string solutionDirectory, IEnumerable<string> sources)
+        public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            string source = string.Join(';', sources);
-
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -Source \"{source}\" -NoCache");
-        }
-
-        public void Install(string configFilePath)
-        {
-            throw new System.NotImplementedException();
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
         }
 
         public void Restore(string solutionFilePath)
@@ -32,7 +24,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private void RunProcess(string arguments)
         {
-            var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "PackageManagement", NuGetExeFileName);
+            var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.PackageManagement, NuGetExeFileName);
             this.EnsureNugetExecutable(nugetFileLocation);
 
             using (Process process = new Process())
@@ -43,7 +35,8 @@ namespace Sitefinity_CLI.PackageManagement
                     FileName = nugetFileLocation,
                     Arguments = arguments,
                     CreateNoWindow = true,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                 };
 
                 process.StartInfo = startInfo;
@@ -53,6 +46,12 @@ namespace Sitefinity_CLI.PackageManagement
                 {
                     string line = process.StandardOutput.ReadLine();
                     logger.LogInformation(line);
+                }
+
+                while (!process.StandardError.EndOfStream)
+                {
+                    string line = process.StandardError.ReadLine();
+                    logger.LogWarning(line);
                 }
             }
         }
@@ -68,8 +67,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        private readonly ILogger logger;
-
+        private readonly ILogger<NuGetCliClient> logger;
         private const string NuGetExeFileName = "nuget.exe";
         private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
     }

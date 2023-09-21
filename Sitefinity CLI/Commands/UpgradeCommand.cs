@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.Commands.Validators;
 using Sitefinity_CLI.Exceptions;
+using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using System;
@@ -14,9 +15,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -38,8 +41,8 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
         public bool AcceptLicense { get; set; }
 
-        [Option(Constants.PackageSources, Description = Constants.PackageSourcesDescription)]
-        public string PackageSources { get; set; }
+        [Option(Constants.NugetConfigPath, Description = Constants.NugetConfigPathDescrption)]
+        public string NugetConfigPath { get; set; } = GetDefaultNugetConfigpath();
 
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
         public string AdditionalPackagesString { get; set; }
@@ -52,7 +55,8 @@ namespace Sitefinity_CLI.Commands
             IProjectConfigFileEditor projectConfigFileEditor,
             IUpgradeConfigGenerator upgradeConfigGenerator,
             IVisualStudioWorker visualStudioWorker,
-            IHttpClientFactory clientFactory)
+            IHttpClientFactory clientFactory,
+            IPackageSourceBuilder packageSourceBuilder)
         {
             this.promptService = promptService;
             this.sitefinityPackageManager = sitefinityPackageManager;
@@ -62,6 +66,7 @@ namespace Sitefinity_CLI.Commands
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
             this.httpClient = clientFactory.CreateClient();
+            this.packageSourceBuilder = packageSourceBuilder;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -104,9 +109,6 @@ namespace Sitefinity_CLI.Commands
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Version))
-                this.SetLatestVersion();
-
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
             var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
@@ -125,7 +127,7 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format("Collecting Sitefinity NuGet package tree for version \"{0}\"...", this.Version));
-            var packageSources = this.GetNugetPackageSources();
+            var packageSources = await this.packageSourceBuilder.GetNugetPackageSources(this.NugetConfigPath);
 
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(this.Version, packageSources);
 
@@ -137,7 +139,7 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityPackageManager.Restore(this.SolutionPath);
             this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, this.Version);
-            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, packageSources);
+            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, newSitefinityPackage.Version, this.SolutionPath, this.NugetConfigPath);
 
             if (!this.AcceptLicense)
             {
@@ -155,11 +157,11 @@ namespace Sitefinity_CLI.Commands
             {
                 foreach (string packageId in additionalPackagesIds)
                 {
-                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, new Version(this.Version));
+                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, new Version(this.Version), packageSources);
                     if (package != null)
                     {
                         additionalPackagesToUpgrade.Add(package);
-                        this.sitefinityPackageManager.Install(package.Id, package.Version, this.SolutionPath, packageSources);
+                        this.sitefinityPackageManager.Install(package.Id, package.Version, this.SolutionPath, this.NugetConfigPath);
 
                         string licenseContent = await this.GetLicenseContent(package);
                         if (!string.IsNullOrEmpty(licenseContent) && !this.AcceptLicense)
@@ -211,16 +213,6 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private IEnumerable<string> GetNugetPackageSources()
-        {
-            if (string.IsNullOrEmpty(this.PackageSources))
-            {
-                return this.sitefinityPackageManager.DefaultPackageSource;
-            }
-
-            var packageSources = this.PackageSources.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ps => ps.Trim());
-            return packageSources;
-        }
 
         private void RestoreConfigValuesForNoSfProjects(Dictionary<string, string> configsWithoutSitefinity)
         {
@@ -408,7 +400,7 @@ namespace Sitefinity_CLI.Commands
             return this.ContainsSitefinityRefKeyword(reference) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
         }
 
-        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion)
+        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<NugetPackageSource> packageSources)
         {
             // get all versions
             IEnumerable<string> versions = await this.sitefinityPackageManager.GetPackageVersions(packageId);
@@ -417,7 +409,7 @@ namespace Sitefinity_CLI.Commands
             foreach (string version in versions)
             {
                 bool isIncompatible = false;
-                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, this.GetNugetPackageSources(), package =>
+                NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, packageSources, package =>
                 {
                     isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
                     return isIncompatible;
@@ -470,22 +462,23 @@ namespace Sitefinity_CLI.Commands
             return hasUserAcceptedEULA;
         }
 
+        private static string GetDefaultNugetConfigpath()
+        {
+            string executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string nugetConfigLocation = Path.Combine(executableLocation, Constants.PackageManagement, "NuGet.Config");
+
+            return nugetConfigLocation;
+        }
+
         private readonly IPromptService promptService;
-
         private readonly ISitefinityPackageManager sitefinityPackageManager;
-
         private readonly ICsProjectFileEditor csProjectFileEditor;
-
         private readonly IProjectConfigFileEditor projectConfigFileEditor;
-
         private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
-
-        private readonly ILogger<object> logger;
-
+        private readonly ILogger<UpgradeCommand> logger;
         private readonly IVisualStudioWorker visualStudioWorker;
-
         private readonly HttpClient httpClient;
-
+        private readonly IPackageSourceBuilder packageSourceBuilder;
         private readonly ICollection<string> allowedAdditionalPackagesIds = new List<string>() { "Progress.Sitefinity.Cloud" };
 
         private const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";

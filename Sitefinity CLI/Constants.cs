@@ -33,6 +33,7 @@ namespace Sitefinity_CLI
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
         public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
+        public const string PackageManagement = "PackageManagement";
 
         // Error messages
         public const string DirectoryNotFoundMessage = "Directory not found. Path: \"{0}\"";
@@ -46,7 +47,7 @@ namespace Sitefinity_CLI
         public const string FileNotFoundMessage = "File \"{0}\" not found";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
-        public const string VersionNotFound = "Version: {0} was not found in https://nuget.sitefinity.com";
+        public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
 
         // Warning messages
@@ -97,13 +98,13 @@ namespace Sitefinity_CLI
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
         public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
-        public const string PackageSourcesDescription = "Provide the nuget package sources used to install the new version of sitefinity";
+        public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
-        public const string PackageSources = "-ps|--packageSources";
+        public const string NugetConfigPath = "-nc|--nugetConfigPath";
         public const string AdditionalPackages = "--additionalPackages";
 
         // File extensions
@@ -165,6 +166,7 @@ namespace Sitefinity_CLI
         public const string PropertiesElem = "properties";
         public const string DependenciesElem = "Dependencies";
         public const string VersionElem = "Version";
+        public const string VersionElemV3 = "version";
         public const string TitleElem = "title";
         public const string TelerikSitefinityReferenceKeyWords = "Telerik.Sitefinity";
         public const string ProgressSitefinityReferenceKeyWords = "Progress.Sitefinity";
