@@ -59,7 +59,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="Telerik.Sitefinity.HttpClientCore, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b28c218413bdf563, processorArchitecture=MSIL">
-      <HintPath>..\packages\Telerik.Sitefinity.HttpClientCore.3.0.1\lib\net45\Telerik.Sitefinity.HttpClientCore.dll</HintPath>
+      <HintPath>..\packages\Telerik.Sitefinity.HttpClientCore.3.1.0\lib\net45\Telerik.Sitefinity.HttpClientCore.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Sitefinity.TestIntegration.Framework, Version={{sitefinityVersion}}, Culture=neutral, PublicKeyToken=b28c218413bdf563, processorArchitecture=MSIL">
       <HintPath>..\packages\Progress.Sitefinity.TestIntegration.Framework.{{sitefinityNugetVersion}}\lib\net48\Telerik.Sitefinity.TestIntegration.Framework.dll</HintPath>
