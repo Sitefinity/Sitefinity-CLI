@@ -136,8 +136,7 @@ namespace Sitefinity_CLI
         public const string UpgradeCommandName = "upgrade";
 
         public const string DefaultResourcePackageName_VersionsBefore12_0 = "Bootstrap";
-        public const string DefaultResourcePackageName_VersionsBefore14_1 = "Bootstrap4";
-        public const string DefaultResourcePackageName = "Bootstrap5";
+        public const string DefaultResourcePackageName = "Bootstrap4";
         public const string DefaultGridWidgetName = "grid-6+6";
         public const string DefaultSourceTemplateName = "Default";
 

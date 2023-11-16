@@ -8,6 +8,7 @@ namespace Sitefinity_CLI.Commands
     internal class AddGridWidgetCommand : AddToResourcePackageCommand
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultGridWidgetName, CommandOptionType.SingleValue)]
+        [DefaultValue(Constants.DefaultGridWidgetName)]
         public override string TemplateName { get; set; } = Constants.DefaultGridWidgetName;
 
         public AddGridWidgetCommand(ILogger<object> logger) : base(logger)

@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -15,7 +13,8 @@ namespace Sitefinity_CLI.Commands
     internal class AddResourcePackageCommand : CommandBase
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
-        public override string TemplateName { get; set; } 
+        [DefaultValue(Constants.DefaultResourcePackageName)]
+        public override string TemplateName { get; set; } = Constants.DefaultResourcePackageName;
 
         public AddResourcePackageCommand(ILogger<object> logger) : base(logger)
         {
@@ -26,11 +25,6 @@ namespace Sitefinity_CLI.Commands
             if (base.OnExecute(config) == 1)
             {
                 return (int)ExitCode.GeneralError;
-            }
-
-            if (string.IsNullOrEmpty(this.TemplateName)) 
-            {
-                this.TemplateName = this.GetDefaultTemplateName(this.Version);
             }
 
             var resourcePackagesFolderPath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName);

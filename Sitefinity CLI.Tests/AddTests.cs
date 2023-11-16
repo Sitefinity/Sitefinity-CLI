@@ -987,9 +987,9 @@ namespace Sitefinity_CLI.Tests
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
             var versionValue = float.Parse(version, cultureInfo.NumberFormat);
-            if (versionValue < 14.1)
+            if (versionValue < 12)
             {
-                return Constants.DefaultResourcePackageName_VersionsBefore14_1;
+                return Constants.DefaultResourcePackageName_VersionsBefore12_0;
             }
             else
             {
