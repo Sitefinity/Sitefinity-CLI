@@ -48,7 +48,6 @@ namespace Sitefinity_CLI.Commands
         /// Gets or sets The name of the template. Defa
         /// </summary>
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
-        [DefaultValue(Constants.DefaultSourceTemplateName)]
         public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
 
         /// <summary>
