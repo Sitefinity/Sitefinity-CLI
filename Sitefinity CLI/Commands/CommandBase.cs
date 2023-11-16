@@ -115,18 +115,9 @@ namespace Sitefinity_CLI.Commands
             if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
                 var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
-
-                string defaultValue = String.Empty;
-
-                if (string.IsNullOrEmpty(this.TemplateName)) 
-                {
-                    defaultValue = this.GetDefaultTemplateName(this.Version);
-                }
-                else
-                {
-                    defaultValue = this.TemplateName;
-                }
-                
+                var templateNameProp = this.GetType().GetProperties().Where(prop => prop.Name == "TemplateName").FirstOrDefault();
+                var defaultValueAttr = templateNameProp.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
+                var defaultValue = defaultValueAttr.Value.ToString();
                 this.TemplateName = Prompt.GetString(promptMessage, promptColor: ConsoleColor.Yellow, defaultValue: defaultValue);
             }
 
@@ -185,7 +176,7 @@ namespace Sitefinity_CLI.Commands
             return (int)ExitCode.OK;
         }
 
-        protected string GetLatestTemplatesVersion()
+        private string GetLatestTemplatesVersion()
         {
             var templatesFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName);
             var directoryNames = Directory.GetDirectories(templatesFolderPath);
@@ -225,21 +216,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             return data;
-        }
-
-        protected virtual string GetDefaultTemplateName(string version)
-        {
-            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
-            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
-            var versionValue = float.Parse(version, cultureInfo.NumberFormat);
-            if (versionValue < 14.1)
-            {
-                return Constants.DefaultResourcePackageName_VersionsBefore14_1;
-            }
-            else
-            {
-                return Constants.DefaultResourcePackageName;
-            }
         }
     }
 }

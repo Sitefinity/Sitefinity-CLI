@@ -7,5 +7,5 @@
   <package id="Newtonsoft.Json" version="13.0.1" targetFramework="net48" />
   <package id="Progress.Sitefinity.IdentityModel" version="1.3.0" targetFramework="net48" />
   <package id="Progress.Sitefinity.TestIntegration.Framework" version="{{sitefinityNugetVersion}}" targetFramework="net48" />
-  <package id="Telerik.Sitefinity.HttpClientCore" version="3.1.0" targetFramework="net48" />
+  <package id="Telerik.Sitefinity.HttpClientCore" version="3.0.1" targetFramework="net48" />
 </packages>
