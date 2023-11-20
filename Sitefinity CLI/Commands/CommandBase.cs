@@ -115,18 +115,7 @@ namespace Sitefinity_CLI.Commands
             if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
                 var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
-
-                string defaultValue = String.Empty;
-
-                if (string.IsNullOrEmpty(this.TemplateName)) 
-                {
-                    defaultValue = this.GetDefaultTemplateName(this.Version);
-                }
-                else
-                {
-                    defaultValue = this.TemplateName;
-                }
-                
+                string defaultValue = this.GetDefaultTemplateName(this.Version);
                 this.TemplateName = Prompt.GetString(promptMessage, promptColor: ConsoleColor.Yellow, defaultValue: defaultValue);
             }
 

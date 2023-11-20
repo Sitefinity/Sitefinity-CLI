@@ -15,7 +15,8 @@ namespace Sitefinity_CLI.Commands
     internal class AddResourcePackageCommand : CommandBase
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
-        public override string TemplateName { get; set; } 
+        [DefaultValue(Constants.DefaultResourcePackageName)]
+        public override string TemplateName { get; set; }
 
         public AddResourcePackageCommand(ILogger<object> logger) : base(logger)
         {
@@ -28,7 +29,7 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            if (string.IsNullOrEmpty(this.TemplateName)) 
+            if (!string.IsNullOrEmpty(this.Version))
             {
                 this.TemplateName = this.GetDefaultTemplateName(this.Version);
             }
