@@ -9,7 +9,7 @@ namespace Sitefinity_CLI.Commands
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultGridWidgetName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultGridWidgetName)]
-        public override string TemplateName { get; set; } = Constants.DefaultGridWidgetName;
+        public override string TemplateName { get; set; }
 
         public AddGridWidgetCommand(ILogger<object> logger) : base(logger)
         {

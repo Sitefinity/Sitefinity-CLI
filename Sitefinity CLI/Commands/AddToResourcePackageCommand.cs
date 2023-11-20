@@ -24,9 +24,15 @@ namespace Sitefinity_CLI.Commands
                 return 1;
             }
 
+            var packageName = Constants.DefaultResourcePackageName;
+            if (!string.IsNullOrEmpty(this.Version))
+            {
+                packageName = this.GetDefaultTemplateName(this.Version);
+            }
+
             if (config.Options.First(x => x.LongName == "package").Value() == null)
             {
-                this.ResourcePackage = Prompt.GetString(Constants.EnterResourcePackagePromptMessage, promptColor: ConsoleColor.Yellow, defaultValue: Constants.DefaultResourcePackageName);
+                this.ResourcePackage = Prompt.GetString(Constants.EnterResourcePackagePromptMessage, promptColor: ConsoleColor.Yellow, defaultValue: packageName);
             }
 
             var filePath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName, this.ResourcePackage, destinationPath, this.Name + fileExtension);

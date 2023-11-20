@@ -9,7 +9,7 @@ namespace Sitefinity_CLI.Commands
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
-        public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
+        public override string TemplateName { get; set; }
 
         public AddPageTemplateCommand(ILogger<object> logger) : base(logger)
         {
@@ -18,6 +18,11 @@ namespace Sitefinity_CLI.Commands
         public override int OnExecute(CommandLineApplication config)
         {
             return this.AddFileToResourcePackage(config, Constants.PageTemplatesPath, Constants.PageTemplateTemplatesFolderName, Constants.RazorFileExtension);
+        }
+
+        protected override string GetDefaultTemplateName(string version)
+        {
+           return base.GetDefaultTemplateName(version);
         }
     }
 }
