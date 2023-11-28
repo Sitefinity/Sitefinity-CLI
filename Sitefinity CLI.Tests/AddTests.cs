@@ -493,7 +493,8 @@ namespace Sitefinity_CLI.Tests
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
                 var prompMessage = string.Format(Constants.SourceTemplatePromptMessage, Constants.AddGridWidgetCommandFullName);
                 expectedOutputString.Append(string.Format("{0} [{1}] ", prompMessage, Constants.DefaultGridWidgetName));
-                expectedOutputString.Append(string.Format("{0} [{1}] ", Constants.EnterResourcePackagePromptMessage, Constants.DefaultResourcePackageName));
+                var expectedResourcePackageName = this.GetDefaulResourcetPackage(templatesVersion);
+                expectedOutputString.Append(string.Format("{0} [{1}] ", Constants.EnterResourcePackagePromptMessage, expectedResourcePackageName));
 
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 

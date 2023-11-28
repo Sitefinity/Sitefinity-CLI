@@ -114,8 +114,13 @@ namespace Sitefinity_CLI.Commands
 
             if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
+                var templateNameProp = this.GetType().GetProperties().Where(prop => prop.Name == "TemplateName").FirstOrDefault();
+                var defaultValueAttr = templateNameProp.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
+                var defaultAttributeValue = defaultValueAttr.Value.ToString();
+
+                var defaultValue = defaultAttributeValue.StartsWith("Bootstrap") ? this.GetDefaultTemplateName(this.Version) : defaultAttributeValue;
+
                 var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
-                string defaultValue = this.GetDefaultTemplateName(this.Version);
                 this.TemplateName = Prompt.GetString(promptMessage, promptColor: ConsoleColor.Yellow, defaultValue: defaultValue);
             }
 
