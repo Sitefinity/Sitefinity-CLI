@@ -29,11 +29,6 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            if (!string.IsNullOrEmpty(this.Version))
-            {
-                this.TemplateName = this.GetDefaultTemplateName(this.Version);
-            }
-
             var resourcePackagesFolderPath = Path.Combine(this.ProjectRootPath, Constants.ResourcePackagesFolderName);
             var templatePackageFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, this.Version, Constants.ResourcePackageTemplatesFolderName, this.TemplateName);
             var newResourcePackagePath = Path.Combine(resourcePackagesFolderPath, this.SanitizedName);
