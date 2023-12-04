@@ -81,7 +81,7 @@ When running a command the CLI will try to automatically detect your Sitefinity 
 
 You can use the ```--version``` option to explicitly set the templates version that CLI should use.
 
-**EXAMPLE**: Following is an example command of using the ```–version``` option:
+**EXAMPLE**: Following is an example command of using the ```–-version``` option:
 ```
 sf add package "New resource package" --version "11.0"
 ```
