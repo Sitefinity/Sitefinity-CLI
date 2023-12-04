@@ -91,7 +91,7 @@ In this case, the CLI will look for a folder named ```11.0``` inside folder ```T
 
 When you run a command, the CLI prompts you to enter the name of the template to be used for the generation. You can also set the name using option ```--template```.
 
-**EXAMPLE**: Following is an example command of using the –template option:
+**EXAMPLE**: Following is an example command of using the ```-–template``` option:
 ```
 sf add pagetemplate "New page" --template "CustomPageTemplate"
 ```
