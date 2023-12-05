@@ -10,6 +10,8 @@
 
   You can download a prebuild version for some operating systems from the [release assets](https://github.com/Sitefinity/Sitefinity-CLI/releases). Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
 
+  To use or build the CLI, you need to install the corresponding version of the [.NET Core SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+
 ## Build the app yourself
  
   To build the application for your OS, enter the following command from the project root folder:
