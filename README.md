@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-  To use or build the CLI, you need to install the corresponding version of the [.NET Core SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
+  To use or build the CLI, you need to install the corresponding version of the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
 ## Installation
 
