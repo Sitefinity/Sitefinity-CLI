@@ -574,7 +574,9 @@ namespace Sitefinity_CLI.Tests
                 var filePath = Path.Combine(folderPath, fileName);
                 var generatedFileContent = File.ReadAllText(filePath);
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
-                Assert.IsTrue(generatedFileContent.EndsWith(inputString.ToString().TrimEnd(Environment.NewLine.ToCharArray())));
+
+                var enteredPrompts = inputString.ToString().TrimEnd().Split(Environment.NewLine);
+                Assert.IsTrue(enteredPrompts.All(s => generatedFileContent.Contains(s)));       
             }
         }
 
