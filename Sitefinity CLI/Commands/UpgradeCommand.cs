@@ -486,7 +486,16 @@ namespace Sitefinity_CLI.Commands
 
         private readonly HttpClient httpClient;
 
-        private readonly ICollection<string> allowedAdditionalPackagesIds = new List<string>() { "Progress.Sitefinity.Cloud", "Progress.Sitefinity.MOVEit", "Progress.Sitefinity.Libraries.Cloudinary", "Progress.Sitefinity.Libraries.Frontify", "Progress.Sitefinity.Libraries.WebP" };
+        private readonly ICollection<string> allowedAdditionalPackagesIds =
+            new List<string>()
+            {
+                "Progress.Sitefinity.Cloud",
+                "Progress.Sitefinity.MOVEit",
+                "Progress.Sitefinity.Libraries.Cloudinary",
+                "Progress.Sitefinity.Libraries.Frontify",
+                "Progress.Sitefinity.Libraries.WebP",
+                "Progress.Sitefinity.AIServiceConnector"
+            };
 
         private const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
     }
