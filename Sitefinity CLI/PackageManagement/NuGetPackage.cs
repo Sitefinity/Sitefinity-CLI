@@ -12,11 +12,16 @@ namespace Sitefinity_CLI.PackageManagement
             this.Dependencies = new List<NuGetPackage>();
         }
 
+        public NuGetPackage(string id, string version)
+            : this()
+        {
+            this.Id = id;
+            this.Version = version;
+        }
+
         public string Id { get; set; }
 
         public string Version { get; set; }
-
-        public string Framework { get; set; }
 
         public IList<NuGetPackage> Dependencies { get; set; }
     }

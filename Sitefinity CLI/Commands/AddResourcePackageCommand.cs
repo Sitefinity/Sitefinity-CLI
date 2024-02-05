@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -14,7 +16,7 @@ namespace Sitefinity_CLI.Commands
     {
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultResourcePackageName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultResourcePackageName)]
-        public override string TemplateName { get; set; } = Constants.DefaultResourcePackageName;
+        public override string TemplateName { get; set; }
 
         public AddResourcePackageCommand(ILogger<object> logger) : base(logger)
         {

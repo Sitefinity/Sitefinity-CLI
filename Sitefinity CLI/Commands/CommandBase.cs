@@ -114,10 +114,13 @@ namespace Sitefinity_CLI.Commands
 
             if (config.Options.First(x => x.LongName == "template").Value() == null)
             {
-                var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
                 var templateNameProp = this.GetType().GetProperties().Where(prop => prop.Name == "TemplateName").FirstOrDefault();
                 var defaultValueAttr = templateNameProp.GetCustomAttribute(typeof(DefaultValueAttribute)) as DefaultValueAttribute;
-                var defaultValue = defaultValueAttr.Value.ToString();
+                var defaultAttributeValue = defaultValueAttr.Value.ToString();
+
+                var defaultValue = defaultAttributeValue.StartsWith("Bootstrap") ? this.GetDefaultTemplateName(this.Version) : defaultAttributeValue;
+
+                var promptMessage = string.Format(Constants.SourceTemplatePromptMessage, config.FullName);
                 this.TemplateName = Prompt.GetString(promptMessage, promptColor: ConsoleColor.Yellow, defaultValue: defaultValue);
             }
 
@@ -176,7 +179,7 @@ namespace Sitefinity_CLI.Commands
             return (int)ExitCode.OK;
         }
 
-        private string GetLatestTemplatesVersion()
+        protected string GetLatestTemplatesVersion()
         {
             var templatesFolderPath = Path.Combine(this.CurrentPath, Constants.TemplatesFolderName);
             var directoryNames = Directory.GetDirectories(templatesFolderPath);
@@ -216,6 +219,21 @@ namespace Sitefinity_CLI.Commands
             }
 
             return data;
+        }
+
+        protected virtual string GetDefaultTemplateName(string version)
+        {
+            CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+            var versionValue = float.Parse(version, cultureInfo.NumberFormat);
+            if (versionValue < 14.1)
+            {
+                return Constants.DefaultResourcePackageName_VersionsBefore14_1;
+            }
+            else
+            {
+                return Constants.DefaultResourcePackageName;
+            }
         }
     }
 }

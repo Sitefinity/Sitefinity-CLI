@@ -49,7 +49,7 @@ namespace Sitefinity_CLI.Commands
         /// </summary>
         [Option(Constants.TemplateNameOptionTemplate, Constants.TemplateNameOptionDescription + Constants.DefaultSourceTemplateName, CommandOptionType.SingleValue)]
         [DefaultValue(Constants.DefaultSourceTemplateName)]
-        public override string TemplateName { get; set; } = Constants.DefaultSourceTemplateName;
+        public override string TemplateName { get; set; }
 
         /// <summary>
         /// Gets the file friendly/class friendly name

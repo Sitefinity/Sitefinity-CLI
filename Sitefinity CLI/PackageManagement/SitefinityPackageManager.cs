@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
 using Sitefinity_CLI.VisualStudio;
 
 namespace Sitefinity_CLI.PackageManagement
@@ -25,27 +26,25 @@ namespace Sitefinity_CLI.PackageManagement
             this.packagesConfigFileEditor = packagesConfigFileEditor;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
-            this.defaultSources = new List<string>() { SitefinityPublicNuGetSource, PublicNuGetSourceV3 };
+            this.defaultSources = new List<NugetPackageSource>()
+            {
+               new NugetPackageSource(SitefinityPublicNuGetSource),
+               new NugetPackageSource(PublicNuGetSourceV3)
+            };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
             this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
         }
 
-        public void Install(string packageId, string version, string solutionFilePath, IEnumerable<string> nugetPackageSources)
+        public void Install(string packageId, string version, string solutionFilePath, string nugetConfigFilePath)
         {
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
             this.logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
-            var sourcesUsed = string.Join(',', nugetPackageSources);
-            this.logger.LogInformation($"Package sources used: {sourcesUsed}");
 
-            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetPackageSources);
+
+            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetConfigFilePath);
 
             this.logger.LogInformation($"[{solutionDirectory}] Install for package '{packageId}' completed");
-        }
-
-        public void Install(string packageId, string version, string solutionFilePath)
-        {
-            this.Install(packageId, version, solutionFilePath, this.defaultSources);
         }
 
         public void Restore(string solutionFilePath)
@@ -75,15 +74,15 @@ namespace Sitefinity_CLI.PackageManagement
             return await this.GetSitefinityPackageTree(version, this.defaultSources);
         }
 
-        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<string> nugetPackageSources)
+        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> nugetPackageSources)
         {
-            var sourcesUsed = string.Join(',', nugetPackageSources);
+            var sourcesUsed = string.Join(',', nugetPackageSources?.Select(x => x.SourceUrl));
             this.logger.LogInformation($"Package sources used: {sourcesUsed}");
 
             return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
         }
 
-        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<string> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<NugetPackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             return await nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, this.supportedFrameworksRegex, shouldBreakSearch);
         }
@@ -136,7 +135,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public async Task<IEnumerable<string>> GetPackageVersions(string id, int versionsCount = 10)
         {
-            return await this.nuGetApiClient.GetPackageVersions(id, new List<string>() { SitefinityPublicNuGetSource }, versionsCount);
+            return await this.nuGetApiClient.GetPackageVersions(id, new List<NugetPackageSource>() { new NugetPackageSource(SitefinityPublicNuGetSource) }, versionsCount);
         }
 
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)
@@ -321,11 +320,11 @@ namespace Sitefinity_CLI.PackageManagement
             return parsedVersion;
         }
 
-        public IEnumerable<string> DefaultPackageSource
+        public IEnumerable<NugetPackageSource> DefaultPackageSource
         {
             get
             {
-                return new List<string>(this.defaultSources);
+                return new List<NugetPackageSource>(this.defaultSources);
             }
         }
 
@@ -619,7 +618,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly ILogger logger;
 
-        private readonly IEnumerable<string> defaultSources;
+        private readonly IEnumerable<NugetPackageSource> defaultSources;
 
         private readonly Regex supportedFrameworksRegex;
 
@@ -628,6 +627,7 @@ namespace Sitefinity_CLI.PackageManagement
         private const string SitefinityPublicNuGetSource = "https://nuget.sitefinity.com/nuget/";
 
         private const string PublicNuGetSourceV3 = "https://api.nuget.org/v3/index.json";
+        //private const string PublicNuGetSourceV3 = "https://www.nuget.org/api/v2";
 
         private const string PackagesFolderName = "packages";
 

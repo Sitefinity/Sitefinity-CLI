@@ -5,22 +5,27 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.Enums;
+using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.PackageManagement
 {
     internal class NuGetApiClient : INuGetApiClient
     {
-        public NuGetApiClient(IHttpClientFactory clientFactory)
+        public NuGetApiClient(IHttpClientFactory clientFactory, ILogger<INuGetApiClient> logger)
         {
             this.clientFactory = clientFactory;
+            this.logger = logger;
             this.httpClient = clientFactory.CreateClient();
             this.nuGetPackageXmlDocumentCache = new Dictionary<string, PackageXmlDocumentModel>();
             this.xmlns = "http://www.w3.org/2005/Atom";
@@ -28,7 +33,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.xmlnsd = "http://schemas.microsoft.com/ado/2007/08/dataservices";
         }
 
-        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<string> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<NugetPackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             // First, try to retrieve the data from the local cache
             var packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LocalPackagesInfoCacheFolder, string.Concat(id, version));
@@ -45,11 +50,11 @@ namespace Sitefinity_CLI.PackageManagement
             NuGetPackage nuGetPackage = new NuGetPackage();
             if (nuGetPackageXmlDoc.ProtoVersion == ProtocolVersion.NuGetAPIV2)
             {
-                dependencies = this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage);
+                dependencies = this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
             }
             else
             {
-                dependencies = this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage);
+                dependencies = this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
             }
 
             if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
@@ -60,19 +65,10 @@ namespace Sitefinity_CLI.PackageManagement
 
             foreach (NuGetPackage dependency in dependencies)
             {
-                bool isFrameworkSupported = true;
-                if (supportedFrameworksRegex != null && !string.IsNullOrEmpty(dependency.Framework))
+                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
+                if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
                 {
-                    isFrameworkSupported = supportedFrameworksRegex.IsMatch(dependency.Framework);
-                }
-
-                if (isFrameworkSupported)
-                {
-                    NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
-                    if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
-                    {
-                        nuGetPackage.Dependencies.Add(nuGetPackageDependency);
-                    }
+                    nuGetPackage.Dependencies.Add(nuGetPackageDependency);
                 }
             }
 
@@ -88,7 +84,18 @@ namespace Sitefinity_CLI.PackageManagement
             return nuGetPackage;
         }
 
-        private List<NuGetPackage> ParseDependenciesV2(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage)
+        private static bool IsFrameworkSuported(Regex supportedFrameworksRegex, string framework)
+        {
+            bool isFrameworkSupported = true;
+            if (supportedFrameworksRegex != null && !string.IsNullOrEmpty(framework))
+            {
+                isFrameworkSupported = supportedFrameworksRegex.IsMatch(framework);
+            }
+
+            return isFrameworkSupported;
+        }
+
+        private List<NuGetPackage> ParseDependenciesV2(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
             XElement propertiesElement = nuGetPackageXmlDoc.XDocumentData
                 .Element(this.xmlns + Constants.EntryElem)
@@ -97,7 +104,7 @@ namespace Sitefinity_CLI.PackageManagement
             var id = nuGetPackageXmlDoc.XDocumentData
                 .Element(this.xmlns + Constants.EntryElem)
                 .Element(this.xmlns + Constants.TitleElem).Value;
-            
+
             var version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
 
             if (id != null && version != null)
@@ -108,51 +115,78 @@ namespace Sitefinity_CLI.PackageManagement
 
             string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
 
-            return this.ParseDependencies(dependenciesString);
+            return this.ParseDependencies(dependenciesString, supportedFrameworksRegex);
         }
 
-        private List<NuGetPackage> ParseDependenciesV3(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage)
+        private List<NuGetPackage> ParseDependenciesV3(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
-            var dependencies = new List<NuGetPackage>();
+            var nugetPackageDeoebdebcies = new List<NuGetPackage>();
             var packageNamespace = nuGetPackageXmlDoc.XDocumentData.Root.GetDefaultNamespace();
             var elementPackage = nuGetPackageXmlDoc.XDocumentData.Element(packageNamespace + Constants.PackageElem);
+
             var metadataNamespace = elementPackage.Descendants().First().GetDefaultNamespace();
             var elementsMetadata = elementPackage.Element(metadataNamespace + Constants.MetadataElem);
+
+            var id = elementsMetadata.Element(metadataNamespace + Constants.IdAttribute).Value;
+            var version = elementsMetadata.Element(metadataNamespace + Constants.VersionElemV3).Value;
+            if (id != null && version != null)
+            {
+                nuGetPackage.Id = id;
+                nuGetPackage.Version = version;
+            }
+
             var groupElementsDependencies = elementsMetadata.Element(metadataNamespace + Constants.DependenciesEl);
 
             if (groupElementsDependencies != null)
             {
                 var groupElements = groupElementsDependencies.Elements(metadataNamespace + Constants.GroupElem);
-                if (groupElements != null)
+                if (groupElements != null && groupElements.Any())
                 {
-                    var groupElementsForTargetFramework = groupElements.Where(x => (x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework)) || !x.HasAttributes);
 
-                    foreach (var ge in groupElementsForTargetFramework)
+                    nugetPackageDeoebdebcies = ExtractedGroupedByFrameworkNugetDependencies(nugetPackageDeoebdebcies, groupElements, supportedFrameworksRegex);
+                }
+                else
+                {
+                    var dependencyElements = groupElementsDependencies.Elements();
+                    nugetPackageDeoebdebcies = this.GetDependencies(dependencyElements);
+                }
+            }
+
+            return nugetPackageDeoebdebcies;
+        }
+
+        private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDeoebdebcies, IEnumerable<XElement> groupElements, Regex supportedFrameworksRegex)
+        {
+            var groupElementsForTargetFramework = groupElements.Where(x => (x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework)) || !x.HasAttributes);
+
+            foreach (var ge in groupElementsForTargetFramework)
+            {
+                string dependenciesTargetFramework = null;
+                if (ge.HasAttributes && ge.Attributes().Any(x => x.Name == Constants.TargetFramework))
+                {
+                    dependenciesTargetFramework = ge.Attribute(Constants.TargetFramework).Value;
+                }
+
+                var depElements = ge.Elements();
+                if (depElements.Any())
+                {
+                    string targetFramework = this.GetFrameworkVersion(dependenciesTargetFramework); ;
+                    if (IsFrameworkSuported(supportedFrameworksRegex, targetFramework))
                     {
-                        string dependenciesTargetFramework = null;
-                        if (ge.HasAttributes && ge.Attributes().Any(x => x.Name == Constants.TargetFramework))
-                        {
-                            dependenciesTargetFramework = ge.Attribute(Constants.TargetFramework).Value;
-                        }
-
-                        var depElements = ge.Elements();
-                        if (depElements.Any())
-                        {
-                            dependencies = this.GetDependencies(depElements, dependenciesTargetFramework);
-                        }
+                        nugetPackageDeoebdebcies = this.GetDependencies(depElements);
                     }
                 }
             }
 
-            return dependencies;
+            return nugetPackageDeoebdebcies;
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<string> sources, int versionsCount = 10)
+        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
         {
             HttpResponseMessage response = null;
-            foreach (string source in sources)
+            foreach (NugetPackageSource nugetSource in nugetSources)
             {
-                string sourceUrl = source.TrimEnd('/');
+                string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
                 using (var request = new HttpRequestMessage(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}"))
                 {
                     request.Headers.Add("Accept", MediaTypeNames.Application.Json);
@@ -182,7 +216,7 @@ namespace Sitefinity_CLI.PackageManagement
             return versions;
         }
 
-        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
             string cacheKey = string.Concat(id, version);
             if (nuGetPackageXmlDocumentCache != null && nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
@@ -226,54 +260,89 @@ namespace Sitefinity_CLI.PackageManagement
             return packageXmlDocument;
         }
 
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
             var versionInfo = ProtocolVersion.NuGetAPIV3;
             var response = await this.GetPackageSpecificationV3(id, version, sources, httpClient);
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (response?.StatusCode != HttpStatusCode.OK)
             {
                 response = await this.GetPackageSpecificationV2(id, version, sources, httpClient);
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     versionInfo = ProtocolVersion.NuGetAPIV2;
                 }
             }
 
+            if (response == null)
+            {
+                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
+                throw new UpgradeException("Upgrade failed!");
+            }
+
             return new PackageSpecificationResponseModel() { SpecResponse = response, ProtoVersion = versionInfo };
         }
 
-        private async Task<HttpResponseMessage> GetPackageSpecificationV3(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private async Task<HttpResponseMessage> GetPackageSpecificationV3(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
         {
+            var apiV3Sources = sources.Where(x => x.SourceUrl.Contains(Constants.ApiV3Identifier));
             HttpResponseMessage response = null;
-            var apiV3Sources = sources.Where(x => x.Contains(Constants.ApiV3Identifier));
-
-            foreach (string source in apiV3Sources)
+            foreach (NugetPackageSource nugetSource in apiV3Sources)
             {
+                this.AppendNugetSourceAuthHeaders(httpClient, nugetSource);
+
                 // We fetch the base URL from the service index because it may be changed without notice
-                string sourceUrl = this.GetBaseAddress(httpClient, source).Result.TrimEnd('/');
+                string sourceUrl = (await this.GetBaseAddress(httpClient, nugetSource))?.TrimEnd('/');
+                if (sourceUrl == null)
+                {
+                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
+                    throw new UpgradeException("Upgrade failed");
+                }
+
                 string loweredId = id.ToLowerInvariant();
                 response = await httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
+
+                // clear the headers so we don't send the auth info to another package source
+                httpClient.DefaultRequestHeaders.Clear();
+
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;
+                }
+                else
+                {
+                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.SourceUrl);
                 }
             }
 
             return response;
         }
 
-        private async Task<HttpResponseMessage> GetPackageSpecificationV2(string id, string version, IEnumerable<string> sources, HttpClient httpClient)
+        private void AppendNugetSourceAuthHeaders(HttpClient httpClient, NugetPackageSource nugetSource)
         {
-            HttpResponseMessage response = null;
-            var apiV2Sources = sources.Where(x => !x.Contains(Constants.ApiV3Identifier));
-
-            foreach (string source in apiV2Sources)
+            // there are cases where the username is not required
+            if (nugetSource.Password != null)
             {
-                string sourceUrl = source.TrimEnd('/');
+                var authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Username}:{nugetSource.Password}");
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
+            }
+        }
+
+        private async Task<HttpResponseMessage> GetPackageSpecificationV2(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
+        {
+            var apiV2Sources = sources.Where(x => !x.SourceUrl.Contains(Constants.ApiV3Identifier));
+            HttpResponseMessage response = null;
+
+            foreach (NugetPackageSource source in apiV2Sources)
+            {
+                string sourceUrl = source.SourceUrl.TrimEnd('/');
                 response = await httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;
+                }
+                else
+                {
+                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.SourceUrl);
                 }
             }
 
@@ -318,7 +387,7 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencyVersions;
         }
 
-        private List<NuGetPackage> ParseDependencies(string dependenciesString)
+        private List<NuGetPackage> ParseDependencies(string dependenciesString, Regex supportedFrameWorkRegex)
         {
             var dependencies = new List<NuGetPackage>();
 
@@ -348,13 +417,16 @@ namespace Sitefinity_CLI.PackageManagement
                             {
                                 framework = dependencyIdAndVersionAndFramework[2].Trim();
                             }
-
-                            if (dependencyId == null || dependencyVersion == null)
+                            if (!IsFrameworkSuported(supportedFrameWorkRegex, framework))
+                            {
+                                continue;
+                            }
+                            if (dependencyId == null || dependencyVersion == null)//check if framework is supported)
                             {
                                 continue;
                             }
 
-                            dependencies.Add(new NuGetPackage() { Id = dependencyId, Version = dependencyVersion, Framework = framework });
+                            dependencies.Add(new NuGetPackage(dependencyId, dependencyVersion));
                         }
                     }
                 }
@@ -363,14 +435,15 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencies;
         }
 
-        private async Task<string> GetBaseAddress(HttpClient httpClient, string source)
+        private async Task<string> GetBaseAddress(HttpClient httpClient, NugetPackageSource nugetSource)
         {
             HttpResponseMessage response = null;
             string baseAddress = null;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, source))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, nugetSource.SourceUrl))
             {
                 request.Headers.Add("Accept", MediaTypeNames.Application.Json);
+
 
                 response = await httpClient.SendAsync(request);
                 if (response.IsSuccessStatusCode)
@@ -386,39 +459,38 @@ namespace Sitefinity_CLI.PackageManagement
             return baseAddress;
         }
 
-        private List<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements, string dependenciesTargetFramework)
+        private List<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements)
         {
             var dependencies = new List<NuGetPackage>();
+
             foreach (var depElement in depElements)
             {
-                var np = new NuGetPackage();
-                var id = depElement.Attribute(Constants.IdAttribute).Value;
-                var val = depElement.Attribute(Constants.VersionAttribute).Value;
-                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(val))
+                var id = depElement.Attribute(Constants.IdAttribute)?.Value;
+                var version = depElement.Attribute(Constants.VersionAttribute)?.Value
+                    .Trim(new char[] { '[', '(', ')', ']' });
+
+                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(version))
                 {
-                    np.Id = id;
-                    np.Version = val;
-                    np.Framework = this.GetFrameworkVersion(dependenciesTargetFramework);
+                    var np = new NuGetPackage(id, version);
                     dependencies.Add(np);
                 }
             }
 
-            return dependencies.Any() ? dependencies : null;
+            return dependencies;
         }
 
         private string GetFrameworkVersion(string dependenciesTargetFramework)
         {
-            string frameworkVersion = null;
             if (!string.IsNullOrEmpty(dependenciesTargetFramework) && dependenciesTargetFramework.Contains(".NETFramework"))
             {
-                frameworkVersion = dependenciesTargetFramework.Substring(13).Replace(".", string.Empty);
+                dependenciesTargetFramework = dependenciesTargetFramework.Substring(13).Replace(".", string.Empty);
             }
 
-            return frameworkVersion != null ? $"net{frameworkVersion}" : string.Empty;
+            return dependenciesTargetFramework != null ? $"net{dependenciesTargetFramework}" : string.Empty;
         }
 
         private readonly IHttpClientFactory clientFactory;
-
+        private readonly ILogger<INuGetApiClient> logger;
         private readonly HttpClient httpClient;
 
         private readonly XNamespace xmlns;

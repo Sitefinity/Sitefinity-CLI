@@ -2,14 +2,14 @@
 
 ## Prerequisites
 
-  To use or build the CLI, you need to install [.NET Core](https://www.microsoft.com/net/download/windows).
+  To use or build the CLI, you need to install the corresponding version of the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 
 ## Installation
 
 * Use prebuild version
 
   You can download a prebuild version for some operating systems from the [release assets](https://github.com/Sitefinity/Sitefinity-CLI/releases). Extract the archive to a folder of your choice and add this folder to the ```PATH``` system variable.
-
+ 
 ## Build the app yourself
  
   To build the application for your OS, enter the following command from the project root folder:
@@ -75,13 +75,13 @@ You can use the add command with the following subcommands:
 
 ## Sitefinity CMS version
 
-Every command has an option ```-version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Telates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
+Every command has an option ```--version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Telates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
 
 When running a command the CLI will try to automatically detect your Sitefinity CMS project version and use the corresponding template. If it cannot detect the version or your Sitefinity CMS version is higher than latest templates version, CLI will use the latest available. 
 
-You can use the ```-version``` option to explicitly set the templates version that CLI should use.
+You can use the ```--version``` option to explicitly set the templates version that CLI should use.
 
-**EXAMPLE**: Following is an example command of using the ```–version``` option:
+**EXAMPLE**: Following is an example command of using the ```–-version``` option:
 ```
 sf add package "New resource package" --version "11.0"
 ```
@@ -89,9 +89,9 @@ In this case, the CLI will look for a folder named ```11.0``` inside folder ```T
 
 ## Template generation
 
-When you run a command, the CLI prompts you to enter the name of the template to be used for the generation. You can also set the name using option ```-template```.
+When you run a command, the CLI prompts you to enter the name of the template to be used for the generation. You can also set the name using option ```--template```.
 
-**EXAMPLE**: Following is an example command of using the –template option:
+**EXAMPLE**: Following is an example command of using the ```-–template``` option:
 ```
 sf add pagetemplate "New page" --template "CustomPageTemplate"
 ```
