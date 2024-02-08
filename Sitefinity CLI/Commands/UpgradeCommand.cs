@@ -486,7 +486,6 @@ namespace Sitefinity_CLI.Commands
                 "Progress.Sitefinity.MOVEit",
                 "Progress.Sitefinity.Libraries.Cloudinary",
                 "Progress.Sitefinity.Libraries.Frontify",
-                "Progress.Sitefinity.Libraries.WebP",
                 "Progress.Sitefinity.AIServiceConnector"
             };
 
