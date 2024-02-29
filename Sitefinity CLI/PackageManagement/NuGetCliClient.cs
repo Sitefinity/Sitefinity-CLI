@@ -14,12 +14,12 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoHttpCache -ConfigFile \"{nugetConfigPath}\"");
         }
 
         public void Restore(string solutionFilePath)
         {
-            this.RunProcess($"restore \"{solutionFilePath}\" -NoCache");
+            this.RunProcess($"restore \"{solutionFilePath}\" -NoHttpCache");
         }
 
         private void RunProcess(string arguments)
