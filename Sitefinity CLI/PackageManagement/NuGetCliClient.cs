@@ -69,6 +69,6 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly ILogger<NuGetCliClient> logger;
         private const string NuGetExeFileName = "nuget.exe";
-        private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
+        private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/v6.8.1/nuget.exe";
     }
 }
