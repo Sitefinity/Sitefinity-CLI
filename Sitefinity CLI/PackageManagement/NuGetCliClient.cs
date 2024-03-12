@@ -27,6 +27,9 @@ namespace Sitefinity_CLI.PackageManagement
             var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.PackageManagement, NuGetExeFileName);
             this.EnsureNugetExecutable(nugetFileLocation);
 
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(nugetFileLocation);
+            this.logger.LogInformation("Executing '{arguments}' with nuget.exe file version: {fileVersion}", arguments, fileVersionInfo.FileVersion);
+
             using (Process process = new Process())
             {
                 var startInfo = new ProcessStartInfo()
