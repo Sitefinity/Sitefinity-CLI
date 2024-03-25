@@ -24,7 +24,7 @@ namespace Sitefinity_CLI.Tests
         {
             var currenPath = Directory.GetCurrentDirectory();
             var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.Parent.FullName;
-            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "net6.0", "win-x86");
+            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "net8.0", "win-x86");
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             this.testedTemplateVersions = this.GetAllTemplatesVersions(cultureInfo).Select(x => x.ToString("n1", cultureInfo)).ToList();
 
