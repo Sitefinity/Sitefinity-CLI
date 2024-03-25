@@ -74,6 +74,6 @@
     </None>
   </ItemGroup>
   <Target Name="SfConfig" AfterTargets="_PublishNoBuildAlternative">
-    <Exec Command="dotnet &quot;$(PublishDir)sf.dll&quot; config" />
+    <Exec Command="&quot;$(PublishDir)sf.exe&quot; config" />
   </Target>
 </Project>
