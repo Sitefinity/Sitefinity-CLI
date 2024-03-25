@@ -315,7 +315,7 @@ namespace Sitefinity_CLI.Tests
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
                 expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
                 expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath)));
-                
+
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -576,7 +576,7 @@ namespace Sitefinity_CLI.Tests
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
 
                 var enteredPrompts = inputString.ToString().TrimEnd().Split(Environment.NewLine);
-                Assert.IsTrue(enteredPrompts.All(s => generatedFileContent.Contains(s)));       
+                Assert.IsTrue(enteredPrompts.All(s => generatedFileContent.Contains(s)));
             }
         }
 
@@ -608,6 +608,8 @@ namespace Sitefinity_CLI.Tests
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
+                var error = process.StandardError;
+                var b = error.ReadToEnd();
 
                 process.WaitForExit();
 
@@ -823,14 +825,24 @@ namespace Sitefinity_CLI.Tests
                 folderPath = testsFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                fileName = string.Format("{0}{1}", "TestAuthors", Constants.CSharpFileExtension);
-                folderPath = testsFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
+                // after 14.3 we change the structure of int tests project
+                if (Version.Parse(templatesVersion) < Version.Parse("14.3"))
+                {
+                    fileName = string.Format("{0}{1}", "TestAuthors", Constants.CSharpFileExtension);
+                    folderPath = testsFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
-                folderPath = testsFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-                
+                    fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
+                    folderPath = testsFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
+                }
+                else
+                {
+                    fileName = string.Format("{0}{1}", "IntegrationTestsSettings", Constants.JsonFileExtension);
+                    folderPath = testsFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
+                }
+
                 expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
                 expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.IntegrationTestsCreatedMessage, resourceName)));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
