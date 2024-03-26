@@ -109,6 +109,9 @@ namespace Sitefinity_CLI.Commands
                 return;
             }
 
+            if (string.IsNullOrEmpty(this.Version))
+                this.SetLatestVersion();
+
             this.logger.LogInformation("Searching the provided project/s for Sitefinity references...");
 
             var sitefinityProjectFilePaths = this.GetProjectsPathsFromSolution(this.SolutionPath, true);
@@ -119,9 +122,6 @@ namespace Sitefinity_CLI.Commands
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
                 return;
             }
-
-            if (string.IsNullOrEmpty(this.Version))
-                this.SetLatestVersion();
 
             Dictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
 
