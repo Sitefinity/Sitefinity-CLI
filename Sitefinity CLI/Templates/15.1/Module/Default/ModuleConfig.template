@@ -1,0 +1,35 @@
+﻿/* {{> sign}} */
+
+using System.Configuration;
+using Telerik.Sitefinity.Configuration;
+using Telerik.Sitefinity.Modules.GenericContent.Configuration;
+
+namespace {{pascalCaseName}}
+{
+    /// <summary>
+    /// Defines module configuration settings.
+    /// </summary>
+    internal class {{pascalCaseName}}Config : ConfigSection
+    {
+        ///// <summary>
+        ///// Sample property demonstrating the usage of ConfigurationPropertyAttribute
+        ///// </summary>
+        //[ConfigurationProperty("PropNames.SampleProperty", DefaultValue = "Default value")]
+        //public virtual string SampleProperty
+        //{
+        //    get
+        //    {
+        //        return (string)base[PropNames.SampleProperty];
+        //    }
+        //    set
+        //    {
+        //        base[PropNames.SampleProperty] = value;
+        //    }
+        //}
+
+        //private class PropNames
+        //{
+        //    internal const string SampleProperty = "sampleProperty";
+        //}
+    }
+}
