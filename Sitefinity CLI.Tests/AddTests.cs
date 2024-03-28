@@ -48,12 +48,6 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void test()
-        {
-            Assert.IsTrue(false);
-        }
-
-        [TestMethod]
         public void AddResourcePackageTest()
         {
             var resourceName = "Test";
