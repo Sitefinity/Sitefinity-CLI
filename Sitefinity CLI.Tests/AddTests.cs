@@ -608,8 +608,6 @@ namespace Sitefinity_CLI.Tests
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
-                var error = process.StandardError;
-                var b = error.ReadToEnd();
 
                 process.WaitForExit();
 

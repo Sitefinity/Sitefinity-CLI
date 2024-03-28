@@ -29,5 +29,11 @@ namespace Sitefinity_CLI.Commands
             : base(csProjectFileEditor, logger)
         {
         }
+
+        public override int OnExecute(CommandLineApplication config)
+        {
+            throw new System.Exception("ASd");
+            return base.OnExecute(config);
+        }
     }
 }
