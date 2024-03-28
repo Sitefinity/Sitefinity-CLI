@@ -75,8 +75,7 @@ namespace Sitefinity_CLI.Tests
 
                 // Check output string to verify message
                 var expectedFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], Constants.ResourcePackagesFolderName, resourceName);
-                //var outputString = myStreamReader.ReadToEnd();
-                var outputString = process.StandardError.ReadToEnd();
+                var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
                 expectedOutputString.AppendLine(string.Format(Constants.ResourcePackageCreatedMessage, resourceName, expectedFolderPath));
@@ -1150,7 +1149,7 @@ namespace Sitefinity_CLI.Tests
         {
             var process = this.CreateNewProcess();
 
-            var args = string.Format("/C sf.exe {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
+            var args = string.Format("/C dotnet sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 
             if (templateName != null)
