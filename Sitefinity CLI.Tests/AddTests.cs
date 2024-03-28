@@ -75,7 +75,8 @@ namespace Sitefinity_CLI.Tests
 
                 // Check output string to verify message
                 var expectedFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], Constants.ResourcePackagesFolderName, resourceName);
-                var outputString = myStreamReader.ReadToEnd();
+                //var outputString = myStreamReader.ReadToEnd();
+                var outputString = process.StandardError.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
                 expectedOutputString.AppendLine(string.Format(Constants.ResourcePackageCreatedMessage, resourceName, expectedFolderPath));
@@ -1140,7 +1141,7 @@ namespace Sitefinity_CLI.Tests
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = this.workingDirectory
+                    WorkingDirectory = this.workingDirectory                 
                 }
             };
         }
