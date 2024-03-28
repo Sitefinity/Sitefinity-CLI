@@ -32,7 +32,6 @@ namespace Sitefinity_CLI.Commands
 
         public override int OnExecute(CommandLineApplication config)
         {
-            throw new System.Exception("ASd");
             return base.OnExecute(config);
         }
     }
