@@ -24,7 +24,7 @@ namespace Sitefinity_CLI.Tests
         {
             var currenPath = Directory.GetCurrentDirectory();
             var solutionRootPath = Directory.GetParent(currenPath).Parent.Parent.Parent.Parent.FullName;
-            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "net6.0", "win-x86");
+            this.workingDirectory = Path.Combine(solutionRootPath, "Sitefinity CLI", "bin", "net8.0", "win-x86");
             CultureInfo cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             this.testedTemplateVersions = this.GetAllTemplatesVersions(cultureInfo).Select(x => x.ToString("n1", cultureInfo)).ToList();
 
@@ -315,7 +315,7 @@ namespace Sitefinity_CLI.Tests
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
                 expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
                 expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath)));
-                
+
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -576,7 +576,7 @@ namespace Sitefinity_CLI.Tests
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
 
                 var enteredPrompts = inputString.ToString().TrimEnd().Split(Environment.NewLine);
-                Assert.IsTrue(enteredPrompts.All(s => generatedFileContent.Contains(s)));       
+                Assert.IsTrue(enteredPrompts.All(s => generatedFileContent.Contains(s)));
             }
         }
 
@@ -823,14 +823,24 @@ namespace Sitefinity_CLI.Tests
                 folderPath = testsFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                fileName = string.Format("{0}{1}", "TestAuthors", Constants.CSharpFileExtension);
-                folderPath = testsFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
+                // after 14.3 we change the structure of int tests project
+                if (Version.Parse(templatesVersion) < Version.Parse("14.3"))
+                {
+                    fileName = string.Format("{0}{1}", "TestAuthors", Constants.CSharpFileExtension);
+                    folderPath = testsFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
-                folderPath = testsFolderPath;
-                AssertFileCreated(folderPath, fileName, expectedOutputString);
-                
+                    fileName = string.Format("{0}{1}", "TestCategories", Constants.CSharpFileExtension);
+                    folderPath = testsFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
+                }
+                else
+                {
+                    fileName = string.Format("{0}{1}", "IntegrationTestsSettings", Constants.JsonFileExtension);
+                    folderPath = testsFolderPath;
+                    AssertFileCreated(folderPath, fileName, expectedOutputString);
+                }
+
                 expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
                 expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.IntegrationTestsCreatedMessage, resourceName)));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
@@ -1122,7 +1132,7 @@ namespace Sitefinity_CLI.Tests
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = this.workingDirectory
+                    WorkingDirectory = this.workingDirectory                 
                 }
             };
         }
@@ -1131,7 +1141,7 @@ namespace Sitefinity_CLI.Tests
         {
             var process = this.CreateNewProcess();
 
-            var args = string.Format("/C sf.exe {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
+            var args = string.Format("/C dotnet sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 
             if (templateName != null)

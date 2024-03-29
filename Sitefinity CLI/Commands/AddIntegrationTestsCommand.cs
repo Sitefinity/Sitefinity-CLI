@@ -29,5 +29,10 @@ namespace Sitefinity_CLI.Commands
             : base(csProjectFileEditor, logger)
         {
         }
+
+        public override int OnExecute(CommandLineApplication config)
+        {
+            return base.OnExecute(config);
+        }
     }
 }
