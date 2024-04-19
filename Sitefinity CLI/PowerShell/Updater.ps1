@@ -7,6 +7,26 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 	return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
 }
 
+function Remove-DeprecatedPackages($projectName, $packageVersion){
+    $deprecatedPackages = @(
+        @{Name = "Telerik.DataAccess.Fluent"; DeprecatedInVersion = [System.Version]"12.2.7200"},
+        @{Name = "Telerik.Sitefinity.OpenAccess"; DeprecatedInVersion = [System.Version]"13.0.7300"}
+        @{Name = "PayPal"; DeprecatedInVersion = [System.Version]"14.0.7700.0"},
+        @{Name = "Telerik.Sitefinity.Analytics"; DeprecatedInVersion = [System.Version]"15.0.8200"}
+    )
+    
+	"`nRemoving deprecated packages for '$projectName'"
+    foreach($package in $deprecatedPackages){
+        if($packageVersion -ge $package.DeprecatedInVersion){
+            $deprecatedPackage = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$projectName`"" 
+            if($null -ne $deprecatedPackage) {
+                "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$projectName`""
+                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$projectName`" " 
+            }
+        }
+    }
+}
+
 $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
 $upgradeTraceLog = $basePath + '\upgrade.log'
@@ -37,12 +57,18 @@ Try
 		$packages = $project.package
 		$packageCounter = 1
 		$totalCount = @($packages).Count
+        $sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.All" }).Version
+
+        if($null -ne $targetSfVersion){
+            Remove-DeprecatedPackages -projectName $projectName -packageVersion $sfPackageVersion
+        }
+
 		foreach ($package in $packages)
 		{
 			$packageName = $package.name
 			$packageVersion = $package.version
 			
-			"`npackage '$packageName' version '$packageVersion'"
+			"`nPackage '$packageName' version '$packageVersion'"
 			
 			$projectPackages = Get-Package -ProjectName $projectName
 			$oldPackage = $projectPackages | Where-Object { $_.Id -eq $packageName }
@@ -53,8 +79,7 @@ Try
 				$isUpdateRequired = IsUpgradeRequired $oldPackageVersion $packageVersion
 				if ($isUpdateRequired)
 				{
-					
-					"`nupgrading from '$oldPackageVersion' to '$packageVersion'"
+					"`nUpgrading from '$oldPackageVersion' to '$packageVersion'"
 					$errorMessage = $null;
 					Invoke-Expression "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll -ErrorVariable errorMessage" 
 					
