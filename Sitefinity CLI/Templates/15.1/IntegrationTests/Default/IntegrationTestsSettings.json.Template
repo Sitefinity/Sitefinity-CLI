@@ -1,8 +1,0 @@
-{
-  "SitefinityUrl": "http://localhost",
-  "SitefinityClientId": "sftestrunner",
-  "SitefinityClientSecret": "secret",
-  "Username": "admin@test.test",
-  "Password": "admin!23",
-  "TestExecutionTimeout": "00:05:00"
-}

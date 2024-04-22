@@ -52,11 +52,7 @@ namespace Sitefinity_CLI.Commands
                 dictionary["binFolder"] = this.BinFolder;
                 dictionary["projectGuid"] = this.ProjectGuid.ToString();
                 dictionary["sitefinityVersion"] = this.SitefinityVersion;
-
-                if (!string.IsNullOrEmpty(this.SitefinityVersion))
-                {
-                    dictionary["sitefinityNugetVersion"] = this.SitefinityVersion.EndsWith(".0") ? this.SitefinityVersion.Remove(this.SitefinityVersion.LastIndexOf("."), 2) : this.SitefinityVersion;
-                }
+                dictionary["sitefinityNugetVersion"] = this.SitefinityVersion.EndsWith(".0") ? this.SitefinityVersion.Remove(this.SitefinityVersion.LastIndexOf("."), 2) : this.SitefinityVersion;
             }
             else
             {
