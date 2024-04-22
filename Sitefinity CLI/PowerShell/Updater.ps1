@@ -9,13 +9,31 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 
 function Remove-DeprecatedPackages($projectName, $packageVersion){
     $deprecatedPackages = @(
-        @{Name = "Telerik.DataAccess.Fluent"; 				DeprecatedInVersion = [System.Version]"12.2.7200"},
-        @{Name = "Telerik.Sitefinity.OpenAccess"; 			DeprecatedInVersion = [System.Version]"13.0.7300"},
-		@{Name = "Telerik.Sitefinity.AmazonCloudSearch"; 	DeprecatedInVersion = [System.Version]"13.3.7600"},
-		@{Name = "PayPal"; 									DeprecatedInVersion = [System.Version]"14.0.7700.0"},
-		@{Name = "Progress.Sitefinity.Dec.Iris.Extension";  DeprecatedInVersion = [System.Version]"14.0.7700.0"},
-        @{Name = "Telerik.Sitefinity.Analytics";			DeprecatedInVersion = [System.Version]"15.0.8200"}
-    )
+       @{
+            Name = "Telerik.DataAccess.Fluent"
+            DeprecatedInVersion = [System.Version]"12.2.7200"
+        },
+        @{
+            Name = "Telerik.Sitefinity.OpenAccess"
+            DeprecatedInVersion = [System.Version]"13.0.7300"
+        },
+        @{
+            Name = "Telerik.Sitefinity.AmazonCloudSearch"
+            DeprecatedInVersion = [System.Version]"13.3.7600"
+        },
+        @{
+            Name = "PayPal"
+            DeprecatedInVersion = [System.Version]"14.0.7700.0"
+        },
+        @{
+            Name = "Progress.Sitefinity.Dec.Iris.Extension"
+            DeprecatedInVersion = [System.Version]"14.0.7700.0"
+        },
+        @{
+            Name = "Telerik.Sitefinity.Analytics"
+            DeprecatedInVersion = [System.Version]"15.0.8200"
+        }
+	}
 
 	"`nRemoving deprecated packages for '$projectName'"
     foreach($package in $deprecatedPackages){
@@ -61,7 +79,7 @@ Try
 		$totalCount = @($packages).Count
         $sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.All" }).Version
 
-        if($null -ne $targetSfVersion){
+        if($null -ne $sfPackageVersion){
             Remove-DeprecatedPackages -projectName $projectName -packageVersion $sfPackageVersion
         }
 
