@@ -1141,7 +1141,7 @@ namespace Sitefinity_CLI.Tests
         {
             var process = this.CreateNewProcess();
 
-            var args = string.Format("/C sf.exe {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
+            var args = string.Format("/C dotnet sf.dll {0} {1} \"{2}\"", Constants.AddCommandName, commandName, resourceName);
             args = AddOptionToArguments(args, "-r", templatesVersion != null ? this.testFolderPaths[templatesVersion] : this.testFolderPaths[this.GetLatestTemplatesVersion()]);
 
             if (templateName != null)
