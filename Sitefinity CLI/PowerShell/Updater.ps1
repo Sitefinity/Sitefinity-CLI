@@ -13,7 +13,7 @@ function Remove-DeprecatedPackages($projectName, $packageVersion){
             Name = "Telerik.DataAccess.Fluent"
             DeprecatedInVersion = [System.Version]"12.2.7200"
         }
-    }
+    )
 
     "`nRemoving deprecated packages for '$projectName'"
     foreach($package in $deprecatedPackages){
