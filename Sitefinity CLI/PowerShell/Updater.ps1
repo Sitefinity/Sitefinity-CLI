@@ -21,7 +21,7 @@ function Remove-DeprecatedPackages($projectName, $packageVersion){
             $deprecatedPackage = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$projectName`"" 
             if($null -ne $deprecatedPackage) {
                 "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$projectName`""
-                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$projectName`" " 
+                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$projectName`" -Force" 
             }
         }
     }
