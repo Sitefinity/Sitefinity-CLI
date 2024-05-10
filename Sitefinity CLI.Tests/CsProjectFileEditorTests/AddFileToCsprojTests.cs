@@ -153,8 +153,7 @@ namespace Sitefinity_CLI.Tests.CsProjectFileEditorTests
             int contentElementsBeforeRemoveCount = contentElementsBeforeRemove.Count();
             int contentElementsAfterRemoveCount = contentElementsAfterRemove.Count();
 
-            Assert.IsFalse(true);
-            //Assert.AreNotEqual(contentElementsAfterRemoveCount, contentElementsBeforeRemoveCount);
+            Assert.AreNotEqual(contentElementsAfterRemoveCount, contentElementsBeforeRemoveCount);
         }
 
         [TestCleanup]
