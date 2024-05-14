@@ -1,3 +1,7 @@
+param(
+	$RemoveDeprecatedPackages
+)
+
 function IsUpgradeRequired($oldPackageVersion, $packageVersion)
 {
     #handles 13.1.7340-preview or 13.1.7340-beta versions
@@ -57,11 +61,16 @@ Try
 		$packages = $project.package
 		$packageCounter = 1
 		$totalCount = @($packages).Count
-        $sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.All" }).Version
 
-        if($null -ne $sfPackageVersion){
-            Remove-DeprecatedPackages -projectName $projectName -packageVersion $sfPackageVersion
-        }
+		if($RemoveDeprecatedPackages -eq "True") 
+		{
+			$sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.All" }).Version
+
+			if($null -ne $sfPackageVersion)
+			{
+				Remove-DeprecatedPackages -projectName $projectName -packageVersion $sfPackageVersion
+			}
+		}
 
 		foreach ($package in $packages)
 		{

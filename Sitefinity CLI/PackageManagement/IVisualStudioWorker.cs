@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -6,6 +7,6 @@ namespace Sitefinity_CLI.PackageManagement
     {
         void Initialize(string solutionFilePath);
 
-        void ExecuteScript(string scriptPath);
+        void ExecuteScript(string scriptPath, List<string> scriptParameters);
     }
 }
