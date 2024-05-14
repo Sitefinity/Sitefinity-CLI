@@ -47,7 +47,7 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
         public string AdditionalPackagesString { get; set; }
 
-        [Option(Constants.RemoveDeprecatedPackages, Description = Constants.AdditionalPackagesDescription)]
+        [Option(Constants.RemoveDeprecatedPackages, Description = Constants.RemoveDeprecatedPackagesDescription)]
         public bool RemoveDeprecatedPackages { get; set; }
 
         public UpgradeCommand(
