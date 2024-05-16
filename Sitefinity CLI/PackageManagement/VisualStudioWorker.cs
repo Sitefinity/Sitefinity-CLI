@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using EnvDTE;
@@ -78,14 +79,16 @@ namespace Sitefinity_CLI.PackageManagement
             }
         }
 
-        public void ExecuteScript(string scriptPath)
+        public void ExecuteScript(string scriptPath, List<string> scriptParameters)
         {
             this.logger.LogInformation(Constants.UnblockingUpgradeScriptMessage);
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Format("Unblock-file '{0}'", scriptPath));
 
             System.Threading.Thread.Sleep(5000);
             this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
-            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Concat("&'", scriptPath, "'"));
+            string commandParameters = string.Join(" ", scriptParameters);
+            string commandToExecute = $"&'{scriptPath}' {commandParameters}";
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, commandToExecute);
         }
 
         private string GetLatestVisualStudioVersion()

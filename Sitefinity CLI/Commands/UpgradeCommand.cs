@@ -47,6 +47,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
         public string AdditionalPackagesString { get; set; }
 
+        [Option(Constants.RemoveDeprecatedPackages, Description = Constants.RemoveDeprecatedPackagesDescription)]
+        public bool RemoveDeprecatedPackages { get; set; }
+
         public UpgradeCommand(
             IPromptService promptService,
             ISitefinityPackageManager sitefinityPackageManager,
@@ -182,7 +185,10 @@ namespace Sitefinity_CLI.Commands
 
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
-            this.visualStudioWorker.ExecuteScript(updaterPath);
+
+            List<string> scriptParameters = [$"-RemoveDeprecatedPackages {this.RemoveDeprecatedPackages}"];
+
+            this.visualStudioWorker.ExecuteScript(updaterPath, scriptParameters);
             this.EnsureOperationSuccess();
 
             this.visualStudioWorker.Dispose();
