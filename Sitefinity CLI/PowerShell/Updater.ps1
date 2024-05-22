@@ -64,7 +64,7 @@ Try
 
 		if($RemoveDeprecatedPackages -eq "True") 
 		{
-			$sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.All" }).Version
+			$sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.Core"}).Version
 
 			if($null -ne $sfPackageVersion)
 			{
