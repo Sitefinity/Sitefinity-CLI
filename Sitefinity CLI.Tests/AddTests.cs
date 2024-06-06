@@ -57,8 +57,55 @@ namespace Sitefinity_CLI.Tests
                 var process = ExecuteCommand(
                     commandName: Constants.AddResourcePackageCommandName,
                     resourceName: resourceName,
-                    templatesVersion: templatesVersion,
-                    templateName: this.GetDefaultResourcePackage(templatesVersion));
+                    templatesVersion: templatesVersion);
+
+                StreamReader myStreamReader = process.StandardOutput;
+                StreamWriter myStreamWriter = process.StandardInput;
+
+                // Answer to the prompt that says Sitefinity project is not recognized
+                myStreamWriter.WriteLine("y");
+
+                // No package name is passed as an argument so we can check if the default template for the respective version will be used
+                myStreamWriter.WriteLine("");
+                process.WaitForExit();
+
+                // Check output string to verify message
+                var expectedFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], Constants.ResourcePackagesFolderName, resourceName);
+                var outputString = myStreamReader.ReadToEnd();
+                var expectedOutputString = new StringBuilder();
+                expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
+
+                var defaultTemplateForVersion = this.GetDefaultResourcePackage(templatesVersion);
+                expectedOutputString.Append($"Enter the name of the Resource package you want to replicate: [{defaultTemplateForVersion}] ");
+                expectedOutputString.AppendLine(string.Format(Constants.ResourcePackageCreatedMessage, resourceName, expectedFolderPath));
+                expectedOutputString.AppendLine(Constants.AddFilesToProjectMessage);
+                Assert.AreEqual(expectedOutputString.ToString(), outputString);
+
+                // Check if folder ResourcePackages is created
+                Assert.IsTrue(Directory.Exists(expectedFolderPath));
+
+                // Compare folders content
+                var resourcePackageDefaultTemplateFolderPath = Path.Combine(this.workingDirectory, Constants.TemplatesFolderName, templatesVersion, Constants.ResourcePackageTemplatesFolderName, this.GetDefaultResourcePackage(templatesVersion));
+                var dir1Files = Directory.EnumerateFiles(resourcePackageDefaultTemplateFolderPath, "*", SearchOption.AllDirectories).Select(Path.GetFileName);
+                var dir2Files = Directory.EnumerateFiles(expectedFolderPath, "*", SearchOption.AllDirectories).Select(Path.GetFileName);
+                var diffs = dir1Files.Except(dir2Files);
+                Assert.AreEqual(0, diffs.Count());
+            }
+        }
+
+        [TestMethod]
+        public void AddResourcePackageBasedOnCustomPackageTest()
+        {
+            var resourceName = "Test";
+
+            foreach (var templatesVersion in testedTemplateVersions)
+            {
+                // TemplateName is passed here to mock any custom template name being passed as argument
+                var process = ExecuteCommand(
+                   commandName: Constants.AddResourcePackageCommandName,
+                   resourceName: resourceName,
+                   templatesVersion: templatesVersion,
+                   templateName: this.GetDefaultResourcePackage(templatesVersion));
 
                 StreamReader myStreamReader = process.StandardOutput;
                 StreamWriter myStreamWriter = process.StandardInput;
