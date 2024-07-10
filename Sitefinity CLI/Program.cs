@@ -20,6 +20,7 @@ namespace Sitefinity_CLI
     [Command("sf")]
     [Subcommand(typeof(AddCommand))]
     [Subcommand(typeof(UpgradeCommand))]
+    [Subcommand(typeof(CreateCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]
     public class Program
     {
