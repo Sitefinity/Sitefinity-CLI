@@ -8,5 +8,7 @@ namespace Sitefinity_CLI.PackageManagement
         void Initialize(string solutionFilePath);
 
         void ExecuteScript(string scriptPath, List<string> scriptParameters);
+
+        void ExecutePackageManagerConsoleCommand(string command);
     }
 }
