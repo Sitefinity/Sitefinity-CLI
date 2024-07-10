@@ -45,6 +45,7 @@ namespace Sitefinity_CLI
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
         public const string FileNotFoundMessage = "File \"{0}\" not found";
+        public const string DirectoryDoesntExistMessage = "Directory \"{0}\" doesn't exist.";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
@@ -89,9 +90,13 @@ namespace Sitefinity_CLI
         public const string ResourcePackageOptionDescription = "The name of the resource package where you want to add the generated resource. Default value: ";
         public const string ProjectRoothPathOptionDescription = "The path to the root of the project where the command will execute.";
         public const string VersionOptionDescription = "Sitefinity version which is compatible with the resource you want to generate.";
+        public const string InstallVersionOptionDescription = "The version of Sitefinity that you want to install. If no version is specified, the latest official version will be used.";
         public const string NameArgumentDescription = "The name of the resource you want to add to the current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
+        public const string InstallDirectoryDescritpion = "The location where the project will be created.";
+        public const string ProjectNameDescription = "The name of your project.";
+        public const string NugetSourcesDescription = "The sources for the nuget packages. Add multiple by using the same command multiple times (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
@@ -137,6 +142,7 @@ namespace Sitefinity_CLI
         public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
         public const string UpgradeCommandName = "upgrade";
+        public const string CreateCommandName = "create";
 
         public const string DefaultResourcePackageName_VersionsBefore14_1 = "Bootstrap4";
         public const string DefaultResourcePackageName = "Bootstrap5";
