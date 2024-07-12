@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Model;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace Sitefinity_CLI.PackageManagement
@@ -76,11 +79,11 @@ namespace Sitefinity_CLI.PackageManagement
             ExecuteCommand($"dotnet nuget add source https://nuget.sitefinity.com/nuget --name SitefinityNuget --configfile {projectDirectory}\\nuget.config");
         }
 
-        public bool VersionExists(string version, string sitefinityPackage, string[] sources)
+        public string GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources)
         {
             string command = $"dotnet package search {sitefinityPackage}";
 
-            if(sources != null)
+            if (sources != null)
             {
                 for (int i = 0; i < sources.Length; i++)
                 {
@@ -118,7 +121,13 @@ namespace Sitefinity_CLI.PackageManagement
                 process.WaitForExit();
             }
 
-            var result = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(commandOutput.ToString());
+            return commandOutput.ToString();
+        }
+
+        public bool VersionExists(string version, string sitefinityPackage, string[] sources)
+        {
+            var packageVersions = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
+            var result = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(packageVersions);
 
             bool exists = false;
 
@@ -135,6 +144,20 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             return exists;
+        }
+
+        public string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage)
+        {
+            var packageVersions = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
+            var result = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(packageVersions);
+
+            var versions = new List<Version>();
+
+            return result.SearchResult
+                .Where(s => s.Packages.Count > 0)
+                .Select(v => new Version(v.Packages[0].Version))
+                .Max()
+                .ToString();
         }
 
         private readonly ILogger<DotnetCliClient> logger;

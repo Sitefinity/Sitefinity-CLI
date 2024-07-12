@@ -109,6 +109,10 @@ namespace Sitefinity_CLI.Commands
 
                 command += $" -Version {this.Version}";
             }
+            else
+            {
+                this.Version = this.dotnetCliClient.GetLatestVersionInNugetSources(this.NugetSources, package);
+            }
 
             var tcs = new TaskCompletionSource<bool>();
 
@@ -132,7 +136,7 @@ namespace Sitefinity_CLI.Commands
             var watcher = new FileSystemWatcher
             {
                 Path = $"{this.Directory}\\packages",
-                Filter = $"{package}*"
+                Filter = $"{package}.{this.Version}"
             };
 
             FileSystemEventHandler createdHandler = null;
