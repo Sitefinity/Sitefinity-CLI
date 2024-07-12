@@ -45,8 +45,8 @@ namespace Sitefinity_CLI
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
         public const string FileNotFoundMessage = "File \"{0}\" not found";
-        public const string DirectoryDoesntExistMessage = "Directory \"{0}\" doesn't exist.";
         public const string InvalidVersionMessage = "Version \"{0}\" is not valid.";
+        public const string InvalidSitefinityMode = "Please select only 1 mode for Sitefinity.";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
@@ -95,7 +95,9 @@ namespace Sitefinity_CLI
         public const string NameArgumentDescription = "The name of the resource you want to add to the current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
-        public const string InstallDirectoryDescritpion = "The location where the project will be created.";
+        public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
+        public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
+        public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
         public const string ProjectNameDescription = "The name of your project.";
         public const string NugetSourcesDescription = "The sources for the nuget packages. Add multiple by using the same command multiple times (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
@@ -109,6 +111,8 @@ namespace Sitefinity_CLI
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourceOptionTemplate = "-s|--source";
+        public const string HeadlessOptionTemplate = "--headless";
+        public const string CoreModulesOptionTemplate = "--coreModules";
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
         public const string NugetConfigPath = "-nc|--nugetConfigPath";

@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations;
 using EnvDTE;
 using System.IO;
 using System.Threading.Tasks;
+using System.Management.Automation.Runspaces;
+using Sitefinity_CLI.Exceptions;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -19,8 +21,13 @@ namespace Sitefinity_CLI.Commands
         public string Name { get; set; }
 
         [Argument(1, Description = Constants.InstallDirectoryDescritpion)]
-        [Required(ErrorMessage = "You must specify a directory for the project.")]
         public string Directory { get; set; }
+
+        [Option(Constants.HeadlessOptionTemplate, Description = Constants.HeadlessModeOptionDescription)]
+        public bool Headless { get; set; }
+
+        [Option(Constants.CoreModulesOptionTemplate, Description = Constants.CoreModulesModeOptionDescription)]
+        public bool CoreModules { get; set; }
 
         [Option(Constants.VersionOptionTemplate, CommandOptionType.SingleValue, Description = Constants.InstallVersionOptionDescription)]
         public string Version { get; set; }
@@ -64,9 +71,43 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual Task ExecuteCreate()
         {
+            this.Directory ??= System.IO.Directory.GetCurrentDirectory();
+
             if (!System.IO.Directory.Exists(this.Directory))
             {
-                throw new DirectoryNotFoundException(string.Format(Constants.DirectoryDoesntExistMessage, this.Directory));
+                throw new DirectoryNotFoundException(string.Format(Constants.DirectoryNotFoundMessage, this.Directory));
+            }
+
+            if(this.Headless && this.CoreModules)
+            {
+                throw new ArgumentException(string.Format(Constants.InvalidSitefinityMode));
+            }
+
+            string package = "Telerik.Sitefinity.All";
+
+            if (this.Headless)
+            {
+                package = "Progress.Sitefinity.Headless";
+            }
+            else if (this.CoreModules)
+            {
+                package = "Progress.Sitefinity";
+            }
+
+            string command = $"Install-Package {package}";
+
+            if (this.Version != null)
+            {
+                this.logger.LogInformation("Checking if version exists in nuget sources...");
+
+                if (!this.dotnetCliClient.VersionExists(this.Version, package, this.NugetSources))
+                {
+                    throw new InvalidVersionException(string.Format(Constants.InvalidVersionMessage, this.Version));
+                }
+
+                this.logger.LogInformation("Version is valid.");
+
+                command += $" -Version {this.Version}";
             }
 
             var tcs = new TaskCompletionSource<bool>();
@@ -82,23 +123,16 @@ namespace Sitefinity_CLI.Commands
             this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln");
 
             this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
-
-            string command = "Install-Package Telerik.Sitefinity.All";
-
-            if (this.Version != null)
-            {
-                command = $"Install-Package Telerik.Sitefinity.All -Version {this.Version}";
-            }
-
             this.logger.LogInformation("Running Sitefinity installation...");
 
             this.visualStudioWorker.ExecutePackageManagerConsoleCommand(command);
+
             System.Threading.Thread.Sleep(5000);
 
             var watcher = new FileSystemWatcher
             {
                 Path = $"{this.Directory}\\packages",
-                Filter = "Telerik.Sitefinity.All*"
+                Filter = $"{package}*"
             };
 
             FileSystemEventHandler createdHandler = null;

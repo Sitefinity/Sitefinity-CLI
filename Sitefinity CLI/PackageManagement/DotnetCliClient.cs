@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Sitefinity_CLI.Model;
 using System.Diagnostics;
+using System.Text;
 
 namespace Sitefinity_CLI.PackageManagement
 {
@@ -71,6 +74,67 @@ namespace Sitefinity_CLI.PackageManagement
             //Adds default nuget sources
             ExecuteCommand($"dotnet nuget add source https://api.nuget.org/v3/index.json --name nuget --configfile {projectDirectory}\\nuget.config");
             ExecuteCommand($"dotnet nuget add source https://nuget.sitefinity.com/nuget --name SitefinityNuget --configfile {projectDirectory}\\nuget.config");
+        }
+
+        public bool VersionExists(string version, string sitefinityPackage, string[] sources)
+        {
+            string command = $"dotnet package search {sitefinityPackage}";
+
+            if(sources != null)
+            {
+                for (int i = 0; i < sources.Length; i++)
+                {
+                    command += " --source " + sources[i];
+                }
+            }
+
+            command += " --source https://api.nuget.org/v3/index.json";
+            command += " --source https://nuget.sitefinity.com/nuget";
+
+            command += " --exact-match --format json --verbosity minimal";
+
+            var commandOutput = new StringBuilder();
+
+            using (Process process = new())
+            {
+                var startInfo = new ProcessStartInfo()
+                {
+                    UseShellExecute = false,
+                    FileName = "cmd.exe",
+                    Arguments = "/c" + command,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                };
+
+                process.StartInfo = startInfo;
+                process.Start();
+
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    commandOutput.Append(process.StandardOutput.ReadLine());
+                }
+
+                process.WaitForExit();
+            }
+
+            var result = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(commandOutput.ToString());
+
+            bool exists = false;
+
+            foreach (var source in result.SearchResult)
+            {
+                foreach (var package in source.Packages)
+                {
+                    if(package.Version == version)
+                    {
+                        exists = true; 
+                        break;
+                    }
+                }
+            }
+
+            return exists;
         }
 
         private readonly ILogger<DotnetCliClient> logger;
