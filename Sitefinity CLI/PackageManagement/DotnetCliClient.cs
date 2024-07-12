@@ -75,8 +75,8 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             //Adds default nuget sources
-            ExecuteCommand($"dotnet nuget add source https://api.nuget.org/v3/index.json --name nuget --configfile {projectDirectory}\\nuget.config");
-            ExecuteCommand($"dotnet nuget add source https://nuget.sitefinity.com/nuget --name SitefinityNuget --configfile {projectDirectory}\\nuget.config");
+            ExecuteCommand($"dotnet nuget add source {Constants.SitefinityDefaultNugetSource} --name SitefinityNuget --configfile {projectDirectory}\\nuget.config");
+            ExecuteCommand($"dotnet nuget add source {Constants.DefaultNugetSource} --name nuget --configfile {projectDirectory}\\nuget.config");
         }
 
         public string GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources)
@@ -91,8 +91,8 @@ namespace Sitefinity_CLI.PackageManagement
                 }
             }
 
-            command += " --source https://api.nuget.org/v3/index.json";
-            command += " --source https://nuget.sitefinity.com/nuget";
+            command += $" --source {Constants.SitefinityDefaultNugetSource}";
+            command += $" --source {Constants.DefaultNugetSource}";
 
             command += " --exact-match --format json --verbosity minimal";
 

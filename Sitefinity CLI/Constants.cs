@@ -192,5 +192,9 @@ namespace Sitefinity_CLI
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
         public const string ApiV3Identifier = "index.json";
+
+        // Nuget sources
+        public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";
+        public const string SitefinityDefaultNugetSource = "https://nuget.sitefinity.com/nuget";
     }
 }
