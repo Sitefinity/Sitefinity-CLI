@@ -118,6 +118,9 @@ namespace Sitefinity_CLI.Commands
 
             string path = $"\"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "VisualStudio", "Templates", "EmptyNetFrameworkWebApp")}\"";
 
+            this.logger.LogInformation("Beginning installation...");
+            this.logger.LogInformation("Creating project...");
+
             this.dotnetCliClient.InstallProjectTemplate(path);
             this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
             this.dotnetCliClient.UninstallProjectTemplate(path);

@@ -16,10 +16,8 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger = logger;
         }
 
-        private void ExecuteCommand(string command)
+        private void ExecuteCommand(string command, bool withLogging = false)
         {
-            this.logger.LogInformation(command);
-
             using (Process process = new())
             {
                 var startInfo = new ProcessStartInfo()
@@ -38,13 +36,19 @@ namespace Sitefinity_CLI.PackageManagement
                 while (!process.StandardOutput.EndOfStream)
                 {
                     string line = process.StandardOutput.ReadLine();
-                    this.logger.LogInformation(line);
+                    if (withLogging)
+                    {
+                        this.logger.LogInformation(line);
+                    }
                 }
 
                 while (!process.StandardError.EndOfStream)
                 {
                     string line = process.StandardError.ReadLine();
-                    this.logger.LogWarning(line);
+                    if (withLogging)
+                    {
+                        this.logger.LogWarning(line);
+                    }
                 }
             }
         }
