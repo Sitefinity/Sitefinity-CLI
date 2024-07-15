@@ -68,6 +68,15 @@ You can use the add command with the following subcommands:
   
   For more information, see [Upgrade using Sitefinity CLI](https://www.progress.com/documentation/sitefinity-cms/upgrade-using-sitefinity-cli).
    
+* To **Create** a new Sitefinity project, execute the following command:
+
+  ```sf create TestProject```
+  
+  You can also specify a directory for the project to be installed in after the name (By default the current directory is used).
+  
+  ```sf create TestProject "D:\TestProjectFolder"```
+  
+  Run the help option to see available install options and configurations.
 
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 
