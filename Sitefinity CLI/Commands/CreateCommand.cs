@@ -124,7 +124,8 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.AddSourcesToNugetConfig(this.NugetSources, $"\"{this.Directory}\"");
 
-            this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln");
+            int waitTime = 10000;
+            this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);
 
             this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
             this.logger.LogInformation("Running Sitefinity installation...");

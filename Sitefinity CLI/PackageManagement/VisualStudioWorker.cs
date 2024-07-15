@@ -17,6 +17,11 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void Initialize(string solutionFilePath)
         {
+            Initialize(solutionFilePath, WaitTime);
+        }
+
+        public void Initialize(string solutionFilePath, int waitTime)
+        {
             var latestVisualStudioVersion = this.GetLatestVisualStudioVersion();
             if (string.IsNullOrEmpty(latestVisualStudioVersion))
             {
@@ -49,7 +54,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger.LogInformation("Solution ready!");
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(WaitTime);
+            System.Threading.Thread.Sleep(waitTime);
 
             try
             {
@@ -62,7 +67,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(WaitTime);
+            System.Threading.Thread.Sleep(waitTime);
 
             this.logger.LogInformation("Studio is ready!");
 
@@ -110,6 +115,6 @@ namespace Sitefinity_CLI.PackageManagement
         private const string VisualStudioRegistryPrefix = "VisualStudio.DTE.";
         private const string PackageManagerConsoleCommand = "View.PackageManagerConsole";
         private const string VisualStudioProcessName = "devenv";
-        private const int WaitTime = 10000;
+        private const int WaitTime = 60000;
     }
 }
