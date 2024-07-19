@@ -68,6 +68,28 @@ namespace Sitefinity_CLI.PackageManagement
             ExecuteCommand($"dotnet new {templateName} -n {projectName} -o \"{directory}\"");
         }
 
+        public void CreateSolution(string name, string directory)
+        {
+            ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\"");
+        }
+
+        public void AddProjectToSolution(string solutionName, string projectDirectory, string projectName)
+        {
+            ExecuteCommand($"dotnet sln \"{projectDirectory}\\{solutionName}.sln\" add \"{projectDirectory}\\{projectName}.csproj\"");
+        }
+
+        public void AddPackageToProject(string projectPath, string packageName, string version)
+        {
+            string versionParameter = "";
+
+            if (version != null)
+            {
+                versionParameter = $"-v {version}";
+            }
+
+            ExecuteCommand($"dotnet add \"{projectPath}\" package {packageName} {versionParameter}");
+        }
+
         public void AddSourcesToNugetConfig(string[] sources, string projectDirectory)
         {
             if (sources != null && sources.Length > 0)
@@ -139,9 +161,9 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 foreach (var package in source.Packages)
                 {
-                    if(package.Version == version)
+                    if (package.Version == version)
                     {
-                        exists = true; 
+                        exists = true;
                         break;
                     }
                 }

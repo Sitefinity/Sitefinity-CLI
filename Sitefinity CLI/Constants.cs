@@ -33,6 +33,9 @@ namespace Sitefinity_CLI
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
         public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
+        public static string TemplateNugetConfigPath = Path.Combine("VisualStudio", "Templates", "EmptyNetFrameworkWebApp", "nuget.config");
+        public static string TemplateRendererProgramCsPath = Path.Combine("VisualStudio", "Templates", "Renderer", "Program.cs");
+        public static string TemplateNetFrameworkWebAppPath = Path.Combine("VisualStudio", "Templates", "EmptyNetFrameworkWebApp");
         public const string PackageManagement = "PackageManagement";
 
         // Error messages
@@ -47,6 +50,7 @@ namespace Sitefinity_CLI
         public const string FileNotFoundMessage = "File \"{0}\" not found";
         public const string InvalidVersionMessage = "Version \"{0}\" is not valid.";
         public const string InvalidSitefinityMode = "Please select only 1 mode for Sitefinity.";
+        public const string InvalidOptionForRendererMessage = "Invalid options for a renderer project: \"{0}\"";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
@@ -97,6 +101,7 @@ namespace Sitefinity_CLI
         public const string DescriptionOptionTemplate = "-d|--description";
         public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
         public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
+        public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
         public const string ProjectNameDescription = "The name of your project.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
@@ -109,6 +114,7 @@ namespace Sitefinity_CLI
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
+        public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
         public const string HeadlessOptionTemplate = "--headless";

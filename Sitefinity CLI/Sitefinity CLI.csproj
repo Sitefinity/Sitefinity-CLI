@@ -21,6 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="VisualStudio\Templates\Renderer\Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="PowerShell\Updater.ps1" />
   </ItemGroup>
 
@@ -47,6 +51,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\EmptyNetFrameworkWebApp.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VisualStudio\Templates\Renderer\Program.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

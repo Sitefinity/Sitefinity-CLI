@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Management.Automation.Runspaces;
 using Sitefinity_CLI.Exceptions;
+using Newtonsoft.Json.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -28,6 +29,9 @@ namespace Sitefinity_CLI.Commands
 
         [Option(Constants.CoreModulesOptionTemplate, Description = Constants.CoreModulesModeOptionDescription)]
         public bool CoreModules { get; set; }
+
+        [Option(Constants.RendererOptionTemplate, Description = Constants.RendererOptionDescription)]
+        public bool Renderer { get; set; }
 
         [Option(Constants.VersionOptionTemplate, CommandOptionType.SingleValue, Description = Constants.InstallVersionOptionDescription)]
         public string Version { get; set; }
@@ -49,9 +53,29 @@ namespace Sitefinity_CLI.Commands
         {
             try
             {
-                await this.ExecuteCreate();
+                if (this.Directory == "./")
+                {
+                    this.Directory = System.IO.Directory.GetCurrentDirectory();
+                }
+                else
+                {
+                    this.Directory ??= $"{System.IO.Directory.GetCurrentDirectory()}\\{this.Name}";
+                }
+                
+                if (!System.IO.Directory.Exists(this.Directory) && this.Directory != $"{System.IO.Directory.GetCurrentDirectory()}\\{this.Name}")
+                {
+                    throw new DirectoryNotFoundException(string.Format(Constants.DirectoryNotFoundMessage, this.Directory));
+                }
 
-                System.Threading.Thread.Sleep(10000);
+                if (this.Renderer)
+                {
+                    this.CreateRendererProject();
+                }
+                else
+                {
+                    await this.ExecuteCreate();
+                    System.Threading.Thread.Sleep(10000);
+                }
 
                 this.logger.LogInformation("Installation completed.");
 
@@ -71,19 +95,12 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual Task ExecuteCreate()
         {
-            this.Directory ??= System.IO.Directory.GetCurrentDirectory();
-
-            var nugetSources = this.NugetSources?.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-            if (!System.IO.Directory.Exists(this.Directory))
-            {
-                throw new DirectoryNotFoundException(string.Format(Constants.DirectoryNotFoundMessage, this.Directory));
-            }
-
             if (this.Headless && this.CoreModules)
             {
                 throw new ArgumentException(string.Format(Constants.InvalidSitefinityMode));
             }
+
+            var nugetSources = this.NugetSources?.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             string package = "Telerik.Sitefinity.All";
 
@@ -118,7 +135,7 @@ namespace Sitefinity_CLI.Commands
 
             var tcs = new TaskCompletionSource<bool>();
 
-            string path = $"\"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "VisualStudio", "Templates", "EmptyNetFrameworkWebApp")}\"";
+            string path = $"\"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNetFrameworkWebAppPath)}\"";
 
             this.logger.LogInformation("Beginning installation...");
             this.logger.LogInformation("Creating project...");
@@ -157,6 +174,98 @@ namespace Sitefinity_CLI.Commands
             watcher.EnableRaisingEvents = true;
 
             return tcs.Task;
+        }
+
+        private void CreateRendererProject()
+        {
+            if (this.Headless && this.CoreModules)
+            {
+                throw new ArgumentException(string.Format(Constants.InvalidOptionForRendererMessage, "--headless, --coreModules"));
+            }
+            else if (this.Headless || this.CoreModules)
+            {
+                var invalidOption = this.Headless ? "--headless" : "--coreModules";
+                throw new ArgumentException(string.Format(Constants.InvalidOptionForRendererMessage, invalidOption));
+            }
+
+            var nugetSources = this.NugetSources?.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            this.logger.LogInformation("Creating renderer project....");
+
+            this.dotnetCliClient.CreateProjectFromTemplate("web", this.Name, this.Directory);
+            this.dotnetCliClient.CreateSolution(this.Name, this.Directory);
+            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name);
+
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);
+
+            File.Copy(path, $"{this.Directory}\\nuget.config", true);
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+
+            if (this.Version != null)
+            {
+                this.logger.LogInformation("Checking if version exists in nuget sources...");
+
+                if (!this.dotnetCliClient.VersionExists(this.Version, "Progress.Sitefinity.AspNetCore.Widgets", nugetSources))
+                {
+                    throw new InvalidVersionException(string.Format(Constants.InvalidVersionMessage, this.Version));
+                }
+
+                this.logger.LogInformation("Version is valid.");
+            }
+
+            var packages = new string[]
+            {
+                "Progress.Sitefinity.AspNetCore.Widgets",
+                "Progress.Sitefinity.AspNetCore.FormWidgets",
+            };
+
+            this.logger.LogInformation("Installing Sitefinity packages...");
+
+            foreach (var package in packages)
+            {
+                this.dotnetCliClient.AddPackageToProject($"{this.Directory}\\{this.Name}.csproj", package, this.Version);
+            }
+
+            ConfigureRendererAppSettings();
+            ConfigureRendererProgramCsFile();
+        }
+
+        private void ConfigureRendererAppSettings()
+        {
+            var logLevel = new JObject
+            {
+                { "Default", "Information" },
+                { "Microsoft", "Warning" },
+                { "Microsoft.Hosting.Lifetime", "Information" }
+            };
+
+            var logging = new JObject
+            {
+                { "LogLevel", logLevel }
+            };
+
+            var sitefinityField = new JObject
+            {
+                { "Url", "https://yoursitefinitywebsiteurl" },
+                { "WebServicePath", "api/default" }
+            };
+
+            var appsettings = new JObject
+            {
+                { "Logging", logging },
+                { "AllowedHosts", "*" },
+                { "Sitefinity", sitefinityField }
+            };
+
+            var json = appsettings.ToString(Formatting.Indented);
+
+            File.WriteAllText($"{this.Directory}\\appsettings.json", json);
+        }
+
+        private void ConfigureRendererProgramCsFile()
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateRendererProgramCsPath);
+            File.Copy(path, $"{this.Directory}\\Program.cs", true);
         }
 
         private readonly IDotnetCliClient dotnetCliClient;
