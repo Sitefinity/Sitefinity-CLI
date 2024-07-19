@@ -32,8 +32,8 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.VersionOptionTemplate, CommandOptionType.SingleValue, Description = Constants.InstallVersionOptionDescription)]
         public string Version { get; set; }
 
-        [Option(Constants.SourceOptionTemplate, CommandOptionType.MultipleValue, Description = Constants.NugetSourcesDescription)]
-        public string[] NugetSources { get; set; }
+        [Option(Constants.SourcesOptionTemplate, CommandOptionType.SingleValue, Description = Constants.NugetSourcesDescription)]
+        public string NugetSources { get; set; }
 
         public CreateCommand(
             ILogger<CreateCommand> logger,
@@ -73,12 +73,14 @@ namespace Sitefinity_CLI.Commands
         {
             this.Directory ??= System.IO.Directory.GetCurrentDirectory();
 
+            var nugetSources = this.NugetSources?.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
             if (!System.IO.Directory.Exists(this.Directory))
             {
                 throw new DirectoryNotFoundException(string.Format(Constants.DirectoryNotFoundMessage, this.Directory));
             }
 
-            if(this.Headless && this.CoreModules)
+            if (this.Headless && this.CoreModules)
             {
                 throw new ArgumentException(string.Format(Constants.InvalidSitefinityMode));
             }
@@ -100,7 +102,7 @@ namespace Sitefinity_CLI.Commands
             {
                 this.logger.LogInformation("Checking if version exists in nuget sources...");
 
-                if (!this.dotnetCliClient.VersionExists(this.Version, package, this.NugetSources))
+                if (!this.dotnetCliClient.VersionExists(this.Version, package, nugetSources))
                 {
                     throw new InvalidVersionException(string.Format(Constants.InvalidVersionMessage, this.Version));
                 }
@@ -111,7 +113,7 @@ namespace Sitefinity_CLI.Commands
             }
             else
             {
-                this.Version = this.dotnetCliClient.GetLatestVersionInNugetSources(this.NugetSources, package);
+                this.Version = this.dotnetCliClient.GetLatestVersionInNugetSources(nugetSources, package);
             }
 
             var tcs = new TaskCompletionSource<bool>();
@@ -125,7 +127,7 @@ namespace Sitefinity_CLI.Commands
             this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
             this.dotnetCliClient.UninstallProjectTemplate(path);
 
-            this.dotnetCliClient.AddSourcesToNugetConfig(this.NugetSources, $"\"{this.Directory}\"");
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
 
             int waitTime = 10000;
             this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);

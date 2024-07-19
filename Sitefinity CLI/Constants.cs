@@ -99,7 +99,7 @@ namespace Sitefinity_CLI
         public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
         public const string ProjectNameDescription = "The name of your project.";
-        public const string NugetSourcesDescription = "The sources for the nuget packages. Add multiple by using the same command multiple times (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
+        public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
@@ -110,7 +110,7 @@ namespace Sitefinity_CLI
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
         public const string VersionOptionTemplate = "-v|--version";
-        public const string SourceOptionTemplate = "-s|--source";
+        public const string SourcesOptionTemplate = "--sources";
         public const string HeadlessOptionTemplate = "--headless";
         public const string CoreModulesOptionTemplate = "--coreModules";
         public const string SkipPrompts = "--skipPrompts";
