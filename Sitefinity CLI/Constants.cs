@@ -181,6 +181,10 @@ namespace Sitefinity_CLI
 
         // Sitefinity package management
         public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
+        public const string SitefinityHeadlessNuGetPackageId = "Progress.Sitefinity.Headless";
+        public const string SitefinityCoreModulesNuGetPackageId = "Progress.Sitefinity";
+        public const string SitefinityWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.Widgets";
+        public const string SitefinityFormWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.FormWidgets";
         public const string SitefinityCoreNuGetPackageId = "Telerik.Sitefinity.Core";
         public const string EntryElem = "entry";
         public const string PropertiesElem = "properties";

@@ -102,15 +102,15 @@ namespace Sitefinity_CLI.Commands
 
             var nugetSources = this.NugetSources?.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            string package = "Telerik.Sitefinity.All";
+            string package = Constants.SitefinityAllNuGetPackageId;
 
             if (this.Headless)
             {
-                package = "Progress.Sitefinity.Headless";
+                package = Constants.SitefinityHeadlessNuGetPackageId;
             }
             else if (this.CoreModules)
             {
-                package = "Progress.Sitefinity";
+                package = Constants.SitefinityCoreModulesNuGetPackageId;
             }
 
             string command = $"Install-Package {package}";
@@ -205,7 +205,7 @@ namespace Sitefinity_CLI.Commands
             {
                 this.logger.LogInformation("Checking if version exists in nuget sources...");
 
-                if (!this.dotnetCliClient.VersionExists(this.Version, "Progress.Sitefinity.AspNetCore.Widgets", nugetSources))
+                if (!this.dotnetCliClient.VersionExists(this.Version, Constants.SitefinityWidgetsNuGetPackageId, nugetSources))
                 {
                     throw new InvalidVersionException(string.Format(Constants.InvalidVersionMessage, this.Version));
                 }
@@ -215,8 +215,8 @@ namespace Sitefinity_CLI.Commands
 
             var packages = new string[]
             {
-                "Progress.Sitefinity.AspNetCore.Widgets",
-                "Progress.Sitefinity.AspNetCore.FormWidgets",
+                Constants.SitefinityWidgetsNuGetPackageId,
+                Constants.SitefinityFormWidgetsNuGetPackageId,
             };
 
             this.logger.LogInformation("Installing Sitefinity packages...");
