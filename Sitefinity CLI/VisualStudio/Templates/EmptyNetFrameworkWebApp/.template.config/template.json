@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Me",
+    "classifications": [ "Web" ],
+    "identity": "Empty .NET Framework Web App",
+    "name": "Empty .NET Framework Web App",
+    "shortName": "netfwebapp",
+    "sourceName":"EmptyNetFrameworkWebApp",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    }
+  }

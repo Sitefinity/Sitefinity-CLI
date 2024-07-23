@@ -61,13 +61,25 @@ You can use the add command with the following subcommands:
 
   ```sf add module "Custom Module"```
 
-* To **Upgrade** your project, execute the following command:
+* To **Create** a new Sitefinity project, execute the following command:
 
+  ```sf create TestProject```
+  
+  You can also specify a directory for the project to be installed in after the name (By default the current directory is used).
+  
+  ```sf create TestProject "D:\TestProjectFolder"```
+
+  Add ```--headless``` to the command to install the headless version of Sitefinity.
+  
+  Add ```--coreModules```  to the command to install the core modules only version of Sitefinity.
+  
+  Run the help option to see all available install options and configurations.
+
+* To **Upgrade** your project, execute the following command:
 
   ```sf upgrade "D:\TestProject\SitefinityWebApp.sln" "13.0.7300"```
   
   For more information, see [Upgrade using Sitefinity CLI](https://www.progress.com/documentation/sitefinity-cms/upgrade-using-sitefinity-cli).
-   
 
 **NOTE**: For more information about the arguments and options for each command, run the help option:
 

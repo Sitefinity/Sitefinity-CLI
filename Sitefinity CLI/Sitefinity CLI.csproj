@@ -21,6 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="VisualStudio\Templates\Renderer\Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="PowerShell\Updater.ps1" />
   </ItemGroup>
 
@@ -28,6 +32,9 @@
     <Content Include="..\NOTICE.txt" Link="NOTICE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\.template.config\template.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +45,15 @@
 
   <ItemGroup>
     <None Include="..\LICENSE.md" Link="LICENSE.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\EmptyNetFrameworkWebApp.csproj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\EmptyNetFrameworkWebApp.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VisualStudio\Templates\Renderer\Program.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -70,6 +86,21 @@
 
   <ItemGroup>
     <None Update="PackageManagement\NuGet.Config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="VisualStudio\Templates\EmptyNetFrameworkWebApp\nuget.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="VisualStudio\Templates\EmptyNetFrameworkWebApp\packages.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="VisualStudio\Templates\EmptyNetFrameworkWebApp\Web.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="VisualStudio\Templates\EmptyNetFrameworkWebApp\Web.Debug.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="VisualStudio\Templates\EmptyNetFrameworkWebApp\Web.Release.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

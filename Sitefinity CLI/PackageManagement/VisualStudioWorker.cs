@@ -17,6 +17,11 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void Initialize(string solutionFilePath)
         {
+            Initialize(solutionFilePath, WaitTime);
+        }
+
+        public void Initialize(string solutionFilePath, int waitTime)
+        {
             var latestVisualStudioVersion = this.GetLatestVisualStudioVersion();
             if (string.IsNullOrEmpty(latestVisualStudioVersion))
             {
@@ -49,7 +54,7 @@ namespace Sitefinity_CLI.PackageManagement
             this.logger.LogInformation("Solution ready!");
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(WaitTime);
+            System.Threading.Thread.Sleep(waitTime);
 
             try
             {
@@ -62,7 +67,7 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(WaitTime);
+            System.Threading.Thread.Sleep(waitTime);
 
             this.logger.LogInformation("Studio is ready!");
 
@@ -77,6 +82,11 @@ namespace Sitefinity_CLI.PackageManagement
                 visualStudioProcess.Kill();
                 this.logger.LogInformation("Closing Visual Studio instance closed.");
             }
+        }
+
+        public void ExecutePackageManagerConsoleCommand(string command)
+        {
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, command);
         }
 
         public void ExecuteScript(string scriptPath, List<string> scriptParameters)

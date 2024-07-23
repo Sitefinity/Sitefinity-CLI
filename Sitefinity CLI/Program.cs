@@ -20,6 +20,7 @@ namespace Sitefinity_CLI
     [Command("sf")]
     [Subcommand(typeof(AddCommand))]
     [Subcommand(typeof(UpgradeCommand))]
+    [Subcommand(typeof(CreateCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]
     public class Program
     {
@@ -39,6 +40,7 @@ namespace Sitefinity_CLI
                     services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
+                    services.AddTransient<IDotnetCliClient, DotnetCliClient>();
                     services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();

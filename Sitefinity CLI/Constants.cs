@@ -33,6 +33,9 @@ namespace Sitefinity_CLI
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
         public static string GridWidgetPath = Path.Combine("GridSystem", "Templates");
+        public static string TemplateNugetConfigPath = Path.Combine("VisualStudio", "Templates", "EmptyNetFrameworkWebApp", "nuget.config");
+        public static string TemplateRendererProgramCsPath = Path.Combine("VisualStudio", "Templates", "Renderer", "Program.cs");
+        public static string TemplateNetFrameworkWebAppPath = Path.Combine("VisualStudio", "Templates", "EmptyNetFrameworkWebApp");
         public const string PackageManagement = "PackageManagement";
 
         // Error messages
@@ -45,6 +48,9 @@ namespace Sitefinity_CLI
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
         public const string FileNotFoundMessage = "File \"{0}\" not found";
+        public const string InvalidVersionMessage = "Version \"{0}\" is not valid.";
+        public const string InvalidSitefinityMode = "Please select only 1 mode for Sitefinity.";
+        public const string InvalidOptionForRendererMessage = "Invalid options for a renderer project: \"{0}\"";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
@@ -89,9 +95,16 @@ namespace Sitefinity_CLI
         public const string ResourcePackageOptionDescription = "The name of the resource package where you want to add the generated resource. Default value: ";
         public const string ProjectRoothPathOptionDescription = "The path to the root of the project where the command will execute.";
         public const string VersionOptionDescription = "Sitefinity version which is compatible with the resource you want to generate.";
+        public const string InstallVersionOptionDescription = "The version of Sitefinity that you want to install. If no version is specified, the latest official version will be used.";
         public const string NameArgumentDescription = "The name of the resource you want to add to the current project.";
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
+        public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
+        public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
+        public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
+        public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
+        public const string ProjectNameDescription = "The name of your project.";
+        public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
@@ -101,8 +114,11 @@ namespace Sitefinity_CLI
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
+        public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
-        public const string SourceOptionTemplate = "-s|--source";
+        public const string SourcesOptionTemplate = "--sources";
+        public const string HeadlessOptionTemplate = "--headless";
+        public const string CoreModulesOptionTemplate = "--coreModules";
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
         public const string NugetConfigPath = "-nc|--nugetConfigPath";
@@ -137,6 +153,7 @@ namespace Sitefinity_CLI
         public const string AddIntegrationTestsCommandFullName = "Integration tests project";
         public const string GenerateConfigCommandName = "config";
         public const string UpgradeCommandName = "upgrade";
+        public const string CreateCommandName = "create";
 
         public const string DefaultResourcePackageName_VersionsBefore14_1 = "Bootstrap4";
         public const string DefaultResourcePackageName = "Bootstrap5";
@@ -164,6 +181,10 @@ namespace Sitefinity_CLI
 
         // Sitefinity package management
         public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
+        public const string SitefinityHeadlessNuGetPackageId = "Progress.Sitefinity.Headless";
+        public const string SitefinityCoreModulesNuGetPackageId = "Progress.Sitefinity";
+        public const string SitefinityWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.Widgets";
+        public const string SitefinityFormWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.FormWidgets";
         public const string SitefinityCoreNuGetPackageId = "Telerik.Sitefinity.Core";
         public const string EntryElem = "entry";
         public const string PropertiesElem = "properties";
@@ -181,5 +202,9 @@ namespace Sitefinity_CLI
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
         public const string ApiV3Identifier = "index.json";
+
+        // Nuget sources
+        public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";
+        public const string SitefinityDefaultNugetSource = "https://nuget.sitefinity.com/nuget";
     }
 }
