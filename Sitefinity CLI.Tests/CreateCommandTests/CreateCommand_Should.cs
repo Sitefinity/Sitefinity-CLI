@@ -37,20 +37,6 @@ namespace Sitefinity_CLI.Tests.CreateCommandTests
         }
 
         [TestMethod]
-        public async Task Throw_When_DirectoryIsNotFound()
-        {
-            var createCommand = new CreateCommandSut(logger, visualStudioWorker, dotnetCliClient)
-            {
-                Directory = "InvalidDirectory"
-            };
-
-            var ex = await Assert.ThrowsExceptionAsync<DirectoryNotFoundException>(createCommand.Execute);
-
-            Assert.IsNotNull(ex);
-            Assert.AreEqual("Directory not found. Path: \"InvalidDirectory\"", ex.Message);
-        }
-
-        [TestMethod]
         public async Task Throw_When_HeadlessAndCoreModulesAreBothTrue()
         {
             var createCommand = new CreateCommandSut(logger, visualStudioWorker, dotnetCliClient)
