@@ -61,7 +61,7 @@ namespace Sitefinity_CLI.Commands
                 {
                     this.Directory ??= $"{System.IO.Directory.GetCurrentDirectory()}\\{this.Name}";
                 }
-                
+
                 if (!System.IO.Directory.Exists(this.Directory) && this.Directory != $"{System.IO.Directory.GetCurrentDirectory()}\\{this.Name}")
                 {
                     throw new DirectoryNotFoundException(string.Format(Constants.DirectoryNotFoundMessage, this.Directory));
@@ -156,22 +156,22 @@ namespace Sitefinity_CLI.Commands
 
             System.Threading.Thread.Sleep(5000);
 
-            var watcher = new FileSystemWatcher
+            watcher = new FileSystemWatcher
             {
                 Path = $"{this.Directory}\\packages",
-                Filter = $"{package}.{this.Version}"
+                EnableRaisingEvents = true
             };
 
-            FileSystemEventHandler createdHandler = null;
-            createdHandler = (s, e) =>
+            watcher.Created += (s, e) =>
             {
-                tcs.TrySetResult(true);
-                watcher.Created -= createdHandler;
-                watcher.Dispose();
-            };
+                this.logger.LogInformation($"Package added: {e.Name}");
 
-            watcher.Created += createdHandler;
-            watcher.EnableRaisingEvents = true;
+                if (e.Name == $"{package}.{this.Version}")
+                {
+                    tcs.TrySetResult(true);
+                    watcher.Dispose();
+                }
+            };
 
             return tcs.Task;
         }
@@ -268,6 +268,7 @@ namespace Sitefinity_CLI.Commands
             File.Copy(path, $"{this.Directory}\\Program.cs", true);
         }
 
+        private FileSystemWatcher watcher;
         private readonly IDotnetCliClient dotnetCliClient;
         private readonly ILogger<CreateCommand> logger;
         private readonly IVisualStudioWorker visualStudioWorker;
