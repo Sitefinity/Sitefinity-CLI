@@ -298,7 +298,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             string versionChunk = includeAttributeValue
                 .Split(',')
-                .FirstOrDefault(x => x.Contains("Version"));
+                .FirstOrDefault(x => x.Contains("Version="));
 
             if (string.IsNullOrWhiteSpace(versionChunk))
             {
