@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 
 namespace Sitefinity_CLI
@@ -124,6 +124,8 @@ namespace Sitefinity_CLI
         public const string NugetConfigPath = "-nc|--nugetConfigPath";
         public const string AdditionalPackages = "--additionalPackages";
         public const string RemoveDeprecatedPackages = "--removeDeprecatedPackages";
+        public const string ThreeTierOptionTemplate = "--threetier";
+        public const string ThreeTierOptionDescription = "Create a Sitefintiy three tier architecure (Headless CMS & ASP.NET Core Renderer). It will append 'CMS' and 'Renderer' to the appropriate project, solution and folder name you supply.";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
