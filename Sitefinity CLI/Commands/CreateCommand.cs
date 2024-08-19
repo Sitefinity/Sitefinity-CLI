@@ -1,4 +1,4 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sitefinity_CLI.PackageManagement;
@@ -39,6 +39,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.SourcesOptionTemplate, CommandOptionType.SingleValue, Description = Constants.NugetSourcesDescription)]
         public string NugetSources { get; set; }
 
+        [Option(Constants.ThreeTierOptionTemplate, Description = Constants.ThreeTierOptionDescription)]
+        public bool ThreeTier { get; set; }
+
         public CreateCommand(
             ILogger<CreateCommand> logger,
             IVisualStudioWorker visualStudioWorker,
@@ -53,7 +56,7 @@ namespace Sitefinity_CLI.Commands
         {
             try
             {
-                if (this.Directory == "./")
+                if (this.Directory == "./" || this.Directory == ".")
                 {
                     this.Directory = System.IO.Directory.GetCurrentDirectory();
                 }
@@ -66,8 +69,19 @@ namespace Sitefinity_CLI.Commands
                 {
                     throw new DirectoryNotFoundException(string.Format(Constants.DirectoryNotFoundMessage, this.Directory));
                 }
+                if (this.ThreeTier)
+                {
+                    var rendererDict = $"{this.Name}Renderer";
+                    var rendererPath = CreateSubDirectories(rendererDict);
+                    this.CreateRendererProject(rendererPath);
 
-                if (this.Renderer)
+                    var cmsDict = $"{this.Name}CMS";
+                    var cmsPath = CreateSubDirectories(cmsDict);
+                    this.Headless = ThreeTier;
+                    await this.ExecuteCreate(cmsPath);
+                    System.Threading.Thread.Sleep(10000);
+                }
+                else if (this.Renderer)
                 {
                     this.CreateRendererProject();
                 }
@@ -93,8 +107,19 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        protected virtual Task ExecuteCreate()
+        private string CreateSubDirectories(string path)
         {
+            bool exists = System.IO.Directory.Exists(this.Directory + "\\" + path);
+
+            if (!exists)
+                System.IO.Directory.CreateDirectory(this.Directory + "\\" + path);
+
+            return this.Directory + "\\" + path;
+        }
+
+        protected virtual Task ExecuteCreate(string directory = "")
+        {
+            var _directory = string.IsNullOrEmpty(directory) ? this.Directory : directory;
             if (this.Headless && this.CoreModules)
             {
                 throw new ArgumentException(string.Format(Constants.InvalidSitefinityMode));
@@ -134,22 +159,23 @@ namespace Sitefinity_CLI.Commands
             }
 
             var tcs = new TaskCompletionSource<bool>();
-
+            var solutionName = $"{this.Name + (string.IsNullOrWhiteSpace(directory) ? string.Empty : "CMS")}";
             string path = $"\"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNetFrameworkWebAppPath)}\"";
 
             this.logger.LogInformation("Beginning installation...");
             this.logger.LogInformation("Creating project...");
-
+            
             this.dotnetCliClient.InstallProjectTemplate(path);
-            this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
+            this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", solutionName, _directory);
             this.dotnetCliClient.UninstallProjectTemplate(path);
 
-            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{_directory}\"");
 
             int waitTime = 10000;
-            this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);
+            
+            this.visualStudioWorker.Initialize($"{_directory}\\{solutionName}.sln", waitTime);
 
-            this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
+            this.logger.LogInformation($"Installing Sitefinity packages to {_directory}\\{solutionName}.sln");
             this.logger.LogInformation("Running Sitefinity installation...");
 
             this.visualStudioWorker.ExecutePackageManagerConsoleCommand(command);
@@ -158,7 +184,7 @@ namespace Sitefinity_CLI.Commands
 
             watcher = new FileSystemWatcher
             {
-                Path = $"{this.Directory}\\packages",
+                Path = $"{_directory}\\packages",
                 EnableRaisingEvents = true
             };
 
@@ -176,8 +202,15 @@ namespace Sitefinity_CLI.Commands
             return tcs.Task;
         }
 
-        private void CreateRendererProject()
+        private void CreateRendererProject(string directory = "")
         {
+            var _directory = string.IsNullOrEmpty(directory) ? this.Directory : directory;
+            string solutionName = this.Name + (string.IsNullOrWhiteSpace(directory) ? string.Empty : "Renderer");
+            //reset headless flag if directory is supplied meaing -threetier command was used
+            if (!string.IsNullOrEmpty(directory) && this.ThreeTier ) {
+                this.Headless = false;
+            }
+
             if (this.Headless && this.CoreModules)
             {
                 throw new ArgumentException(string.Format(Constants.InvalidOptionForRendererMessage, "--headless, --coreModules"));
@@ -192,14 +225,15 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation("Creating renderer project....");
 
-            this.dotnetCliClient.CreateProjectFromTemplate("web", this.Name, this.Directory);
-            this.dotnetCliClient.CreateSolution(this.Name, this.Directory);
-            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name);
+            this.dotnetCliClient.CreateProjectFromTemplate("web", solutionName, _directory);
+
+            this.dotnetCliClient.CreateSolution(solutionName, _directory);
+            this.dotnetCliClient.AddProjectToSolution(solutionName, _directory, solutionName);
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);
 
-            File.Copy(path, $"{this.Directory}\\nuget.config", true);
-            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+            File.Copy(path, $"{_directory}\\nuget.config", true);
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{_directory}\"");
 
             if (this.Version != null)
             {
@@ -223,14 +257,14 @@ namespace Sitefinity_CLI.Commands
 
             foreach (var package in packages)
             {
-                this.dotnetCliClient.AddPackageToProject($"{this.Directory}\\{this.Name}.csproj", package, this.Version);
+                this.dotnetCliClient.AddPackageToProject($"{_directory}\\{solutionName}.csproj", package, this.Version);
             }
 
-            ConfigureRendererAppSettings();
-            ConfigureRendererProgramCsFile();
+            ConfigureRendererAppSettings(_directory);
+            ConfigureRendererProgramCsFile(_directory);
         }
 
-        private void ConfigureRendererAppSettings()
+        private void ConfigureRendererAppSettings(string directory = "")
         {
             var logLevel = new JObject
             {
@@ -259,13 +293,14 @@ namespace Sitefinity_CLI.Commands
 
             var json = appsettings.ToString(Formatting.Indented);
 
-            File.WriteAllText($"{this.Directory}\\appsettings.json", json);
+            File.WriteAllText($"{(string.IsNullOrEmpty(directory) ? this.Directory : directory)}\\appsettings.json", json);
         }
 
-        private void ConfigureRendererProgramCsFile()
+        private void ConfigureRendererProgramCsFile(string directory = "")
         {
+            
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateRendererProgramCsPath);
-            File.Copy(path, $"{this.Directory}\\Program.cs", true);
+            File.Copy(path, $"{(string.IsNullOrEmpty(directory) ? this.Directory : directory)}\\Program.cs", true);
         }
 
         private FileSystemWatcher watcher;
