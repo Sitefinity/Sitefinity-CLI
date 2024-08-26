@@ -94,6 +94,11 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
+            if (!Path.IsPathFullyQualified(this.SolutionPath))
+            {
+                this.SolutionPath = Path.GetFullPath(this.SolutionPath);
+            }
+
             if (!File.Exists(this.SolutionPath))
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
