@@ -65,15 +65,57 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         public async Task Throw_When_SolutionPathIsNotFound()
         {
             var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
+            string path = "wrongSolutionpath";
             try
             {
-                upgradeComamnd.SolutionPath = "wrongSolutionpath";
+                upgradeComamnd.SolutionPath = path;
                 await upgradeComamnd.Execute();
             }
             catch (FileNotFoundException e)
             {
-                Assert.AreEqual("File \"wrongSolutionpath\" not found", e.Message);
+                string fullPath = Path.GetFullPath(path);
+                Assert.AreEqual($"File \"{fullPath}\" not found", e.Message);
             }
+        }
+
+        [TestMethod]
+        public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedRelatively()
+        {
+            var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
+            string projectDirectory = GetProjectDirectory();
+            string newWorkingDirectory = Path.Combine(projectDirectory, "UpgradeCommandTests");
+            string solutionPath = Path.Combine("Mocks", "fake.sln");
+
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = "15.1.8325";
+            upgradeCommand.SkipPrompts = true;
+            Directory.SetCurrentDirectory(newWorkingDirectory);
+            await upgradeCommand.Execute();
+
+            Assert.AreEqual(Path.Combine(newWorkingDirectory, solutionPath), upgradeCommand.SolutionPath);
+        }
+        
+        [TestMethod]
+        public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedFull()
+        {
+            var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
+            string projectDirectory = GetProjectDirectory();
+            string solutionPath = Path.Combine(projectDirectory, "UpgradeCommandTests", "Mocks", "fake.sln");
+
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = "15.1.8325";
+            upgradeCommand.SkipPrompts = true;
+            await upgradeCommand.Execute();
+
+            Assert.AreEqual(solutionPath, upgradeCommand.SolutionPath);
+        }
+
+        private string GetProjectDirectory()
+        {
+            string workingDirectory = Directory.GetCurrentDirectory();
+            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+
+            return projectDirectory;
         }
     }
 }
