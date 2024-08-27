@@ -82,8 +82,8 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedRelatively()
         {
             var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
-            string projectDirectory = GetProjectDirectory();
-            string newWorkingDirectory = Path.Combine(projectDirectory, "UpgradeCommandTests");
+            string workingDirectory = Directory.GetCurrentDirectory();
+            string newWorkingDirectory = Path.Combine(workingDirectory, "UpgradeCommandTests");
             string solutionPath = Path.Combine("Mocks", "fake.sln");
 
             upgradeCommand.SolutionPath = solutionPath;
@@ -99,8 +99,8 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedFull()
         {
             var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
-            string projectDirectory = GetProjectDirectory();
-            string solutionPath = Path.Combine(projectDirectory, "UpgradeCommandTests", "Mocks", "fake.sln");
+            string workingDirectory = Directory.GetCurrentDirectory();
+            string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fake.sln");
 
             upgradeCommand.SolutionPath = solutionPath;
             upgradeCommand.Version = "15.1.8325";
@@ -108,14 +108,6 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             await upgradeCommand.Execute();
 
             Assert.AreEqual(solutionPath, upgradeCommand.SolutionPath);
-        }
-
-        private string GetProjectDirectory()
-        {
-            string workingDirectory = Directory.GetCurrentDirectory();
-            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
-
-            return projectDirectory;
         }
     }
 }
