@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Sitefinity_CLI;
 using Microsoft.Extensions.DependencyInjection;
 using SitefinityCLI.Tests.UpgradeCommandTests.Mocks;
-using Sitefinity_CLI.Logging;
-using Microsoft.Extensions.Logging.Console;
 using System.Net.Http;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
