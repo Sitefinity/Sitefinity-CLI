@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.VisualStudio;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Sitefinity_CLI;
 using Microsoft.Extensions.DependencyInjection;
 using SitefinityCLI.Tests.UpgradeCommandTests.Mocks;
-using Sitefinity_CLI.Logging;
-using Microsoft.Extensions.Logging.Console;
 using System.Net.Http;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
@@ -65,15 +59,49 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         public async Task Throw_When_SolutionPathIsNotFound()
         {
             var upgradeComamnd = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
+            string path = "wrongSolutionpath";
             try
             {
-                upgradeComamnd.SolutionPath = "wrongSolutionpath";
+                upgradeComamnd.SolutionPath = path;
                 await upgradeComamnd.Execute();
             }
             catch (FileNotFoundException e)
             {
-                Assert.AreEqual("File \"wrongSolutionpath\" not found", e.Message);
+                string fullPath = Path.GetFullPath(path);
+                Assert.AreEqual($"File \"{fullPath}\" not found", e.Message);
             }
+        }
+
+        [TestMethod]
+        public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedRelatively()
+        {
+            var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
+            string workingDirectory = Directory.GetCurrentDirectory();
+            string newWorkingDirectory = Path.Combine(workingDirectory, "UpgradeCommandTests");
+            string solutionPath = Path.Combine("Mocks", "fake.sln");
+
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = "15.1.8325";
+            upgradeCommand.SkipPrompts = true;
+            Directory.SetCurrentDirectory(newWorkingDirectory);
+            await upgradeCommand.Execute();
+
+            Assert.AreEqual(Path.Combine(newWorkingDirectory, solutionPath), upgradeCommand.SolutionPath);
+        }
+        
+        [TestMethod]
+        public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedFull()
+        {
+            var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
+            string workingDirectory = Directory.GetCurrentDirectory();
+            string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fake.sln");
+
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = "15.1.8325";
+            upgradeCommand.SkipPrompts = true;
+            await upgradeCommand.Execute();
+
+            Assert.AreEqual(solutionPath, upgradeCommand.SolutionPath);
         }
     }
 }
