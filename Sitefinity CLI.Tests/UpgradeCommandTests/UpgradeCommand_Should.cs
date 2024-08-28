@@ -92,13 +92,13 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
 
                 Assert.AreEqual(Path.Combine(newWorkingDirectory, solutionPath), upgradeCommand.SolutionPath);
             }
-            finally 
+            finally
             {
                 Directory.SetCurrentDirectory(workingDirectory);
             }
-            
+
         }
-        
+
         [TestMethod]
         public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedFull()
         {
