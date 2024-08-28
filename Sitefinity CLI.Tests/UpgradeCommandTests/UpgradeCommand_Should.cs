@@ -9,6 +9,7 @@ using Sitefinity_CLI;
 using Microsoft.Extensions.DependencyInjection;
 using SitefinityCLI.Tests.UpgradeCommandTests.Mocks;
 using System.Net.Http;
+using System;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
@@ -77,16 +78,25 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         {
             var upgradeCommand = new UpgradeCommandSut(promptService, sitefinityPackageManager, csProjectFileEditor, logger, projectConfigFileEditor, upgradeConfigGenerator, visualStudioWorker, httpClientFactory, packageSourceBuilder);
             string workingDirectory = Directory.GetCurrentDirectory();
-            string newWorkingDirectory = Path.Combine(workingDirectory, "UpgradeCommandTests");
-            string solutionPath = Path.Combine("Mocks", "fake.sln");
 
-            upgradeCommand.SolutionPath = solutionPath;
-            upgradeCommand.Version = "15.1.8325";
-            upgradeCommand.SkipPrompts = true;
-            Directory.SetCurrentDirectory(newWorkingDirectory);
-            await upgradeCommand.Execute();
+            try
+            {
+                string newWorkingDirectory = Path.Combine(workingDirectory, "UpgradeCommandTests");
+                string solutionPath = Path.Combine("Mocks", "fake.sln");
 
-            Assert.AreEqual(Path.Combine(newWorkingDirectory, solutionPath), upgradeCommand.SolutionPath);
+                upgradeCommand.SolutionPath = solutionPath;
+                upgradeCommand.Version = "15.1.8325";
+                upgradeCommand.SkipPrompts = true;
+                Directory.SetCurrentDirectory(newWorkingDirectory);
+                await upgradeCommand.Execute();
+
+                Assert.AreEqual(Path.Combine(newWorkingDirectory, solutionPath), upgradeCommand.SolutionPath);
+            }
+            finally 
+            {
+                Directory.SetCurrentDirectory(workingDirectory);
+            }
+            
         }
         
         [TestMethod]
