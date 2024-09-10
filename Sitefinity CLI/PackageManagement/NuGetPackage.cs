@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Sitefinity_CLI.PackageManagement
 {
     [DebuggerDisplay("ID = {Id} Version = {Version}")]
-    internal class NuGetPackage
+    public class NuGetPackage
     {
         public NuGetPackage()
         {

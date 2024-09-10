@@ -7,6 +7,8 @@ using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.Services;
+using Sitefinity_CLI.Services.Interfaces;
 using Sitefinity_CLI.VisualStudio;
 using System;
 using System.Runtime.CompilerServices;
@@ -45,8 +47,11 @@ namespace Sitefinity_CLI
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
+                    services.AddTransient<IProjectService, ProjectService>();
                     services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
+                    services.AddScoped<IPackageService, PackageService>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
+                    services.AddSingleton<IVisualStudioService, VisualStudioService>();
                     services.AddSingleton<IPromptService, PromptService>();
                 })
                 .UseConsoleLifetime()

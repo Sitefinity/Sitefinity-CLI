@@ -57,6 +57,8 @@ namespace Sitefinity_CLI
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
 
         // Warning messages
+        public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";
+        public const string SearchingProjectForReferencesMessage = "Searching the provided project/s for Sitefinity references...";
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
         public const string SourceTemplatePromptMessage = "Enter the name of the {0} you want to replicate:";
         public const string HigherSitefinityVersionMessage = "Your version of Sitefinity CLI creates files compatible with Sitefinity CMS {1}. There may be inconsistencies with your project version - {0}";
@@ -114,6 +116,7 @@ namespace Sitefinity_CLI
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
+        public const string UpgradeCommandDescription = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.";
         public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
@@ -206,5 +209,6 @@ namespace Sitefinity_CLI
         // Nuget sources
         public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";
         public const string SitefinityDefaultNugetSource = "https://nuget.sitefinity.com/nuget";
+        public const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
     }
 }
