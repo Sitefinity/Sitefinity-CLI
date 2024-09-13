@@ -1,4 +1,5 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+﻿using HandlebarsDotNet;
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Commands.Validators;
@@ -74,11 +75,23 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
-            await Validate();
+            // return boolean
+            bool isSuccess = await Validate();
+
+            if (!isSuccess)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(this.Version))
+            {
+                this.Version = await this.projectService.GetLatestSitefinityVersion();
+            }
 
             this.logger.LogInformation(Constants.SearchingProjectForReferencesMessage);
 
-            IEnumerable<string> sitefinityProjectFilePaths = this.projectService.GetProjectPathsFromSolution(this.SolutionPath, this.Version, true);
+            IEnumerable<string> sitefinityProjectFilePaths = this.projectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version);
+            IEnumerable<NugetPackageSource> packageSources = await this.packageService.GetPackageSources(this.NugetConfigPath);
 
             if (!sitefinityProjectFilePaths.Any())
             {
@@ -89,21 +102,48 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
 
-            NuGetPackage installedPackage = await this.packageService.InstallPackage(UpgradeOptions, sitefinityProjectFilePaths);
+            NuGetPackage installedPackage = await this.packageService.PrepareSitefinityUpgradePackage(UpgradeOptions, sitefinityProjectFilePaths);
 
-            if (installedPackage == null)
+            if (!this.AcceptLicense)
             {
-                return;
+                string licenseContent = await this.GetLicenseContent(installedPackage, Constants.LicenseAgreementsFolderName);
+                bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
+
+                if (!hasUserAccepted)
+                {
+                    return;
+                }
             }
 
+            IEnumerable<NuGetPackage> additionalPackages = await this.packageService.InstallAdditionalPackages(this.UpgradeOptions, packageSources);
+
+            foreach (NuGetPackage package in additionalPackages)
+            {
+                if (package != null)
+                {
+                    string licenseContent = await this.GetLicenseContent(package, this.SolutionPath);
+                    if (!string.IsNullOrEmpty(licenseContent) && !this.AcceptLicense)
+                    {
+                        bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
+
+                        if (!hasUserAccepted)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            await this.projectService.GenerateNuGetConfig(sitefinityProjectFilePaths, installedPackage, packageSources, additionalPackages.ToList());
             this.visualStudioService.InitializeSolution(UpgradeOptions);
             this.projectService.RestoreReferences(UpgradeOptions);
             this.packageService.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 
-        private async Task Validate()
+        private async Task<bool> Validate()
         {
+            bool isSuccess = true;
             if (!Path.IsPathFullyQualified(this.SolutionPath))
             {
                 this.SolutionPath = Path.GetFullPath(this.SolutionPath);
@@ -117,13 +157,38 @@ namespace Sitefinity_CLI.Commands
             if (!this.SkipPrompts && !this.promptService.PromptYesNo(Constants.UpgradeWarning))
             {
                 this.logger.LogInformation(Constants.UpgradeWasCanceled);
-                return;
+                isSuccess = false;
             }
 
-            if (string.IsNullOrEmpty(this.Version))
+            return isSuccess;
+        }
+
+        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage, string solutionPath, string licensesFolder = "")
+        {
+            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(solutionPath), Constants.PackagesFolderName);
+            string pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", licensesFolder, "License.txt");
+
+            if (!File.Exists(pathToTheLicense))
             {
-                this.Version = await this.projectService.GetLatestSitefinityVersion();
+                return null;
             }
+
+            string licenseContent = await File.ReadAllTextAsync(pathToTheLicense);
+
+            return licenseContent;
+        }
+
+        private bool PromptAcceptLicense(string licenseContent)
+        {
+            string licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
+            bool hasUserAcceptedEULA = this.promptService.PromptYesNo(licensePromptMessage, false);
+
+            if (!hasUserAcceptedEULA)
+            {
+                this.logger.LogInformation(Constants.UpgradeWasCanceled);
+            }
+
+            return hasUserAcceptedEULA;
         }
 
         private static string GetDefaultNugetConfigpath()

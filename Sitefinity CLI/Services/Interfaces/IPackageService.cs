@@ -1,6 +1,5 @@
 ﻿using Sitefinity_CLI.PackageManagement;
 using System.Threading.Tasks;
-using System;
 using System.Collections.Generic;
 using Sitefinity_CLI.Model;
 
@@ -8,9 +7,13 @@ namespace Sitefinity_CLI.Services.Interfaces
 {
     public interface IPackageService
     {
-        Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, string nugetConfigPath);
-        Task<NuGetPackage> InstallPackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths);
+        Task<NuGetPackage> PrepareSitefinityUpgradePackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths);
+
+        Task<IEnumerable<NugetPackageSource>> GetPackageSources(string nugetConfigPath);
+
+        Task<IEnumerable<NuGetPackage>> InstallAdditionalPackages(UpgradeOptions options, IEnumerable<NugetPackageSource> packageSources);
+
         void SyncProjectReferencesWithPackages(IEnumerable<string> projectFilePaths, string solutionFolder);
-        
+
     }
 }

@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Sitefinity_CLI.Model;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.PackageManagement;
 
 namespace Sitefinity_CLI.Services
 {
@@ -43,7 +44,35 @@ namespace Sitefinity_CLI.Services
             return latestVersion;
         }
 
-        public IDictionary<string, string> GetConfigsForProjectsWithoutSitefinity(IEnumerable<string> projectsWithouthSfreferencePaths)
+        public IEnumerable<string> GetSitefinityProjectPathsFromSolution(string solutionPath, string version)
+        {
+            IEnumerable<string> allProjectPaths = this.GetProjectPathsFromSolution(solutionPath);
+            IEnumerable<string> onlySitefinityProjectPaths = allProjectPaths
+                .Where(ap => this.HasSitefinityReferences(ap) && this.HasValidSitefinityVersion(ap, version));
+        
+            return onlySitefinityProjectPaths;
+        }
+
+        public async Task GenerateNuGetConfig(IEnumerable<string> sitefinityProjectFilePaths,
+            NuGetPackage newSitefinityPackage,
+            IEnumerable<NugetPackageSource> packageSources,
+            ICollection<NuGetPackage> additionalPackagesToUpgrade)
+        {
+            var projectPathsWithSitefinityVersion = sitefinityProjectFilePaths.Select(x => new Tuple<string, Version>(x, this.DetectSitefinityVersion(x)));
+            await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectPathsWithSitefinityVersion, newSitefinityPackage, packageSources, additionalPackagesToUpgrade);
+        }
+
+
+        public void RestoreReferences(UpgradeOptions options)
+        {
+            IEnumerable<string> sitefinityProjectFilePaths = this.GetSitefinityProjectPathsFromSolution(options.SolutionPath, options.Version);
+            IEnumerable<string> projectsWithouthSitefinityPaths = this.GetProjectPathsFromSolution(options.SolutionPath).Except(sitefinityProjectFilePaths);
+            IDictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
+
+            this.RestoreConfigValuesForNoSfProjects(configsWithoutSitefinity);
+        }
+
+        private IDictionary<string, string> GetConfigsForProjectsWithoutSitefinity(IEnumerable<string> projectsWithouthSfreferencePaths)
         {
             var configsWithoutSitefinity = new Dictionary<string, string>();
             foreach (var project in projectsWithouthSfreferencePaths)
@@ -59,7 +88,7 @@ namespace Sitefinity_CLI.Services
             return configsWithoutSitefinity;
         }
 
-        public IEnumerable<string> GetProjectPathsFromSolution(string solutionPath, string version, bool onlySitefinityProjects = false)
+        private IEnumerable<string> GetProjectPathsFromSolution(string solutionPath)
         {
             if (!solutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -70,25 +99,10 @@ namespace Sitefinity_CLI.Services
                 .Select(sp => sp.AbsolutePath)
                 .Where(ap => (ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) || ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase)));
 
-            if (onlySitefinityProjects)
-            {
-                projectFilesAbsolutePaths = projectFilesAbsolutePaths
-                    .Where(ap => this.HasSitefinityReferences(ap) && this.HasValidSitefinityVersion(ap, version));
-            }
-
             return projectFilesAbsolutePaths;
         }
 
-        public void RestoreReferences(UpgradeOptions options)
-        {
-            IEnumerable<string> sitefinityProjectFilePaths = this.GetProjectPathsFromSolution(options.SolutionPath, options.Version, true);
-            IEnumerable<string> projectsWithouthSitefinityPaths = this.GetProjectPathsFromSolution(options.SolutionPath, options.Version).Except(sitefinityProjectFilePaths);
-            IDictionary<string, string> configsWithoutSitefinity = this.GetConfigsForProjectsWithoutSitefinity(projectsWithouthSitefinityPaths);
-
-            this.RestoreConfigValuesForNoSfProjects(configsWithoutSitefinity);
-        }
-
-        public Version DetectSitefinityVersion(string sitefinityProjectPath)
+        private Version DetectSitefinityVersion(string sitefinityProjectPath)
         {
             CsProjectFileReference sitefinityReference = this.csProjectFileEditor.GetReferences(sitefinityProjectPath)
                 .FirstOrDefault(r => this.IsSitefinityReference(r));
@@ -158,6 +172,7 @@ namespace Sitefinity_CLI.Services
 
         private readonly IProjectConfigFileEditor projectConfigFileEditor;
         private readonly ICsProjectFileEditor csProjectFileEditor;
+        private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
         private readonly HttpClient httpClient;
         private readonly ILogger<ProjectService> logger;
     }
