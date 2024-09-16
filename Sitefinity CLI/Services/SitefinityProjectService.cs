@@ -10,12 +10,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System;
 using Sitefinity_CLI.Services.Interfaces;
+using System.Collections.Generic;
 
 namespace Sitefinity_CLI.Services
 {
-    public class SitefinityVersionService : ISitefinityVersionService
+    public class SitefinityProjectService : ISitefinityProjectService
     {
-        public SitefinityVersionService(ICsProjectFileEditor csProjectFileEditor, ILogger<SitefinityVersionService> logger, IHttpClientFactory clientFactory)
+        public SitefinityProjectService(ICsProjectFileEditor csProjectFileEditor, ILogger<SitefinityProjectService> logger, IHttpClientFactory clientFactory)
         {
             this.csProjectFileEditor = csProjectFileEditor;
             this.httpClient = clientFactory.CreateClient();
@@ -75,10 +76,35 @@ namespace Sitefinity_CLI.Services
             return true;
         }
 
+        public IEnumerable<string> GetProjectPathsFromSolution(string solutionPath)
+        {
+            if (!solutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new UpgradeException(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
+            }
+
+            return SolutionFileEditor.GetProjects(solutionPath)
+                .Select(sp => sp.AbsolutePath)
+                .Where(ap => ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) ||
+                             ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public IEnumerable<string> GetSitefinityProjectPathsFromSolution(string solutionPath, string version)
+        {
+            IEnumerable<string> allProjectPaths = GetProjectPathsFromSolution(solutionPath);
+            return allProjectPaths.Where(this.HasSitefinityReferences);
+        }
+
+        private bool HasSitefinityReferences(string projectFilePath)
+        {
+            IEnumerable<CsProjectFileReference> references = this.csProjectFileEditor.GetReferences(projectFilePath);
+            return references.Any(this.IsSitefinityReference);
+        }
+
         private bool IsSitefinityReference(CsProjectFileReference reference) => reference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
 
         private readonly ICsProjectFileEditor csProjectFileEditor;
         private readonly HttpClient httpClient;
-        private readonly ILogger<SitefinityVersionService> logger;
+        private readonly ILogger<SitefinityProjectService> logger;
     }
 }

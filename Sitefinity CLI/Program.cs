@@ -40,8 +40,7 @@ namespace Sitefinity_CLI
                 {
                     services.AddHttpClient();
                     services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
-                    services.AddTransient<ISitefinityProjectPathService, SitefinityProjectPathService>();
-                    services.AddTransient<ISitefinityVersionService, SitefinityVersionService>();
+                    services.AddTransient<ISitefinityProjectService, SitefinityProjectService>();
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IDotnetCliClient, DotnetCliClient>();

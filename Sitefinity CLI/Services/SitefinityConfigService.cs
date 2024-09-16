@@ -11,7 +11,7 @@ namespace Sitefinity_CLI.Services
 {
     public class SitefinityConfigService : ISitefinityConfigService
     {
-        public SitefinityConfigService(IProjectConfigFileEditor projectConfigFileEditor, ISitefinityVersionService sitefinityVersionService, IUpgradeConfigGenerator upgradeConfigGenerator)
+        public SitefinityConfigService(IProjectConfigFileEditor projectConfigFileEditor, ISitefinityProjectService sitefinityVersionService, IUpgradeConfigGenerator upgradeConfigGenerator)
         {
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
