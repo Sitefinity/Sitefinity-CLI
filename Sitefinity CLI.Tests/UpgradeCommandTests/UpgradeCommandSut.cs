@@ -8,9 +8,16 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
     internal class UpgradeCommandSut : UpgradeCommand
     {
-        public UpgradeCommandSut(IProjectService projectService, IPackageService packageService,IVisualStudioService visualStudioService, ILogger<UpgradeCommand> logger, IPromptService promptService)
-            : base(projectService, packageService, visualStudioService, logger, promptService)
+        public UpgradeCommandSut(
+             ISitefinityNugetPackageService packageService,
+             IVisualStudioService visualStudioService,
+             ILogger<UpgradeCommand> logger,
+             IPromptService promptService,
+             ISitefinityProjectPathService projectPathService,
+             ISitefinityVersionService sitefinityVersionService,
+             ISitefinityConfigService sitefinityConfigService) : base(packageService, visualStudioService, logger, promptService, projectPathService, sitefinityVersionService, sitefinityConfigService)
         {
+
         }
 
         public async Task Execute()

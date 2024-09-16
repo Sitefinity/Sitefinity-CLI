@@ -184,6 +184,7 @@ namespace Sitefinity_CLI
 
         // Sitefinity package management
         public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
+        public const string SitefinityCloudPackage = "Progress.Sitefinity.Cloud";
         public const string SitefinityHeadlessNuGetPackageId = "Progress.Sitefinity.Headless";
         public const string SitefinityCoreModulesNuGetPackageId = "Progress.Sitefinity";
         public const string SitefinityWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.Widgets";

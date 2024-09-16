@@ -40,6 +40,8 @@ namespace Sitefinity_CLI
                 {
                     services.AddHttpClient();
                     services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
+                    services.AddTransient<ISitefinityProjectPathService, SitefinityProjectPathService>();
+                    services.AddTransient<ISitefinityVersionService, SitefinityVersionService>();
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IDotnetCliClient, DotnetCliClient>();
@@ -47,9 +49,10 @@ namespace Sitefinity_CLI
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
-                    services.AddTransient<IProjectService, ProjectService>();
+                    services.AddTransient<ISitefinityConfigService, SitefinityConfigService>();
+                    services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
                     services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
-                    services.AddScoped<IPackageService, PackageService>();
+                    services.AddScoped<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
                     services.AddSingleton<IVisualStudioService, VisualStudioService>();
                     services.AddSingleton<IPromptService, PromptService>();

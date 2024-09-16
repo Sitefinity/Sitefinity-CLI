@@ -34,12 +34,12 @@ namespace Sitefinity_CLI.Services
         {
             this.logger.LogInformation("Waiting for operation to complete...");
 
-            var resultFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "result.log");
-            var progressFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "progress.log");
+            string resultFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "result.log");
+            string progressFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "progress.log");
             File.Delete(resultFile);
             int waitStep = 500;
             int iterations = 0;
-            var lastProgressUpdate = string.Empty;
+            string lastProgressUpdate = string.Empty;
             while (true)
             {
                 if (!File.Exists(resultFile))
@@ -48,7 +48,7 @@ namespace Sitefinity_CLI.Services
                     {
                         try
                         {
-                            var progressInfo = this.ReadAllTextFromFile(progressFile).Replace("\r\n", string.Empty);
+                            string progressInfo = this.ReadAllTextFromFile(progressFile).Replace("\r\n", string.Empty);
                             if (lastProgressUpdate != progressInfo)
                             {
                                 lastProgressUpdate = progressInfo;
@@ -66,7 +66,7 @@ namespace Sitefinity_CLI.Services
                 }
 
                 Thread.Sleep(waitStep);
-                var result = this.ReadAllTextFromFile(resultFile);
+                string result = this.ReadAllTextFromFile(resultFile);
                 if (result != "success")
                 {
                     this.logger.LogError(string.Format("Error occured while upgrading nuget packages. {0}", result));
@@ -80,8 +80,8 @@ namespace Sitefinity_CLI.Services
         }
         private string ReadAllTextFromFile(string path)
         {
-            using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var textReader = new StreamReader(fileStream);
+            using FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using StreamReader textReader = new StreamReader(fileStream);
             return textReader.ReadToEnd();
         }
 

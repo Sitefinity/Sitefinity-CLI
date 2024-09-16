@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.Services
 {
-    internal class PackageService : IPackageService
+    internal class SitefinityNugetPackageService : ISitefinityNugetPackageService
     {
-        public PackageService(ISitefinityPackageManager sitefinityPackageManager, IPackageSourceBuilder packageSourceBuilder, IUpgradeConfigGenerator upgradeConfigGenerator)
+        public SitefinityNugetPackageService(ISitefinityPackageManager sitefinityPackageManager, IPackageSourceBuilder packageSourceBuilder, IUpgradeConfigGenerator upgradeConfigGenerator)
         {
             this.sitefinityPackageManager = sitefinityPackageManager;
             this.packageSourceBuilder = packageSourceBuilder;
@@ -123,6 +123,6 @@ namespace Sitefinity_CLI.Services
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
         private readonly IPackageSourceBuilder packageSourceBuilder;
-        private readonly ICollection<string> allowedAdditionalPackagesIds = ["Progress.Sitefinity.Cloud"];
+        private readonly ICollection<string> allowedAdditionalPackagesIds = [Constants.SitefinityCloudPackage];
     }
 }

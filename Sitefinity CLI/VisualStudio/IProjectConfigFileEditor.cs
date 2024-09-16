@@ -1,6 +1,6 @@
 ﻿namespace Sitefinity_CLI.VisualStudio
 {
-    internal interface IProjectConfigFileEditor
+    public interface IProjectConfigFileEditor
     {
         string GetProjectConfigPath(string projectLocation);
     }

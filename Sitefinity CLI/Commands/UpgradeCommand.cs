@@ -46,17 +46,23 @@ namespace Sitefinity_CLI.Commands
         public bool RemoveDeprecatedPackages { get; set; }
 
         public UpgradeCommand(
-            IProjectService projectService,
-            IPackageService packageService,
+            ISitefinityNugetPackageService packageService,
             IVisualStudioService visualStudioService,
             ILogger<UpgradeCommand> logger,
-            IPromptService promptService)
+            IPromptService promptService,
+            ISitefinityProjectPathService projectPathService,
+            ISitefinityVersionService sitefinityVersionService,
+            ISitefinityConfigService sitefinityConfigService)
         {
-            this.projectService = projectService;
+
             this.packageService = packageService;
             this.visualStudioService = visualStudioService;
             this.logger = logger;
             this.promptService = promptService;
+            this.projectPathService = projectPathService;
+            this.sitefinityVersionService = sitefinityVersionService;
+            this.sitefinityConfigService = sitefinityConfigService;
+
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -75,8 +81,7 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
-            // return boolean
-            bool isSuccess = await Validate();
+            bool isSuccess = this.Validate();
 
             if (!isSuccess)
             {
@@ -85,12 +90,16 @@ namespace Sitefinity_CLI.Commands
 
             if (string.IsNullOrEmpty(this.Version))
             {
-                this.Version = await this.projectService.GetLatestSitefinityVersion();
+                this.Version = await this.sitefinityVersionService.GetLatestSitefinityVersion();
+                this.logger.LogInformation(string.Format(Constants.LatestVersionFound, this.Version));
             }
 
             this.logger.LogInformation(Constants.SearchingProjectForReferencesMessage);
 
-            IEnumerable<string> sitefinityProjectFilePaths = this.projectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version);
+            IEnumerable<string> sitefinityProjectFilePaths = this.projectPathService
+                    .GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version)
+                    .Where(ap => sitefinityVersionService.HasValidSitefinityVersion(ap, this.Version));
+
             IEnumerable<NugetPackageSource> packageSources = await this.packageService.GetPackageSources(this.NugetConfigPath);
 
             if (!sitefinityProjectFilePaths.Any())
@@ -102,7 +111,7 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
 
-            NuGetPackage installedPackage = await this.packageService.PrepareSitefinityUpgradePackage(UpgradeOptions, sitefinityProjectFilePaths);
+            NuGetPackage installedPackage = await this.packageService.PrepareSitefinityUpgradePackage(this.UpgradeOptions, sitefinityProjectFilePaths);
 
             if (!this.AcceptLicense)
             {
@@ -134,14 +143,20 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            await this.projectService.GenerateNuGetConfig(sitefinityProjectFilePaths, installedPackage, packageSources, additionalPackages.ToList());
+            IEnumerable<Tuple<string, Version>> projectPathsWithSitefinityVersion = sitefinityProjectFilePaths.Select(x => new Tuple<string, Version>(x, sitefinityVersionService.DetectSitefinityVersion(x)));
+            await this.sitefinityConfigService.GenerateNuGetConfig(projectPathsWithSitefinityVersion, installedPackage, packageSources, additionalPackages.ToList());
             this.visualStudioService.InitializeSolution(UpgradeOptions);
-            this.projectService.RestoreReferences(UpgradeOptions);
+
+            IEnumerable<string> projectsWithoutSitefinityPaths = this.projectPathService.GetProjectPathsFromSolution(this.SolutionPath).Except(sitefinityProjectFilePaths);
+            IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigsForProjectsWithoutSitefinity(projectsWithoutSitefinityPaths);
+
+            this.sitefinityConfigService.RestoreConfigValuesForNoSfProjects(configsWithoutSitefinity);
+
             this.packageService.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 
-        private async Task<bool> Validate()
+        private bool Validate()
         {
             bool isSuccess = true;
             if (!Path.IsPathFullyQualified(this.SolutionPath))
@@ -197,10 +212,12 @@ namespace Sitefinity_CLI.Commands
             return Path.Combine(executableLocation, Constants.PackageManagement, "NuGet.Config");
         }
 
-        private readonly IProjectService projectService;
-        private readonly IPackageService packageService;
+        private readonly ISitefinityNugetPackageService packageService;
         private readonly IVisualStudioService visualStudioService;
         private readonly ILogger<UpgradeCommand> logger;
         private readonly IPromptService promptService;
+        private readonly ISitefinityProjectPathService projectPathService;
+        private readonly ISitefinityVersionService sitefinityVersionService;
+        private readonly ISitefinityConfigService sitefinityConfigService;
     }
 }

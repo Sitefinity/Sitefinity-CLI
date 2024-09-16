@@ -5,7 +5,7 @@ using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.Services.Interfaces
 {
-    public interface IPackageService
+    public interface ISitefinityNugetPackageService
     {
         Task<NuGetPackage> PrepareSitefinityUpgradePackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths);
 
