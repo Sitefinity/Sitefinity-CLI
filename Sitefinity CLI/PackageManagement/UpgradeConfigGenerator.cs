@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,34 +15,41 @@ namespace Sitefinity_CLI.PackageManagement
     {
         public UpgradeConfigGenerator(
             ISitefinityPackageManager sitefinityPackageManager,
+             ISitefinityProjectService sitefinityProjectService,
             ILogger<UpgradeConfigGenerator> logger)
         {
             this.sitefinityPackageManager = sitefinityPackageManager;
+            this.sitefinityProjectService = sitefinityProjectService;
             this.logger = logger;
             this.processedPackagesPerProjectCache = new Dictionary<string, HashSet<string>>();
         }
 
         public async Task GenerateUpgradeConfig(
-            IEnumerable<Tuple<string, Version>> projectFilePathsWithSitefinityVersion,
+           IEnumerable<string> projectFilePathsWithSitefinityVersion,
             NuGetPackage newSitefinityVersionPackageTree,
-            IEnumerable<NugetPackageSource> packageSources,
+            string nugetConfigPath,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
         {
+            IEnumerable<Tuple<string, Version>> projectPathsWithSitefinityVersion = projectFilePathsWithSitefinityVersion
+                .Select(x => new Tuple<string, Version>(x, sitefinityProjectService.DetectSitefinityVersion(x)));
+
             this.logger.LogInformation("Exporting upgrade config...");
 
             XmlDocument powerShellXmlConfig = new XmlDocument();
             XmlElement powerShellXmlConfigNode = powerShellXmlConfig.CreateElement("config");
             powerShellXmlConfig.AppendChild(powerShellXmlConfigNode);
 
-            foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectFilePathsWithSitefinityVersion)
+            var packageSources = await this.sitefinityPackageManager.GetNugetPackageSources(nugetConfigPath);
+
+            foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
                 await this.GenerateProjectUpgradeConfigSection(
-                    powerShellXmlConfig, 
-                    powerShellXmlConfigNode, 
-                    projectFilePathWithSitefinityVersion.Item1, 
-                    newSitefinityVersionPackageTree, 
-                    packageSources, 
-                    projectFilePathWithSitefinityVersion.Item2, 
+                    powerShellXmlConfig,
+                    powerShellXmlConfigNode,
+                    projectFilePathWithSitefinityVersion.Item1,
+                    newSitefinityVersionPackageTree,
+                    packageSources,
+                    projectFilePathWithSitefinityVersion.Item2,
                     additionalPackagesToUpgrade);
             }
 
@@ -182,7 +190,7 @@ namespace Sitefinity_CLI.PackageManagement
         private readonly ILogger logger;
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
-
+        private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly IDictionary<string, HashSet<string>> processedPackagesPerProjectCache;
     }
 }

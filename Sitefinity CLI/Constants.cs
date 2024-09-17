@@ -55,6 +55,9 @@ namespace Sitefinity_CLI
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
+        public const string TryToUpdateInvalidVersionMessage = "The version '{0}' you are trying to upgrade to is not valid.";
+        public const string CannotUpgradeAdditionalPackagesMessage = "The given additional packages cannot be upgraded. The currently supported additional packages for upgrade are: {0}";
+        public const string LatestVersionNotFoundMeesage = "Can't get the latest Sitefinity version. Please specify the upgrade version.";
 
         // Warning messages
         public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";
@@ -206,6 +209,9 @@ namespace Sitefinity_CLI
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
         public const string ApiV3Identifier = "index.json";
+
+        // Patterns
+        public const string VersionPattern = @"Version=(.*?),";
 
         // Nuget sources
         public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";

@@ -4,6 +4,6 @@ namespace Sitefinity_CLI.Services.Interfaces
 {
     public interface IVisualStudioService
     {
-        void InitializeSolution(UpgradeOptions options);
+        void ExecuteVisualStudioUpgrade(UpgradeOptions options);
     }
 }

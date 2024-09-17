@@ -44,7 +44,7 @@ namespace Sitefinity_CLI
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IDotnetCliClient, DotnetCliClient>();
-                    services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
+                    //services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();

@@ -9,11 +9,10 @@ namespace Sitefinity_CLI.Services.Interfaces
     {
         Task<NuGetPackage> PrepareSitefinityUpgradePackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths);
 
-        Task<IEnumerable<NugetPackageSource>> GetPackageSources(string nugetConfigPath);
-
-        Task<IEnumerable<NuGetPackage>> InstallAdditionalPackages(UpgradeOptions options, IEnumerable<NugetPackageSource> packageSources);
+        Task<IEnumerable<NuGetPackage>> PrepareAdditionalPackages(UpgradeOptions options);
 
         void SyncProjectReferencesWithPackages(IEnumerable<string> projectFilePaths, string solutionFolder);
 
+        Task<string> GetLatestSitefinityVersion();
     }
 }

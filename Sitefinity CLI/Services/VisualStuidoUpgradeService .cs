@@ -18,7 +18,7 @@ namespace Sitefinity_CLI.Services
             this.logger = logger;
         }
 
-        public void InitializeSolution(UpgradeOptions options)
+        public void ExecuteVisualStudioUpgrade(UpgradeOptions options)
         {
             string updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             List<string> scriptParameters = [$"-RemoveDeprecatedPackages {options.RemoveDeprecatedPackages}"];
