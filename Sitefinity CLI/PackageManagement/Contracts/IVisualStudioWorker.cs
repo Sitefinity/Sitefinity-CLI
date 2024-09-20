@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Contracts
 {
     public interface IVisualStudioWorker : IDisposable
     {

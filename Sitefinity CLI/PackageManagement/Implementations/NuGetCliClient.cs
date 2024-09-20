@@ -2,8 +2,9 @@
 using System.IO;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class NuGetCliClient : INuGetCliClient
     {
@@ -14,21 +15,21 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
+            RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
         }
 
         public void Restore(string solutionFilePath)
         {
-            this.RunProcess($"restore \"{solutionFilePath}\" -NoCache");
+            RunProcess($"restore \"{solutionFilePath}\" -NoCache");
         }
 
         private void RunProcess(string arguments)
         {
             var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.PackageManagement, NuGetExeFileName);
-            this.EnsureNugetExecutable(nugetFileLocation);
+            EnsureNugetExecutable(nugetFileLocation);
 
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(nugetFileLocation);
-            this.logger.LogInformation("Executing '{arguments}' with nuget.exe file version: {fileVersion}", arguments, fileVersionInfo.FileVersion);
+            logger.LogInformation("Executing '{arguments}' with nuget.exe file version: {fileVersion}", arguments, fileVersionInfo.FileVersion);
 
             using (Process process = new Process())
             {

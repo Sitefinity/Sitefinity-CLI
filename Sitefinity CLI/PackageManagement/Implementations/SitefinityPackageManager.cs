@@ -10,9 +10,10 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.VisualStudio;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class SitefinityPackageManager : ISitefinityPackageManager
     {
@@ -28,41 +29,41 @@ namespace Sitefinity_CLI.PackageManagement
             this.packagesConfigFileEditor = packagesConfigFileEditor;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
-            this.defaultSources = new List<NugetPackageSource>()
+            defaultSources = new List<NugetPackageSource>()
             {
                new NugetPackageSource(SitefinityPublicNuGetSource),
                new NugetPackageSource(PublicNuGetSourceV3)
             };
-            this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
-            this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
+            supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
+            systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
         }
 
         public void Install(string packageId, string version, string solutionFilePath, string nugetConfigFilePath)
         {
             string solutionDirectory = Path.GetDirectoryName(solutionFilePath);
 
-            this.logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
+            logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
 
 
-            this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetConfigFilePath);
+            nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetConfigFilePath);
 
-            this.logger.LogInformation($"[{solutionDirectory}] Install for package '{packageId}' completed");
+            logger.LogInformation($"[{solutionDirectory}] Install for package '{packageId}' completed");
         }
 
         public void Restore(string solutionFilePath)
         {
-            this.logger.LogInformation($"[{solutionFilePath}] Restoring packages started...");
+            logger.LogInformation($"[{solutionFilePath}] Restoring packages started...");
 
-            this.nuGetCliClient.Restore(solutionFilePath);
+            nuGetCliClient.Restore(solutionFilePath);
 
-            this.logger.LogInformation($"[{solutionFilePath}] Restoring packages completed");
+            logger.LogInformation($"[{solutionFilePath}] Restoring packages completed");
         }
 
         public bool PackageExists(string packageId, string projectFilePath)
         {
             string packagesConfigFilePath = GetPackagesConfigFilePathForProject(projectFilePath);
 
-            NuGetPackage nuGetPackage = this.packagesConfigFileEditor.FindPackage(packagesConfigFilePath, packageId);
+            NuGetPackage nuGetPackage = packagesConfigFileEditor.FindPackage(packagesConfigFilePath, packageId);
             if (nuGetPackage != null)
             {
                 return true;
@@ -73,28 +74,28 @@ namespace Sitefinity_CLI.PackageManagement
 
         public async Task<NuGetPackage> GetSitefinityPackageTree(string version)
         {
-            return await this.GetSitefinityPackageTree(version, this.defaultSources);
+            return await GetSitefinityPackageTree(version, defaultSources);
         }
 
         public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> nugetPackageSources)
         {
             var sourcesUsed = string.Join(',', nugetPackageSources?.Select(x => x.SourceUrl));
-            this.logger.LogInformation($"Package sources used: {sourcesUsed}");
+            logger.LogInformation($"Package sources used: {sourcesUsed}");
 
-            return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
+            return await nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, supportedFrameworksRegex);
         }
 
         public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<NugetPackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
-            return await nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, this.supportedFrameworksRegex, shouldBreakSearch);
+            return await nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, supportedFrameworksRegex, shouldBreakSearch);
         }
 
         public void SyncReferencesWithPackages(string projectFilePath, string solutionDir)
         {
-            this.logger.LogInformation($"Synchronizing packages and references for project '{projectFilePath}'");
+            logger.LogInformation($"Synchronizing packages and references for project '{projectFilePath}'");
 
             string packagesConfigFilePath = GetPackagesConfigFilePathForProject(projectFilePath);
-            IEnumerable<NuGetPackage> packages = this.packagesConfigFileEditor.GetPackages(packagesConfigFilePath);
+            IEnumerable<NuGetPackage> packages = packagesConfigFileEditor.GetPackages(packagesConfigFilePath);
 
             XmlDocument projectFileXmlDocument = new XmlDocument();
             projectFileXmlDocument.Load(projectFilePath);
@@ -102,7 +103,7 @@ namespace Sitefinity_CLI.PackageManagement
             var processedAssemblies = new HashSet<string>();
             var projectDir = Path.GetDirectoryName(projectFilePath);
 
-            var projectConfigPath = this.projectConfigFileEditor.GetProjectConfigPath(projectDir);
+            var projectConfigPath = projectConfigFileEditor.GetProjectConfigPath(projectDir);
             XmlNodeList bindingRedirectNodes = null;
             XmlDocument projectConfig = null;
             if (!string.IsNullOrEmpty(projectConfigPath))
@@ -115,29 +116,29 @@ namespace Sitefinity_CLI.PackageManagement
             XmlNodeList referenceElements = projectFileXmlDocument.GetElementsByTagName(Constants.ReferenceElem);
             string targetFramework = GetTargetFramework(projectFileXmlDocument);
 
-            IEnumerable<AssemblyReference> nugetPackageAssemblyReferences = this.GetAssemblyReferencesFromNuGetPackages(packages, targetFramework, projectDir, solutionDir);
+            IEnumerable<AssemblyReference> nugetPackageAssemblyReferences = GetAssemblyReferencesFromNuGetPackages(packages, targetFramework, projectDir, solutionDir);
             IEnumerable<IGrouping<string, AssemblyReference>> nuGetPackageAssemblyReferenceGroups = nugetPackageAssemblyReferences
-                .Where(ar => ar.Version != null && !this.systemAssembliesNotToUpdate.Contains(ar.Name))
+                .Where(ar => ar.Version != null && !systemAssembliesNotToUpdate.Contains(ar.Name))
                 .GroupBy(ar => ar.Name);
 
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
             foreach (IGrouping<string, AssemblyReference> nuGetPackageAssemblyReferenceGroup in nuGetPackageAssemblyReferenceGroups)
             {
-                this.AddOrUpdateReferencesForAssembly(projectFileXmlDocument, referenceElements, bindingRedirectNodes, projectConfig, nuGetPackageAssemblyReferenceGroup.Key, nuGetPackageAssemblyReferenceGroup);
+                AddOrUpdateReferencesForAssembly(projectFileXmlDocument, referenceElements, bindingRedirectNodes, projectConfig, nuGetPackageAssemblyReferenceGroup.Key, nuGetPackageAssemblyReferenceGroup);
             }
 
-            IEnumerable<string> nugetPackageRelativeFileReferences = this.GetRelativeFilePathsFromNuGetPackages(packages, projectDir, solutionDir);
-            this.RemoveReferencesToMissingNuGetPackageDlls(projectDir, solutionDir, projectFileXmlDocument, nugetPackageRelativeFileReferences);
+            IEnumerable<string> nugetPackageRelativeFileReferences = GetRelativeFilePathsFromNuGetPackages(packages, projectDir, solutionDir);
+            RemoveReferencesToMissingNuGetPackageDlls(projectDir, solutionDir, projectFileXmlDocument, nugetPackageRelativeFileReferences);
 
             projectFileXmlDocument.Save(projectFilePath);
             projectConfig?.Save(projectConfigPath);
 
-            this.logger.LogInformation($"Synchronization completed for project '{projectFilePath}'");
+            logger.LogInformation($"Synchronization completed for project '{projectFilePath}'");
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, int versionsCount = 10)
+        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> packageSources, int versionsCount = 10)
         {
-            return await this.nuGetApiClient.GetPackageVersions(id, new List<NugetPackageSource>() { new NugetPackageSource(SitefinityPublicNuGetSource) }, versionsCount);
+            return await nuGetApiClient.GetPackageVersions(id, packageSources, versionsCount);
         }
 
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)
@@ -155,7 +156,7 @@ namespace Sitefinity_CLI.PackageManagement
                 if (includeAttributeValue.StartsWith(relativePackagesDirPath, StringComparison.OrdinalIgnoreCase) &&
                     !nugetPackageRelativeFileReferences.Any(fr => fr.Equals(includeAttributeValue, StringComparison.OrdinalIgnoreCase)))
                 {
-                    this.logger.LogInformation($"Removing '{elementWithIncludeAttribute.Name}' element with include attribute '{includeAttributeValue}', because file cannot be found in NuGet packages installed for this project.");
+                    logger.LogInformation($"Removing '{elementWithIncludeAttribute.Name}' element with include attribute '{includeAttributeValue}', because file cannot be found in NuGet packages installed for this project.");
                     elementWithIncludeAttribute.ParentNode.RemoveChild(elementWithIncludeAttribute);
                 }
             }
@@ -184,7 +185,7 @@ namespace Sitefinity_CLI.PackageManagement
                     var nugetSource = new NugetPackageSource();
                     nugetSource.SourceName = packageSourceName;
                     nugetSource.SourceUrl = packageSourceUrl;
-                    this.TryAddPackageCredentialsToSource(packageSourceCredentials, packageSourceName, nugetSource);
+                    TryAddPackageCredentialsToSource(packageSourceCredentials, packageSourceName, nugetSource);
                     packageSourceList.Add(nugetSource);
                 }
             }
@@ -198,7 +199,7 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 if (packageSourceName.Any(c => char.IsWhiteSpace(c)))
                 {
-                    this.logger.LogError("The package source: {packageSource} contains white space char. If you have <packageSourceCredentials> element for it it won't be extracted", nugetSource.SourceName);
+                    logger.LogError("The package source: {packageSource} contains white space char. If you have <packageSourceCredentials> element for it it won't be extracted", nugetSource.SourceName);
                     return;
                 }
 
@@ -215,7 +216,7 @@ namespace Sitefinity_CLI.PackageManagement
 
                         if (string.IsNullOrEmpty(nugetSource.Username) || string.IsNullOrEmpty(nugetSource.Password))
                         {
-                            this.logger.LogError("Error while retrieveing credentials for source: {packageSource}.", nugetSource.SourceUrl);
+                            logger.LogError("Error while retrieveing credentials for source: {packageSource}.", nugetSource.SourceUrl);
                             throw new UpgradeException("Upgrade failed due to errors reading the provided nugetConfig");
                         }
                     }
@@ -237,11 +238,11 @@ namespace Sitefinity_CLI.PackageManagement
                 if (!string.IsNullOrWhiteSpace(includeAttribute.Value) &&
                     (includeAttribute.Value.Equals(assemblyName, StringComparison.OrdinalIgnoreCase) || includeAttribute.Value.StartsWith(assemblyName + ",", StringComparison.OrdinalIgnoreCase)))
                 {
-                    Version currentAssemblyVersion = this.ExtractAssemblyVersionFromIncludeAttribute(includeAttribute.Value);
+                    Version currentAssemblyVersion = ExtractAssemblyVersionFromIncludeAttribute(includeAttribute.Value);
 
                     if (currentAssemblyVersion != null && currentAssemblyVersion > nugetPackageAssemblyReferenceWithNewestVersion.Version)
                     {
-                        this.logger.LogInformation($"The assembly reference '{assemblyName}' is on version '{currentAssemblyVersion}'. It won't be downgraded to version '{nugetPackageAssemblyReferenceWithNewestVersion.Version}'.");
+                        logger.LogInformation($"The assembly reference '{assemblyName}' is on version '{currentAssemblyVersion}'. It won't be downgraded to version '{nugetPackageAssemblyReferenceWithNewestVersion.Version}'.");
                         isAssemblyReferenceFound = true;
                         break;
                     }
@@ -251,14 +252,14 @@ namespace Sitefinity_CLI.PackageManagement
 
                     if (!includeAttribute.Value.Equals(includeAttributeNewValue, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.logger.LogInformation($"Updated include attribue '{includeAttribute.Value}' to '{includeAttributeNewValue}'.");
+                        logger.LogInformation($"Updated include attribue '{includeAttribute.Value}' to '{includeAttributeNewValue}'.");
                         includeAttribute.Value = includeAttributeNewValue;
                     }
 
-                    XmlNode hintPathNode = this.GetChildNode(referenceElement, Constants.HintPathElem);
+                    XmlNode hintPathNode = GetChildNode(referenceElement, Constants.HintPathElem);
                     if (hintPathNode == null)
                     {
-                        this.logger.LogInformation($"Added hint path '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}' for reference assembly '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}'.");
+                        logger.LogInformation($"Added hint path '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}' for reference assembly '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}'.");
 
                         hintPathNode = projectFileXmlDocument.CreateElement(Constants.HintPathElem, projectFileXmlDocument.DocumentElement.NamespaceURI);
                         referenceElement.AppendChild(hintPathNode);
@@ -266,7 +267,7 @@ namespace Sitefinity_CLI.PackageManagement
                     }
                     else if (!nugetPackageAssemblyReferences.Any(ar => ar.Version == nugetPackageAssemblyReferenceWithNewestVersion.Version && ar.HintPath.Equals(hintPathNode.InnerText, StringComparison.OrdinalIgnoreCase)))
                     {
-                        this.logger.LogInformation($"Updated hint path '{hintPathNode.InnerText}' to '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}' for reference assembly '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}'.");
+                        logger.LogInformation($"Updated hint path '{hintPathNode.InnerText}' to '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}' for reference assembly '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}'.");
 
                         hintPathNode.InnerText = nugetPackageAssemblyReferenceWithNewestVersion.HintPath;
                     }
@@ -278,7 +279,7 @@ namespace Sitefinity_CLI.PackageManagement
 
             if (!isAssemblyReferenceFound)
             {
-                this.logger.LogInformation($"Added missing assembly reference '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}' with hint path '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}'.");
+                logger.LogInformation($"Added missing assembly reference '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}' with hint path '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}'.");
 
                 XmlNode referencesGroup = projectFileXmlDocument.GetElementsByTagName(Constants.ItemGroupElem)[0];
                 XmlElement referenceNode = projectFileXmlDocument.CreateElement(Constants.ReferenceElem, projectFileXmlDocument.DocumentElement.NamespaceURI);
@@ -294,7 +295,7 @@ namespace Sitefinity_CLI.PackageManagement
                 referencesGroup.AppendChild(referenceNode);
             }
 
-            this.SyncBindingRedirects(projectConfig, bindingRedirectNodes, assemblyName, nugetPackageAssemblyReferenceWithNewestVersion.Version.ToString());
+            SyncBindingRedirects(projectConfig, bindingRedirectNodes, assemblyName, nugetPackageAssemblyReferenceWithNewestVersion.Version.ToString());
         }
 
         private XmlNode GetChildNode(XmlNode node, string childNodeName)
@@ -317,7 +318,7 @@ namespace Sitefinity_CLI.PackageManagement
             List<string> filePaths = new List<string>();
             foreach (NuGetPackage nuGetPackage in nuGetPackages)
             {
-                string packageDir = this.GetNuGetPackageDir(solutionDir, nuGetPackage);
+                string packageDir = GetNuGetPackageDir(solutionDir, nuGetPackage);
                 filePaths.AddRange(Directory.GetFiles(packageDir, "*.*", SearchOption.AllDirectories));
             }
 
@@ -329,11 +330,11 @@ namespace Sitefinity_CLI.PackageManagement
             List<string> dllFilePaths = new List<string>();
             foreach (NuGetPackage nuGetPackage in nuGetPackages)
             {
-                string packageDir = this.GetNuGetPackageDir(solutionDir, nuGetPackage);
-                dllFilePaths.AddRange(this.GetPackageDlls(packageDir, targetFramework));
+                string packageDir = GetNuGetPackageDir(solutionDir, nuGetPackage);
+                dllFilePaths.AddRange(GetPackageDlls(packageDir, targetFramework));
             }
 
-            IEnumerable<AssemblyReference> assemblyReferences = dllFilePaths.Distinct().Select(d => this.GetAssemblyReferenceFromDllFilePath(d, projectDir));
+            IEnumerable<AssemblyReference> assemblyReferences = dllFilePaths.Distinct().Select(d => GetAssemblyReferenceFromDllFilePath(d, projectDir));
 
             return assemblyReferences;
         }
@@ -367,7 +368,7 @@ namespace Sitefinity_CLI.PackageManagement
 
             if (string.IsNullOrWhiteSpace(versionChunk))
             {
-                this.logger.LogInformation($"Unable to extract the version from '{includeAttributeValue}'.");
+                logger.LogInformation($"Unable to extract the version from '{includeAttributeValue}'.");
 
                 return null;
             }
@@ -379,7 +380,7 @@ namespace Sitefinity_CLI.PackageManagement
             Version parsedVersion = null;
             if (!Version.TryParse(assemblyVersionString, out parsedVersion))
             {
-                this.logger.LogInformation($"Unable to parse version string '{assemblyVersionString}'.");
+                logger.LogInformation($"Unable to parse version string '{assemblyVersionString}'.");
             }
 
             return parsedVersion;
@@ -389,7 +390,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             get
             {
-                return new List<NugetPackageSource>(this.defaultSources);
+                return new List<NugetPackageSource>(defaultSources);
             }
         }
 
@@ -664,11 +665,11 @@ namespace Sitefinity_CLI.PackageManagement
                 {
                     doc.Save(projectFilePath);
 
-                    this.logger.LogInformation(string.Format(Constants.TargetFrameworkChanged, Path.GetFileName(projectFilePath), targetFramework));
+                    logger.LogInformation(string.Format(Constants.TargetFrameworkChanged, Path.GetFileName(projectFilePath), targetFramework));
                 }
                 else
                 {
-                    this.logger.LogInformation(string.Format(Constants.TargetFrameworkDoesNotNeedChanged, Path.GetFileName(projectFilePath), targetFramework));
+                    logger.LogInformation(string.Format(Constants.TargetFrameworkDoesNotNeedChanged, Path.GetFileName(projectFilePath), targetFramework));
                 }
             }
         }

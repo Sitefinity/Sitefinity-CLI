@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     [DebuggerDisplay("ID = {Id} Version = {Version}")]
     public class NuGetPackage
     {
         public NuGetPackage()
         {
-            this.Dependencies = new List<NuGetPackage>();
+            Dependencies = new List<NuGetPackage>();
         }
 
         public NuGetPackage(string id, string version)
             : this()
         {
-            this.Id = id;
-            this.Version = version;
+            Id = id;
+            Version = version;
         }
 
         public string Id { get; set; }

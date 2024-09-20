@@ -7,6 +7,8 @@ using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services;
 using Sitefinity_CLI.Services.Interfaces;
 using Sitefinity_CLI.VisualStudio;

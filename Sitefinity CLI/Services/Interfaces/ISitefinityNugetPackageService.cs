@@ -1,7 +1,7 @@
-﻿using Sitefinity_CLI.PackageManagement;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Collections.Generic;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Implementations;
 
 namespace Sitefinity_CLI.Services.Interfaces
 {

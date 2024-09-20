@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Sitefinity_CLI.PackageManagement.Implementations;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Contracts
 {
     internal interface IPackagesConfigFileEditor
     {
