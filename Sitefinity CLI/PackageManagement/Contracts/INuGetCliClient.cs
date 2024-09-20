@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Sitefinity_CLI.Model;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Contracts
 {
     internal interface INuGetCliClient
     {

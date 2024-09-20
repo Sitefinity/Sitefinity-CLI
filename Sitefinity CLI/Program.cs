@@ -7,6 +7,10 @@ using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.PackageManagement.Implementations;
+using Sitefinity_CLI.Services;
+using Sitefinity_CLI.Services.Interfaces;
 using Sitefinity_CLI.VisualStudio;
 using System;
 using System.Runtime.CompilerServices;
@@ -38,15 +42,20 @@ namespace Sitefinity_CLI
                 {
                     services.AddHttpClient();
                     services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
+                    services.AddTransient<ISitefinityProjectService, SitefinityProjectService>();
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IDotnetCliClient, DotnetCliClient>();
-                    services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
+                    //services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
+                    services.AddTransient<ISitefinityConfigService, SitefinityConfigService>();
+                    services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
                     services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
+                    services.AddScoped<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
                     services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
+                    services.AddSingleton<IVisualStudioService, VisualStudioService>();
                     services.AddSingleton<IPromptService, PromptService>();
                 })
                 .UseConsoleLifetime()

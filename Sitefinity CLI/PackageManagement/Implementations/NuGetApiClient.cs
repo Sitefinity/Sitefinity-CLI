@@ -17,8 +17,9 @@ using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class NuGetApiClient : INuGetApiClient
     {
@@ -27,10 +28,10 @@ namespace Sitefinity_CLI.PackageManagement
             this.clientFactory = clientFactory;
             this.logger = logger;
             this.httpClient = clientFactory.CreateClient();
-            this.nuGetPackageXmlDocumentCache = new Dictionary<string, PackageXmlDocumentModel>();
-            this.xmlns = "http://www.w3.org/2005/Atom";
-            this.xmlnsm = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
-            this.xmlnsd = "http://schemas.microsoft.com/ado/2007/08/dataservices";
+            nuGetPackageXmlDocumentCache = new Dictionary<string, PackageXmlDocumentModel>();
+            xmlns = "http://www.w3.org/2005/Atom";
+            xmlnsm = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
+            xmlnsd = "http://schemas.microsoft.com/ado/2007/08/dataservices";
         }
 
         public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<NugetPackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
@@ -40,7 +41,7 @@ namespace Sitefinity_CLI.PackageManagement
             if (File.Exists(packageDependenciesHashFilePath))
                 return JsonConvert.DeserializeObject<NuGetPackage>(File.ReadAllText(packageDependenciesHashFilePath));
 
-            PackageXmlDocumentModel nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources, httpClient);
+            PackageXmlDocumentModel nuGetPackageXmlDoc = await GetPackageXmlDocument(id, version, sources);
             if (nuGetPackageXmlDoc == null)
             {
                 return null;
@@ -50,11 +51,11 @@ namespace Sitefinity_CLI.PackageManagement
             NuGetPackage nuGetPackage = new NuGetPackage();
             if (nuGetPackageXmlDoc.ProtoVersion == ProtocolVersion.NuGetAPIV2)
             {
-                dependencies = this.ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
+                dependencies = ParseDependenciesV2(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
             }
             else
             {
-                dependencies = this.ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
+                dependencies = ParseDependenciesV3(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
             }
 
             if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
@@ -65,7 +66,7 @@ namespace Sitefinity_CLI.PackageManagement
 
             foreach (NuGetPackage dependency in dependencies)
             {
-                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
+                NuGetPackage nuGetPackageDependency = await GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
                 if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
                 {
                     nuGetPackage.Dependencies.Add(nuGetPackageDependency);
@@ -98,14 +99,14 @@ namespace Sitefinity_CLI.PackageManagement
         private List<NuGetPackage> ParseDependenciesV2(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
             XElement propertiesElement = nuGetPackageXmlDoc.XDocumentData
-                .Element(this.xmlns + Constants.EntryElem)
-                .Element(this.xmlnsm + Constants.PropertiesElem);
+                .Element(xmlns + Constants.EntryElem)
+                .Element(xmlnsm + Constants.PropertiesElem);
 
             var id = nuGetPackageXmlDoc.XDocumentData
-                .Element(this.xmlns + Constants.EntryElem)
-                .Element(this.xmlns + Constants.TitleElem).Value;
+                .Element(xmlns + Constants.EntryElem)
+                .Element(xmlns + Constants.TitleElem).Value;
 
-            var version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
+            var version = propertiesElement.Element(xmlnsd + Constants.VersionElem).Value;
 
             if (id != null && version != null)
             {
@@ -113,9 +114,9 @@ namespace Sitefinity_CLI.PackageManagement
                 nuGetPackage.Version = version;
             }
 
-            string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
+            string dependenciesString = propertiesElement.Element(xmlnsd + Constants.DependenciesElem).Value;
 
-            return this.ParseDependencies(dependenciesString, supportedFrameworksRegex);
+            return ParseDependencies(dependenciesString, supportedFrameworksRegex);
         }
 
         private List<NuGetPackage> ParseDependenciesV3(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
@@ -148,7 +149,7 @@ namespace Sitefinity_CLI.PackageManagement
                 else
                 {
                     var dependencyElements = groupElementsDependencies.Elements();
-                    nugetPackageDeoebdebcies = this.GetDependencies(dependencyElements);
+                    nugetPackageDeoebdebcies = GetDependencies(dependencyElements);
                 }
             }
 
@@ -157,7 +158,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDeoebdebcies, IEnumerable<XElement> groupElements, Regex supportedFrameworksRegex)
         {
-            var groupElementsForTargetFramework = groupElements.Where(x => (x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework)) || !x.HasAttributes);
+            var groupElementsForTargetFramework = groupElements.Where(x => x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework) || !x.HasAttributes);
 
             foreach (var ge in groupElementsForTargetFramework)
             {
@@ -170,10 +171,10 @@ namespace Sitefinity_CLI.PackageManagement
                 var depElements = ge.Elements();
                 if (depElements.Any())
                 {
-                    string targetFramework = this.GetFrameworkVersion(dependenciesTargetFramework); ;
+                    string targetFramework = GetFrameworkVersion(dependenciesTargetFramework); ;
                     if (IsFrameworkSuported(supportedFrameworksRegex, targetFramework))
                     {
-                        nugetPackageDeoebdebcies = this.GetDependencies(depElements);
+                        nugetPackageDeoebdebcies = GetDependencies(depElements);
                     }
                 }
             }
@@ -183,19 +184,25 @@ namespace Sitefinity_CLI.PackageManagement
 
         public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
         {
+            IEnumerable<string> v2packageVersions = await GetV2PackageVersions(id, nugetSources, versionsCount);
+            IEnumerable<string> v3packageVersions = await GetV3PackageVersions(id, nugetSources, versionsCount);
+
+            return v2packageVersions.Concat(v3packageVersions).OrderByDescending(x => x).ToHashSet();
+        }
+
+        private async Task<IEnumerable<string>> GetV2PackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
+        {
             HttpResponseMessage response = null;
             foreach (NugetPackageSource nugetSource in nugetSources)
             {
                 string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
-                using (var request = new HttpRequestMessage(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}"))
-                {
-                    request.Headers.Add("Accept", MediaTypeNames.Application.Json);
+                using HttpRequestMessage request = new(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}");
+                request.Headers.Add("Accept", MediaTypeNames.Application.Json);
 
-                    response = await this.httpClient.SendAsync(request);
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        break;
-                    }
+                response = await httpClient.SendAsync(request);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    break;
                 }
             }
 
@@ -211,12 +218,45 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             JObject jsonObject = JObject.Parse(responseContentString);
-            var packages = (JArray)jsonObject["d"];
-            var versions = packages.Where(x => (string)x["Id"] == id).Select(x => (string)x["Version"]).ToList();
+            JArray packages = (JArray)jsonObject["d"];
+            IEnumerable<string> versions = packages.Where(x => (string)x["Id"] == id).Select(x => (string)x["Version"]);
             return versions;
         }
 
-        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
+        private async Task<IEnumerable<string>> GetV3PackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
+        {
+            HttpResponseMessage response = null;
+            foreach (NugetPackageSource nugetSource in nugetSources.Where(x => x.SourceUrl.Contains("azure")))
+            {
+                AppendNugetSourceAuthHeaders(nugetSource);
+                string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
+                string url = $"{sourceUrl}/v3/flat2/{id}/index.json";
+                response = await this.httpClient.GetAsync(url);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    break;
+                }
+            }
+
+            if (response == null)
+            {
+                return null;
+            }
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(responseContent))
+            {
+                return null;
+            }
+
+            JObject jsonObject = JObject.Parse(responseContent);
+            JArray versions = (JArray)jsonObject["versions"];
+
+            return versions.Take(versionsCount).Select(v => v.ToString());
+        }
+
+        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             string cacheKey = string.Concat(id, version);
             if (nuGetPackageXmlDocumentCache != null && nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
@@ -230,14 +270,14 @@ namespace Sitefinity_CLI.PackageManagement
                 }
             }
 
-            PackageSpecificationResponseModel specification = await this.GetPackageSpecification(id, version, sources, httpClient);
+            PackageSpecificationResponseModel specification = await GetPackageSpecification(id, version, sources);
 
             if (specification.SpecResponse == null || specification.SpecResponse.StatusCode != HttpStatusCode.OK)
             {
                 return null;
             }
 
-            string responseContentString = await this.GetResponseContentString(specification.SpecResponse);
+            string responseContentString = await GetResponseContentString(specification.SpecResponse);
             if (string.IsNullOrWhiteSpace(responseContentString))
             {
                 return null;
@@ -260,13 +300,13 @@ namespace Sitefinity_CLI.PackageManagement
             return packageXmlDocument;
         }
 
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             var versionInfo = ProtocolVersion.NuGetAPIV3;
-            var response = await this.GetPackageSpecificationV3(id, version, sources, httpClient);
+            var response = await GetPackageSpecificationV3(id, version, sources);
             if (response?.StatusCode != HttpStatusCode.OK)
             {
-                response = await this.GetPackageSpecificationV2(id, version, sources, httpClient);
+                response = await GetPackageSpecificationV2(id, version, sources);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     versionInfo = ProtocolVersion.NuGetAPIV2;
@@ -275,26 +315,26 @@ namespace Sitefinity_CLI.PackageManagement
 
             if (response == null)
             {
-                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
+                logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
                 throw new UpgradeException("Upgrade failed!");
             }
 
             return new PackageSpecificationResponseModel() { SpecResponse = response, ProtoVersion = versionInfo };
         }
 
-        private async Task<HttpResponseMessage> GetPackageSpecificationV3(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
+        private async Task<HttpResponseMessage> GetPackageSpecificationV3(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             var apiV3Sources = sources.Where(x => x.SourceUrl.Contains(Constants.ApiV3Identifier));
             HttpResponseMessage response = null;
             foreach (NugetPackageSource nugetSource in apiV3Sources)
             {
-                this.AppendNugetSourceAuthHeaders(httpClient, nugetSource);
+                AppendNugetSourceAuthHeaders(nugetSource);
 
                 // We fetch the base URL from the service index because it may be changed without notice
-                string sourceUrl = (await this.GetBaseAddress(httpClient, nugetSource))?.TrimEnd('/');
+                string sourceUrl = (await GetBaseAddress(nugetSource))?.TrimEnd('/');
                 if (sourceUrl == null)
                 {
-                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
+                    logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
                     throw new UpgradeException("Upgrade failed");
                 }
 
@@ -310,24 +350,14 @@ namespace Sitefinity_CLI.PackageManagement
                 }
                 else
                 {
-                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.SourceUrl);
+                    logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.SourceUrl);
                 }
             }
 
             return response;
         }
 
-        private void AppendNugetSourceAuthHeaders(HttpClient httpClient, NugetPackageSource nugetSource)
-        {
-            // there are cases where the username is not required
-            if (nugetSource.Password != null)
-            {
-                var authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Username}:{nugetSource.Password}");
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
-            }
-        }
-
-        private async Task<HttpResponseMessage> GetPackageSpecificationV2(string id, string version, IEnumerable<NugetPackageSource> sources, HttpClient httpClient)
+        private async Task<HttpResponseMessage> GetPackageSpecificationV2(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             var apiV2Sources = sources.Where(x => !x.SourceUrl.Contains(Constants.ApiV3Identifier));
             HttpResponseMessage response = null;
@@ -342,19 +372,30 @@ namespace Sitefinity_CLI.PackageManagement
                 }
                 else
                 {
-                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.SourceUrl);
+                    logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.SourceUrl);
                 }
             }
 
             return response;
         }
 
+
+        private void AppendNugetSourceAuthHeaders(NugetPackageSource nugetSource)
+        {
+            // there are cases where the username is not required
+            if (nugetSource.Password != null)
+            {
+                byte[] authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Username}:{nugetSource.Password}");
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
+            }
+        }
+
         private async Task<string> GetResponseContentString(HttpResponseMessage response)
         {
             if (response.Content.Headers.ContentEncoding.Contains("gzip"))
             {
-                byte[] decompressedBytes = this.DecompressGzip(await response.Content.ReadAsByteArrayAsync());
-                string responseText = await this.ConvertBytesToString(decompressedBytes);
+                byte[] decompressedBytes = DecompressGzip(await response.Content.ReadAsByteArrayAsync());
+                string responseText = await ConvertBytesToString(decompressedBytes);
 
                 return responseText;
             }
@@ -409,7 +450,7 @@ namespace Sitefinity_CLI.PackageManagement
                             string dependencyId = dependencyIdAndVersionAndFramework[0].Trim();
 
                             string dependencyVersionString = dependencyIdAndVersionAndFramework[1].Trim();
-                            string[] dependencyVersions = this.ParseVersionString(dependencyVersionString);
+                            string[] dependencyVersions = ParseVersionString(dependencyVersionString);
                             string dependencyVersion = dependencyVersions[0];
 
                             string framework = null;
@@ -435,7 +476,7 @@ namespace Sitefinity_CLI.PackageManagement
             return dependencies;
         }
 
-        private async Task<string> GetBaseAddress(HttpClient httpClient, NugetPackageSource nugetSource)
+        private async Task<string> GetBaseAddress(NugetPackageSource nugetSource)
         {
             HttpResponseMessage response = null;
             string baseAddress = null;
@@ -501,7 +542,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         private readonly IDictionary<string, PackageXmlDocumentModel> nuGetPackageXmlDocumentCache;
 
-        private readonly static object lockObj = new Object();
+        private readonly static object lockObj = new object();
         private const string LocalPackagesInfoCacheFolder = "PackagesInfoCache";
         private const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
     }

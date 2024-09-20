@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

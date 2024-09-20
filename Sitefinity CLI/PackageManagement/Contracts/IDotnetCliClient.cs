@@ -1,4 +1,4 @@
-﻿namespace Sitefinity_CLI.PackageManagement
+﻿namespace Sitefinity_CLI.PackageManagement.Contracts
 {
     internal interface IDotnetCliClient
     {

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class PackagesConfigFileEditor : XmlFileEditorBase, IPackagesConfigFileEditor
     {
@@ -10,12 +11,12 @@ namespace Sitefinity_CLI.PackageManagement
         {
             IEnumerable<NuGetPackage> nuGetPackages = null;
 
-            base.ReadFile(packagesConfigFilePath, (doc) =>
+            ReadFile(packagesConfigFilePath, (doc) =>
             {
                 IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
 
-                nuGetPackages = xmlPackageElements.Select(xpe => this.CreateNuGetPackageFromXmlPackageElement(xpe));
+                nuGetPackages = xmlPackageElements.Select(xpe => CreateNuGetPackageFromXmlPackageElement(xpe));
             });
 
             return nuGetPackages;
@@ -25,7 +26,7 @@ namespace Sitefinity_CLI.PackageManagement
         {
             NuGetPackage nuGetPackage = null;
 
-            base.ReadFile(packagesConfigFilePath, (doc) =>
+            ReadFile(packagesConfigFilePath, (doc) =>
             {
                 IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
@@ -34,7 +35,7 @@ namespace Sitefinity_CLI.PackageManagement
 
                 if (xmlPackageElement != null)
                 {
-                    nuGetPackage = this.CreateNuGetPackageFromXmlPackageElement(xmlPackageElement);
+                    nuGetPackage = CreateNuGetPackageFromXmlPackageElement(xmlPackageElement);
                 }
             });
 
@@ -43,7 +44,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void RemovePackage(string packagesConfigFilePath, string packageId)
         {
-            base.ModifyFile(packagesConfigFilePath, (doc) =>
+            ModifyFile(packagesConfigFilePath, (doc) =>
             {
                 IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
