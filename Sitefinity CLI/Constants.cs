@@ -10,6 +10,7 @@ namespace Sitefinity_CLI
         // Folder names
         public const string ResourcePackagesFolderName = "ResourcePackages";
         public const string MVCFolderName = "MVC";
+        public const string LocalPackagesInfoCacheFolder = "PackagesInfoCache";
         public const string ModuleFolderName = "Modules";
         public const string ControllersFolderName = "Controllers";
         public const string ViewsFolderName = "Views";
@@ -29,6 +30,7 @@ namespace Sitefinity_CLI
         public const string CsProjTemplateName = "csproj";
         public const string PackagesFolderName = "packages";
         public const string LicenseAgreementsFolderName = "LicenseAgreements";
+        public const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
@@ -208,7 +210,7 @@ namespace Sitefinity_CLI
         public const string DependenciesEl = "dependencies";
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
-        public const string ApiV3Identifier = "index.json";
+        public const string ApiV3Identifier = "v3";
 
         // Patterns
         public const string VersionPattern = @"Version=(.*?),";

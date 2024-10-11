@@ -1,6 +1,6 @@
 ﻿namespace Sitefinity_CLI.Enums
 {
-    internal enum ProtocolVersion
+    public enum ProtocolVersion
     {
         NuGetAPIV2,
         NuGetAPIV3

@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.PackageManagement.Contracts
 {
-    internal interface INugetSpecificationProvider
+    public interface INugetProvider
     {
         Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources);
+
+        Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> sources, int versionsCount = 10);
     }
 }

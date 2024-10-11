@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging.Console;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Logging;
-using Sitefinity_CLI.PackageManagement;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services;
@@ -28,6 +27,8 @@ namespace Sitefinity_CLI
     [Subcommand(typeof(GenerateConfigCommand))]
     public class Program
     {
+        public delegate INugetProvider NugetProviderFactory(ProtocolVersion version);
+
         public static async Task<int> Main(string[] args)
         {
             try
@@ -43,10 +44,13 @@ namespace Sitefinity_CLI
                     services.AddHttpClient();
                     services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
                     services.AddTransient<ISitefinityProjectService, SitefinityProjectService>();
+                    services.AddTransient<INuGetDependencyParser, NuGetV2DependencyParser>();
+                    services.AddTransient<INuGetDependencyParser, NuGetV3DependencyParser>();
+                    services.AddTransient<INugetProvider, NuGetV2Provider>();
+                    services.AddTransient<INugetProvider, NuGetV3Provider>();
                     services.AddTransient<INuGetApiClient, NuGetApiClient>();
                     services.AddTransient<INuGetCliClient, NuGetCliClient>();
                     services.AddTransient<IDotnetCliClient, DotnetCliClient>();
-                    //services.AddTransient<IPackageSourceBuilder, PackageSourceBuilder>();
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
