@@ -2,7 +2,7 @@
 
 namespace Sitefinity_CLI.Model
 {
-    public class NugetPackageSource
+    internal class NugetPackageSource
     {
         public NugetPackageSource()
         {

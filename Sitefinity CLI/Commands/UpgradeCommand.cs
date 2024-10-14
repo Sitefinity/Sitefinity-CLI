@@ -69,12 +69,12 @@ namespace Sitefinity_CLI.Commands
         {
             try
             {
-                await ExecuteUpgrade();
+                await this.ExecuteUpgrade();
                 return 0;
             }
             catch (Exception ex)
             {
-                logger.LogError($"Error during upgrade: {ex.Message}");
+                this.logger.LogError($"Error during upgrade: {ex.Message}");
                 return 1;
             }
         }

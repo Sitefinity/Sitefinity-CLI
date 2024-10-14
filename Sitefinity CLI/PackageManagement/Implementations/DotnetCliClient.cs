@@ -39,7 +39,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                     string line = process.StandardOutput.ReadLine();
                     if (withLogging)
                     {
-                        logger.LogInformation(line);
+                        this.logger.LogInformation(line);
                     }
                 }
 
@@ -48,7 +48,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                     string line = process.StandardError.ReadLine();
                     if (withLogging)
                     {
-                        logger.LogWarning(line);
+                        this.logger.LogWarning(line);
                     }
                 }
             }

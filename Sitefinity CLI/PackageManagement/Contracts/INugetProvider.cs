@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.PackageManagement.Contracts
 {
-    public interface INugetProvider
+    internal interface INugetProvider
     {
         Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources);
 

@@ -24,7 +24,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         }
 
         private void RunProcess(string arguments)
-        { 
+        {
             var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.PackageManagement, NuGetExeFileName);
             this.EnsureNugetExecutable(nugetFileLocation);
 

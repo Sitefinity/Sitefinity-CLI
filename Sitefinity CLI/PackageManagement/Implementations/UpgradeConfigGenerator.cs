@@ -82,7 +82,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger.LogInformation($"Detected sitefinity version for '{projectFilePath}' - '{currentSitefinityVersion}'.");
 
             this.logger.LogInformation($"Collecting Sitefinity NuGet package tree for '{projectFilePath}'...");
-            NuGetPackage currentSitefinityVersionPackageTree = await sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString(), packageSources);
+            NuGetPackage currentSitefinityVersionPackageTree = await this.sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString(), packageSources);
 
             this.processedPackagesPerProjectCache[projectFilePath] = new HashSet<string>();
 
@@ -105,7 +105,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             IList<NuGetPackage> packageTreesToProcessFurther = new List<NuGetPackage>();
             foreach (NuGetPackage currentSitefinityVersionPackage in currentSitefinityVersionPackages)
             {
-                bool isPackageAlreadyProcessed = processedPackagesPerProjectCache[projectFilePath].Contains(currentSitefinityVersionPackage.Id);
+                bool isPackageAlreadyProcessed = this.processedPackagesPerProjectCache[projectFilePath].Contains(currentSitefinityVersionPackage.Id);
                 if (!isPackageAlreadyProcessed &&
                     !this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackage, newSitefinityVersionPackageTree))
                 {
@@ -157,7 +157,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private void AddNuGetPackageTreeToCache(string projectFilePath, NuGetPackage nuGetPackage)
         {
-            if (!processedPackagesPerProjectCache[projectFilePath].Contains(nuGetPackage.Id))
+            if (!this.processedPackagesPerProjectCache[projectFilePath].Contains(nuGetPackage.Id))
             {
                 this.processedPackagesPerProjectCache[projectFilePath].Add(nuGetPackage.Id);
             }
