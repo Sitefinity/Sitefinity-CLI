@@ -74,7 +74,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public async Task<NuGetPackage> GetSitefinityPackageTree(string version)
         {
-            return await this.GetSitefinityPackageTree(version, defaultSources);
+            return await this.GetSitefinityPackageTree(version, this.defaultSources);
         }
 
         public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> nugetPackageSources)
@@ -82,7 +82,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             var sourcesUsed = string.Join(',', nugetPackageSources?.Select(x => x.SourceUrl));
             this.logger.LogInformation($"Package sources used: {sourcesUsed}");
 
-            return await this.nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, supportedFrameworksRegex);
+            return await this.nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
         }
 
         public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<NugetPackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
@@ -118,7 +118,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             IEnumerable<AssemblyReference> nugetPackageAssemblyReferences = this.GetAssemblyReferencesFromNuGetPackages(packages, targetFramework, projectDir, solutionDir);
             IEnumerable<IGrouping<string, AssemblyReference>> nuGetPackageAssemblyReferenceGroups = nugetPackageAssemblyReferences
-                .Where(ar => ar.Version != null && !systemAssembliesNotToUpdate.Contains(ar.Name))
+                .Where(ar => ar.Version != null && !this.systemAssembliesNotToUpdate.Contains(ar.Name))
                 .GroupBy(ar => ar.Name);
 
             // Foreach package installed for this project, check if all DLLs are included. If not - include missing ones. Fix binding redirects in web.config if necessary.
@@ -318,7 +318,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             List<string> filePaths = new List<string>();
             foreach (NuGetPackage nuGetPackage in nuGetPackages)
             {
-                string packageDir = GetNuGetPackageDir(solutionDir, nuGetPackage);
+                string packageDir = this.GetNuGetPackageDir(solutionDir, nuGetPackage);
                 filePaths.AddRange(Directory.GetFiles(packageDir, "*.*", SearchOption.AllDirectories));
             }
 
@@ -330,11 +330,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             List<string> dllFilePaths = new List<string>();
             foreach (NuGetPackage nuGetPackage in nuGetPackages)
             {
-                string packageDir = GetNuGetPackageDir(solutionDir, nuGetPackage);
-                dllFilePaths.AddRange(GetPackageDlls(packageDir, targetFramework));
+                string packageDir = this.GetNuGetPackageDir(solutionDir, nuGetPackage);
+                dllFilePaths.AddRange(this.GetPackageDlls(packageDir, targetFramework));
             }
 
-            IEnumerable<AssemblyReference> assemblyReferences = dllFilePaths.Distinct().Select(d => GetAssemblyReferenceFromDllFilePath(d, projectDir));
+            IEnumerable<AssemblyReference> assemblyReferences = dllFilePaths.Distinct().Select(d => this.GetAssemblyReferenceFromDllFilePath(d, projectDir));
 
             return assemblyReferences;
         }
@@ -390,7 +390,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             get
             {
-                return new List<NugetPackageSource>(defaultSources);
+                return new List<NugetPackageSource>(this.defaultSources);
             }
         }
 
@@ -665,15 +665,14 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 {
                     doc.Save(projectFilePath);
 
-                    logger.LogInformation(string.Format(Constants.TargetFrameworkChanged, Path.GetFileName(projectFilePath), targetFramework));
+                    this.logger.LogInformation(string.Format(Constants.TargetFrameworkChanged, Path.GetFileName(projectFilePath), targetFramework));
                 }
                 else
                 {
-                    logger.LogInformation(string.Format(Constants.TargetFrameworkDoesNotNeedChanged, Path.GetFileName(projectFilePath), targetFramework));
+                    this.logger.LogInformation(string.Format(Constants.TargetFrameworkDoesNotNeedChanged, Path.GetFileName(projectFilePath), targetFramework));
                 }
             }
         }
-        // remove
         private readonly INuGetApiClient nuGetApiClient;
 
         private readonly INuGetCliClient nuGetCliClient;
