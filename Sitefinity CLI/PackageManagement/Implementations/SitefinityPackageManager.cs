@@ -256,7 +256,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                         includeAttribute.Value = includeAttributeNewValue;
                     }
 
-                    XmlNode hintPathNode = GetChildNode(referenceElement, Constants.HintPathElem);
+                    XmlNode hintPathNode = this.GetChildNode(referenceElement, Constants.HintPathElem);
                     if (hintPathNode == null)
                     {
                         this.logger.LogInformation($"Added hint path '{nugetPackageAssemblyReferenceWithNewestVersion.HintPath}' for reference assembly '{nugetPackageAssemblyReferenceWithNewestVersion.FullName}'.");
@@ -295,7 +295,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 referencesGroup.AppendChild(referenceNode);
             }
 
-            SyncBindingRedirects(projectConfig, bindingRedirectNodes, assemblyName, nugetPackageAssemblyReferenceWithNewestVersion.Version.ToString());
+            this.SyncBindingRedirects(projectConfig, bindingRedirectNodes, assemblyName, nugetPackageAssemblyReferenceWithNewestVersion.Version.ToString());
         }
 
         private XmlNode GetChildNode(XmlNode node, string childNodeName)
