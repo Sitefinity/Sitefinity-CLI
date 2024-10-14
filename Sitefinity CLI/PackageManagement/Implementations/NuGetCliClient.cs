@@ -15,21 +15,21 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
         }
 
         public void Restore(string solutionFilePath)
         {
-            RunProcess($"restore \"{solutionFilePath}\" -NoCache");
+            this.RunProcess($"restore \"{solutionFilePath}\" -NoCache");
         }
 
         private void RunProcess(string arguments)
         { 
             var nugetFileLocation = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.PackageManagement, NuGetExeFileName);
-            EnsureNugetExecutable(nugetFileLocation);
+            this.EnsureNugetExecutable(nugetFileLocation);
 
             FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(nugetFileLocation);
-            logger.LogInformation("Executing '{arguments}' with nuget.exe file version: {fileVersion}", arguments, fileVersionInfo.FileVersion);
+            this.logger.LogInformation("Executing '{arguments}' with nuget.exe file version: {fileVersion}", arguments, fileVersionInfo.FileVersion);
 
             using (Process process = new Process())
             {

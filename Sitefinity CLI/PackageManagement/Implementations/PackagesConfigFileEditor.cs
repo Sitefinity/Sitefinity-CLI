@@ -11,12 +11,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             IEnumerable<NuGetPackage> nuGetPackages = null;
 
-            ReadFile(packagesConfigFilePath, (doc) =>
+            base.ReadFile(packagesConfigFilePath, (doc) =>
             {
                 IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
 
-                nuGetPackages = xmlPackageElements.Select(xpe => CreateNuGetPackageFromXmlPackageElement(xpe));
+                nuGetPackages = xmlPackageElements.Select(xpe => this.CreateNuGetPackageFromXmlPackageElement(xpe));
             });
 
             return nuGetPackages;
@@ -26,7 +26,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             NuGetPackage nuGetPackage = null;
 
-            ReadFile(packagesConfigFilePath, (doc) =>
+            base.ReadFile(packagesConfigFilePath, (doc) =>
             {
                 IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);
@@ -35,7 +35,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
                 if (xmlPackageElement != null)
                 {
-                    nuGetPackage = CreateNuGetPackageFromXmlPackageElement(xmlPackageElement);
+                    nuGetPackage = this.CreateNuGetPackageFromXmlPackageElement(xmlPackageElement);
                 }
             });
 
@@ -44,7 +44,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void RemovePackage(string packagesConfigFilePath, string packageId)
         {
-            ModifyFile(packagesConfigFilePath, (doc) =>
+            base.ModifyFile(packagesConfigFilePath, (doc) =>
             {
                 IEnumerable<XElement> xmlPackageElements = doc.Element(Constants.PackagesElem)
                     .Elements(Constants.PackageElem);

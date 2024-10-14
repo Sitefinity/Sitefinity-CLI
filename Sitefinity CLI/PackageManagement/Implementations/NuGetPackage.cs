@@ -5,18 +5,18 @@ using System.Diagnostics;
 namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     [DebuggerDisplay("ID = {Id} Version = {Version}")]
-    public class NuGetPackage
+    internal class NuGetPackage
     {
         public NuGetPackage()
         {
-            Dependencies = new List<NuGetPackage>();
+            this.Dependencies = new List<NuGetPackage>();
         }
 
         public NuGetPackage(string id, string version)
             : this()
         {
-            Id = id;
-            Version = version;
+            this.Id = id;
+            this.Version = version;
         }
 
         public string Id { get; set; }

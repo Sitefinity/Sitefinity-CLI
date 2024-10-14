@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Sitefinity_CLI.Services
 {
-    public class SitefinityConfigService : ISitefinityConfigService
+    class SitefinityConfigService : ISitefinityConfigService
     {
         public SitefinityConfigService(IProjectConfigFileEditor projectConfigFileEditor, ISitefinityProjectService sitefinityProjectService)
         {

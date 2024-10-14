@@ -18,20 +18,20 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void Initialize(string solutionFilePath)
         {
-            Initialize(solutionFilePath, WaitTime);
+            this.Initialize(solutionFilePath, WaitTime);
         }
 
         public void Initialize(string solutionFilePath, int waitTime)
         {
-            var latestVisualStudioVersion = GetLatestVisualStudioVersion();
+            var latestVisualStudioVersion = this.GetLatestVisualStudioVersion();
             if (string.IsNullOrEmpty(latestVisualStudioVersion))
             {
                 // TODO: the command should just fail with return code 1, but the execution should not continue
-                logger.LogError(string.Format("Visual studio installation not found."));
+                this.logger.LogError(string.Format("Visual studio installation not found."));
                 throw new Exception("Visual studio installation not found.");
             }
 
-            logger.LogInformation(string.Format("Visual studio installation found. Version: \"{0}\". Launching...", latestVisualStudioVersion));
+            this.logger.LogInformation(string.Format("Visual studio installation found. Version: \"{0}\". Launching...", latestVisualStudioVersion));
 
             var currentProcesses = System.Diagnostics.Process.GetProcessesByName(VisualStudioProcessName);
 
@@ -50,56 +50,56 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             dte.UserControl = false;
             dte.MainWindow.Visible = true;
 
-            logger.LogInformation(string.Format("Opening solution: \"{0}\"...", solutionFilePath));
+            this.logger.LogInformation(string.Format("Opening solution: \"{0}\"...", solutionFilePath));
             dte.Solution.Open(solutionFilePath);
-            logger.LogInformation("Solution ready!");
+            this.logger.LogInformation("Solution ready!");
 
-            logger.LogInformation("Waiting...");
+            this.logger.LogInformation("Waiting...");
             System.Threading.Thread.Sleep(waitTime);
 
             try
             {
-                logger.LogInformation("Opening console...");
+                this.logger.LogInformation("Opening console...");
                 dte.ExecuteCommand(PackageManagerConsoleCommand);
             }
             catch
             {
-                logger.LogInformation("Opening console failed.");
+                this.logger.LogInformation("Opening console failed.");
             }
 
-            logger.LogInformation("Waiting...");
+            this.logger.LogInformation("Waiting...");
             System.Threading.Thread.Sleep(waitTime);
 
-            logger.LogInformation("Studio is ready!");
+            this.logger.LogInformation("Studio is ready!");
 
-            visualStudioInstance = dte;
+            this.visualStudioInstance = dte;
         }
 
         public void Dispose()
         {
             if (visualStudioProcess != null)
             {
-                logger.LogInformation("Closing Visual Studio instance...");
-                visualStudioProcess.Kill();
-                logger.LogInformation("Closing Visual Studio instance closed.");
+                this.logger.LogInformation("Closing Visual Studio instance...");
+                this.visualStudioProcess.Kill();
+                this.logger.LogInformation("Closing Visual Studio instance closed.");
             }
         }
 
         public void ExecutePackageManagerConsoleCommand(string command)
         {
-            visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, command);
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, command);
         }
 
         public void ExecuteScript(string scriptPath, List<string> scriptParameters)
         {
-            logger.LogInformation(Constants.UnblockingUpgradeScriptMessage);
-            visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Format("Unblock-file '{0}'", scriptPath));
+            this.logger.LogInformation(Constants.UnblockingUpgradeScriptMessage);
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Format("Unblock-file '{0}'", scriptPath));
 
             System.Threading.Thread.Sleep(5000);
-            logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
+            this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
             string commandParameters = string.Join(" ", scriptParameters);
             string commandToExecute = $"&'{scriptPath}' {commandParameters}";
-            visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, commandToExecute);
+            this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, commandToExecute);
         }
 
         private string GetLatestVisualStudioVersion()

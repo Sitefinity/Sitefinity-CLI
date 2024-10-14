@@ -27,7 +27,7 @@ namespace Sitefinity_CLI
     [Subcommand(typeof(GenerateConfigCommand))]
     public class Program
     {
-        public delegate INugetProvider NugetProviderFactory(ProtocolVersion version);
+        internal delegate INugetProvider NugetProviderFactory(ProtocolVersion version);
 
         public static async Task<int> Main(string[] args)
         {
