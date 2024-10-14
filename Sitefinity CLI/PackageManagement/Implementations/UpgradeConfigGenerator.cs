@@ -44,12 +44,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
                 await this.GenerateProjectUpgradeConfigSection(
-                    powerShellXmlConfig,
-                    powerShellXmlConfigNode,
-                    projectFilePathWithSitefinityVersion.Item1,
-                    newSitefinityVersionPackageTree,
-                    packageSources,
-                    projectFilePathWithSitefinityVersion.Item2,
+                    powerShellXmlConfig, 
+                    powerShellXmlConfigNode, 
+                    projectFilePathWithSitefinityVersion.Item1, 
+                    newSitefinityVersionPackageTree, 
+                    packageSources, 
+                    projectFilePathWithSitefinityVersion.Item2, 
                     additionalPackagesToUpgrade);
             }
 
@@ -85,7 +85,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             NuGetPackage currentSitefinityVersionPackageTree = await this.sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString(), packageSources);
 
             this.processedPackagesPerProjectCache[projectFilePath] = new HashSet<string>();
-
             if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree, newSitefinityVersionPackageTree))
             {
                 await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree.Dependencies, newSitefinityVersionPackageTree);

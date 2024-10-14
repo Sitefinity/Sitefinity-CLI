@@ -673,6 +673,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 }
             }
         }
+
         private readonly INuGetApiClient nuGetApiClient;
 
         private readonly INuGetCliClient nuGetCliClient;

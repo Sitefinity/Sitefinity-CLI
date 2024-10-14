@@ -77,7 +77,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void Dispose()
         {
-            if (visualStudioProcess != null)
+            if (this.visualStudioProcess != null)
             {
                 this.logger.LogInformation("Closing Visual Studio instance...");
                 this.visualStudioProcess.Kill();
