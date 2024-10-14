@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Sitefinity_CLI.Services.Interfaces
+namespace Sitefinity_CLI.Services.Contracts
 {
     public interface ISitefinityProjectService
     {

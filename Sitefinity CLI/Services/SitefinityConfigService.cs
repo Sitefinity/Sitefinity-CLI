@@ -1,4 +1,4 @@
-﻿using Sitefinity_CLI.Services.Interfaces;
+﻿using Sitefinity_CLI.Services.Contracts;
 using Sitefinity_CLI.VisualStudio;
 using System.Collections.Generic;
 using System.IO;

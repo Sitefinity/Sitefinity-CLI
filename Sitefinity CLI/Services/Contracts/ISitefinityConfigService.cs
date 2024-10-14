@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Sitefinity_CLI.Services.Interfaces
+namespace Sitefinity_CLI.Services.Contracts
 {
     public interface ISitefinityConfigService
     {

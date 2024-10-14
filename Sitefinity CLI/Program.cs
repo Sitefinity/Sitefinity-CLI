@@ -9,7 +9,7 @@ using Sitefinity_CLI.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services;
-using Sitefinity_CLI.Services.Interfaces;
+using Sitefinity_CLI.Services.Contracts;
 using Sitefinity_CLI.VisualStudio;
 using System;
 using System.Runtime.CompilerServices;

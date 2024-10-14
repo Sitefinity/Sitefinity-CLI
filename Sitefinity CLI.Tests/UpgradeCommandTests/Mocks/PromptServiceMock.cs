@@ -1,6 +1,6 @@
 ﻿using Sitefinity_CLI;
 
-namespace SitefinityCLI.Tests.UpgradeCommandTests.Mocks
+namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
 {
     internal class PromptServiceMock : IPromptService
     {

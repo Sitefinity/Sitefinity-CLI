@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Implementations;
 
-namespace Sitefinity_CLI.Services.Interfaces
+namespace Sitefinity_CLI.Services.Contracts
 {
     public interface ISitefinityNugetPackageService
     {

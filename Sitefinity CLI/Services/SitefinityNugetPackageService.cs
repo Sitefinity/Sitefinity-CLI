@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Model;
-using Sitefinity_CLI.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
+using Sitefinity_CLI.Services.Contracts;
 
 namespace Sitefinity_CLI.Services
 {
@@ -82,17 +82,6 @@ namespace Sitefinity_CLI.Services
 
         private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<NugetPackageSource> packageSources)
         {
-            // source 1 - 10,11,12
-            //source 2 - 10,31,15
-            // 1. download sitefinity cloud from repo
-            // 2. make branch and increment version
-            // 3. run pipeline against new branch and download the new nugetpackage artifcat
-            // 4  publish the new package in private devops feed
-            // 5  download sdk / auth tools in order to auth through visual studio
-            // 6 try to upgrade the current sf package version locally from the private feed version (example - 9999)
-
-
-            // in this code we collect only versions from the public feed, adjust to collet from the others feeds
             IEnumerable<string> versions = await this.sitefinityPackageManager.GetPackageVersions(packageId, packageSources);
 
             NuGetPackage compatiblePackage = null;

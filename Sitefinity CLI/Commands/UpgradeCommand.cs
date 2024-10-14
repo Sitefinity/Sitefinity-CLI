@@ -6,7 +6,7 @@ using Sitefinity_CLI.Commands.Validators;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
-using Sitefinity_CLI.Services.Interfaces;
+using Sitefinity_CLI.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -82,7 +82,6 @@ namespace Sitefinity_CLI.Commands
         protected virtual async Task ExecuteUpgrade()
         {
             bool isSuccess = this.Validate();
-            this.AdditionalPackagesString = "Progress.Sitefinity.Cloud";
 
             if (!isSuccess)
             {
@@ -99,11 +98,11 @@ namespace Sitefinity_CLI.Commands
 
             IEnumerable<string> sitefinityProjectFilePaths = this.sitefinityProjectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version);
 
-            //if (!sitefinityProjectFilePaths.Any())
-            //{
-            //    Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
-            //    return;
-            //}
+            if (!sitefinityProjectFilePaths.Any())
+            {
+                Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
+                return;
+            }
 
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));

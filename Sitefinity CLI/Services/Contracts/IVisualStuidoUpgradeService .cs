@@ -1,6 +1,6 @@
 ﻿using Sitefinity_CLI.Model;
 
-namespace Sitefinity_CLI.Services.Interfaces
+namespace Sitefinity_CLI.Services.Contracts
 {
     public interface IVisualStudioService
     {

@@ -2,7 +2,7 @@
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
-using Sitefinity_CLI.Services.Interfaces;
+using Sitefinity_CLI.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;

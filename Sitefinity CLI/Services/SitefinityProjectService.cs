@@ -6,8 +6,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System;
-using Sitefinity_CLI.Services.Interfaces;
 using System.Collections.Generic;
+using Sitefinity_CLI.Services.Contracts;
 
 namespace Sitefinity_CLI.Services
 {

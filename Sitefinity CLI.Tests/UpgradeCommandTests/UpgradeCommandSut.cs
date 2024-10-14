@@ -2,26 +2,35 @@
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI;
 using Sitefinity_CLI.Commands;
-using Sitefinity_CLI.Services.Interfaces;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.Services.Contracts;
 
-namespace SitefinityCLI.Tests.UpgradeCommandTests
+namespace Sitefinity_CLI.Tests.UpgradeCommandTests
 {
     internal class UpgradeCommandSut : UpgradeCommand
     {
+        // sitefinityPackageService
+        // visualStudioService
+        // logger
+        // promptService
+        // sitefinityProjectService
+        // sitefinityConfigService
+        // upgradeConfigGenerator
         public UpgradeCommandSut(
-             ISitefinityNugetPackageService packageService,
-             IVisualStudioService visualStudioService,
-             ILogger<UpgradeCommand> logger,
-             IPromptService promptService,
-             ISitefinityProjectService sitefinityVersionService,
-             ISitefinityConfigService sitefinityConfigService) : base(packageService, visualStudioService, logger, promptService, sitefinityVersionService, sitefinityConfigService)
+             ISitefinityNugetPackageService sitefinityPackageService,
+            IVisualStudioService visualStudioService,
+            ILogger<UpgradeCommand> logger,
+            IPromptService promptService,
+            ISitefinityProjectService sitefinityProjectService,
+            ISitefinityConfigService sitefinityConfigService,
+            IUpgradeConfigGenerator upgradeConfigGenerator) : base(sitefinityPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator)
         {
 
         }
 
         public async Task Execute()
         {
-            await this.ExecuteUpgrade();
+            await ExecuteUpgrade();
         }
     }
 }
