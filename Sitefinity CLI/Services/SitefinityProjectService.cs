@@ -52,13 +52,13 @@ namespace Sitefinity_CLI.Services
 
         public IEnumerable<string> GetSitefinityProjectPathsFromSolution(string solutionPath, string version)
         {
-            IEnumerable<string> allProjectPaths = GetProjectPathsFromSolution(solutionPath);
+            IEnumerable<string> allProjectPaths = this.GetProjectPathsFromSolution(solutionPath);
             return allProjectPaths.Where(path => this.HasSitefinityReferences(path) && this.HasValidSitefinityVersion(path, version));
         }
 
         public IEnumerable<string> GetNonSitefinityProjectPaths(string solutionPath)
         {
-            IEnumerable<string> allProjectPaths = GetProjectPathsFromSolution(solutionPath);
+            IEnumerable<string> allProjectPaths = this.GetProjectPathsFromSolution(solutionPath);
             return allProjectPaths.Where(p => !this.HasSitefinityReferences(p));
         }
 

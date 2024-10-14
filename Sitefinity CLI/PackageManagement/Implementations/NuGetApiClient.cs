@@ -36,13 +36,13 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 return JsonConvert.DeserializeObject<NuGetPackage>(File.ReadAllText(packageDependenciesHashFilePath));
             }
 
-            PackageXmlDocumentModel nuGetPackageXmlDoc = await GetPackageXmlDocument(id, version, sources);
+            PackageXmlDocumentModel nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources);
             if (nuGetPackageXmlDoc == null)
             {
                 return null;
             }
 
-            NuGetPackage nuGetPackage = new NuGetPackage();
+            NuGetPackage nuGetPackage = new();
             List<NuGetPackage> dependencies = dependencyParsers[nuGetPackageXmlDoc.ProtoVersion].ParseDependencies(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
 
             if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
@@ -53,7 +53,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             foreach (NuGetPackage dependency in dependencies)
             {
-                NuGetPackage nuGetPackageDependency = await GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
+                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
                 if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
                 {
                     nuGetPackage.Dependencies.Add(nuGetPackageDependency);
@@ -76,7 +76,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             List<string> allVersions = [];
 
-            foreach (INugetProvider nugetProvider in nugetProviders.Values)
+            foreach (INugetProvider nugetProvider in this.nugetProviders.Values)
             {
                 IEnumerable<string> versionsFromProvider = await nugetProvider.GetPackageVersions(id, nugetSources, versionsCount);
                 allVersions.AddRange(versionsFromProvider);
@@ -88,25 +88,25 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             string cacheKey = string.Concat(id, version);
-            if (nuGetPackageXmlDocumentCache != null && nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
+            if (this.nuGetPackageXmlDocumentCache != null && this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
             {
                 lock (lockObj)
                 {
-                    if (nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
+                    if (this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
                     {
-                        return nuGetPackageXmlDocumentCache[cacheKey];
+                        return this.nuGetPackageXmlDocumentCache[cacheKey];
                     }
                 }
             }
 
-            PackageSpecificationResponseModel specification = await GetPackageSpecification(id, version, sources);
+            PackageSpecificationResponseModel specification = await this.GetPackageSpecification(id, version, sources);
 
             if (specification.SpecResponse == null || specification.SpecResponse.StatusCode != HttpStatusCode.OK)
             {
                 return null;
             }
 
-            string responseContentString = await GetResponseContentString(specification.SpecResponse);
+            string responseContentString = await this.GetResponseContentString(specification.SpecResponse);
             if (string.IsNullOrWhiteSpace(responseContentString))
             {
                 return null;
@@ -115,13 +115,13 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             XDocument nuGetPackageXmlDoc = XDocument.Parse(responseContentString);
             PackageXmlDocumentModel packageXmlDocument = new PackageXmlDocumentModel() { XDocumentData = nuGetPackageXmlDoc, ProtoVersion = specification.ProtoVersion };
 
-            if (nuGetPackageXmlDocumentCache != null && !nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
+            if (this.nuGetPackageXmlDocumentCache != null && !this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
             {
                 lock (lockObj)
                 {
-                    if (!nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
+                    if (!this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
                     {
-                        nuGetPackageXmlDocumentCache.Add(cacheKey, packageXmlDocument);
+                        this.nuGetPackageXmlDocumentCache.Add(cacheKey, packageXmlDocument);
                     }
                 }
             }
@@ -136,14 +136,14 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             foreach (ProtocolVersion versionInfo in versionOrder)
             {
-                response = await nugetProviders[versionInfo].GetPackageSpecification(id, version, sources);
+                response = await this.nugetProviders[versionInfo].GetPackageSpecification(id, version, sources);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = versionInfo };
                 }
             }
 
-            logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
+            this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
             throw new UpgradeException("Upgrade failed!");
         }
 
@@ -151,8 +151,8 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             if (response.Content.Headers.ContentEncoding.Contains("gzip"))
             {
-                byte[] decompressedBytes = DecompressGzip(await response.Content.ReadAsByteArrayAsync());
-                string responseText = await ConvertBytesToString(decompressedBytes);
+                byte[] decompressedBytes = this.DecompressGzip(await response.Content.ReadAsByteArrayAsync());
+                string responseText = await this.ConvertBytesToString(decompressedBytes);
 
                 return responseText;
             }

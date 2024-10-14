@@ -28,21 +28,21 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             HttpResponseMessage response = null;
             foreach (NugetPackageSource nugetSource in apiV3Sources)
             {
-                AppendNugetSourceAuthHeaders(nugetSource);
+                this.AppendNugetSourceAuthHeaders(nugetSource);
 
                 // We fetch the base URL from the service index because it may be changed without notice
                 string sourceUrl = (await GetBaseAddress(nugetSource))?.TrimEnd('/');
                 if (sourceUrl == null)
                 {
-                    logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
+                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
                     throw new UpgradeException("Upgrade failed");
                 }
 
                 string loweredId = id.ToLowerInvariant();
-                response = await httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
+                response = await this.httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
 
                 // clear the headers so we don't send the auth info to another package source
-                httpClient.DefaultRequestHeaders.Clear();
+                this.httpClient.DefaultRequestHeaders.Clear();
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -50,7 +50,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 }
                 else
                 {
-                    logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.SourceUrl);
+                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.SourceUrl);
                 }
             }
 
@@ -63,7 +63,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             HttpResponseMessage response = null;
             foreach (NugetPackageSource nugetSource in nugetv3Sources)
             {
-                AppendNugetSourceAuthHeaders(nugetSource);
+                this.AppendNugetSourceAuthHeaders(nugetSource);
                 string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
                 string url = $"{sourceUrl}/flat2/{id}/index.json";
                 response = await this.httpClient.GetAsync(url);
@@ -97,7 +97,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             if (nugetSource.Password != null)
             {
                 byte[] authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Username}:{nugetSource.Password}");
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
+                this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
             }
         }
 

@@ -11,7 +11,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
     {
         public List<NuGetPackage> ParseDependencies(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
-            List<NuGetPackage> nugetPackageDeoebdebcies = new List<NuGetPackage>();
+            List<NuGetPackage> nugetPackageDependencies = new List<NuGetPackage>();
             XNamespace packageNamespace = nuGetPackageXmlDoc.XDocumentData.Root.GetDefaultNamespace();
             XElement elementPackage = nuGetPackageXmlDoc.XDocumentData.Element(packageNamespace + Constants.PackageElem);
 
@@ -34,21 +34,22 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 if (groupElements != null && groupElements.Any())
                 {
 
-                    nugetPackageDeoebdebcies = ExtractedGroupedByFrameworkNugetDependencies(nugetPackageDeoebdebcies, groupElements, supportedFrameworksRegex);
+                    nugetPackageDependencies = this.ExtractedGroupedByFrameworkNugetDependencies(nugetPackageDependencies, groupElements, supportedFrameworksRegex);
                 }
                 else
                 {
                     IEnumerable<XElement> dependencyElements = groupElementsDependencies.Elements();
-                    nugetPackageDeoebdebcies = GetDependencies(dependencyElements);
+                    nugetPackageDependencies = this.GetDependencies(dependencyElements);
                 }
             }
 
-            return nugetPackageDeoebdebcies;
+            return nugetPackageDependencies;
         }
 
         private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDeoebdebcies, IEnumerable<XElement> groupElements, Regex supportedFrameworksRegex)
         {
-            IEnumerable<XElement> groupElementsForTargetFramework = groupElements.Where(x => x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework) || !x.HasAttributes);
+            IEnumerable<XElement> groupElementsForTargetFramework = groupElements
+                .Where(x => x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework) || !x.HasAttributes);
 
             foreach (XElement ge in groupElementsForTargetFramework)
             {
@@ -61,10 +62,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 IEnumerable<XElement> depElements = ge.Elements();
                 if (depElements.Any())
                 {
-                    string targetFramework = GetFrameworkVersion(dependenciesTargetFramework); ;
+                    string targetFramework = this.GetFrameworkVersion(dependenciesTargetFramework); ;
                     if (IsFrameworkSuported(supportedFrameworksRegex, targetFramework))
                     {
-                        nugetPackageDeoebdebcies = GetDependencies(depElements);
+                        nugetPackageDeoebdebcies = this.GetDependencies(depElements);
                     }
                 }
             }

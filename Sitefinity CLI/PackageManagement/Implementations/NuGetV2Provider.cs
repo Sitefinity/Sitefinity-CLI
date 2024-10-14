@@ -27,14 +27,14 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             foreach (NugetPackageSource source in apiV2Sources)
             {
                 string sourceUrl = source.SourceUrl.TrimEnd('/');
-                response = await httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
+                response = await this.httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;
                 }
                 else
                 {
-                    logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.SourceUrl);
+                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.SourceUrl);
                 }
             }
 
@@ -52,7 +52,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 using HttpRequestMessage request = new(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}");
                 request.Headers.Add("Accept", MediaTypeNames.Application.Json);
 
-                response = await httpClient.SendAsync(request);
+                response = await this.httpClient.SendAsync(request);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;

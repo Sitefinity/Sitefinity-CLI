@@ -19,14 +19,14 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         public List<NuGetPackage> ParseDependencies(PackageXmlDocumentModel nuGetPackageXmlDoc, NuGetPackage nuGetPackage, Regex supportedFrameworksRegex)
         {
             XElement propertiesElement = nuGetPackageXmlDoc.XDocumentData
-                     .Element(xmlns + Constants.EntryElem)
-                     .Element(xmlnsm + Constants.PropertiesElem);
+                     .Element(this.xmlns + Constants.EntryElem)
+                     .Element(this.xmlnsm + Constants.PropertiesElem);
 
             string id = nuGetPackageXmlDoc.XDocumentData
-                .Element(xmlns + Constants.EntryElem)
-                .Element(xmlns + Constants.TitleElem).Value;
+                .Element(this.xmlns + Constants.EntryElem)
+                .Element(this.xmlns + Constants.TitleElem).Value;
 
-            string version = propertiesElement.Element(xmlnsd + Constants.VersionElem).Value;
+            string version = propertiesElement.Element(this.xmlnsd + Constants.VersionElem).Value;
 
             if (id != null && version != null)
             {
@@ -34,9 +34,9 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 nuGetPackage.Version = version;
             }
 
-            string dependenciesString = propertiesElement.Element(xmlnsd + Constants.DependenciesElem).Value;
+            string dependenciesString = propertiesElement.Element(this.xmlnsd + Constants.DependenciesElem).Value;
 
-            return ParseDependencies(dependenciesString, supportedFrameworksRegex);
+            return this.ParseDependencies(dependenciesString, supportedFrameworksRegex);
         }
         private List<NuGetPackage> ParseDependencies(string dependenciesString, Regex supportedFrameWorkRegex)
         {
@@ -60,7 +60,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                             string dependencyId = dependencyIdAndVersionAndFramework[0].Trim();
 
                             string dependencyVersionString = dependencyIdAndVersionAndFramework[1].Trim();
-                            string[] dependencyVersions = ParseVersionString(dependencyVersionString);
+                            string[] dependencyVersions = this.ParseVersionString(dependencyVersionString);
                             string dependencyVersion = dependencyVersions[0];
 
                             string framework = null;
