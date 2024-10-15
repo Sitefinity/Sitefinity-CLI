@@ -46,7 +46,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return nugetPackageDependencies;
         }
 
-        private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDeoebdebcies, IEnumerable<XElement> groupElements, Regex supportedFrameworksRegex)
+        private List<NuGetPackage> ExtractedGroupedByFrameworkNugetDependencies(List<NuGetPackage> nugetPackageDependencies, IEnumerable<XElement> groupElements, Regex supportedFrameworksRegex)
         {
             IEnumerable<XElement> groupElementsForTargetFramework = groupElements
                 .Where(x => x.HasAttributes && x.Attributes().Any(x => x.Name == Constants.TargetFramework) || !x.HasAttributes);
@@ -65,12 +65,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                     string targetFramework = this.GetFrameworkVersion(dependenciesTargetFramework); ;
                     if (IsFrameworkSuported(supportedFrameworksRegex, targetFramework))
                     {
-                        nugetPackageDeoebdebcies = this.GetDependencies(depElements);
+                        nugetPackageDependencies = this.GetDependencies(depElements);
                     }
                 }
             }
 
-            return nugetPackageDeoebdebcies;
+            return nugetPackageDependencies;
         }
 
         private List<NuGetPackage> GetDependencies(IEnumerable<XElement> depElements)
