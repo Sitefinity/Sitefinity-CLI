@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Commands;
-using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.PackageManagement.Contracts;
 using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.Tests.CreateCommandTests

@@ -1,7 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sitefinity_CLI.PackageManagement;
 using System;
 using System.ComponentModel.DataAnnotations;
 using EnvDTE;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using System.Management.Automation.Runspaces;
 using Sitefinity_CLI.Exceptions;
 using Newtonsoft.Json.Linq;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
 namespace Sitefinity_CLI.Commands
 {

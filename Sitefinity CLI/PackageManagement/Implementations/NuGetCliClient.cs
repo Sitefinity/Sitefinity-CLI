@@ -2,8 +2,9 @@
 using System.IO;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class NuGetCliClient : INuGetCliClient
     {

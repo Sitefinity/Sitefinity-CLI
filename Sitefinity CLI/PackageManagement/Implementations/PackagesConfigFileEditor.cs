@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class PackagesConfigFileEditor : XmlFileEditorBase, IPackagesConfigFileEditor
     {

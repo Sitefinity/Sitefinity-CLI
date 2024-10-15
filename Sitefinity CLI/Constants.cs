@@ -10,6 +10,7 @@ namespace Sitefinity_CLI
         // Folder names
         public const string ResourcePackagesFolderName = "ResourcePackages";
         public const string MVCFolderName = "MVC";
+        public const string LocalPackagesInfoCacheFolder = "PackagesInfoCache";
         public const string ModuleFolderName = "Modules";
         public const string ControllersFolderName = "Controllers";
         public const string ViewsFolderName = "Views";
@@ -29,6 +30,7 @@ namespace Sitefinity_CLI
         public const string CsProjTemplateName = "csproj";
         public const string PackagesFolderName = "packages";
         public const string LicenseAgreementsFolderName = "LicenseAgreements";
+        public const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
@@ -55,8 +57,13 @@ namespace Sitefinity_CLI
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
+        public const string TryToUpdateInvalidVersionMessage = "The version '{0}' you are trying to upgrade to is not valid.";
+        public const string CannotUpgradeAdditionalPackagesMessage = "The given additional packages cannot be upgraded. The currently supported additional packages for upgrade are: {0}";
+        public const string LatestVersionNotFoundMeesage = "Can't get the latest Sitefinity version. Please specify the upgrade version.";
 
         // Warning messages
+        public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";
+        public const string SearchingProjectForReferencesMessage = "Searching the provided project/s for Sitefinity references...";
         public const string EnterResourcePackagePromptMessage = "Enter the name of the resource package where the resource should be added:";
         public const string SourceTemplatePromptMessage = "Enter the name of the {0} you want to replicate:";
         public const string HigherSitefinityVersionMessage = "Your version of Sitefinity CLI creates files compatible with Sitefinity CMS {1}. There may be inconsistencies with your project version - {0}";
@@ -114,6 +121,7 @@ namespace Sitefinity_CLI
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
+        public const string UpgradeCommandDescription = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.";
         public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
@@ -181,6 +189,7 @@ namespace Sitefinity_CLI
 
         // Sitefinity package management
         public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
+        public const string SitefinityCloudPackage = "Progress.Sitefinity.Cloud";
         public const string SitefinityHeadlessNuGetPackageId = "Progress.Sitefinity.Headless";
         public const string SitefinityCoreModulesNuGetPackageId = "Progress.Sitefinity";
         public const string SitefinityWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.Widgets";
@@ -201,10 +210,14 @@ namespace Sitefinity_CLI
         public const string DependenciesEl = "dependencies";
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
-        public const string ApiV3Identifier = "index.json";
+        public const string ApiV3Identifier = "v3";
+
+        // Patterns
+        public const string VersionPattern = @"Version=(.*?),";
 
         // Nuget sources
         public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";
         public const string SitefinityDefaultNugetSource = "https://nuget.sitefinity.com/nuget";
+        public const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
     }
 }

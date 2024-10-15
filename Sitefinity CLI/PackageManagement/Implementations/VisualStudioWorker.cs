@@ -5,8 +5,9 @@ using System.Threading;
 using EnvDTE;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using Sitefinity_CLI.PackageManagement.Contracts;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     public class VisualStudioWorker : IVisualStudioWorker
     {
@@ -17,7 +18,7 @@ namespace Sitefinity_CLI.PackageManagement
 
         public void Initialize(string solutionFilePath)
         {
-            Initialize(solutionFilePath, WaitTime);
+            this.Initialize(solutionFilePath, WaitTime);
         }
 
         public void Initialize(string solutionFilePath, int waitTime)
@@ -41,7 +42,7 @@ namespace Sitefinity_CLI.PackageManagement
             {
                 if (!currentProcesses.Any(p => p.Id == process.Id))
                 {
-                    this.visualStudioProcess = process;
+                    visualStudioProcess = process;
                 }
             }
 
@@ -79,7 +80,7 @@ namespace Sitefinity_CLI.PackageManagement
             if (this.visualStudioProcess != null)
             {
                 this.logger.LogInformation("Closing Visual Studio instance...");
-                visualStudioProcess.Kill();
+                this.visualStudioProcess.Kill();
                 this.logger.LogInformation("Closing Visual Studio instance closed.");
             }
         }

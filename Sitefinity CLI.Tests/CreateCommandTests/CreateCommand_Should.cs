@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.Exceptions;
-using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.PackageManagement.Implementations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.Tests.CreateCommandTests

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sitefinity_CLI.PackageManagement;
+using Sitefinity_CLI.PackageManagement.Implementations;
 
-namespace SitefinityCLI.Tests.UpgradeCommandTests.SitefinityPackageManagerTests
+namespace Sitefinity_CLI.Tests.UpgradeCommandTests.SitefinityPackageManagerTests
 {
     [TestClass]
     public class SitefinityPackageManager_GetPackageDlls_Should

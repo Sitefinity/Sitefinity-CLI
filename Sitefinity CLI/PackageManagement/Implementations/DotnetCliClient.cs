@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class DotnetCliClient : IDotnetCliClient
     {

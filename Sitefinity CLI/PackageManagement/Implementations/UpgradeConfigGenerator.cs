@@ -1,39 +1,47 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Sitefinity_CLI.PackageManagement
+namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class UpgradeConfigGenerator : IUpgradeConfigGenerator
     {
         public UpgradeConfigGenerator(
             ISitefinityPackageManager sitefinityPackageManager,
+             ISitefinityProjectService sitefinityProjectService,
             ILogger<UpgradeConfigGenerator> logger)
         {
             this.sitefinityPackageManager = sitefinityPackageManager;
+            this.sitefinityProjectService = sitefinityProjectService;
             this.logger = logger;
             this.processedPackagesPerProjectCache = new Dictionary<string, HashSet<string>>();
         }
 
         public async Task GenerateUpgradeConfig(
-            IEnumerable<Tuple<string, Version>> projectFilePathsWithSitefinityVersion,
+           IEnumerable<string> projectFilePathsWithSitefinityVersion,
             NuGetPackage newSitefinityVersionPackageTree,
-            IEnumerable<NugetPackageSource> packageSources,
+            string nugetConfigPath,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
         {
+            IEnumerable<Tuple<string, Version>> projectPathsWithSitefinityVersion = projectFilePathsWithSitefinityVersion
+                .Select(x => new Tuple<string, Version>(x, this.sitefinityProjectService.DetectSitefinityVersion(x)));
+
             this.logger.LogInformation("Exporting upgrade config...");
 
             XmlDocument powerShellXmlConfig = new XmlDocument();
             XmlElement powerShellXmlConfigNode = powerShellXmlConfig.CreateElement("config");
             powerShellXmlConfig.AppendChild(powerShellXmlConfigNode);
 
-            foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectFilePathsWithSitefinityVersion)
+            IEnumerable<NugetPackageSource> packageSources = await this.sitefinityPackageManager.GetNugetPackageSources(nugetConfigPath);
+
+            foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
                 await this.GenerateProjectUpgradeConfigSection(
                     powerShellXmlConfig, 
@@ -46,7 +54,6 @@ namespace Sitefinity_CLI.PackageManagement
             }
 
             powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "config.xml"));
-
             this.logger.LogInformation("Successfully exported upgrade config!");
         }
 
@@ -180,9 +187,8 @@ namespace Sitefinity_CLI.PackageManagement
         }
 
         private readonly ILogger logger;
-
         private readonly ISitefinityPackageManager sitefinityPackageManager;
-
+        private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly IDictionary<string, HashSet<string>> processedPackagesPerProjectCache;
     }
 }
