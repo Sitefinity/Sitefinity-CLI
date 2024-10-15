@@ -24,7 +24,6 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 
-        // TODO: not part  of this interface
         void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version);
 
         Task<IEnumerable<NugetPackageSource>> GetNugetPackageSources(string nugetConfigFilePath);
