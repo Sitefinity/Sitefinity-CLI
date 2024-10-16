@@ -17,9 +17,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class NuGetV3Provider : INugetProvider
     {
-        public NuGetV3Provider(IHttpClientFactory httpClientFactory)
+        public NuGetV3Provider(IHttpClientFactory httpClientFactory, ILogger<NuGetV3Provider> logger)
         {
             this.httpClient = httpClientFactory.CreateClient();
+            this.logger = logger;
         }
 
         public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
