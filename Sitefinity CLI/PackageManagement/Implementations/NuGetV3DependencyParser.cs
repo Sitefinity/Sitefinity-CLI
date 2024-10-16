@@ -1,5 +1,6 @@
 ﻿using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -80,11 +81,13 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             foreach (XElement depElement in depElements)
             {
                 string id = depElement.Attribute(Constants.IdAttribute)?.Value;
-                string version = depElement.Attribute(Constants.VersionAttribute)?.Value
-                    .Trim(new char[] { '[', '(', ')', ']' });
+                string versionFromXml = depElement.Attribute(Constants.VersionAttribute)?.Value;
 
-                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(version))
+                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(versionFromXml))
                 {
+                    string[] dependencyVersions = this.ParseVersionString(versionFromXml);
+                    string version = dependencyVersions[0];
+
                     NuGetPackage np = new NuGetPackage(id, version);
                     dependencies.Add(np);
                 }
@@ -112,6 +115,14 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             return dependenciesTargetFramework != null ? $"net{dependenciesTargetFramework}" : string.Empty;
+        }
+
+        private string[] ParseVersionString(string versionString)
+        {
+            versionString = versionString.Trim(['[', '(', ')', ']']);
+            string[] dependencyVersions = versionString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return dependencyVersions;
         }
     }
 }
