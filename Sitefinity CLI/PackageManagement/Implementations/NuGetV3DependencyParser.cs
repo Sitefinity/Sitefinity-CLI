@@ -81,15 +81,13 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             foreach (XElement depElement in depElements)
             {
                 string id = depElement.Attribute(Constants.IdAttribute)?.Value;
+                string versionFromXml = depElement.Attribute(Constants.VersionAttribute)?.Value;
 
-                string versionFromXml = depElement.Attribute(Constants.VersionAttribute)?.Value
-                    .Trim(new char[] { '[', '(', ')', ']' });
-
-                string[] dependencyVersions = this.ParseVersionString(versionFromXml);
-                string version = dependencyVersions[0];
-
-                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(version))
+                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(versionFromXml))
                 {
+                    string[] dependencyVersions = this.ParseVersionString(versionFromXml);
+                    string version = dependencyVersions[0];
+
                     NuGetPackage np = new NuGetPackage(id, version);
                     dependencies.Add(np);
                 }
