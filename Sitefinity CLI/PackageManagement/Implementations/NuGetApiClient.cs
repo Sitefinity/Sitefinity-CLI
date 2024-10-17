@@ -132,6 +132,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             ProtocolVersion[] versionOrder = [ProtocolVersion.NuGetAPIV3, ProtocolVersion.NuGetAPIV2];
+            ProtocolVersion currentVersion = ProtocolVersion.NuGetAPIV3;
             HttpResponseMessage response = null;
 
             foreach (ProtocolVersion versionInfo in versionOrder)
@@ -139,12 +140,18 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 response = await this.nugetProviders[versionInfo].GetPackageSpecification(id, version, sources);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
-                    return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = versionInfo };
+                    currentVersion = versionInfo;
+                    break;
                 }
             }
 
-            this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
-            throw new UpgradeException("Upgrade failed!");
+            if (response == null)
+            {
+                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
+                throw new UpgradeException("Upgrade failed!");
+            }
+
+            return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = currentVersion };
         }
 
         private async Task<string> GetResponseContentString(HttpResponseMessage response)
