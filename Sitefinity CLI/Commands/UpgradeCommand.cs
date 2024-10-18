@@ -96,7 +96,8 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation(Constants.SearchingProjectForReferencesMessage);
 
-            IEnumerable<string> sitefinityProjectFilePaths = this.sitefinityProjectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version);
+            IEnumerable<string> sitefinityProjectFilePaths = this.sitefinityProjectService
+                .GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version).ToList();
 
             if (!sitefinityProjectFilePaths.Any())
             {
