@@ -126,7 +126,7 @@ namespace Sitefinity_CLI.Commands
             {
                 if (package != null)
                 {
-                    string licenseContent = await this.GetLicenseContent(package, this.SolutionPath);
+                    string licenseContent = await this.GetLicenseContent(package);
                     if (!string.IsNullOrEmpty(licenseContent) && !this.AcceptLicense)
                     {
                         bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
@@ -173,9 +173,9 @@ namespace Sitefinity_CLI.Commands
             return isSuccess;
         }
 
-        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage, string solutionPath, string licensesFolder = "")
+        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage, string licensesFolder = "")
         {
-            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(solutionPath), Constants.PackagesFolderName);
+            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
             string pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", licensesFolder, "License.txt");
 
             if (!File.Exists(pathToTheLicense))
