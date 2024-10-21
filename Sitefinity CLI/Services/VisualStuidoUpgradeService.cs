@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
@@ -23,8 +24,18 @@ namespace Sitefinity_CLI.Services
             string updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             List<string> scriptParameters = [$"-RemoveDeprecatedPackages {options.RemoveDeprecatedPackages}"];
 
+            // TODO WHY DISPOSE
             using IVisualStudioWorker worker = visualStudioWorker;
             this.visualStudioWorker.Initialize(options.SolutionPath);
+            this.visualStudioWorker.ExecuteScript(updaterPath, scriptParameters);
+
+            this.EnsureOperationSuccess();
+        }
+
+        public void ExecuteNugetInstall(string solutionPath)
+        {
+            using IVisualStudioWorker worker = visualStudioWorker;
+            this.visualStudioWorker.Initialize(solutionPath);
             this.visualStudioWorker.ExecuteScript(updaterPath, scriptParameters);
 
             this.EnsureOperationSuccess();
@@ -78,6 +89,7 @@ namespace Sitefinity_CLI.Services
 
             this.logger.LogInformation("Operation completed successfully!");
         }
+
         private string ReadAllTextFromFile(string path)
         {
             using FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
