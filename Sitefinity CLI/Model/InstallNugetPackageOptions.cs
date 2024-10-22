@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Sitefinity_CLI.Model
 {
-    internal class InstallNugetPackageOptions
+    public class InstallNugetPackageOptions
     {
-        public int MyProperty { get; set; }
+        public string SolutionPath { get; set; }
+
+        public string Version { get; set; }
+
+        public string PackageName { get; set; }
+
+        public ICollection<string> ProjectNames { get; set; }
     }
 }

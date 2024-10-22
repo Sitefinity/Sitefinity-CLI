@@ -42,8 +42,8 @@ try
 
 	if ($TargetProjectFiles -ne $null) 
 	{
-		$projectToUpgrade = $TargetProjectFiles.Split(";");
-		foreach ($project in $projectToUpgrade){
+		foreach ($project in $TargetProjectFiles)
+		{
 			Install-NugetPackage -packageName $PackageToInstall -version $VersionToInstall -projectName $project
 		}
 	}

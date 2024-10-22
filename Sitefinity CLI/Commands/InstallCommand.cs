@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
 using Sitefinity_CLI.Services.Contracts;
 
 namespace Sitefinity_CLI.Commands
@@ -35,11 +32,11 @@ namespace Sitefinity_CLI.Commands
             this.visualStudioService = visualStudioService;
         }
 
-        protected async Task<int> OnExecuteAsync(CommandLineApplication app)
+        protected int OnExecuteAsync(CommandLineApplication app)
         {
             try
             {
-                await this.ExecuteInstallAsync();
+                this.ExecuteInstallAsync();
                 return 0;
             }
             catch (Exception ex)
@@ -49,17 +46,26 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private async Task ExecuteInstallAsync()
+        private void ExecuteInstallAsync()
         {
             if (!this.Validate())
             {
                 return;
             }
-            // open sln.
+
             // see how we determine on whicch project we should install the nuget package. bu default it wil be installed on the default project
+            string[] projectNames = this.Projectnames?.Split(this.packageNamesSeprators, StringSplitOptions.RemoveEmptyEntries);
 
-            this.visualStudioService.ExecuteNugetInstall(this.SolutionPath, this.PackageName, this.Version, this.Projectnames);
+            InstallNugetPackageOptions installOptions = new InstallNugetPackageOptions()
+            {
+                SolutionPath = this.SolutionPath,
+                PackageName = this.PackageName,
+                Version = this.Version,
+                ProjectNames = projectNames
+            };
 
+            this.visualStudioService.ExecuteNugetInstall(installOptions);
+            this.logger.LogInformation("Installl package command finished successfully!");
         }
 
         private bool Validate()
@@ -75,11 +81,10 @@ namespace Sitefinity_CLI.Commands
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            // check if the version is correct
-
             return isSuccess;
         }
 
+        private readonly string[] packageNamesSeprators = new string[] { ";" };
         private readonly ILogger<InstallCommand> logger;
         private readonly IVisualStudioService visualStudioService;
     }

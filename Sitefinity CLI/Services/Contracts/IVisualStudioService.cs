@@ -6,6 +6,6 @@ namespace Sitefinity_CLI.Services.Contracts
     {
         void ExecuteVisualStudioUpgrade(UpgradeOptions options);
 
-        void ExecuteNugetInstall(string solutionPath, string packageToInstall, string version, string projectFiles);
+        void ExecuteNugetInstall(InstallNugetPackageOptions options);
     }
 }

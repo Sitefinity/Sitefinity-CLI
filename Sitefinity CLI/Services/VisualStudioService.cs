@@ -6,6 +6,7 @@ using Sitefinity_CLI.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace Sitefinity_CLI.Services
@@ -31,20 +32,20 @@ namespace Sitefinity_CLI.Services
             this.EnsureOperationSuccess();
         }
 
-        public void ExecuteNugetInstall(string solutionPath, string packageToInstall, string version, string projectFiles)
+        public void ExecuteNugetInstall(InstallNugetPackageOptions options)
         {
             IVisualStudioWorker worker = visualStudioWorker;
-            this.visualStudioWorker.Initialize(solutionPath);
+            this.visualStudioWorker.Initialize(options.SolutionPath);
             string instaallerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
-            List<string> scriptParameters = [$"-PackageToInstall \"{packageToInstall}\""];
+            List<string> scriptParameters = [$"-PackageToInstall \"{options.PackageName}\""];
 
-            if (!string.IsNullOrEmpty(version))
+            if (!string.IsNullOrEmpty(options.Version))
             {
-                scriptParameters.Add($"-Version {version}");
+                scriptParameters.Add($"-Version {options.Version}");
             }
-            if (!string.IsNullOrEmpty(projectFiles))
+            if (options.ProjectNames != null && options.ProjectNames.Count > 0)
             {
-                scriptParameters.Add($"-TargetProjectFiles {projectFiles}");
+                scriptParameters.Add($"-TargetProjectFiles {options.ProjectNames}");
             }
 
             this.visualStudioWorker.ExecuteScript(instaallerPowerShellPath, scriptParameters);
