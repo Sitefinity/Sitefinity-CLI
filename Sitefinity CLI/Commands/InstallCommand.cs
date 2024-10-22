@@ -7,11 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Services.Contracts;
 
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.InstallCommandName, Constants.UpgradeCommandDescription)]
+    [Command(Constants.InstallCommandName, Constants.InstallCommandDescription)]
     internal class InstallCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
@@ -22,13 +23,16 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = Constants.PackageNameRequired)]
         public string PackageName { get; set; }
 
-        [Argument(2, Description = Constants.PackageVersion)]
-        [Required(ErrorMessage = Constants.PackageVersionRequired)]
+        [Option(Constants.VersionOptionTemplate, CommandOptionType.SingleValue, Description = Constants.PackageVersion)]
         public string Version { get; set; }
 
-        public InstallCommand(ILogger<InstallCommand> logger)
+        [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
+        public string Projectnames { get; set; }
+
+        public InstallCommand(ILogger<InstallCommand> loggerр, IVisualStudioService visualStudioService)
         {
             this.logger = logger;
+            this.visualStudioService = visualStudioService;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -40,7 +44,7 @@ namespace Sitefinity_CLI.Commands
             }
             catch (Exception ex)
             {
-                this.logger.LogError("Error during upgrade: {ExceptionMessage}", ex.Message);
+                this.logger.LogError("Error during install: {ExceptionMessage}", ex.Message);
                 return 1;
             }
         }
@@ -54,7 +58,7 @@ namespace Sitefinity_CLI.Commands
             // open sln.
             // see how we determine on whicch project we should install the nuget package. bu default it wil be installed on the default project
 
-
+            this.visualStudioService.ExecuteNugetInstall(this.SolutionPath, this.PackageName, this.Version, this.Projectnames);
 
         }
 
@@ -77,5 +81,6 @@ namespace Sitefinity_CLI.Commands
         }
 
         private readonly ILogger<InstallCommand> logger;
+        private readonly IVisualStudioService visualStudioService;
     }
 }

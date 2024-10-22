@@ -22,6 +22,7 @@ namespace Sitefinity_CLI
     [HelpOption]
     [Command("sf")]
     [Subcommand(typeof(AddCommand))]
+    [Subcommand(typeof(InstallCommand))]
     [Subcommand(typeof(UpgradeCommand))]
     [Subcommand(typeof(CreateCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]

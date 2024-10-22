@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HandlebarsDotNet;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
@@ -21,7 +22,7 @@ namespace Sitefinity_CLI.Services
 
         public void ExecuteVisualStudioUpgrade(UpgradeOptions options)
         {
-            string updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
+            string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             List<string> scriptParameters = [$"-RemoveDeprecatedPackages {options.RemoveDeprecatedPackages}"];
 
             // TODO WHY DISPOSE
@@ -32,13 +33,16 @@ namespace Sitefinity_CLI.Services
             this.EnsureOperationSuccess();
         }
 
-        public void ExecuteNugetInstall(string solutionPath)
+        public void ExecuteNugetInstall(string solutionPath, string packageToInstall, string version, string projectFiles)
         {
-            using IVisualStudioWorker worker = visualStudioWorker;
+            IVisualStudioWorker worker = visualStudioWorker;
             this.visualStudioWorker.Initialize(solutionPath);
-            this.visualStudioWorker.ExecuteScript(updaterPath, scriptParameters);
+            string instaallerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
+            List<string> scriptParameters = [$"-PackageToInstall \"{packageToInstall}\" -Version {version} -TargetProjectFiles \"{projectFiles}\""];
 
-            this.EnsureOperationSuccess();
+            this.visualStudioWorker.ExecuteScript(instaallerPowerShellPath, scriptParameters);
+
+            //this.EnsureOperationSuccess();
         }
 
         private void EnsureOperationSuccess()
