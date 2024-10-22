@@ -62,7 +62,6 @@ namespace Sitefinity_CLI
         public const string LatestVersionNotFoundMeesage = "Can't get the latest Sitefinity version. Please specify the upgrade version.";
         public const string SolutionPathRequired = "You must specify a path to a solution file.";
         public const string PackageNameRequired = "You must specify the name of the package you want to install.";
-        //public const string PackageVersionRequired = "You must specify the version of the package you want to install.";
  
         // Warning messages
         public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";

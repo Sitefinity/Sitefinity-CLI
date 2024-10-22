@@ -1,6 +1,4 @@
-﻿using HandlebarsDotNet;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
