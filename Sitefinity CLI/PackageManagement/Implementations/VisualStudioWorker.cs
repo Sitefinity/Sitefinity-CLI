@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using EnvDTE;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Sitefinity_CLI.PackageManagement.Contracts;
+using Thread = System.Threading.Thread;
 
 namespace Sitefinity_CLI.PackageManagement.Implementations
 {
@@ -26,7 +26,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             var latestVisualStudioVersion = this.GetLatestVisualStudioVersion();
             if (string.IsNullOrEmpty(latestVisualStudioVersion))
             {
-                // TODO: the command should just fail with return code 1, but the execution should not continue
                 this.logger.LogError(string.Format("Visual studio installation not found."));
                 throw new Exception("Visual studio installation not found.");
             }
@@ -55,7 +54,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger.LogInformation("Solution ready!");
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(waitTime);
+            Thread.Sleep(waitTime);
 
             try
             {
@@ -68,7 +67,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             this.logger.LogInformation("Waiting...");
-            System.Threading.Thread.Sleep(waitTime);
+            Thread.Sleep(waitTime);
 
             this.logger.LogInformation("Studio is ready!");
 
@@ -95,7 +94,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger.LogInformation(Constants.UnblockingUpgradeScriptMessage);
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Format("Unblock-file '{0}'", scriptPath));
 
-            System.Threading.Thread.Sleep(5000);
+            Thread.Sleep(5000);
             this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
             string commandParameters = string.Join(" ", scriptParameters);
             string commandToExecute = $"&'{scriptPath}' {commandParameters}";

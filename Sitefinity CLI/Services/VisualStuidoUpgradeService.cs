@@ -38,11 +38,20 @@ namespace Sitefinity_CLI.Services
             IVisualStudioWorker worker = visualStudioWorker;
             this.visualStudioWorker.Initialize(solutionPath);
             string instaallerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
-            List<string> scriptParameters = [$"-PackageToInstall \"{packageToInstall}\" -Version {version} -TargetProjectFiles \"{projectFiles}\""];
+            List<string> scriptParameters = [$"-PackageToInstall \"{packageToInstall}\""];
+
+            if (!string.IsNullOrEmpty(version))
+            {
+                scriptParameters.Add($"-Version {version}");
+            }
+            if (!string.IsNullOrEmpty(projectFiles))
+            {
+                scriptParameters.Add($"-TargetProjectFiles {projectFiles}");
+            }
 
             this.visualStudioWorker.ExecuteScript(instaallerPowerShellPath, scriptParameters);
 
-            //this.EnsureOperationSuccess();
+            this.EnsureOperationSuccess();
         }
 
         private void EnsureOperationSuccess()
@@ -84,8 +93,8 @@ namespace Sitefinity_CLI.Services
                 string result = this.ReadAllTextFromFile(resultFile);
                 if (result != "success")
                 {
-                    this.logger.LogError(string.Format("Error occured while upgrading nuget packages. {0}", result));
-                    throw new UpgradeException("Upgrade failed");
+                    this.logger.LogError("Error occured while executin visual stuido command {Message}", result);
+                    throw new VisualStudioCommandException("Operation failed");
                 }
 
                 break;
