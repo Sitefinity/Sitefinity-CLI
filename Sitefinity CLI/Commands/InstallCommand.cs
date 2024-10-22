@@ -29,7 +29,7 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
         public string Projectnames { get; set; }
 
-        public InstallCommand(ILogger<InstallCommand> loggerр, IVisualStudioService visualStudioService)
+        public InstallCommand(ILogger<InstallCommand> logger, IVisualStudioService visualStudioService)
         {
             this.logger = logger;
             this.visualStudioService = visualStudioService;
