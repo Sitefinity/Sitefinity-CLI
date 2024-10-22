@@ -20,8 +20,7 @@ function Install-NugetPackage($packageName, $version, $projectName){
 	"`nRunning command '$installExpression"
 	Invoke-Expression $installExpression 
 	
-	#Invoke-Expression "Install-Package -Id $packageName -Version $version -ErrorVariable errorMessage"
-	if ($errorMessage -ne $null)
+	if ($errorMessage)
 	{
 		Write-Error -Message "`nError occured while installing $packageName. The error was: $errorMessage" -ErrorAction Stop
 	}
@@ -53,7 +52,7 @@ try
 		Install-NugetPackage -packageName $PackageToInstall -version $VersionToInstall
 	}
 
-	New-Item -Path $PSScriptRoot -Name "result.log" -ItemType "file" -Value "success"
+	New-Item -Path $PSScriptRoot -Name $resultLogFileName -ItemType "file" -Value "success"
 }
 catch
 {
