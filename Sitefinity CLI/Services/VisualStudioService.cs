@@ -45,7 +45,8 @@ namespace Sitefinity_CLI.Services
             }
             if (options.ProjectNames != null && options.ProjectNames.Count > 0)
             {
-                scriptParameters.Add($"-TargetProjectFiles {options.ProjectNames}");
+                string projectNames = string.Join(',', options.ProjectNames);
+                scriptParameters.Add($"-TargetProjectFiles {projectNames}");
             }
 
             this.visualStudioWorker.ExecuteScript(instaallerPowerShellPath, scriptParameters);

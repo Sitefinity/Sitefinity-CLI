@@ -1,7 +1,7 @@
 param(
 	$PackageToInstall,
 	$VersionToInstall,
-	$TargetProjectFiles
+	[string[]]$TargetProjectFiles
 )
 
 function Install-NugetPackage($packageName, $version, $projectName){
