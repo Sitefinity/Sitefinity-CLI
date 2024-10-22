@@ -6,7 +6,8 @@ param(
 
 function Install-NugetPackage($packageName, $version, $projectName){
 	$errorMessage = $null;
-	$installExpression = "Install-Package `"$($packageName)`" -ErrorVariable errorMessage"
+	$installExpression = "Install-Package -Id `"$($packageName)`" -ErrorVariable errorMessage"
+
 	if ($null -ne $version)
 	{
 		$installExpression += " -Version `"$version`""
@@ -17,11 +18,10 @@ function Install-NugetPackage($packageName, $version, $projectName){
 	}
 
 	"`nRunning command '$installExpression"
-
 	Invoke-Expression $installExpression 
-
-	$errorMessage
-	if ($null -ne $errorMessage)
+	
+	#Invoke-Expression "Install-Package -Id $packageName -Version $version -ErrorVariable errorMessage"
+	if ($errorMessage -ne $null)
 	{
 		Write-Error -Message "`nError occured while installing $packageName. The error was: $errorMessage" -ErrorAction Stop
 	}
@@ -41,7 +41,7 @@ try
 {
 	Start-Transcript -Path $installTraceLogPath
 
-	if ($null -ne $TargetProjectFiles) 
+	if ($TargetProjectFiles -ne $null) 
 	{
 		$projectToUpgrade = $TargetProjectFiles.Split(";");
 		foreach ($project in $projectToUpgrade){
@@ -53,7 +53,7 @@ try
 		Install-NugetPackage -packageName $PackageToInstall -version $VersionToInstall
 	}
 
-	New-Item -Path $PSScriptRoot -Name $resultLogFileName -ItemType "file" -Value "success"
+	New-Item -Path $PSScriptRoot -Name "result.log" -ItemType "file" -Value "success"
 }
 catch
 {
