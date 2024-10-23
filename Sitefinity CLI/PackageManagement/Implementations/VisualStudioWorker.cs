@@ -97,7 +97,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             Thread.Sleep(UnblockingPSPScriptWaitTime);
             string commandParameters = string.Join(" ", scriptParameters);
             string commandToExecute = $"&'{scriptPath}' {commandParameters}";
-            this.logger.LogInformation("Executing script in visual studio - {ScriptPath}. Command used: {Params}", scriptPath, commandToExecute));
+            this.logger.LogInformation("Executing script in visual studio - {ScriptPath}. Command used: {Params}", scriptPath, commandToExecute);
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, commandToExecute);
         }
 
