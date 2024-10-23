@@ -79,7 +79,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             foreach (INugetProvider nugetProvider in this.nugetProviders.Values)
             {
                 IEnumerable<string> versionsFromProvider = await nugetProvider.GetPackageVersions(id, nugetSources, versionsCount);
-                allVersions.AddRange(versionsFromProvider);
+                if (versionsFromProvider != null)
+                {
+                    allVersions.AddRange(versionsFromProvider);
+                }
             }
 
             return allVersions.OrderByDescending(x => x);
