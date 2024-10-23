@@ -5,5 +5,7 @@ namespace Sitefinity_CLI.Services.Contracts
     public interface IVisualStudioService
     {
         void ExecuteVisualStudioUpgrade(UpgradeOptions options);
+
+        void ExecuteNugetInstall(InstallNugetPackageOptions options);
     }
 }

@@ -24,7 +24,7 @@ namespace Sitefinity_CLI.Commands
         public UpgradeOptions UpgradeOptions => new(SolutionPath, Version, SkipPrompts, AcceptLicense, NugetConfigPath, AdditionalPackagesString, RemoveDeprecatedPackages);
 
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
-        [Required(ErrorMessage = "You must specify a path to a solution file.")]
+        [Required(ErrorMessage = Constants.SolutionPathRequired)]
         public string SolutionPath { get; set; }
 
         [Argument(1, Description = Constants.VersionToOptionDescription)]

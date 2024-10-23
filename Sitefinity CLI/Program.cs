@@ -22,6 +22,7 @@ namespace Sitefinity_CLI
     [HelpOption]
     [Command("sf")]
     [Subcommand(typeof(AddCommand))]
+    [Subcommand(typeof(InstallCommand))]
     [Subcommand(typeof(UpgradeCommand))]
     [Subcommand(typeof(CreateCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]
@@ -58,9 +59,10 @@ namespace Sitefinity_CLI
                     services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
                     services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
                     services.AddScoped<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
-                    services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
+                    services.AddScoped<IVisualStudioWorker, VisualStudioWorker>();
                     services.AddSingleton<IVisualStudioService, VisualStudioService>();
                     services.AddSingleton<IPromptService, PromptService>();
+                    services.AddSingleton<IVisualStudioWorkerFactory, VisualStuidoWorkerFactory>();
                 })
                 .UseConsoleLifetime()
                 .RunCommandLineApplicationAsync<Program>(args);

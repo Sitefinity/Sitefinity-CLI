@@ -60,7 +60,9 @@ namespace Sitefinity_CLI
         public const string TryToUpdateInvalidVersionMessage = "The version '{0}' you are trying to upgrade to is not valid.";
         public const string CannotUpgradeAdditionalPackagesMessage = "The given additional packages cannot be upgraded. The currently supported additional packages for upgrade are: {0}";
         public const string LatestVersionNotFoundMeesage = "Can't get the latest Sitefinity version. Please specify the upgrade version.";
-
+        public const string SolutionPathRequired = "You must specify a path to a solution file.";
+        public const string PackageNameRequired = "You must specify the name of the package you want to install.";
+ 
         // Warning messages
         public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";
         public const string SearchingProjectForReferencesMessage = "Searching the provided project/s for Sitefinity references...";
@@ -219,5 +221,13 @@ namespace Sitefinity_CLI
         public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";
         public const string SitefinityDefaultNugetSource = "https://nuget.sitefinity.com/nuget";
         public const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
+
+        // Install command
+        public const string InstallCommandName = "install";
+        public const string InstallCommandDescription = "Installs a nuget package to a specified solution.";
+        public const string PackageNameDescrption = "The name of the nuget package you want to install.";
+        public const string PackageVersion = "The version of the nuget package you want to install.";
+        public const string ProjectNamesOptionTempate = "-pn|--projectNames";
+        public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
     }
 }
