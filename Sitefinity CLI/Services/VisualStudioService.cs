@@ -1,21 +1,20 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.Services.Contracts;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 
 namespace Sitefinity_CLI.Services
 {
     internal class VisualStudioService : IVisualStudioService
     {
-        public VisualStudioService(IVisualStudioWorker visualStudioWorker, ILogger<VisualStudioService> logger)
+        public VisualStudioService(IVisualStudioWorkerFactory visualStudioWorkerFactory, ILogger<VisualStudioService> logger)
         {
-            this.visualStudioWorker = visualStudioWorker;
+            this.visualStudioWorkerFactory = visualStudioWorkerFactory;
             this.logger = logger;
         }
 
@@ -24,18 +23,18 @@ namespace Sitefinity_CLI.Services
             string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             List<string> scriptParameters = [$"-RemoveDeprecatedPackages {options.RemoveDeprecatedPackages}"];
 
-            // TODO WHY DISPOSE
-            using IVisualStudioWorker worker = visualStudioWorker;
-            this.visualStudioWorker.Initialize(options.SolutionPath);
-            this.visualStudioWorker.ExecuteScript(updaterPath, scriptParameters);
+            using IVisualStudioWorker worker = this.visualStudioWorkerFactory.CreateVisualStudioWorker();
+            worker.Initialize(options.SolutionPath);
+            worker.ExecuteScript(updaterPath, scriptParameters);
 
             this.EnsureOperationSuccess();
         }
 
         public void ExecuteNugetInstall(InstallNugetPackageOptions options)
         {
-            IVisualStudioWorker worker = visualStudioWorker;
-            this.visualStudioWorker.Initialize(options.SolutionPath);
+            using IVisualStudioWorker worker = this.visualStudioWorkerFactory.CreateVisualStudioWorker();
+            worker.Initialize(options.SolutionPath);
+
             string installerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
             List<string> scriptParameters = [$"-PackageToInstall \"{options.PackageName}\""];
 
@@ -49,7 +48,7 @@ namespace Sitefinity_CLI.Services
                 scriptParameters.Add($"-TargetProjectFiles {projectNames}");
             }
 
-            this.visualStudioWorker.ExecuteScript(installerPowerShellPath, scriptParameters);
+            worker.ExecuteScript(installerPowerShellPath, scriptParameters);
 
             this.EnsureOperationSuccess();
         }
@@ -58,8 +57,10 @@ namespace Sitefinity_CLI.Services
         {
             this.logger.LogInformation("Waiting for operation to complete...");
 
-            string resultFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "result.log");
-            string progressFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "progress.log");
+            string resultFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, ResultFileName);
+            string progressFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, ProgressLogFileName);
+
+            // TODO: This might be handled in Powershell
             File.Delete(resultFile);
             int waitStep = 500;
             int iterations = 0;
@@ -91,7 +92,7 @@ namespace Sitefinity_CLI.Services
 
                 Thread.Sleep(waitStep);
                 string result = this.ReadAllTextFromFile(resultFile);
-                if (result != "success")
+                if (result != SuccessIndicator)
                 {
                     this.logger.LogError("Error occured while executin visual stuido command {Message}", result);
                     throw new VisualStudioCommandException("Operation failed");
@@ -110,7 +111,10 @@ namespace Sitefinity_CLI.Services
             return textReader.ReadToEnd();
         }
 
-        private readonly IVisualStudioWorker visualStudioWorker;
+        private readonly IVisualStudioWorkerFactory visualStudioWorkerFactory;
         private readonly ILogger<VisualStudioService> logger;
+        private const string ResultFileName = "result.log";
+        private const string SuccessIndicator = "success";
+        private const string ProgressLogFileName = "progress.log";
     }
 }
