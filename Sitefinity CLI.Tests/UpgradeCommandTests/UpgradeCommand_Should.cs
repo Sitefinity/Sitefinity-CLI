@@ -57,6 +57,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
             services.AddSingleton<IVisualStudioService, VisualStudioService>();
             services.AddSingleton<IPromptService, PromptServiceMock>();
+            services.AddSingleton<IVisualStudioWorkerFactory, VisualStuidoWorkerFactory>();
 
             this.serviceProvider = services.BuildServiceProvider();
             
