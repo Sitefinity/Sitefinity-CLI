@@ -26,11 +26,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             var latestVisualStudioVersion = this.GetLatestVisualStudioVersion();
             if (string.IsNullOrEmpty(latestVisualStudioVersion))
             {
-                this.logger.LogError(string.Format("Visual studio installation not found."));
                 throw new Exception("Visual studio installation not found.");
             }
 
-            this.logger.LogInformation(string.Format("Visual studio installation found. Version: \"{0}\". Launching...", latestVisualStudioVersion));
+            this.logger.LogInformation("Visual studio installation found. Version: \"{VisualStudioVersion}\". Launching...", latestVisualStudioVersion);
 
             var currentProcesses = System.Diagnostics.Process.GetProcessesByName(VisualStudioProcessName);
 
@@ -49,12 +48,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             dte.UserControl = false;
             dte.MainWindow.Visible = true;
 
-            this.logger.LogInformation(string.Format("Opening solution: \"{0}\"...", solutionFilePath));
+            this.logger.LogInformation("Opening solution: \"{SolutionPath}\"...", solutionFilePath);
             dte.Solution.Open(solutionFilePath);
-            this.logger.LogInformation("Solution ready!");
-
             this.logger.LogInformation("Waiting...");
             Thread.Sleep(waitTime);
+            this.logger.LogInformation("Solution ready!");
 
             try
             {
