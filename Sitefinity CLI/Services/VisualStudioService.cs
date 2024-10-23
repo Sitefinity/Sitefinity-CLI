@@ -36,7 +36,7 @@ namespace Sitefinity_CLI.Services
         {
             IVisualStudioWorker worker = visualStudioWorker;
             this.visualStudioWorker.Initialize(options.SolutionPath);
-            string instaallerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
+            string installerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
             List<string> scriptParameters = [$"-PackageToInstall \"{options.PackageName}\""];
 
             if (!string.IsNullOrEmpty(options.Version))
@@ -49,7 +49,7 @@ namespace Sitefinity_CLI.Services
                 scriptParameters.Add($"-TargetProjectFiles {projectNames}");
             }
 
-            this.visualStudioWorker.ExecuteScript(instaallerPowerShellPath, scriptParameters);
+            this.visualStudioWorker.ExecuteScript(installerPowerShellPath, scriptParameters);
 
             this.EnsureOperationSuccess();
         }

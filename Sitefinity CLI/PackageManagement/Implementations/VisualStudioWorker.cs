@@ -94,10 +94,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger.LogInformation(Constants.UnblockingUpgradeScriptMessage);
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, string.Format("Unblock-file '{0}'", scriptPath));
 
-            Thread.Sleep(5000);
-            this.logger.LogInformation(string.Format("Executing script in visual studio - '{0}'", scriptPath));
+            Thread.Sleep(UnblockingPSPScriptWaitTime);
             string commandParameters = string.Join(" ", scriptParameters);
             string commandToExecute = $"&'{scriptPath}' {commandParameters}";
+            this.logger.LogInformation("Executing script in visual studio - {ScriptPath}. Command used: {Params}", scriptPath, commandToExecute));
             this.visualStudioInstance.ExecuteCommand(PackageManagerConsoleCommand, commandToExecute);
         }
 
@@ -116,5 +116,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private const string PackageManagerConsoleCommand = "View.PackageManagerConsole";
         private const string VisualStudioProcessName = "devenv";
         private const int WaitTime = 60000;
+        private const int UnblockingPSPScriptWaitTime = 5000;
     }
 }

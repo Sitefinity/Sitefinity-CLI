@@ -224,9 +224,9 @@ namespace Sitefinity_CLI
 
         // Install command
         public const string InstallCommandName = "install";
-        public const string InstallCommandDescription = "Installs a nuget package to a specified solution";
-        public const string PackageNameDescrption = "The name of the nuget package that you want to install";
-        public const string PackageVersion = "The version of the package you want to install";
+        public const string InstallCommandDescription = "Installs a nuget package to a specified solution.";
+        public const string PackageNameDescrption = "The name of the nuget package you want to install.";
+        public const string PackageVersion = "The version of the nuget package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
     }

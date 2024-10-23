@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Text.Json;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Model;
@@ -24,7 +25,7 @@ namespace Sitefinity_CLI.Commands
         public string Version { get; set; }
 
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
-        public string Projectnames { get; set; }
+        public string ProjectNames { get; set; }
 
         public InstallCommand(ILogger<InstallCommand> logger, IVisualStudioService visualStudioService)
         {
@@ -36,7 +37,7 @@ namespace Sitefinity_CLI.Commands
         {
             try
             {
-                this.ExecuteInstallAsync();
+                this.ExecuteInstallCommand();
                 return 0;
             }
             catch (Exception ex)
@@ -46,15 +47,14 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private void ExecuteInstallAsync()
+        private void ExecuteInstallCommand()
         {
             if (!this.Validate())
             {
                 return;
             }
 
-            // see how we determine on whicch project we should install the nuget package. bu default it wil be installed on the default project
-            string[] projectNames = this.Projectnames?.Split(this.packageNamesSeprators, StringSplitOptions.RemoveEmptyEntries);
+            string[] projectNames = this.ProjectNames?.Split(this.packageNamesSeprators, StringSplitOptions.RemoveEmptyEntries);
 
             InstallNugetPackageOptions installOptions = new InstallNugetPackageOptions()
             {
@@ -64,6 +64,7 @@ namespace Sitefinity_CLI.Commands
                 ProjectNames = projectNames
             };
 
+            this.logger.LogInformation("Install Command will be executed with the following paramters: {Params}", JsonSerializer.Serialize(installOptions));
             this.visualStudioService.ExecuteNugetInstall(installOptions);
             this.logger.LogInformation("Installl package command finished successfully!");
         }
@@ -84,7 +85,7 @@ namespace Sitefinity_CLI.Commands
             return isSuccess;
         }
 
-        private readonly string[] packageNamesSeprators = new string[] { ";" };
+        private readonly string[] packageNamesSeprators = [";"];
         private readonly ILogger<InstallCommand> logger;
         private readonly IVisualStudioService visualStudioService;
     }
