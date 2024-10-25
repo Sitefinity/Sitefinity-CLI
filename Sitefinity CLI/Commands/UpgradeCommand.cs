@@ -186,7 +186,7 @@ namespace Sitefinity_CLI.Commands
             var updaterPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
             this.visualStudioWorker.Initialize(this.SolutionPath);
 
-            List<string> scriptParameters = [$"-RemoveDeprecatedPackages {this.RemoveDeprecatedPackages}"];
+            List<string> scriptParameters = [$"-RemoveDeprecatedPackages ${this.RemoveDeprecatedPackages}"];
 
             this.visualStudioWorker.ExecuteScript(updaterPath, scriptParameters);
             this.EnsureOperationSuccess();
