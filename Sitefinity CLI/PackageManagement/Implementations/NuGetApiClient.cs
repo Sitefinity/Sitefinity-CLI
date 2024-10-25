@@ -72,22 +72,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return nuGetPackage;
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
-        {
-            List<string> allVersions = [];
-
-            foreach (INugetProvider nugetProvider in this.nugetProviders.Values)
-            {
-                IEnumerable<string> versionsFromProvider = await nugetProvider.GetPackageVersions(id, nugetSources, versionsCount);
-                if (versionsFromProvider != null)
-                {
-                    allVersions.AddRange(versionsFromProvider);
-                }
-            }
-
-            return allVersions.OrderByDescending(x => x);
-        }
-
         private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources)
         {
             string cacheKey = string.Concat(id, version);

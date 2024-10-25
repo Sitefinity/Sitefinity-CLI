@@ -58,40 +58,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return response;
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
-        {
-            IEnumerable<NugetPackageSource> nugetv3Sources = nugetSources.Where(x => x.SourceUrl.Contains(Constants.ApiV3Identifier));
-            HttpResponseMessage response = null;
-            foreach (NugetPackageSource nugetSource in nugetv3Sources)
-            {
-                this.AppendNugetSourceAuthHeaders(nugetSource);
-                string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
-                string url = $"{sourceUrl}/flat2/{id}/index.json";
-                response = await this.httpClient.GetAsync(url);
-
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    break;
-                }
-            }
-
-            if (response == null)
-            {
-                return null;
-            }
-
-            string responseContent = await response.Content.ReadAsStringAsync();
-            if (string.IsNullOrWhiteSpace(responseContent))
-            {
-                return null;
-            }
-
-            JObject jsonObject = JObject.Parse(responseContent);
-            JArray versions = (JArray)jsonObject["versions"];
-
-            return versions.Take(versionsCount).Select(v => v.ToString());
-        }
-
         private void AppendNugetSourceAuthHeaders(NugetPackageSource nugetSource)
         {
             // there are cases where the username is not required
