@@ -106,7 +106,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             ExecuteCommand($"dotnet nuget add source {Constants.DefaultNugetSource} --name nuget --configfile {projectDirectory}\\nuget.config");
         }
 
-        public string GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources)
+        public IEnumerable<string> GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources)
         {
             string command = $"dotnet package search {sitefinityPackage}";
 
@@ -148,41 +148,25 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 process.WaitForExit();
             }
 
-            return commandOutput.ToString();
+            var nugetPackagesSearchResult = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(commandOutput.ToString());
+            var versions = nugetPackagesSearchResult.SearchResult.SelectMany(x => x.Packages.Select(p => p.Version));
+
+            return versions;
         }
 
         public bool VersionExists(string version, string sitefinityPackage, string[] sources)
         {
-            var packageVersions = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
-            var result = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(packageVersions);
+            var result = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
 
-            bool exists = false;
-
-            foreach (var source in result.SearchResult)
-            {
-                foreach (var package in source.Packages)
-                {
-                    if (package.Version == version)
-                    {
-                        exists = true;
-                        break;
-                    }
-                }
-            }
-
-            return exists;
+            return result.Any(v => v == version);
         }
 
         public string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage)
         {
-            var packageVersions = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
-            var result = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(packageVersions);
+            var result = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
 
-            var versions = new List<Version>();
-
-            return result.SearchResult
-                .Where(s => s.Packages.Count > 0)
-                .Select(v => new Version(v.Packages[0].Version))
+            return result
+                .Select(v => new Version(v))
                 .Max()
                 .ToString();
         }

@@ -1,4 +1,8 @@
-﻿namespace Sitefinity_CLI.PackageManagement.Contracts
+﻿using System.Collections;
+using System.Collections.Generic;
+using Sitefinity_CLI.Model;
+
+namespace Sitefinity_CLI.PackageManagement.Contracts
 {
     internal interface IDotnetCliClient
     {
@@ -9,7 +13,7 @@
         void AddProjectToSolution(string solutionName, string projectDirectory, string projectName);
         void AddPackageToProject(string projectPath, string packageName, string version);
         void AddSourcesToNugetConfig(string[] sources, string filePath);
-        string GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources);
+        IEnumerable<string> GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources);
         bool VersionExists(string version, string sitefinityPackage, string[] sources);
         string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage);
     }
