@@ -156,19 +156,15 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public bool VersionExists(string version, string sitefinityPackage, string[] sources)
         {
-            var result = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
-
-            return result.Any(v => v == version);
+            return GetPackageVersionsInNugetSources(sitefinityPackage, sources).Any(v => v == version);
         }
 
         public string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage)
         {
-            var result = GetPackageVersionsInNugetSources(sitefinityPackage, sources);
-
-            return result
-                .Select(v => new Version(v))
-                .Max()
-                .ToString();
+            return GetPackageVersionsInNugetSources(sitefinityPackage, sources)
+                   .Select(v => new Version(v))
+                   .Max()
+                   .ToString();
         }
 
         private readonly ILogger<DotnetCliClient> logger;
