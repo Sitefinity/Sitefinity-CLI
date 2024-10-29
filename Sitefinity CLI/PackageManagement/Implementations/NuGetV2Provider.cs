@@ -41,41 +41,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return response;
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> nugetSources, int versionsCount = 10)
-        {
-            IEnumerable<NugetPackageSource> nugetv2Sources = nugetSources.Where(x => !x.SourceUrl.Contains(Constants.ApiV3Identifier));
-
-            HttpResponseMessage response = null;
-            foreach (NugetPackageSource nugetSource in nugetv2Sources)
-            {
-                string sourceUrl = nugetSource.SourceUrl.TrimEnd('/');
-                using HttpRequestMessage request = new(HttpMethod.Get, $"{sourceUrl}/FindPackagesById()?Id='{id}'&$orderby=Version desc&$top={versionsCount}");
-                request.Headers.Add("Accept", MediaTypeNames.Application.Json);
-
-                response = await this.httpClient.SendAsync(request);
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    break;
-                }
-            }
-
-            if (response == null)
-            {
-                return null;
-            }
-
-            string responseContentString = await response.Content.ReadAsStringAsync();
-            if (string.IsNullOrWhiteSpace(responseContentString))
-            {
-                return null;
-            }
-
-            JObject jsonObject = JObject.Parse(responseContentString);
-            JArray packages = (JArray)jsonObject["d"];
-            IEnumerable<string> versions = packages.Where(x => (string)x["Id"] == id).Select(x => (string)x["Version"]);
-            return versions;
-        }
-
         private readonly HttpClient httpClient;
         private readonly ILogger<NuGetV2Provider> logger;
     }

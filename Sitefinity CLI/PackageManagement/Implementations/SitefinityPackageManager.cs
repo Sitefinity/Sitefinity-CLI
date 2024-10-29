@@ -136,11 +136,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger.LogInformation($"Synchronization completed for project '{projectFilePath}'");
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> packageSources, int versionsCount = 10)
-        {
-            return await this.nuGetApiClient.GetPackageVersions(id, packageSources, versionsCount);
-        }
-
         private void RemoveReferencesToMissingNuGetPackageDlls(string projectDir, string solutionDir, XmlDocument projectFileXmlDocument, IEnumerable<string> nugetPackageRelativeFileReferences)
         {
             string packagesDir = Path.Combine(solutionDir, PackagesFolderName);
@@ -677,7 +672,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private readonly INuGetApiClient nuGetApiClient;
 
         private readonly INuGetCliClient nuGetCliClient;
-
+        private readonly IDotnetCliClient dotnetCliClient;
         private readonly IPackagesConfigFileEditor packagesConfigFileEditor;
 
         private readonly IProjectConfigFileEditor projectConfigFileEditor;

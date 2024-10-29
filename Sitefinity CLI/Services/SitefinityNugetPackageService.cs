@@ -14,9 +14,10 @@ namespace Sitefinity_CLI.Services
 {
     internal class SitefinityNugetPackageService : ISitefinityNugetPackageService
     {
-        public SitefinityNugetPackageService(ISitefinityPackageManager sitefinityPackageManager, IHttpClientFactory httpClientFactory)
+        public SitefinityNugetPackageService(ISitefinityPackageManager sitefinityPackageManager, IHttpClientFactory httpClientFactory, IDotnetCliClient dotnetCliClient)
         {
             this.sitefinityPackageManager = sitefinityPackageManager;
+            this.dotnetCliClient = dotnetCliClient;
             this.httpClient = httpClientFactory.CreateClient();
         }
      
@@ -82,7 +83,7 @@ namespace Sitefinity_CLI.Services
 
         private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<NugetPackageSource> packageSources)
         {
-            IEnumerable<string> versions = await this.sitefinityPackageManager.GetPackageVersions(packageId, packageSources);
+            IEnumerable<string> versions =  this.dotnetCliClient.GetPackageVersionsInNugetSources(packageId, null);
 
             NuGetPackage compatiblePackage = null;
 
@@ -138,6 +139,7 @@ namespace Sitefinity_CLI.Services
         private bool IsSitefinityPackage(string packageId) => packageId.StartsWith(Constants.TelerikSitefinityReferenceKeyWords) || packageId.StartsWith(Constants.ProgressSitefinityReferenceKeyWords);
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
+        private readonly IDotnetCliClient dotnetCliClient;
         private readonly HttpClient httpClient;
         private readonly ICollection<string> allowedAdditionalPackagesIds = [Constants.SitefinityCloudPackage];
     }

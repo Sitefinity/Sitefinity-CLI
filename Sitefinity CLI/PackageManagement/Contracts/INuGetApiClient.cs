@@ -10,7 +10,5 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
     internal interface INuGetApiClient
     {
         Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<NugetPackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null);
-
-        Task<IEnumerable<string>> GetPackageVersions(string id, IEnumerable<NugetPackageSource> sources, int versionsCount = 10);
     }
 }
