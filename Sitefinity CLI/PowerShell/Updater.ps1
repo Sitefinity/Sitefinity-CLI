@@ -75,7 +75,7 @@ function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
 	@{
             Name                = "Telerik.Sitefinity.AmazonCloudSearch"
             DeprecatedInVersion = [System.Version]"15.0.8200" 
-        },
+        }
     )
 
     "`nRemoving deprecated packages for '$projectName'"
