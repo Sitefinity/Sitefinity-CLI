@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services.Contracts;
+using NuGet.Configuration;
 
 namespace Sitefinity_CLI.Services
 {
@@ -23,7 +24,7 @@ namespace Sitefinity_CLI.Services
      
         public async Task<NuGetPackage> PrepareSitefinityUpgradePackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths)
         {
-            IEnumerable<NugetPackageSource> packageSources = await this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
+            IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
 
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(options.Version, packageSources);
 
@@ -36,7 +37,7 @@ namespace Sitefinity_CLI.Services
 
         public async Task<IEnumerable<NuGetPackage>> PrepareAdditionalPackages(UpgradeOptions options)
         {
-            IEnumerable<NugetPackageSource> packageSources = await this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
+            IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
             IEnumerable<string> additionalPackagesIds = this.GetAdditionalPackages(options.AdditionalPackagesString);
             ICollection<NuGetPackage> additionalPackagesToUpgrade = new List<NuGetPackage>();
 
@@ -81,7 +82,7 @@ namespace Sitefinity_CLI.Services
             return latestVersion;
         }
 
-        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<NugetPackageSource> packageSources)
+        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<PackageSource> packageSources)
         {
             IEnumerable<string> versions =  this.dotnetCliClient.GetPackageVersionsInNugetSources(packageId, null);
 

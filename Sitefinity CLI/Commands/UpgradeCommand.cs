@@ -1,6 +1,7 @@
 ﻿using HandlebarsDotNet;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sitefinity_CLI.Commands.Validators;
 using Sitefinity_CLI.Model;
@@ -53,7 +54,8 @@ namespace Sitefinity_CLI.Commands
             IPromptService promptService,
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
-            IUpgradeConfigGenerator upgradeConfigGenerator)
+            IUpgradeConfigGenerator upgradeConfigGenerator,
+            ISitefinityPackageManager sitefinityPackageManager)
         {
 
             this.sitefinityPackageService = sitefinityPackageService;
@@ -63,6 +65,7 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityProjectService = sitefinityProjectService;
             this.sitefinityConfigService = sitefinityConfigService;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
+            this.sitefinityPackageManager = sitefinityPackageManager;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -81,6 +84,10 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
+            var packageSources = this.sitefinityPackageManager.GetNugetPackageSources(this.NugetConfigPath);
+
+            return;
+
             bool isSuccess = this.Validate();
 
             if (!isSuccess)
@@ -215,5 +222,6 @@ namespace Sitefinity_CLI.Commands
         private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly ISitefinityConfigService sitefinityConfigService;
         private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
+        private readonly ISitefinityPackageManager sitefinityPackageManager;
     }
 }

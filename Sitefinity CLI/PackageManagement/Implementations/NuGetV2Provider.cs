@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using NuGet.Configuration;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using System.Collections.Generic;
@@ -19,22 +20,22 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
+        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
         {
-            IEnumerable<NugetPackageSource> apiV2Sources = sources.Where(x => !x.SourceUrl.Contains(Constants.ApiV3Identifier));
+            IEnumerable<PackageSource> apiV2Sources = sources.Where(x => !x.Source.Contains(Constants.ApiV3Identifier));
             HttpResponseMessage response = null;
 
-            foreach (NugetPackageSource source in apiV2Sources)
+            foreach (PackageSource source in apiV2Sources)
             {
-                string sourceUrl = source.SourceUrl.TrimEnd('/');
-                response = await this.httpClient.GetAsync($"{sourceUrl}/Packages(Id='{id}',Version='{version}')");
+                // TODO: CHECK
+                response = await this.httpClient.GetAsync($"{source.SourceUri}/Packages(Id='{id}',Version='{version}')");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     break;
                 }
                 else
                 {
-                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.SourceUrl);
+                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.Source);
                 }
             }
 

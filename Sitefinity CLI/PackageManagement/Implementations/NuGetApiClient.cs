@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NuGet.Configuration;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
@@ -27,7 +28,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.dependencyParsers = this.InitializeDependencyParsers(parsers);
         }
 
-        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<NugetPackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<PackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             // First, try to retrieve the data from the local cache
             string packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, version));
@@ -72,7 +73,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return nuGetPackage;
         }
 
-        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources)
+        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<PackageSource> sources)
         {
             string cacheKey = string.Concat(id, version);
             if (this.nuGetPackageXmlDocumentCache != null && this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
@@ -116,7 +117,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return packageXmlDocument;
         }
 
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
         {
             ProtocolVersion[] versionOrder = [ProtocolVersion.NuGetAPIV3, ProtocolVersion.NuGetAPIV2];
             ProtocolVersion currentVersion = ProtocolVersion.NuGetAPIV3;
@@ -134,7 +135,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             if (response == null)
             {
-                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
+                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.Source));
                 throw new UpgradeException("Upgrade failed!");
             }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using NuGet.Configuration;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
@@ -23,11 +24,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger = logger;
         }
 
-        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
+        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
         {
-            IEnumerable<NugetPackageSource> apiV3Sources = sources.Where(x => x.SourceUrl.Contains(Constants.ApiV3Identifier));
+            IEnumerable<PackageSource> apiV3Sources = sources.Where(x => x.Source.Contains(Constants.ApiV3Identifier));
             HttpResponseMessage response = null;
-            foreach (NugetPackageSource nugetSource in apiV3Sources)
+            foreach (PackageSource nugetSource in apiV3Sources)
             {
                 this.AppendNugetSourceAuthHeaders(nugetSource);
 
@@ -35,7 +36,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 string sourceUrl = (await GetBaseAddress(nugetSource))?.TrimEnd('/');
                 if (sourceUrl == null)
                 {
-                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.SourceUrl);
+                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.Source);
                     throw new UpgradeException("Upgrade failed");
                 }
 
@@ -51,29 +52,29 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 }
                 else
                 {
-                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.SourceUrl);
+                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.Source);
                 }
             }
 
             return response;
         }
 
-        private void AppendNugetSourceAuthHeaders(NugetPackageSource nugetSource)
+        private void AppendNugetSourceAuthHeaders(PackageSource nugetSource)
         {
             // there are cases where the username is not required
-            if (nugetSource.Password != null)
+            if (nugetSource.Credentials != null)
             {
-                byte[] authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Username}:{nugetSource.Password}");
+                byte[] authenticationBytes = Encoding.ASCII.GetBytes($"{nugetSource.Credentials.Username}:{nugetSource.Credentials.Password}");
                 this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authenticationBytes));
             }
         }
 
-        private async Task<string> GetBaseAddress(NugetPackageSource nugetSource)
+        private async Task<string> GetBaseAddress(PackageSource nugetSource)
         {
             HttpResponseMessage response = null;
             string baseAddress = null;
 
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, nugetSource.SourceUrl);
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, nugetSource.Source);
             request.Headers.Add("Accept", MediaTypeNames.Application.Json);
             response = await httpClient.SendAsync(request);
 

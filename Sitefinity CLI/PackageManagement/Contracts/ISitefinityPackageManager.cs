@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NuGet.Configuration;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Implementations;
 
@@ -16,14 +17,14 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
 
         Task<NuGetPackage> GetSitefinityPackageTree(string version);
 
-        Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> packageSources);
+        Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<PackageSource> packageSources);
 
-        Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<NugetPackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null);
+        Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<PackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null);
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 
         void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version);
 
-        Task<IEnumerable<NugetPackageSource>> GetNugetPackageSources(string nugetConfigFilePath);
+        IEnumerable<PackageSource> GetNugetPackageSources(string nugetConfigFilePath);
     }
 }
