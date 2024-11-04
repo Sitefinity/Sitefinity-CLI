@@ -1,6 +1,4 @@
-﻿/* {{> sign}} */
-
-namespace {{pascalCaseName}}
+﻿namespace {{pascalCaseName}}
 {
     internal class TestAuthors
     {

@@ -1,6 +1,4 @@
-﻿@* {{> sign}} *@
-
-@model {{projectDefaultNamespace}}.Mvc.Models.{{pascalCaseName}}Model
+﻿@model {{projectDefaultNamespace}}.Mvc.Models.{{pascalCaseName}}Model
 <div>
 	@Model.Message
 </div>
