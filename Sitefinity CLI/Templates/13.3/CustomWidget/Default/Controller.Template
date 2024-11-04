@@ -1,6 +1,4 @@
-﻿/* {{> sign}} */
-
-using {{projectDefaultNamespace}}.Mvc.Models;
+﻿using {{projectDefaultNamespace}}.Mvc.Models;
 using System.Web.Mvc;
 using Telerik.Sitefinity.Mvc;
 using Telerik.Sitefinity.Personalization;

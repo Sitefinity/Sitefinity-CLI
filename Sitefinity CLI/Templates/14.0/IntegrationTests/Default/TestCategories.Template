@@ -1,6 +1,4 @@
-﻿/* {{> sign}} */
-
-using MbUnit.Framework;
+﻿using MbUnit.Framework;
 
 namespace {{pascalCaseName}}
 {

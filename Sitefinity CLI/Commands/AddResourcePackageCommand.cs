@@ -55,8 +55,7 @@ namespace Sitefinity_CLI.Commands
             foreach (string filePath in Directory.GetFiles(templatePackageFolderPath, "*.*", SearchOption.AllDirectories))
             {
                 var newFilePath = filePath.Replace(templatePackageFolderPath, newResourcePackagePath);
-                File.Copy(filePath, filePath.Replace(templatePackageFolderPath, newResourcePackagePath));
-                this.AddSignToFile(newFilePath);
+                File.Copy(filePath, newFilePath);
             }
 
             Utils.WriteLine(string.Format(Constants.ResourcePackageCreatedMessage, directortyInfo.Name, newResourcePackagePath), ConsoleColor.Green);

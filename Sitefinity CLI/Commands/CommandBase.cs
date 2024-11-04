@@ -45,8 +45,6 @@ namespace Sitefinity_CLI.Commands
         [Option("-v|--version", Constants.VersionOptionDescription, CommandOptionType.SingleValue)]
         public string Version { get; set; }
 
-        protected string Sign { get; set; }
-
         protected string CurrentPath { get; set; }
 
         protected string AssemblyVersion { get; set; }
@@ -60,17 +58,6 @@ namespace Sitefinity_CLI.Commands
             this.CurrentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             this.AssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             this.Logger = logger;
-
-            var data = new
-            {
-                toolName = Constants.CLIName,
-                version = this.AssemblyVersion
-            };
-
-            var templateSource = File.ReadAllText(Path.Combine(this.CurrentPath, Constants.TemplatesFolderName, "Sign.Template"));
-            var template = Handlebars.Compile(templateSource);
-            this.Sign = template(data);
-            Handlebars.RegisterTemplate("sign", templateSource);
         }
 
         public virtual int OnExecute(CommandLineApplication config)
@@ -130,29 +117,6 @@ namespace Sitefinity_CLI.Commands
         protected virtual string GetAssemblyPath()
         {
             return Path.Combine(this.ProjectRootPath, "bin", "Telerik.Sitefinity.dll");
-        }
-
-        protected void AddSignToFile(string filePath)
-        {
-            var content = File.ReadAllText(filePath);
-            var fileExtension = Path.GetExtension(filePath);
-            string commentedSign;
-            switch (fileExtension)
-            {
-                case ".html":
-                    commentedSign = string.Format("<!-- {0} -->{1}", this.Sign, Environment.NewLine);
-                    break;
-                case ".cshtml":
-                    commentedSign = string.Format("@* {0} *@{1}", this.Sign, Environment.NewLine);
-                    break;
-                case ".cs":
-                case ".js":
-                default:
-                    commentedSign = string.Format("/* {0} */{1}", this.Sign, Environment.NewLine);
-                    break;
-            }
-
-            File.WriteAllText(filePath, string.Format("{0}{1}", commentedSign, content));
         }
 
         protected virtual int CreateFileFromTemplate(string filePath, string templatePath, string resourceFullName, object data)

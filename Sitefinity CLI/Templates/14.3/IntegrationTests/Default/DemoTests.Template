@@ -1,6 +1,4 @@
-﻿/* {{> sign}} */
-
-using System;
+﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.Sitefinity.TestIntegration.Framework.MSTest;
 

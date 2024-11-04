@@ -1,5 +1,3 @@
-/* {{> sign}} */
-
 using System;
 using Telerik.Sitefinity;
 using Telerik.Sitefinity.Abstractions;
