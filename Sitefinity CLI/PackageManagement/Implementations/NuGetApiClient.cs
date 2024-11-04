@@ -117,6 +117,27 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return packageXmlDocument;
         }
 
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification1(string id, string version, IEnumerable<PackageSource> nugetPackageSources)
+        {
+            HttpResponseMessage response = null;
+            foreach (PackageSource source in nugetPackageSources)
+            {
+                ProtocolVersion protocolVersion = (ProtocolVersion)source.ProtocolVersion;
+                response = await this.nugetProviders[protocolVersion].GetPackageSpecification(id, version, source);
+                if (response?.StatusCode == HttpStatusCode.OK)
+                {
+                    return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = protocolVersion};
+                }
+            }
+
+            if (response == null)
+            {
+                this.logger.LogError("Unable to retrieve package with name: {Id} and version: {Version} from any of the provided sources: {Sources}", id, version, nugetPackageSources.Select(s => s.Source));
+                throw new UpgradeException("Upgrade failed!");
+            }
+        }
+
+
         private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
         {
             ProtocolVersion[] versionOrder = [ProtocolVersion.NuGetAPIV3, ProtocolVersion.NuGetAPIV2];
@@ -135,7 +156,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             if (response == null)
             {
-                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.Source));
+                this.logger.LogError("Unable to retrieve package with name: {Id} and version: {Version} from any of the provided sources: {Sources}", id, version, sources.Select(s => s.Source));
                 throw new UpgradeException("Upgrade failed!");
             }
 

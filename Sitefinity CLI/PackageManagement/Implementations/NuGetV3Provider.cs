@@ -26,7 +26,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
         {
-            IEnumerable<PackageSource> apiV3Sources = sources.Where(x => x.Source.Contains(Constants.ApiV3Identifier));
+            IEnumerable<PackageSource> apiV3Sources = sources.Where(x => x.ProtocolVersion == Constants.NugetProtoclV3);
             HttpResponseMessage response = null;
             foreach (PackageSource nugetSource in apiV3Sources)
             {
@@ -48,7 +48,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    break;
+                    return response;
                 }
                 else
                 {
@@ -88,6 +88,37 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             return baseAddress;
+        }
+
+        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, PackageSource nugetSource)
+        {
+            HttpResponseMessage response = null;
+            this.AppendNugetSourceAuthHeaders(nugetSource);
+
+            // We fetch the base URL from the service index because it may be changed without notice
+            string sourceUrl = (await GetBaseAddress(nugetSource))?.TrimEnd('/');
+            if (sourceUrl == null)
+            {
+                this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.Source);
+                throw new UpgradeException("Upgrade failed");
+            }
+
+            string loweredId = id.ToLowerInvariant();
+            response = await this.httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
+
+            // clear the headers so we don't send the auth info to another package source
+            this.httpClient.DefaultRequestHeaders.Clear();
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response;
+            }
+            else
+            {
+                this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.Source);
+            }
+
+            return response;
         }
 
         private readonly HttpClient httpClient;

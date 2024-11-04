@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
@@ -166,9 +167,17 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             var setting = Settings.LoadSpecificSettings(null, nugetConfigFilePath);
-            var packageSourceProvider = new PackageSourceProvider(setting);
-            var sources = PackageSourceProvider.LoadPackageSources(setting);
-            return sources;
+            var nugetPackageSources = PackageSourceProvider.LoadPackageSources(setting);
+
+            // To be able to use .ProtoclVersion property of the library there must be xml attribute in the xml config file indicating the protocl version e.g. 2,3.
+            // However most of the cients configs do not have that
+            foreach (var source in nugetPackageSources)
+            {
+                source.ProtocolVersion = source.SourceUri.Segments.Contains(Constants.ApiV3IdentifierSegment) 
+                    ? Constants.NugetProtoclV3 : Constants.NugetProtoclV2;
+            }
+
+            return nugetPackageSources;
         }
 
         private void AddOrUpdateReferencesForAssembly(XmlDocument projectFileXmlDocument, XmlNodeList referenceElements, XmlNodeList bindingRedirectNodes, XmlDocument projectConfig, string assemblyName, IEnumerable<AssemblyReference> nugetPackageAssemblyReferences)

@@ -84,10 +84,6 @@ namespace Sitefinity_CLI.Commands
 
         protected virtual async Task ExecuteUpgrade()
         {
-            var packageSources = this.sitefinityPackageManager.GetNugetPackageSources(this.NugetConfigPath);
-
-            return;
-
             bool isSuccess = this.Validate();
 
             if (!isSuccess)
