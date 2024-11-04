@@ -117,7 +117,6 @@ You can easily create custom templates. To do this, create a file with extension
 
 **EXAMPLE**: Following is a sample template file:
 ```
-{{> sign}}
 
 {{message}}
 {{time}}
@@ -132,7 +131,6 @@ You can easily create custom templates. To do this, create a file with extension
   "age"
 ]
 ```
-**NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
 
 ## Known issues
 #### Visual Studio 2015 integration
