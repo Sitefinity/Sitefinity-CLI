@@ -26,14 +26,54 @@ function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
         },
         @{
             Name                = "PayPal"
-            DeprecatedInVersion = [System.Version]"14.0.7700.0" 
+            DeprecatedInVersion = [System.Version]"14.0.7700" 
+        },
+	@{
+            Name                = "CsvHelper"
+            DeprecatedInVersion = [System.Version]"14.0.7700" 
+        },
+	@{
+            Name                = "payflow_dotNET"
+            DeprecatedInVersion = [System.Version]"14.0.7700" 
         },
         @{
             Name                = "Progress.Sitefinity.Dec.Iris.Extension"
-            DeprecatedInVersion = [System.Version]"14.0.7700.0" 
+            DeprecatedInVersion = [System.Version]"14.0.7700" 
+        },
+	@{
+            Name                = "Progress.Sitefinity.IdentityServer3"
+            DeprecatedInVersion = [System.Version]"14.4.8100" 
+        },
+	@{
+            Name                = "Progress.Sitefinity.IdentityServer3.AccessTokenValidation"
+            DeprecatedInVersion = [System.Version]"14.4.8100" 
+        },
+	@{
+            Name                = "Autofac"
+            DeprecatedInVersion = [System.Version]"14.4.8100" 
+        },
+	@{
+            Name                = "Autofac.WebApi2"
+            DeprecatedInVersion = [System.Version]"14.4.8100" 
+        },
+	@{
+            Name                = "Microsoft.AspNet.WebApi.Owin"
+            DeprecatedInVersion = [System.Version]"14.4.8100" 
+        },
+	@{
+            Name                = "Microsoft.AspNet.WebApi.Tracing"
+            DeprecatedInVersion = [System.Version]"14.4.8100" 
         },
         @{
             Name                = "Telerik.Sitefinity.Analytics"
+            DeprecatedInVersion = [System.Version]"15.0.8200" 
+        },
+	@{
+            Name                = "Progress.Sitefinity.Ecommerce"
+            DeprecatedInVersion = [System.Version]"15.0.8200" 
+        },
+	@{
+            Name                = "Telerik.Sitefinity.AmazonCloudSearch"
             DeprecatedInVersion = [System.Version]"15.0.8200" 
         }
     )
