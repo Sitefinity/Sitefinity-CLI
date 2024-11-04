@@ -24,41 +24,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger = logger;
         }
 
-        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
-        {
-            IEnumerable<PackageSource> apiV3Sources = sources.Where(x => x.ProtocolVersion == Constants.NugetProtoclV3);
-            HttpResponseMessage response = null;
-            foreach (PackageSource nugetSource in apiV3Sources)
-            {
-                this.AppendNugetSourceAuthHeaders(nugetSource);
-
-                // We fetch the base URL from the service index because it may be changed without notice
-                string sourceUrl = (await GetBaseAddress(nugetSource))?.TrimEnd('/');
-                if (sourceUrl == null)
-                {
-                    this.logger.LogError("Unable to retrieve sourceUrl for nuget source: {source}", nugetSource.Source);
-                    throw new UpgradeException("Upgrade failed");
-                }
-
-                string loweredId = id.ToLowerInvariant();
-                response = await this.httpClient.GetAsync($"{sourceUrl}/{loweredId}/{version}/{loweredId}.nuspec");
-
-                // clear the headers so we don't send the auth info to another package source
-                this.httpClient.DefaultRequestHeaders.Clear();
-
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    return response;
-                }
-                else
-                {
-                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, nugetSource.Source);
-                }
-            }
-
-            return response;
-        }
-
         private void AppendNugetSourceAuthHeaders(PackageSource nugetSource)
         {
             // there are cases where the username is not required

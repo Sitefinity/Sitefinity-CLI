@@ -54,8 +54,7 @@ namespace Sitefinity_CLI.Commands
             IPromptService promptService,
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
-            IUpgradeConfigGenerator upgradeConfigGenerator,
-            ISitefinityPackageManager sitefinityPackageManager)
+            IUpgradeConfigGenerator upgradeConfigGenerator)
         {
 
             this.sitefinityPackageService = sitefinityPackageService;
@@ -65,7 +64,6 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityProjectService = sitefinityProjectService;
             this.sitefinityConfigService = sitefinityConfigService;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
-            this.sitefinityPackageManager = sitefinityPackageManager;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -218,6 +216,5 @@ namespace Sitefinity_CLI.Commands
         private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly ISitefinityConfigService sitefinityConfigService;
         private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
-        private readonly ISitefinityPackageManager sitefinityPackageManager;
     }
 }

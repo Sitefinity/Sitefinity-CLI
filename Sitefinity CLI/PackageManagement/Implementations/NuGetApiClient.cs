@@ -117,50 +117,28 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return packageXmlDocument;
         }
 
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification1(string id, string version, IEnumerable<PackageSource> nugetPackageSources)
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> nugetPackageSources)
         {
-            HttpResponseMessage response = null;
+            PackageSpecificationResponseModel packageSepc = new PackageSpecificationResponseModel();
+
             foreach (PackageSource source in nugetPackageSources)
             {
                 ProtocolVersion protocolVersion = (ProtocolVersion)source.ProtocolVersion;
-                response = await this.nugetProviders[protocolVersion].GetPackageSpecification(id, version, source);
+                HttpResponseMessage response = await this.nugetProviders[protocolVersion].GetPackageSpecification(id, version, source);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
-                    return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = protocolVersion};
+                    packageSepc.SpecResponse = response;
+                    packageSepc.ProtoVersion = protocolVersion;
                 }
             }
 
-            if (response == null)
+            if (packageSepc.SpecResponse == null)
             {
                 this.logger.LogError("Unable to retrieve package with name: {Id} and version: {Version} from any of the provided sources: {Sources}", id, version, nugetPackageSources.Select(s => s.Source));
                 throw new UpgradeException("Upgrade failed!");
             }
-        }
 
-
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
-        {
-            ProtocolVersion[] versionOrder = [ProtocolVersion.NuGetAPIV3, ProtocolVersion.NuGetAPIV2];
-            ProtocolVersion currentVersion = ProtocolVersion.NuGetAPIV3;
-            HttpResponseMessage response = null;
-
-            foreach (ProtocolVersion versionInfo in versionOrder)
-            {
-                response = await this.nugetProviders[versionInfo].GetPackageSpecification(id, version, sources);
-                if (response?.StatusCode == HttpStatusCode.OK)
-                {
-                    currentVersion = versionInfo;
-                    break;
-                }
-            }
-
-            if (response == null)
-            {
-                this.logger.LogError("Unable to retrieve package with name: {Id} and version: {Version} from any of the provided sources: {Sources}", id, version, sources.Select(s => s.Source));
-                throw new UpgradeException("Upgrade failed!");
-            }
-
-            return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = currentVersion };
+            return packageSepc;
         }
 
         private async Task<string> GetResponseContentString(HttpResponseMessage response)

@@ -20,28 +20,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> sources)
-        {
-            IEnumerable<PackageSource> apiV2Sources = sources.Where(x => x.ProtocolVersion == Constants.NugetProtoclV2);
-            HttpResponseMessage response = null;
-
-            foreach (PackageSource source in apiV2Sources)
-            {
-                // TODO: CHECK
-                response = await this.httpClient.GetAsync($"{source.SourceUri}/Packages(Id='{id}',Version='{version}')");
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    return response;
-                }
-                else
-                {
-                    this.logger.LogInformation("Unable to retrieve package with name: {id} and version: {version} from feed: {sourceUrl}", id, version, source.Source);
-                }
-            }
-
-            return response;
-        }
-
         public async Task<HttpResponseMessage> GetPackageSpecification(string id, string version, PackageSource source)
         {
             HttpResponseMessage response = null;
