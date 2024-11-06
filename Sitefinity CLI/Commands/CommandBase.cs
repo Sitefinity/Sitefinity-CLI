@@ -147,8 +147,11 @@ namespace Sitefinity_CLI.Commands
                     break;
                 case ".cs":
                 case ".js":
-                default:
                     commentedSign = string.Format("/* {0} */{1}", this.Sign, Environment.NewLine);
+                    break;
+                case ".json":
+                default:
+                    commentedSign = string.Empty;
                     break;
             }
 
