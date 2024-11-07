@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NuGet.Configuration;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
@@ -27,7 +28,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.dependencyParsers = this.InitializeDependencyParsers(parsers);
         }
 
-        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<NugetPackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<PackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             // First, try to retrieve the data from the local cache
             string packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, version));
@@ -72,7 +73,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return nuGetPackage;
         }
 
-        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<NugetPackageSource> sources)
+        private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<PackageSource> sources)
         {
             string cacheKey = string.Concat(id, version);
             if (this.nuGetPackageXmlDocumentCache != null && this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
@@ -116,29 +117,28 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return packageXmlDocument;
         }
 
-        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<NugetPackageSource> sources)
+        private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> nugetPackageSources)
         {
-            ProtocolVersion[] versionOrder = [ProtocolVersion.NuGetAPIV3, ProtocolVersion.NuGetAPIV2];
-            ProtocolVersion currentVersion = ProtocolVersion.NuGetAPIV3;
-            HttpResponseMessage response = null;
+            PackageSpecificationResponseModel packageSepc = new PackageSpecificationResponseModel();
 
-            foreach (ProtocolVersion versionInfo in versionOrder)
+            foreach (PackageSource source in nugetPackageSources)
             {
-                response = await this.nugetProviders[versionInfo].GetPackageSpecification(id, version, sources);
+                ProtocolVersion protocolVersion = (ProtocolVersion)source.ProtocolVersion;
+                HttpResponseMessage response = await this.nugetProviders[protocolVersion].GetPackageSpecification(id, version, source);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
-                    currentVersion = versionInfo;
-                    break;
+                    packageSepc.SpecResponse = response;
+                    packageSepc.ProtoVersion = protocolVersion;
                 }
             }
 
-            if (response == null)
+            if (packageSepc.SpecResponse == null)
             {
-                this.logger.LogError("Unable to retrieve package with name: {id} and version: {version} from any of the provided sources: {sources}", id, version, sources.Select(s => s.SourceUrl));
+                this.logger.LogError("Unable to retrieve package with name: {Id} and version: {Version} from any of the provided sources: {Sources}", id, version, nugetPackageSources.Select(s => s.Source));
                 throw new UpgradeException("Upgrade failed!");
             }
 
-            return new PackageSpecificationResponseModel { SpecResponse = response, ProtoVersion = currentVersion };
+            return packageSepc;
         }
 
         private async Task<string> GetResponseContentString(HttpResponseMessage response)

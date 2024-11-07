@@ -212,7 +212,9 @@ namespace Sitefinity_CLI
         public const string DependenciesEl = "dependencies";
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
-        public const string ApiV3Identifier = "v3";
+        public const string ApiV3IdentifierSegment = "v3/";
+        public const int  NugetProtoclV2 = 2;
+        public const int NugetProtoclV3 = 3;
 
         // Patterns
         public const string VersionPattern = @"Version=(.*?),";
