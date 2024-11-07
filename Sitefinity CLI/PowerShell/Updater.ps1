@@ -1,5 +1,6 @@
 param(
-    [bool] $RemoveDeprecatedPackages
+    [bool] $RemoveDeprecatedPackages,
+    [System.Version] $SitefinityVersion
 )
 
 function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
@@ -10,7 +11,12 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
     return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
 }
 
-function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
+function Remove-DeprecatedPackages {
+    param(
+        [string] $ProjectName,
+        [System.Version] $SitefinityVersion
+    )
+
     $deprecatedPackages = @(
         @{
             Name                = "Telerik.DataAccess.Fluent"
@@ -78,13 +84,14 @@ function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
         }
     )
 
-    "`nRemoving deprecated packages for '$projectName'"
+    "`nRemoving deprecated packages for '$ProjectName'"
     foreach ($package in $deprecatedPackages) {
-        if ($sfPackageVersion -ge $package.DeprecatedInVersion) {
-            $deprecatedPackage = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$projectName`"" 
+        if ($SitefinityVersion -ge $package.DeprecatedInVersion) {
+            $deprecatedPackageMatches = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$ProjectName`"" 
+            $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $package.Name } | Select-Object -First 1
             if ($null -ne $deprecatedPackage) {
-                "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$projectName`""
-                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$projectName`" -Force" 
+                "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
+                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -Force" 
             }
         }
     }
@@ -118,11 +125,7 @@ try {
         $totalCount = @($packages).Count
 
         if ($RemoveDeprecatedPackages) {
-            $sfPackageVersion = ($packages | Where-Object { @("Telerik.Sitefinity", "Telerik.Sitefinity.Core", "Telerik.Sitefinity.All") -contains $_.name }).Version
-
-            if ($null -ne $sfPackageVersion) {
-                Remove-DeprecatedPackages -projectName $projectName -sfPackageVersion $sfPackageVersion
-            }
+            Remove-DeprecatedPackages -ProjectName $projectName -SitefinityVersion $SitefinityVersion
         }
 
         foreach ($package in $packages) {
