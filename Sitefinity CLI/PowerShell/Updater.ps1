@@ -18,63 +18,63 @@ function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
         },
         @{
             Name                = "Telerik.Sitefinity.OpenAccess"
-            DeprecatedInVersion = [System.Version]"13.0.7300" 
+            DeprecatedInVersion = [System.Version]"13.0.7300"
         },
         @{
             Name                = "Telerik.Sitefinity.AmazonCloudSearch"
-            DeprecatedInVersion = [System.Version]"13.3.7600" 
+            DeprecatedInVersion = [System.Version]"13.3.7600"
         },
         @{
             Name                = "PayPal"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
-	@{
+	    @{
             Name                = "CsvHelper"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
-	@{
+	    @{
             Name                = "payflow_dotNET"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
         @{
             Name                = "Progress.Sitefinity.Dec.Iris.Extension"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
-	@{
+	    @{
             Name                = "Progress.Sitefinity.IdentityServer3"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+	    @{
             Name                = "Progress.Sitefinity.IdentityServer3.AccessTokenValidation"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+	    @{
             Name                = "Autofac"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+	    @{
             Name                = "Autofac.WebApi2"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+	    @{
             Name                = "Microsoft.AspNet.WebApi.Owin"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+	    @{
             Name                = "Microsoft.AspNet.WebApi.Tracing"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
         @{
             Name                = "Telerik.Sitefinity.Analytics"
-            DeprecatedInVersion = [System.Version]"15.0.8200" 
+            DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+	    @{
             Name                = "Progress.Sitefinity.Ecommerce"
-            DeprecatedInVersion = [System.Version]"15.0.8200" 
+            DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+	    @{
             Name                = "Telerik.Sitefinity.AmazonCloudSearch"
-            DeprecatedInVersion = [System.Version]"15.0.8200" 
+            DeprecatedInVersion = [System.Version]"15.0.8200"
         }
     )
 
@@ -118,7 +118,7 @@ try {
         $totalCount = @($packages).Count
 
         if ($RemoveDeprecatedPackages) {
-            $sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.Core" -or $_.name -eq "Telerik.Sitefinity.All" }).Version
+            $sfPackageVersion = ($packages | Where-Object { @("Telerik.Sitefinity", "Telerik.Sitefinity.Core", "Telerik.Sitefinity.All") -contains $_.name }).Version
 
             if ($null -ne $sfPackageVersion) {
                 Remove-DeprecatedPackages -projectName $projectName -sfPackageVersion $sfPackageVersion
