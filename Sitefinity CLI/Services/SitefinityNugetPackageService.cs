@@ -27,7 +27,7 @@ namespace Sitefinity_CLI.Services
         {
             IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
 
-            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(options.Version, packageSources);
+            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(options.VersionAsString, packageSources);
             if (newSitefinityPackage == null)
             {
                 throw new UpgradeException($"Unable to prepare upgrade package for version: {options.Version}");
