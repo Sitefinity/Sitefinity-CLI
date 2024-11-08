@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using NuGet.Configuration;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.Services.Contracts;
@@ -39,7 +40,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             XmlElement powerShellXmlConfigNode = powerShellXmlConfig.CreateElement("config");
             powerShellXmlConfig.AppendChild(powerShellXmlConfigNode);
 
-            IEnumerable<NugetPackageSource> packageSources = await this.sitefinityPackageManager.GetNugetPackageSources(nugetConfigPath);
+            IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(nugetConfigPath);
 
             foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
@@ -62,7 +63,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             XmlElement powerShellXmlConfigNode,
             string projectFilePath,
             NuGetPackage newSitefinityVersionPackageTree,
-            IEnumerable<NugetPackageSource> packageSources,
+            IEnumerable<PackageSource> packageSources,
             Version currentSitefinityVersion,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
         {

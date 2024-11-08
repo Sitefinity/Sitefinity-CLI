@@ -2,7 +2,7 @@
 {
     internal enum ProtocolVersion
     {
-        NuGetAPIV2,
-        NuGetAPIV3
+        NuGetAPIV2 = 2,
+        NuGetAPIV3 = 3
     }
 }

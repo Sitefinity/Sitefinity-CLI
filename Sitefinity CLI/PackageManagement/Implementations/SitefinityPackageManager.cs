@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using NuGet.Configuration;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
@@ -29,10 +31,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.packagesConfigFileEditor = packagesConfigFileEditor;
             this.projectConfigFileEditor = projectConfigFileEditor;
             this.logger = logger;
-            this.defaultSources = new List<NugetPackageSource>()
+            this.defaultSources = new List<PackageSource>()
             {
-               new NugetPackageSource(SitefinityPublicNuGetSource),
-               new NugetPackageSource(PublicNuGetSourceV3)
+               new PackageSource(SitefinityPublicNuGetSource),
+               new PackageSource(PublicNuGetSourceV3)
             };
             this.supportedFrameworksRegex = new Regex("^net[0-9]*$", RegexOptions.Compiled);
             this.systemAssembliesNotToUpdate = new HashSet<string>() { "System.Runtime", "System.IO" };
@@ -77,15 +79,15 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return await this.GetSitefinityPackageTree(version, this.defaultSources);
         }
 
-        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<NugetPackageSource> nugetPackageSources)
+        public async Task<NuGetPackage> GetSitefinityPackageTree(string version, IEnumerable<PackageSource> nugetPackageSources)
         {
-            var sourcesUsed = string.Join(',', nugetPackageSources?.Select(x => x.SourceUrl));
+            var sourcesUsed = string.Join(',', nugetPackageSources?.Select(x => x.Source));
             this.logger.LogInformation($"Package sources used: {sourcesUsed}");
 
             return await this.nuGetApiClient.GetPackageWithFullDependencyTree(Constants.SitefinityAllNuGetPackageId, version, nugetPackageSources, this.supportedFrameworksRegex);
         }
 
-        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<NugetPackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<PackageSource> nugetPackageSources, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
             return await this.nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, supportedFrameworksRegex, shouldBreakSearch);
         }
@@ -156,68 +158,26 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 }
             }
         }
-        public async Task<IEnumerable<NugetPackageSource>> GetNugetPackageSources(string nugetConfigFilePath)
+
+        public IEnumerable<PackageSource> GetNugetPackageSources(string nugetConfigFilePath)
         {
             if (string.IsNullOrEmpty(nugetConfigFilePath))
             {
                 throw new ArgumentException(nameof(nugetConfigFilePath));
             }
 
-            var packageSourceList = new List<NugetPackageSource>();
+            var setting = Settings.LoadSpecificSettings(null, nugetConfigFilePath);
+            var nugetPackageSources = PackageSourceProvider.LoadPackageSources(setting);
 
-            var fileContent = await File.ReadAllTextAsync(nugetConfigFilePath);
-            XDocument nuGetPackageXmlDoc = XDocument.Parse(fileContent);
-            var xmlPackageSources = nuGetPackageXmlDoc.Root?.Element("packageSources")?.Elements().Where(e => e.Name == "add");
-            var packageSourceCredentials = nuGetPackageXmlDoc.Root?.Element("packageSourceCredentials");
-
-            foreach (var xmlPackageSource in xmlPackageSources)
+            // To be able to use .ProtoclVersion property of the library there must be xml attribute in the xml config file indicating the protocl version e.g. 2,3.
+            // However most of the cients configs do not have that
+            foreach (var source in nugetPackageSources)
             {
-                string packageSourceName = xmlPackageSource.Attribute("key")?.Value;
-                string packageSourceUrl = xmlPackageSource.Attribute("value")?.Value;
-
-                if (!string.IsNullOrEmpty(packageSourceName) && !string.IsNullOrEmpty(packageSourceUrl))
-                {
-                    var nugetSource = new NugetPackageSource();
-                    nugetSource.SourceName = packageSourceName;
-                    nugetSource.SourceUrl = packageSourceUrl;
-                    this.TryAddPackageCredentialsToSource(packageSourceCredentials, packageSourceName, nugetSource);
-                    packageSourceList.Add(nugetSource);
-                }
+                source.ProtocolVersion = source.SourceUri.Segments.Contains(Constants.ApiV3IdentifierSegment) 
+                    ? Constants.NugetProtoclV3 : Constants.NugetProtoclV2;
             }
 
-            return packageSourceList;
-        }
-
-        private void TryAddPackageCredentialsToSource(XElement packageSourceCredentials, string packageSourceName, NugetPackageSource nugetSource)
-        {
-            if (packageSourceCredentials != null)
-            {
-                if (packageSourceName.Any(c => char.IsWhiteSpace(c)))
-                {
-                    this.logger.LogError("The package source: {packageSource} contains white space char. If you have <packageSourceCredentials> element for it it won't be extracted", nugetSource.SourceName);
-                    return;
-                }
-
-                var packageCredentials = packageSourceCredentials.Element(packageSourceName);
-                if (packageCredentials != null)
-                {
-                    var userName = packageCredentials.Descendants().FirstOrDefault(e => (string)e.Attribute("key") == "Username");
-                    var passWord = packageCredentials.Descendants().FirstOrDefault(e => (string)e.Attribute("key") == "ClearTextPassword");
-
-                    if (userName != null && passWord != null)
-                    {
-                        nugetSource.Username = userName.Attribute("value")?.Value;
-                        nugetSource.Password = passWord.Attribute("value")?.Value;
-
-                        if (string.IsNullOrEmpty(nugetSource.Username) || string.IsNullOrEmpty(nugetSource.Password))
-                        {
-                            logger.LogError("Error while retrieveing credentials for source: {packageSource}.", nugetSource.SourceUrl);
-                            throw new UpgradeException("Upgrade failed due to errors reading the provided nugetConfig");
-                        }
-                    }
-                }
-
-            }
+            return nugetPackageSources;
         }
 
         private void AddOrUpdateReferencesForAssembly(XmlDocument projectFileXmlDocument, XmlNodeList referenceElements, XmlNodeList bindingRedirectNodes, XmlDocument projectConfig, string assemblyName, IEnumerable<AssemblyReference> nugetPackageAssemblyReferences)
@@ -381,11 +341,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return parsedVersion;
         }
 
-        public IEnumerable<NugetPackageSource> DefaultPackageSource
+        public IEnumerable<PackageSource> DefaultPackageSource
         {
             get
             {
-                return new List<NugetPackageSource>(this.defaultSources);
+                return new List<PackageSource>(this.defaultSources);
             }
         }
 
@@ -679,7 +639,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private readonly ILogger logger;
 
-        private readonly IEnumerable<NugetPackageSource> defaultSources;
+        private readonly IEnumerable<PackageSource> defaultSources;
 
         private readonly Regex supportedFrameworksRegex;
 
