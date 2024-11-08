@@ -97,6 +97,7 @@ namespace Sitefinity_CLI
         public const string TargetFrameworkChanged = "Target framework for {0} set to {1}";
         public const string TargetFrameworkDoesNotNeedChanged = "Target framework for {0} does not need change ({1})";
         public const string LatestVersionFound = "Latest version for Sitefinity found: {0}";
+        public const string RemovingEnhancerAssemblyForProjectsIfExists = "Removing EnhancerAssembly for projects (if exists)";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
@@ -171,6 +172,8 @@ namespace Sitefinity_CLI
         public const string DefaultSourceTemplateName = "Default";
 
         // Csproj editor constants
+        public const string EnhancerAssemblyElem = "EnhancerAssembly";
+        public const string PropertyGroupElem = "PropertyGroup";
         public const string ItemGroupElem = "ItemGroup";
         public const string CompileElem = "Compile";
         public const string ReferenceElem = "Reference";

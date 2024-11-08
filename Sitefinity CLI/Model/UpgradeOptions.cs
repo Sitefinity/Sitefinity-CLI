@@ -1,21 +1,36 @@
-﻿namespace Sitefinity_CLI.Model
+﻿using System;
+using Sitefinity_CLI.Exceptions;
+using System.Linq;
+
+namespace Sitefinity_CLI.Model
 {
     public class UpgradeOptions
     {
-        public UpgradeOptions(string solutionPath, string version, bool skipPrompts, bool acceptLicense, string nugetConfigPath, string additionalPackagesString, bool removeDeprecatedPackages)
+        public UpgradeOptions(string solutionPath, string versionAsString, bool skipPrompts, bool acceptLicense, string nugetConfigPath, string additionalPackagesString, bool removeDeprecatedPackages)
         {
             SolutionPath = solutionPath;
-            Version = version;
             SkipPrompts = skipPrompts;
             AcceptLicense = acceptLicense;
             NugetConfigPath = nugetConfigPath;
             AdditionalPackagesString = additionalPackagesString;
             RemoveDeprecatedPackages = removeDeprecatedPackages;
+            VersionAsString = versionAsString;
+
+            if (Version.TryParse(versionAsString.Split('-').First(), out Version version))
+            {
+                Version = version;
+            }
+            else
+            {
+                throw new UpgradeException(string.Format(Constants.TryToUpdateInvalidVersionMessage, versionAsString));
+            }
         }
 
         public string SolutionPath { get; set; }
 
-        public string Version { get; set; }
+        public string VersionAsString { get; set; }
+
+        public Version Version { get; set; }
 
         public bool SkipPrompts { get; set; }
 
