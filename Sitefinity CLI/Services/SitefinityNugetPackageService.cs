@@ -26,11 +26,11 @@ namespace Sitefinity_CLI.Services
         {
             IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
 
-            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(options.Version, packageSources);
+            NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(options.VersionAsString, packageSources);
 
             this.sitefinityPackageManager.Restore(options.SolutionPath);
-            this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, options.Version);
-            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, options.Version, options.SolutionPath, options.NugetConfigPath);
+            this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, options.VersionAsString);
+            this.sitefinityPackageManager.Install(newSitefinityPackage.Id, options.VersionAsString, options.SolutionPath, options.NugetConfigPath);
 
             return newSitefinityPackage;
         }
@@ -45,7 +45,7 @@ namespace Sitefinity_CLI.Services
             {
                 foreach (string packageId in additionalPackagesIds)
                 {
-                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, new Version(options.Version), packageSources);
+                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, options.Version, packageSources);
                     if (package != null)
                     {
                         additionalPackagesToUpgrade.Add(package);

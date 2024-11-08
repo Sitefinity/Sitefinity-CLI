@@ -4,6 +4,8 @@ namespace Sitefinity_CLI.VisualStudio
 {
     public interface ICsProjectFileEditor
     {
+        void RemovePropertyGroupElement(string csProjFilePath, string elementName);
+
         void RemoveReference(string csProjFilePath, string assemblyFilePath);
 
         IEnumerable<CsProjectFileReference> GetReferences(string csProjFilePath);

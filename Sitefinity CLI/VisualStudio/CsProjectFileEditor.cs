@@ -8,6 +8,23 @@ namespace Sitefinity_CLI.VisualStudio
 {
     public class CsProjectFileEditor : XmlFileEditorBase, ICsProjectFileEditor
     {
+        public void RemovePropertyGroupElement(string csProjFilePath, string elementName)
+        {
+            base.ModifyFile(csProjFilePath, (doc) =>
+            {
+                IEnumerable<XElement> elements = doc.Element(msbuild + Constants.ProjectElem)
+                    .Elements(msbuild + Constants.PropertyGroupElem)
+                    .Elements(msbuild + elementName);
+
+                foreach (XElement element in elements)
+                {
+                    element.Remove();
+                }
+
+                return doc;
+            });
+        }
+
         public void RemoveReference(string csProjFilePath, string assemblyFilePath)
         {
             base.ModifyFile(csProjFilePath, (doc) =>

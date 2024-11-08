@@ -19,7 +19,7 @@ namespace Sitefinity_CLI.Services
             this.logger = logger;
         }
 
-        public Version DetectSitefinityVersion(string sitefinityProjectPath)
+        public Version GetSitefinityVersion(string sitefinityProjectPath)
         {
             CsProjectFileReference sitefinityReference = this.csProjectFileEditor.GetReferences(sitefinityProjectPath).FirstOrDefault(this.IsSitefinityReference);
 
@@ -30,6 +30,7 @@ namespace Sitefinity_CLI.Services
                 if (versionMatch.Success)
                 {
                     string sitefinityVersionWithoutRevision = Version.Parse(versionMatch.Groups[1].Value).ToString(3);
+                    
                     return Version.Parse(sitefinityVersionWithoutRevision);
                 }
             }
@@ -50,40 +51,29 @@ namespace Sitefinity_CLI.Services
                              ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        public IEnumerable<string> GetSitefinityProjectPathsFromSolution(string solutionPath, string version)
+        public IEnumerable<string> GetSitefinityProjectPathsFromSolution(string solutionPath)
         {
             IEnumerable<string> allProjectPaths = this.GetProjectPathsFromSolution(solutionPath);
-            return allProjectPaths.Where(path => this.HasSitefinityReferences(path) && this.HasValidSitefinityVersion(path, version));
+
+            return allProjectPaths.Where(path => this.HasSitefinityReferences(path));
         }
 
         public IEnumerable<string> GetNonSitefinityProjectPaths(string solutionPath)
         {
             IEnumerable<string> allProjectPaths = this.GetProjectPathsFromSolution(solutionPath);
+            
             return allProjectPaths.Where(p => !this.HasSitefinityReferences(p));
         }
 
-        private bool HasValidSitefinityVersion(string projectFilePath, string version)
+        public void RemoveEnhancerAssemblyIfExists(string projectFilePath)
         {
-            Version currentVersion = this.DetectSitefinityVersion(projectFilePath);
-
-            if (string.IsNullOrWhiteSpace(version) || !Version.TryParse(version.Split('-').First(), out Version versionToUpgrade))
-            {
-                throw new UpgradeException(string.Format(Constants.TryToUpdateInvalidVersionMessage, version));
-            }
-
-            if (versionToUpgrade <= currentVersion)
-            {
-                string projectName = Path.GetFileName(projectFilePath);
-                this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, projectName, currentVersion, versionToUpgrade));
-                return false;
-            }
-
-            return true;
+            this.csProjectFileEditor.RemovePropertyGroupElement(projectFilePath, Constants.EnhancerAssemblyElem);
         }
 
         private bool HasSitefinityReferences(string projectFilePath)
         {
             IEnumerable<CsProjectFileReference> references = this.csProjectFileEditor.GetReferences(projectFilePath);
+            
             return references.Any(this.IsSitefinityReference);
         }
 
