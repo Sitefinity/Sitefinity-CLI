@@ -154,7 +154,7 @@ namespace Sitefinity_CLI.Commands
 
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, this.UpgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
 
-            if (this.UpgradeOptions.Version > new Version(12, 2, 7200))
+            if (this.UpgradeOptions.Version >= new Version(12, 2, 7200))
             {
                 this.logger.LogInformation(Constants.RemovingEnhancerAssemblyForProjectsIfExists);
                 foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectFilePathsWithSitefinityVersion)
