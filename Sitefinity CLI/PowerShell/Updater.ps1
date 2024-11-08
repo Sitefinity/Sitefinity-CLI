@@ -1,5 +1,6 @@
 param(
-    [bool] $RemoveDeprecatedPackages
+    [bool] $RemoveDeprecatedPackages,
+    [System.Version] $SitefinityVersion
 )
 
 function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
@@ -10,7 +11,12 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
     return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
 }
 
-function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
+function Remove-DeprecatedPackages {
+    param(
+        [string] $ProjectName,
+        [System.Version] $SitefinityVersion
+    )
+
     $deprecatedPackages = @(
         @{
             Name                = "Telerik.DataAccess.Fluent"
@@ -18,73 +24,74 @@ function Remove-DeprecatedPackages($projectName, $sfPackageVersion) {
         },
         @{
             Name                = "Telerik.Sitefinity.OpenAccess"
-            DeprecatedInVersion = [System.Version]"13.0.7300" 
+            DeprecatedInVersion = [System.Version]"13.0.7300"
         },
         @{
             Name                = "Telerik.Sitefinity.AmazonCloudSearch"
-            DeprecatedInVersion = [System.Version]"13.3.7600" 
+            DeprecatedInVersion = [System.Version]"13.3.7600"
         },
         @{
             Name                = "PayPal"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
-	@{
+        @{
             Name                = "CsvHelper"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
-	@{
+        @{
             Name                = "payflow_dotNET"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
         @{
             Name                = "Progress.Sitefinity.Dec.Iris.Extension"
-            DeprecatedInVersion = [System.Version]"14.0.7700" 
+            DeprecatedInVersion = [System.Version]"14.0.7700"
         },
-	@{
+        @{
             Name                = "Progress.Sitefinity.IdentityServer3"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+        @{
             Name                = "Progress.Sitefinity.IdentityServer3.AccessTokenValidation"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+        @{
             Name                = "Autofac"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+        @{
             Name                = "Autofac.WebApi2"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+        @{
             Name                = "Microsoft.AspNet.WebApi.Owin"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
-	@{
+        @{
             Name                = "Microsoft.AspNet.WebApi.Tracing"
-            DeprecatedInVersion = [System.Version]"14.4.8100" 
+            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
         @{
             Name                = "Telerik.Sitefinity.Analytics"
-            DeprecatedInVersion = [System.Version]"15.0.8200" 
+            DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+        @{
             Name                = "Progress.Sitefinity.Ecommerce"
-            DeprecatedInVersion = [System.Version]"15.0.8200" 
+            DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+        @{
             Name                = "Telerik.Sitefinity.AmazonCloudSearch"
-            DeprecatedInVersion = [System.Version]"15.0.8200" 
+            DeprecatedInVersion = [System.Version]"15.0.8200"
         }
     )
 
-    "`nRemoving deprecated packages for '$projectName'"
+    "`nRemoving deprecated packages for '$ProjectName'"
     foreach ($package in $deprecatedPackages) {
-        if ($sfPackageVersion -ge $package.DeprecatedInVersion) {
-            $deprecatedPackage = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$projectName`"" 
+        if ($SitefinityVersion -ge $package.DeprecatedInVersion) {
+            $deprecatedPackageMatches = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$ProjectName`"" 
+            $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $package.Name } | Select-Object -First 1
             if ($null -ne $deprecatedPackage) {
-                "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$projectName`""
-                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$projectName`" -Force" 
+                "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
+                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -Force" 
             }
         }
     }
@@ -118,11 +125,7 @@ try {
         $totalCount = @($packages).Count
 
         if ($RemoveDeprecatedPackages) {
-            $sfPackageVersion = ($packages | Where-Object { $_.name -eq "Telerik.Sitefinity.Core" -or $_.name -eq "Telerik.Sitefinity.All" }).Version
-
-            if ($null -ne $sfPackageVersion) {
-                Remove-DeprecatedPackages -projectName $projectName -sfPackageVersion $sfPackageVersion
-            }
+            Remove-DeprecatedPackages -ProjectName $projectName -SitefinityVersion $SitefinityVersion
         }
 
         foreach ($package in $packages) {
