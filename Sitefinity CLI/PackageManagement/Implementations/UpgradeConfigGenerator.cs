@@ -27,14 +27,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         }
 
         public async Task GenerateUpgradeConfig(
-           IEnumerable<string> projectFilePathsWithSitefinityVersion,
+            IEnumerable<(string FilePath, Version Version)> projectPathsWithSitefinityVersion,
             NuGetPackage newSitefinityVersionPackageTree,
             string nugetConfigPath,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
         {
-            IEnumerable<Tuple<string, Version>> projectPathsWithSitefinityVersion = projectFilePathsWithSitefinityVersion
-                .Select(x => new Tuple<string, Version>(x, this.sitefinityProjectService.DetectSitefinityVersion(x)));
-
             this.logger.LogInformation("Exporting upgrade config...");
 
             XmlDocument powerShellXmlConfig = new XmlDocument();
@@ -43,15 +40,15 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(nugetConfigPath);
 
-            foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
+            foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
                 await this.GenerateProjectUpgradeConfigSection(
-                    powerShellXmlConfig,
-                    powerShellXmlConfigNode,
-                    projectFilePathWithSitefinityVersion.Item1,
-                    newSitefinityVersionPackageTree,
-                    packageSources,
-                    projectFilePathWithSitefinityVersion.Item2,
+                    powerShellXmlConfig, 
+                    powerShellXmlConfigNode, 
+                    projectFilePathWithSitefinityVersion.FilePath, 
+                    newSitefinityVersionPackageTree, 
+                    packageSources, 
+                    projectFilePathWithSitefinityVersion.Version, 
                     additionalPackagesToUpgrade);
             }
 

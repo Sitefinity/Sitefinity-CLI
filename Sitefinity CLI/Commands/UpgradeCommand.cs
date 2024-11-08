@@ -1,20 +1,19 @@
-﻿using HandlebarsDotNet;
-using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Sitefinity_CLI.Commands.Validators;
-using Sitefinity_CLI.Model;
-using Sitefinity_CLI.PackageManagement.Contracts;
-using Sitefinity_CLI.PackageManagement.Implementations;
-using Sitefinity_CLI.Services.Contracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using HandlebarsDotNet;
+using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Sitefinity_CLI.Commands.Validators;
+using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.PackageManagement.Implementations;
+using Sitefinity_CLI.Services.Contracts;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -97,19 +96,31 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation(Constants.SearchingProjectForReferencesMessage);
 
-            IEnumerable<string> sitefinityProjectFilePaths = this.sitefinityProjectService
-                .GetSitefinityProjectPathsFromSolution(this.SolutionPath, this.Version).ToList();
+            IEnumerable<(string FilePath, Version Version)> projectFilePathsWithSitefinityVersion = this.sitefinityProjectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath)
+                .Select(p => (FilePath: p, Version: this.sitefinityProjectService.GetSitefinityVersion(p)))
+                .Where(p => {
+                    if (this.UpgradeOptions.Version <= p.Version)
+                    {
+                        this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, Path.GetFileName(p.FilePath), p.Version, this.UpgradeOptions.Version));
 
-            if (!sitefinityProjectFilePaths.Any())
+                        return false;
+                    }
+
+                    return true;
+                })
+                .ToList();
+
+            if (!projectFilePathsWithSitefinityVersion.Any())
             {
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
+
                 return;
             }
 
-            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectFilePaths.Count()));
+            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, projectFilePathsWithSitefinityVersion.Count()));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
 
-            NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(this.UpgradeOptions, sitefinityProjectFilePaths);
+            NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(this.UpgradeOptions, projectFilePathsWithSitefinityVersion.Select(p => p.FilePath));
 
             if (!this.AcceptLicense)
             {
@@ -141,7 +152,16 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            await this.upgradeConfigGenerator.GenerateUpgradeConfig(sitefinityProjectFilePaths, upgradePackage, this.UpgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
+            await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, this.UpgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
+
+            if (this.UpgradeOptions.Version > new Version(12, 2, 7200))
+            {
+                this.logger.LogInformation(Constants.RemovingEnhancerAssemblyForProjectsIfExists);
+                foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectFilePathsWithSitefinityVersion)
+                {
+                    this.sitefinityProjectService.RemoveEnhancerAssemblyIfExists(projectFilePathWithSitefinityVersion.FilePath);
+                }
+            }
 
             IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigsForProjectsWithoutSitefinity(this.SolutionPath);
 
@@ -149,7 +169,7 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityConfigService.RestoreConfugrtionValues(configsWithoutSitefinity);
 
-            this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectFilePaths, Path.GetDirectoryName(this.SolutionPath));
+            this.sitefinityPackageService.SyncProjectReferencesWithPackages(projectFilePathsWithSitefinityVersion.Select(p => p.FilePath), Path.GetDirectoryName(this.SolutionPath));
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 
