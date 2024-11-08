@@ -89,7 +89,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             PackageSpecificationResponseModel specification = await this.GetPackageSpecification(id, version, sources);
 
-            if (specification.SpecResponse == null || specification.SpecResponse.StatusCode != HttpStatusCode.OK)
+            if (specification?.SpecResponse == null || specification.SpecResponse.StatusCode != HttpStatusCode.OK)
             {
                 return null;
             }
@@ -135,7 +135,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             if (packageSepc.SpecResponse == null)
             {
                 this.logger.LogError("Unable to retrieve package with name: {Id} and version: {Version} from any of the provided sources: {Sources}", id, version, nugetPackageSources.Select(s => s.Source));
-                throw new UpgradeException("Upgrade failed!");
             }
 
             return packageSepc;

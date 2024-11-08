@@ -10,6 +10,7 @@ using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services.Contracts;
 using NuGet.Configuration;
+using Sitefinity_CLI.Exceptions;
 
 namespace Sitefinity_CLI.Services
 {
@@ -21,12 +22,16 @@ namespace Sitefinity_CLI.Services
             this.dotnetCliClient = dotnetCliClient;
             this.httpClient = httpClientFactory.CreateClient();
         }
-     
+
         public async Task<NuGetPackage> PrepareSitefinityUpgradePackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths)
         {
             IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
 
             NuGetPackage newSitefinityPackage = await this.sitefinityPackageManager.GetSitefinityPackageTree(options.Version, packageSources);
+            if (newSitefinityPackage == null)
+            {
+                throw new UpgradeException($"Unable to prepare upgrade package for version: {options.Version}");
+            }
 
             this.sitefinityPackageManager.Restore(options.SolutionPath);
             this.sitefinityPackageManager.SetTargetFramework(sitefinityProjectFilePaths, options.Version);
@@ -84,7 +89,7 @@ namespace Sitefinity_CLI.Services
 
         private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<PackageSource> packageSources)
         {
-            IEnumerable<string> versions =  this.dotnetCliClient.GetPackageVersionsInNugetSources(packageId, null);
+            IEnumerable<string> versions = this.dotnetCliClient.GetPackageVersionsInNugetSources(packageId, null);
 
             NuGetPackage compatiblePackage = null;
 
@@ -93,7 +98,11 @@ namespace Sitefinity_CLI.Services
                 bool isIncompatible = false;
                 NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, packageSources, package =>
                 {
-                    isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
+                    if (package != null)
+                    {
+                        isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
+                    }
+
                     return isIncompatible;
                 });
 

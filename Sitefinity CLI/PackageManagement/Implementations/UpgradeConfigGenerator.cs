@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using NuGet.Configuration;
+using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.Services.Contracts;
@@ -45,12 +46,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             foreach (Tuple<string, Version> projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
                 await this.GenerateProjectUpgradeConfigSection(
-                    powerShellXmlConfig, 
-                    powerShellXmlConfigNode, 
-                    projectFilePathWithSitefinityVersion.Item1, 
-                    newSitefinityVersionPackageTree, 
-                    packageSources, 
-                    projectFilePathWithSitefinityVersion.Item2, 
+                    powerShellXmlConfig,
+                    powerShellXmlConfigNode,
+                    projectFilePathWithSitefinityVersion.Item1,
+                    newSitefinityVersionPackageTree,
+                    packageSources,
+                    projectFilePathWithSitefinityVersion.Item2,
                     additionalPackagesToUpgrade);
             }
 
@@ -84,6 +85,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             this.logger.LogInformation($"Collecting Sitefinity NuGet package tree for '{projectFilePath}'...");
             NuGetPackage currentSitefinityVersionPackageTree = await this.sitefinityPackageManager.GetSitefinityPackageTree(currentSitefinityVersion.ToString(), packageSources);
+            if (currentSitefinityVersionPackageTree == null)
+            {
+                throw new UpgradeException("Unable to obtain current Sitefinity dependency tree");
+            }
 
             this.processedPackagesPerProjectCache[projectFilePath] = new HashSet<string>();
             if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree, newSitefinityVersionPackageTree))
