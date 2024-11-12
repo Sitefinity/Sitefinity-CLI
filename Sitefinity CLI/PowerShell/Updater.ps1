@@ -91,7 +91,7 @@ function Remove-DeprecatedPackages {
             $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $package.Name } | Select-Object -First 1
             if ($null -ne $deprecatedPackage) {
                 "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
-                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -Force" 
+                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -RemoveDependencies -Force" 
             }
         }
     }
