@@ -77,10 +77,6 @@ function Remove-DeprecatedPackages {
         @{
             Name                = "Progress.Sitefinity.Ecommerce"
             DeprecatedInVersion = [System.Version]"15.0.8200"
-        },
-        @{
-            Name                = "Telerik.Sitefinity.AmazonCloudSearch"
-            DeprecatedInVersion = [System.Version]"15.0.8200"
         }
     )
 
