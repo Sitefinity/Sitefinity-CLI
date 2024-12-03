@@ -46,6 +46,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.RemoveDeprecatedPackages, Description = Constants.RemoveDeprecatedPackagesDescription)]
         public bool RemoveDeprecatedPackages { get; set; }
 
+        [Option(Constants.RetainEnhancer, Description = Constants.RetainEnhancerDescription)]
+        public bool RetainReferenceToEnhancer { get; set; }
+
         public UpgradeCommand(
             ISitefinityNugetPackageService sitefinityPackageService,
             IVisualStudioService visualStudioService,
@@ -98,7 +101,8 @@ namespace Sitefinity_CLI.Commands
 
             IEnumerable<(string FilePath, Version Version)> projectFilePathsWithSitefinityVersion = this.sitefinityProjectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath)
                 .Select(p => (FilePath: p, Version: this.sitefinityProjectService.GetSitefinityVersion(p)))
-                .Where(p => {
+                .Where(p =>
+                {
                     if (this.UpgradeOptions.Version <= p.Version)
                     {
                         this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, Path.GetFileName(p.FilePath), p.Version, this.UpgradeOptions.Version));
@@ -154,7 +158,7 @@ namespace Sitefinity_CLI.Commands
 
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, this.UpgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
 
-            if (this.UpgradeOptions.Version >= new Version(12, 2, 7200))
+            if (this.UpgradeOptions.Version >= new Version(12, 2, 7200) && !this.RetainReferenceToEnhancer)
             {
                 this.logger.LogInformation(Constants.RemovingEnhancerAssemblyForProjectsIfExists);
                 foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectFilePathsWithSitefinityVersion)

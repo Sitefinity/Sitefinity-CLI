@@ -125,6 +125,7 @@ namespace Sitefinity_CLI
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
         public const string UpgradeCommandDescription = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.";
+        public const string RetainEnhancerDescription = "Use this flag to indicate that you want to keep the reference to enhancer.exe. Otherwise if you upgrade to version >= 12.2.7200 it will be removed. More info here: https://www.progress.com/sitefinity-cms/release-notes/sitefinity-cms-12-2-7200-(official-release)#Developer%20Tools%20updates";
         public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
@@ -135,6 +136,7 @@ namespace Sitefinity_CLI
         public const string NugetConfigPath = "-nc|--nugetConfigPath";
         public const string AdditionalPackages = "--additionalPackages";
         public const string RemoveDeprecatedPackages = "--removeDeprecatedPackages";
+        public const string RetainEnhancer = "-re|--retainEnhancer";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";
