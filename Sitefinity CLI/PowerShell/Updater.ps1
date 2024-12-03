@@ -35,24 +35,12 @@ function Remove-DeprecatedPackages {
             DeprecatedInVersion = [System.Version]"14.0.7700"
         },
         @{
-            Name                = "CsvHelper"
-            DeprecatedInVersion = [System.Version]"14.0.7700"
-        },
-        @{
             Name                = "payflow_dotNET"
             DeprecatedInVersion = [System.Version]"14.0.7700"
         },
         @{
             Name                = "Progress.Sitefinity.Dec.Iris.Extension"
             DeprecatedInVersion = [System.Version]"14.0.7700"
-        },
-        @{
-            Name                = "Progress.Sitefinity.IdentityServer3"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Progress.Sitefinity.IdentityServer3.AccessTokenValidation"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
         },
         @{
             Name                = "Autofac"
@@ -78,17 +66,9 @@ function Remove-DeprecatedPackages {
             Name                = "Progress.Sitefinity.Ecommerce"
             DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+	    @{
             Name                = "AntiXSS"
             DeprecatedInVersion = [System.Version]"15.0.8200"
-        },
-	@{
-            Name                = "linqtotwitterNET40"
-            DeprecatedInVersion = [System.Version]"15.2.8400"
-        },
-	@{
-            Name                = "Telerik.Sitefinity.Twitterizer"
-            DeprecatedInVersion = [System.Version]"15.2.8400"
         }
     )
 
