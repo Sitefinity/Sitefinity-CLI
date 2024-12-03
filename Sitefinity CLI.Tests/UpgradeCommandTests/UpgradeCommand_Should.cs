@@ -13,6 +13,7 @@ using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks;
 using Sitefinity_CLI.Services.Contracts;
 using Sitefinity_CLI.Services;
+using System;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
@@ -39,7 +40,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             var services = new ServiceCollection();
             services.AddHttpClient();
             services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
-            services.AddTransient<ISitefinityProjectService, SitefinityProjectService>();
+            services.AddTransient<ISitefinityProjectService, SitefinityProjectServiceMock>();
             services.AddTransient<INuGetDependencyParser, NuGetV2DependencyParser>();
             services.AddTransient<INuGetDependencyParser, NuGetV3DependencyParser>();
             services.AddTransient<INugetProvider, NuGetV2Provider>();
@@ -49,19 +50,19 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             services.AddTransient<IDotnetCliClient, DotnetCliClient>();
             services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
             services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
-            services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
-            services.AddTransient<ISitefinityConfigService, SitefinityConfigService>();
-            services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
+            services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGeneratorMock>();
+            services.AddTransient<ISitefinityConfigService, SitefinityConfigServiceMock>();
+            services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageServiceMock>();
             services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
-            services.AddScoped<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
             services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
-            services.AddSingleton<IVisualStudioService, VisualStudioService>();
+            services.AddSingleton<IVisualStudioService, VisualStudioServiceMock>();
             services.AddSingleton<IPromptService, PromptServiceMock>();
             services.AddSingleton<IVisualStudioWorkerFactory, VisualStuidoWorkerFactory>();
 
             this.serviceProvider = services.BuildServiceProvider();
-            
+
             this.sitefinityNugetPackageService = serviceProvider.GetService<ISitefinityNugetPackageService>();
+            this.sitefinityConfigService = serviceProvider.GetService<ISitefinityConfigService>();
             this.sitefinityProjectService = serviceProvider.GetService<ISitefinityProjectService>();
             this.visualStudioService = serviceProvider.GetService<IVisualStudioService>();
             this.sitefinityPackageManager = serviceProvider.GetService<ISitefinityPackageManager>();
@@ -130,6 +131,67 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             await upgradeCommand.Execute();
 
             Assert.AreEqual(solutionPath, upgradeCommand.SolutionPath);
+        }
+
+        [TestMethod]
+        public async Task NotRemoveEnhancer_ForVersionsPrior12_2()
+        {
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+
+            string solutionPath = Path.Combine(Directory.GetCurrentDirectory(), "UpgradeCommandTests", "Mocks", "fake.sln");
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = "11.2.6900";
+            upgradeCommand.SkipPrompts = true;
+            upgradeCommand.AcceptLicense = true;
+
+            SitefinityProjectServiceMock sitefinityProjectServiceMock = (SitefinityProjectServiceMock)this.sitefinityProjectService;
+            sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled = false;
+            await upgradeCommand.Execute();
+
+            Assert.IsFalse(sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled);
+        }
+
+        [DataTestMethod]
+        [DataRow("12.2.7200")]
+        [DataRow("14.4.8100")]
+        [DataRow("15.2.8400")]
+        public async Task NotRemoveEnhancer_ForVersionsAfter12_2_IfRetainEnhancerFlagOption_IsPassed(string sfVersion)
+        {
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+
+            string solutionPath = Path.Combine(Directory.GetCurrentDirectory(), "UpgradeCommandTests", "Mocks", "fake.sln");
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = sfVersion;
+            upgradeCommand.SkipPrompts = true;
+            upgradeCommand.AcceptLicense = true;
+            upgradeCommand.RetainReferenceToEnhancer = true;
+
+            SitefinityProjectServiceMock sitefinityProjectServiceMock = (SitefinityProjectServiceMock)this.sitefinityProjectService;
+            sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled = false;
+            await upgradeCommand.Execute();
+
+            Assert.IsFalse(sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled);
+        }
+
+        [DataTestMethod]
+        [DataRow("12.2.7200")]
+        [DataRow("14.4.8100")]
+        [DataRow("15.2.8400")]
+        public async Task RemoveEnhancer_ForVersionsAfter12_2_IfRetainEnhancerFlagOption_IsNOTPassed(string sfVersion)
+        {
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+
+            string solutionPath = Path.Combine(Directory.GetCurrentDirectory(), "UpgradeCommandTests", "Mocks", "fake.sln");
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = sfVersion;
+            upgradeCommand.SkipPrompts = true;
+            upgradeCommand.AcceptLicense = true;
+
+            SitefinityProjectServiceMock sitefinityProjectServiceMock = (SitefinityProjectServiceMock)this.sitefinityProjectService;
+            sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled = false;
+            await upgradeCommand.Execute();
+
+            Assert.IsTrue(sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled);
         }
     }
 }

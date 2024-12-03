@@ -167,11 +167,11 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigsForProjectsWithoutSitefinity(this.SolutionPath);
+            IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigurtaionsForProjectsWithoutSitefinity(this.SolutionPath);
 
             this.visualStudioService.ExecuteVisualStudioUpgrade(this.UpgradeOptions);
 
-            this.sitefinityConfigService.RestoreConfugrtionValues(configsWithoutSitefinity);
+            this.sitefinityConfigService.RestoreConfigurationValues(configsWithoutSitefinity);
 
             this.sitefinityPackageService.SyncProjectReferencesWithPackages(projectFilePathsWithSitefinityVersion.Select(p => p.FilePath), Path.GetDirectoryName(this.SolutionPath));
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));

@@ -4,8 +4,8 @@ namespace Sitefinity_CLI.Services.Contracts
 {
     public interface ISitefinityConfigService
     {
-        void RestoreConfugrtionValues(IDictionary<string, string> configsWithoutSitefinity);
+        void RestoreConfigurationValues(IDictionary<string, string> configsWithoutSitefinity);
 
-        IDictionary<string, string> GetConfigsForProjectsWithoutSitefinity(string solutionPath);
+        IDictionary<string, string> GetConfigurtaionsForProjectsWithoutSitefinity(string solutionPath);
     }
 }
