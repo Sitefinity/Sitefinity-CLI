@@ -43,7 +43,10 @@ namespace Sitefinity_CLI.Commands
         public string AdditionalPackagesString { get; set; }
 
         [Option(Constants.RemoveDeprecatedPackages, Description = Constants.RemoveDeprecatedPackagesDescription)]
-        public string RemoveDeprecatedPackages { get; set; }
+        public bool RemoveDeprecatedPackages { get; set; }
+
+        [Option(Constants.RemoveDeprecatedPackages, CommandOptionType.SingleValue, Description = Constants.RemoveDeprecatedPackagesExceptDescription)]
+        public string RemoveDeprecatedPackagesExcept { get; set; }
 
         public UpgradeCommand(
             ISitefinityNugetPackageService sitefinityPackageService,
@@ -100,7 +103,8 @@ namespace Sitefinity_CLI.Commands
                 this.AcceptLicense,
                 this.NugetConfigPath,
                 this.AdditionalPackagesString,
-                this.RemoveDeprecatedPackages);
+                this.RemoveDeprecatedPackages,
+                this.RemoveDeprecatedPackagesExcept);
 
             if (upgradeOptions.DeprecatedPackagesList.Count > 0)
             {

@@ -1,5 +1,5 @@
 param(
-    [string[]] $RemoveDeprecatedPackages
+    [string[]] PackagesToRemove
 )
 
 function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
@@ -10,15 +10,16 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
     return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
 }
 
-function Remove-DeprecatedPackages {
+function Remove-Packages {
     param(
-        [string] $ProjectName
+        [string] $ProjectName,
+        [string[]] $PackagesToRemove
     )
 
     "`nRemoving deprecated packages for '$ProjectName'"
-    foreach ($package in $deprecatedPackages) {
-        $deprecatedPackageMatches = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$ProjectName`"" 
-        $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $package.Name } | Select-Object -First 1
+    foreach ($packageName in $PackagesToRemove) {
+        $deprecatedPackageMatches = Invoke-Expression "Get-Package `"$($packageName)`" -ProjectName `"$ProjectName`"" 
+        $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $packageName } | Select-Object -First 1
         if ($null -ne $deprecatedPackage) {
             "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
             Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -RemoveDependencies -Force" 
@@ -26,9 +27,6 @@ function Remove-DeprecatedPackages {
     }
 }
 
-$RemoveDeprecatedPackages
-
-<#
 $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
 $upgradeTraceLog = $basePath + '\upgrade.log'
@@ -56,9 +54,7 @@ try {
         $packageCounter = 1
         $totalCount = @($packages).Count
 
-        if ($RemoveDeprecatedPackages) {
-            Remove-DeprecatedPackages -ProjectName $projectName -SitefinityVersion $SitefinityVersion
-        }
+        Remove-Packages -ProjectName $projectName -PackagesToRemove $PackagesToRemove
 
         foreach ($package in $packages) {
             $packageName = $package.name
@@ -110,4 +106,3 @@ finally {
 
     Stop-Transcript
 }
-#>

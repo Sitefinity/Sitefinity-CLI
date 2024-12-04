@@ -7,7 +7,7 @@ namespace Sitefinity_CLI.Model
 {
     public class UpgradeOptions
     {
-        public UpgradeOptions(string solutionPath, string versionAsString, bool skipPrompts, bool acceptLicense, string nugetConfigPath, string additionalPackagesString, string removeDeprecatedPackages)
+        public UpgradeOptions(string solutionPath, string versionAsString, bool skipPrompts, bool acceptLicense, string nugetConfigPath, string additionalPackagesString, bool removeDeprecatedPackages, string removeDeprecatedPackagesExcept)
         {
             SolutionPath = solutionPath;
             SkipPrompts = skipPrompts;
@@ -25,10 +25,7 @@ namespace Sitefinity_CLI.Model
                 throw new UpgradeException(string.Format(Constants.TryToUpdateInvalidVersionMessage, versionAsString));
             }
 
-            if (!string.IsNullOrEmpty(removeDeprecatedPackages))
-            {
-                CalculatePackagesToBeRemoved(removeDeprecatedPackages);
-            }
+            CalculatePackagesToBeRemoved(removeDeprecatedPackages, removeDeprecatedPackagesExcept);
         }
 
         private readonly List<DeprecatedPackage> DeprecatedPackagesRepository = new()
@@ -67,20 +64,26 @@ namespace Sitefinity_CLI.Model
 
         public string AdditionalPackagesString { get; set; }
 
-        public string RemoveDeprecatedPackages { get; set; }
-
         public List<string> DeprecatedPackagesList { get; set; } = new List<string>();
 
-        private void CalculatePackagesToBeRemoved(string removeDeprecatedPackages)
+        private void CalculatePackagesToBeRemoved(bool removeDeprecatedPackages, string removeDeprecatedPackagesExcept)
         {
-            List<string> listOfDeprecatedPackagesToBeRetained = removeDeprecatedPackages
-                .Split(";", StringSplitOptions.RemoveEmptyEntries)
-                .ToList();
+            List<string> listOfDeprecatedPackagesToBeRetained = new List<string>();
 
-            this.DeprecatedPackagesList = this.DeprecatedPackagesRepository
-                .Where(v => v.DeprecatedInVersion <= this.Version && !listOfDeprecatedPackagesToBeRetained.Contains(v.Name))
-                .Select(p=>p.Name)
-                .ToList();
+            if (!string.IsNullOrEmpty(removeDeprecatedPackagesExcept))
+            {
+                listOfDeprecatedPackagesToBeRetained = removeDeprecatedPackagesExcept
+                    .Split(";", StringSplitOptions.RemoveEmptyEntries)
+                    .ToList();
+            }
+
+            if (removeDeprecatedPackages || listOfDeprecatedPackagesToBeRetained.Any())
+            {
+                this.DeprecatedPackagesList = this.DeprecatedPackagesRepository
+                    .Where(v => v.DeprecatedInVersion <= this.Version && !listOfDeprecatedPackagesToBeRetained.Contains(v.Name))
+                    .Select(p => p.Name)
+                    .ToList();
+            }
         }
     }
 }
