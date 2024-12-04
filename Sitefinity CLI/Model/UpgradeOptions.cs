@@ -1,19 +1,19 @@
 ﻿using System;
 using Sitefinity_CLI.Exceptions;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Sitefinity_CLI.Model
 {
     public class UpgradeOptions
     {
-        public UpgradeOptions(string solutionPath, string versionAsString, bool skipPrompts, bool acceptLicense, string nugetConfigPath, string additionalPackagesString, bool removeDeprecatedPackages)
+        public UpgradeOptions(string solutionPath, string versionAsString, bool skipPrompts, bool acceptLicense, string nugetConfigPath, string additionalPackagesString, string removeDeprecatedPackages)
         {
             SolutionPath = solutionPath;
             SkipPrompts = skipPrompts;
             AcceptLicense = acceptLicense;
             NugetConfigPath = nugetConfigPath;
             AdditionalPackagesString = additionalPackagesString;
-            RemoveDeprecatedPackages = removeDeprecatedPackages;
             VersionAsString = versionAsString;
 
             if (Version.TryParse(versionAsString.Split('-').First(), out Version version))
@@ -24,7 +24,34 @@ namespace Sitefinity_CLI.Model
             {
                 throw new UpgradeException(string.Format(Constants.TryToUpdateInvalidVersionMessage, versionAsString));
             }
+
+            if (!string.IsNullOrEmpty(removeDeprecatedPackages))
+            {
+                CalculatePackagesToBeRemoved(removeDeprecatedPackages);
+            }
         }
+
+        private readonly List<DeprecatedPackage> DeprecatedPackagesRepository = new()
+        {
+            new DeprecatedPackage("Telerik.DataAccess.Fluent", new Version("12.2.7200")),
+            new DeprecatedPackage("Telerik.Sitefinity.OpenAccess", new Version("13.0.7300")),
+            new DeprecatedPackage("Telerik.Sitefinity.AmazonCloudSearch", new Version("13.3.7600")),
+            new DeprecatedPackage("PayPal", new Version("14.0.7700")),
+            new DeprecatedPackage("CsvHelper", new Version("14.0.7700")),
+            new DeprecatedPackage("payflow_dotNET", new Version("14.0.7700")),
+            new DeprecatedPackage("Progress.Sitefinity.Dec.Iris.Extension", new Version("14.0.7700")),
+            new DeprecatedPackage("Progress.Sitefinity.IdentityServer3", new Version("14.4.8100")),
+            new DeprecatedPackage("Progress.Sitefinity.IdentityServer3.AccessTokenValidation", new Version("14.4.8100")),
+            new DeprecatedPackage("Autofac", new Version("14.4.8100")),
+            new DeprecatedPackage("Autofac.WebApi2", new Version("14.4.8100")),
+            new DeprecatedPackage("Microsoft.AspNet.WebApi.Owin", new Version("14.4.8100")),
+            new DeprecatedPackage("Microsoft.AspNet.WebApi.Tracing", new Version("14.4.8100")),
+            new DeprecatedPackage("Telerik.Sitefinity.Analytics", new Version("15.0.8200")),
+            new DeprecatedPackage("Progress.Sitefinity.Ecommerce", new Version("15.0.8200")),
+            new DeprecatedPackage("AntiXSS", new Version("15.0.8200")),
+            new DeprecatedPackage("linqtotwitterNET40", new Version("15.2.8400")),
+            new DeprecatedPackage("DeprecatedInVersion", new Version("15.2.8400")),
+        };
 
         public string SolutionPath { get; set; }
 
@@ -40,6 +67,20 @@ namespace Sitefinity_CLI.Model
 
         public string AdditionalPackagesString { get; set; }
 
-        public bool RemoveDeprecatedPackages { get; set; }
+        public string RemoveDeprecatedPackages { get; set; }
+
+        public List<string> DeprecatedPackagesList { get; set; } = new List<string>();
+
+        private void CalculatePackagesToBeRemoved(string removeDeprecatedPackages)
+        {
+            List<string> listOfDeprecatedPackagesToBeRetained = removeDeprecatedPackages
+                .Split(";", StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+
+            this.DeprecatedPackagesList = this.DeprecatedPackagesRepository
+                .Where(v => v.DeprecatedInVersion <= this.Version && !listOfDeprecatedPackagesToBeRetained.Contains(v.Name))
+                .Select(p=>p.Name)
+                .ToList();
+        }
     }
 }

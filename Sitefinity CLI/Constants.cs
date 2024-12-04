@@ -78,6 +78,7 @@ namespace Sitefinity_CLI
         public const string SolutionNotReadable = "Unable to read solution";
         public const string NoProjectsFoundToUpgradeWarningMessage = "No projects with Sitefinity references found to upgrade.";
         public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
+        public const string ProceedWithUpgradeMessage = "Proceed with the upgrade?";
         public const string UpgradeWarning = "Make sure to have your project under source control. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instance in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
         public const string SettingExecutionPolicyMessage = "Setting the execution policy for the current process to unrestricted!";
         public const string UnblockingUpgradeScriptMessage = "Unblocking script file.";
@@ -123,9 +124,8 @@ namespace Sitefinity_CLI
         public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
-        public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade";
+        public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade. To retain packages list them separeted by ; (e.g. --removeDeprecatedPackages \"Telerik.DataAccess.Fluent;CsvHelper\"";
         public const string UpgradeCommandDescription = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.";
-        public const string RetainEnhancerDescription = "Use this flag to indicate that you want to keep the reference to enhancer.exe. Otherwise if you upgrade to version >= 12.2.7200 it will be removed. More info here: https://www.progress.com/sitefinity-cms/release-notes/sitefinity-cms-12-2-7200-(official-release)#Developer%20Tools%20updates";
         public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
@@ -136,7 +136,6 @@ namespace Sitefinity_CLI
         public const string NugetConfigPath = "-nc|--nugetConfigPath";
         public const string AdditionalPackages = "--additionalPackages";
         public const string RemoveDeprecatedPackages = "--removeDeprecatedPackages";
-        public const string RetainEnhancer = "-re|--retainEnhancer";
 
         // File extensions
         public const string RazorFileExtension = ".cshtml";

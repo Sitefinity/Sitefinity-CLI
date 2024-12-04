@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using HandlebarsDotNet;
 using McMaster.Extensions.CommandLineUtils;
@@ -21,8 +22,6 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.UpgradeCommandName, Constants.UpgradeCommandDescription)]
     internal class UpgradeCommand
     {
-        public UpgradeOptions UpgradeOptions => new(SolutionPath, Version, SkipPrompts, AcceptLicense, NugetConfigPath, AdditionalPackagesString, RemoveDeprecatedPackages);
-
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
         [Required(ErrorMessage = Constants.SolutionPathRequired)]
         public string SolutionPath { get; set; }
@@ -44,10 +43,7 @@ namespace Sitefinity_CLI.Commands
         public string AdditionalPackagesString { get; set; }
 
         [Option(Constants.RemoveDeprecatedPackages, Description = Constants.RemoveDeprecatedPackagesDescription)]
-        public bool RemoveDeprecatedPackages { get; set; }
-
-        [Option(Constants.RetainEnhancer, Description = Constants.RetainEnhancerDescription)]
-        public bool RetainReferenceToEnhancer { get; set; }
+        public string RemoveDeprecatedPackages { get; set; }
 
         public UpgradeCommand(
             ISitefinityNugetPackageService sitefinityPackageService,
@@ -97,15 +93,36 @@ namespace Sitefinity_CLI.Commands
                 this.logger.LogInformation(string.Format(Constants.LatestVersionFound, this.Version));
             }
 
+            UpgradeOptions upgradeOptions = new(
+                this.SolutionPath,
+                this.Version,
+                this.SkipPrompts,
+                this.AcceptLicense,
+                this.NugetConfigPath,
+                this.AdditionalPackagesString,
+                this.RemoveDeprecatedPackages);
+
+            if (upgradeOptions.DeprecatedPackagesList.Count > 0)
+            {
+                this.logger.LogInformation("The following deprecated packages will be removed as part of the upgrade: {DeprecatedPackages}", string.Join(", ", upgradeOptions.DeprecatedPackagesList));
+                if (!upgradeOptions.SkipPrompts)
+                {
+                    if (!this.promptService.PromptYesNo(Constants.ProceedWithUpgradeMessage))
+                    {
+                        return;
+                    }
+                }
+            }
+
             this.logger.LogInformation(Constants.SearchingProjectForReferencesMessage);
 
             IEnumerable<(string FilePath, Version Version)> projectFilePathsWithSitefinityVersion = this.sitefinityProjectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath)
                 .Select(p => (FilePath: p, Version: this.sitefinityProjectService.GetSitefinityVersion(p)))
                 .Where(p =>
                 {
-                    if (this.UpgradeOptions.Version <= p.Version)
+                    if (upgradeOptions.Version <= p.Version)
                     {
-                        this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, Path.GetFileName(p.FilePath), p.Version, this.UpgradeOptions.Version));
+                        this.logger.LogWarning(string.Format(Constants.VersionIsGreaterThanOrEqual, Path.GetFileName(p.FilePath), p.Version, upgradeOptions.Version));
 
                         return false;
                     }
@@ -124,7 +141,7 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, projectFilePathsWithSitefinityVersion.Count()));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
 
-            NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(this.UpgradeOptions, projectFilePathsWithSitefinityVersion.Select(p => p.FilePath));
+            NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, projectFilePathsWithSitefinityVersion.Select(p => p.FilePath));
 
             if (!this.AcceptLicense)
             {
@@ -137,7 +154,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            IEnumerable<NuGetPackage> additionalPackagesToUpgrade = await this.sitefinityPackageService.PrepareAdditionalPackages(this.UpgradeOptions);
+            IEnumerable<NuGetPackage> additionalPackagesToUpgrade = await this.sitefinityPackageService.PrepareAdditionalPackages(upgradeOptions);
 
             foreach (NuGetPackage package in additionalPackagesToUpgrade)
             {
@@ -156,20 +173,12 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, this.UpgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
-
-            if (this.UpgradeOptions.Version >= new Version(12, 2, 7200) && !this.RetainReferenceToEnhancer)
-            {
-                this.logger.LogInformation(Constants.RemovingEnhancerAssemblyForProjectsIfExists);
-                foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectFilePathsWithSitefinityVersion)
-                {
-                    this.sitefinityProjectService.RemoveEnhancerAssemblyIfExists(projectFilePathWithSitefinityVersion.FilePath);
-                }
-            }
+            await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
+            this.sitefinityProjectService.PrepareCsProjectFilesForUpgrade(upgradeOptions, projectFilePathsWithSitefinityVersion);
 
             IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigurtaionsForProjectsWithoutSitefinity(this.SolutionPath);
 
-            this.visualStudioService.ExecuteVisualStudioUpgrade(this.UpgradeOptions);
+            this.visualStudioService.ExecuteVisualStudioUpgrade(upgradeOptions);
 
             this.sitefinityConfigService.RestoreConfigurationValues(configsWithoutSitefinity);
 

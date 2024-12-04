@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sitefinity_CLI.Model;
 using Sitefinity_CLI.Services.Contracts;
 
 namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
@@ -31,6 +32,11 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
         public Version GetSitefinityVersion(string sitefinityProjectPath)
         {
             return this.SFVersion;
+        }
+
+        public void PrepareCsProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<(string FilePath, Version Version)> projectFilesToPrepare)
+        {
+            throw new NotImplementedException();
         }
 
         public void RemoveEnhancerAssemblyIfExists(string projectFilePath)

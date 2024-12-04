@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System;
 using System.Collections.Generic;
 using Sitefinity_CLI.Services.Contracts;
+using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.Services
 {
@@ -30,7 +31,7 @@ namespace Sitefinity_CLI.Services
                 if (versionMatch.Success)
                 {
                     string sitefinityVersionWithoutRevision = Version.Parse(versionMatch.Groups[1].Value).ToString(3);
-                    
+
                     return Version.Parse(sitefinityVersionWithoutRevision);
                 }
             }
@@ -61,11 +62,23 @@ namespace Sitefinity_CLI.Services
         public IEnumerable<string> GetNonSitefinityProjectPaths(string solutionPath)
         {
             IEnumerable<string> allProjectPaths = this.GetProjectPathsFromSolution(solutionPath);
-            
+
             return allProjectPaths.Where(p => !this.HasSitefinityReferences(p));
         }
 
-        public void RemoveEnhancerAssemblyIfExists(string projectFilePath)
+        public void PrepareCsProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<(string FilePath, Version Version)> projectFilesToPrepare)
+        {
+            if (upgradeOptions.DeprecatedPackagesList.Contains("Telerik.DataAccess.Fluent"))
+            {
+                this.logger.LogInformation(Constants.RemovingEnhancerAssemblyForProjectsIfExists);
+                foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectFilesToPrepare)
+                {
+                    this.RemoveEnhancerAssemblyIfExists(projectFilePathWithSitefinityVersion.FilePath);
+                }
+            }
+        }
+
+        private void RemoveEnhancerAssemblyIfExists(string projectFilePath)
         {
             this.csProjectFileEditor.RemovePropertyGroupElement(projectFilePath, Constants.EnhancerAssemblyElem);
         }
@@ -73,11 +86,13 @@ namespace Sitefinity_CLI.Services
         private bool HasSitefinityReferences(string projectFilePath)
         {
             IEnumerable<CsProjectFileReference> references = this.csProjectFileEditor.GetReferences(projectFilePath);
-            
+
             return references.Any(this.IsSitefinityReference);
         }
 
         private bool IsSitefinityReference(CsProjectFileReference reference) => reference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
+
+      
 
         private readonly ICsProjectFileEditor csProjectFileEditor;
         private readonly HttpClient httpClient;

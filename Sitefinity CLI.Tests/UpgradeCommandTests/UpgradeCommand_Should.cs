@@ -164,7 +164,6 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             upgradeCommand.Version = sfVersion;
             upgradeCommand.SkipPrompts = true;
             upgradeCommand.AcceptLicense = true;
-            upgradeCommand.RetainReferenceToEnhancer = true;
 
             SitefinityProjectServiceMock sitefinityProjectServiceMock = (SitefinityProjectServiceMock)this.sitefinityProjectService;
             sitefinityProjectServiceMock.RemoveEnhancerAssemblyIfExistsCalled = false;
