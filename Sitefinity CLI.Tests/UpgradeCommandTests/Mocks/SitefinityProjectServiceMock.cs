@@ -37,10 +37,5 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
         public void PrepareCsProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<(string FilePath, Version Version)> projectFilesToPrepare)
         {
         }
-
-        public void RemoveEnhancerAssemblyIfExists(string projectFilePath)
-        {
-            this.RemoveEnhancerAssemblyIfExistsCalled = true;
-        }
     }
 }
