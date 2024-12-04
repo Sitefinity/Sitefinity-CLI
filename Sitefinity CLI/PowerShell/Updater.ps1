@@ -78,15 +78,15 @@ function Remove-DeprecatedPackages {
             Name                = "Progress.Sitefinity.Ecommerce"
             DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+	    @{
             Name                = "AntiXSS"
             DeprecatedInVersion = [System.Version]"15.0.8200"
         },
-	@{
+	    @{
             Name                = "linqtotwitterNET40"
             DeprecatedInVersion = [System.Version]"15.2.8400"
         },
-	@{
+	    @{
             Name                = "Telerik.Sitefinity.Twitterizer"
             DeprecatedInVersion = [System.Version]"15.2.8400"
         }
