@@ -126,7 +126,7 @@ namespace Sitefinity_CLI
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade.";
-        public const string RemoveDeprecatedPackagesExceptDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade. To retain packages list them separated by ; (e.g. --removeDeprecatedPackagesExcept \"Telerik.DataAccess.Fluent;CsvHelper\"";
+        public const string RemoveDeprecatedPackagesExceptDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade. To retain packages list them separated by ; (e.g. --removeDeprecatedPackagesExcept \"Telerik.DataAccess.Fluent;CsvHelper\")";
         public const string UpgradeCommandDescription = "Upgrade Sitefinity project/s to a newer version of Sitefinity. If no version is specified, the latest official version will be used.";
         public const string RendererOptionTemplate = "--renderer";
         public const string VersionOptionTemplate = "-v|--version";
