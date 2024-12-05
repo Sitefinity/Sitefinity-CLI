@@ -23,7 +23,7 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
 
         public Task<NuGetPackage> PrepareSitefinityUpgradePackage(UpgradeOptions options, IEnumerable<string> sitefinityProjectFilePaths)
         {
-         return   Task.FromResult(new NuGetPackage());
+            return Task.FromResult(new NuGetPackage());
         }
 
         public void SyncProjectReferencesWithPackages(IEnumerable<string> projectFilePaths, string solutionFolder)

@@ -1,19 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sitefinity_CLI.Commands;
-using Sitefinity_CLI.VisualStudio;
-using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Threading.Tasks;
-using Sitefinity_CLI;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.IO;
 using System.Net.Http;
-using Sitefinity_CLI.Tests.UpgradeCommandTests;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sitefinity_CLI;
+using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
-using Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks;
 using Sitefinity_CLI.Services.Contracts;
-using Sitefinity_CLI.Services;
-using System;
+using Sitefinity_CLI.Tests.UpgradeCommandTests;
+using Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks;
+using Sitefinity_CLI.VisualStudio;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
