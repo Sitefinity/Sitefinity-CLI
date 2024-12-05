@@ -46,7 +46,7 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.RemoveDeprecatedPackages, Description = Constants.RemoveDeprecatedPackagesDescription)]
         public bool RemoveDeprecatedPackages { get; set; }
 
-        [Option(Constants.RemoveDeprecatedPackages, CommandOptionType.SingleValue, Description = Constants.RemoveDeprecatedPackagesExceptDescription)]
+        [Option(Constants.RemoveDeprecatedPackagesExcept, Description = Constants.RemoveDeprecatedPackagesExceptDescription)]
         public string RemoveDeprecatedPackagesExcept { get; set; }
 
         public UpgradeCommand(
@@ -109,9 +109,11 @@ namespace Sitefinity_CLI.Commands
 
             if (upgradeOptions.DeprecatedPackagesList.Count > 0)
             {
-                this.logger.LogInformation("The following deprecated packages will be removed as part of the upgrade: {DeprecatedPackages}", string.Join(", ", upgradeOptions.DeprecatedPackagesList));
+                this.logger.LogInformation("Deprecated packages that will be removed as part of the upgrade: {DeprecatedPackages}", string.Join(", ", upgradeOptions.DeprecatedPackagesList));
                 if (!upgradeOptions.SkipPrompts)
                 {
+                    string formatedDeprecatedPackagesMessage = string.Join(Environment.NewLine, upgradeOptions.DeprecatedPackagesList);
+                    Utils.WriteLine($"{Constants.UninstallingPackagesWarning}{Environment.NewLine}{formatedDeprecatedPackagesMessage}", ConsoleColor.DarkYellow);
                     if (!this.promptService.PromptYesNo(Constants.ProceedWithUpgradeMessage))
                     {
                         return;
