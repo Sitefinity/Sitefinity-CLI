@@ -113,7 +113,7 @@ namespace Sitefinity_CLI.Commands
                 if (!upgradeOptions.SkipPrompts)
                 {
                     string formatedDeprecatedPackagesMessage = string.Join(Environment.NewLine, upgradeOptions.DeprecatedPackagesList);
-                    Utils.WriteLine($"{Constants.UninstallingPackagesWarning}{Environment.NewLine}{formatedDeprecatedPackagesMessage}", ConsoleColor.DarkYellow);
+                    Utils.WriteLine($"{Environment.NewLine}{Constants.UninstallingPackagesWarning}{Environment.NewLine}{formatedDeprecatedPackagesMessage}", ConsoleColor.DarkYellow);
                     if (!this.promptService.PromptYesNo(Constants.ProceedWithUpgradeMessage))
                     {
                         return;
