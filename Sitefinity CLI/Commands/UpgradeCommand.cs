@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -138,14 +139,14 @@ namespace Sitefinity_CLI.Commands
             if (!projectFilePathsWithSitefinityVersion.Any())
             {
                 Utils.WriteLine(Constants.NoProjectsFoundToUpgradeWarningMessage, ConsoleColor.Yellow);
-
                 return;
             }
 
-            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, projectFilePathsWithSitefinityVersion.Count()));
+            List<string> sitefinityProjectsFilePaths = projectFilePathsWithSitefinityVersion.Select(p => p.FilePath).ToList();
+            this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectsFilePaths.Count));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
 
-            NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, projectFilePathsWithSitefinityVersion.Select(p => p.FilePath));
+            NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
             if (!this.AcceptLicense)
             {
@@ -178,7 +179,7 @@ namespace Sitefinity_CLI.Commands
             }
 
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
-            this.sitefinityProjectService.PrepareCsProjectFilesForUpgrade(upgradeOptions, projectFilePathsWithSitefinityVersion);
+            this.sitefinityProjectService.PrepareProjectFilesForUpgrade(upgradeOptions, sitefinityProjectsFilePaths);
 
             IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigurtaionsForProjectsWithoutSitefinity(this.SolutionPath);
 
@@ -186,7 +187,7 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityConfigService.RestoreConfigurationValues(configsWithoutSitefinity);
 
-            this.sitefinityPackageService.SyncProjectReferencesWithPackages(projectFilePathsWithSitefinityVersion.Select(p => p.FilePath), Path.GetDirectoryName(this.SolutionPath));
+            this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectsFilePaths, Path.GetDirectoryName(this.SolutionPath));
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 

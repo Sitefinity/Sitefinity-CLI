@@ -66,21 +66,16 @@ namespace Sitefinity_CLI.Services
             return allProjectPaths.Where(p => !this.HasSitefinityReferences(p));
         }
 
-        public void PrepareCsProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<(string FilePath, Version Version)> projectFilesToPrepare)
+        public void PrepareProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<string> projectFilesToPrepare)
         {
             if (upgradeOptions.DeprecatedPackagesList.Contains("Telerik.DataAccess.Fluent"))
             {
                 this.logger.LogInformation(Constants.RemovingEnhancerAssemblyForProjectsIfExists);
-                foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectFilesToPrepare)
+                foreach (string projectFilePath in projectFilesToPrepare)
                 {
-                    this.RemoveEnhancerAssemblyIfExists(projectFilePathWithSitefinityVersion.FilePath);
+                    this.csProjectFileEditor.RemovePropertyGroupElement(projectFilePath, Constants.EnhancerAssemblyElem);
                 }
             }
-        }
-
-        private void RemoveEnhancerAssemblyIfExists(string projectFilePath)
-        {
-            this.csProjectFileEditor.RemovePropertyGroupElement(projectFilePath, Constants.EnhancerAssemblyElem);
         }
 
         private bool HasSitefinityReferences(string projectFilePath)
@@ -91,8 +86,6 @@ namespace Sitefinity_CLI.Services
         }
 
         private bool IsSitefinityReference(CsProjectFileReference reference) => reference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
-
-      
 
         private readonly ICsProjectFileEditor csProjectFileEditor;
         private readonly HttpClient httpClient;

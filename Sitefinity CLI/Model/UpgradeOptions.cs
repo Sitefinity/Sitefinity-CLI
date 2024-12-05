@@ -28,28 +28,6 @@ namespace Sitefinity_CLI.Model
             CalculatePackagesToBeRemoved(removeDeprecatedPackages, removeDeprecatedPackagesExcept);
         }
 
-        private readonly List<DeprecatedPackage> DeprecatedPackagesRepository = new()
-        {
-            new DeprecatedPackage("Telerik.DataAccess.Fluent", new Version("12.2.7200")),
-            new DeprecatedPackage("Telerik.Sitefinity.OpenAccess", new Version("13.0.7300")),
-            new DeprecatedPackage("Telerik.Sitefinity.AmazonCloudSearch", new Version("13.3.7600")),
-            new DeprecatedPackage("PayPal", new Version("14.0.7700")),
-            new DeprecatedPackage("CsvHelper", new Version("14.0.7700")),
-            new DeprecatedPackage("payflow_dotNET", new Version("14.0.7700")),
-            new DeprecatedPackage("Progress.Sitefinity.Dec.Iris.Extension", new Version("14.0.7700")),
-            new DeprecatedPackage("Progress.Sitefinity.IdentityServer3", new Version("14.4.8100")),
-            new DeprecatedPackage("Progress.Sitefinity.IdentityServer3.AccessTokenValidation", new Version("14.4.8100")),
-            new DeprecatedPackage("Autofac", new Version("14.4.8100")),
-            new DeprecatedPackage("Autofac.WebApi2", new Version("14.4.8100")),
-            new DeprecatedPackage("Microsoft.AspNet.WebApi.Owin", new Version("14.4.8100")),
-            new DeprecatedPackage("Microsoft.AspNet.WebApi.Tracing", new Version("14.4.8100")),
-            new DeprecatedPackage("Telerik.Sitefinity.Analytics", new Version("15.0.8200")),
-            new DeprecatedPackage("Progress.Sitefinity.Ecommerce", new Version("15.0.8200")),
-            new DeprecatedPackage("AntiXSS", new Version("15.0.8200")),
-            new DeprecatedPackage("linqtotwitterNET40", new Version("15.2.8400")),
-            new DeprecatedPackage("DeprecatedInVersion", new Version("15.2.8400")),
-        };
-
         public string SolutionPath { get; set; }
 
         public string VersionAsString { get; set; }
@@ -85,5 +63,27 @@ namespace Sitefinity_CLI.Model
                     .ToList();
             }
         }
+
+        private readonly List<DeprecatedPackage> DeprecatedPackagesRepository = new()
+        {
+            new DeprecatedPackage("Telerik.DataAccess.Fluent", new Version("12.2.7200")),
+            new DeprecatedPackage("Telerik.Sitefinity.OpenAccess", new Version("13.0.7300")),
+            new DeprecatedPackage("Telerik.Sitefinity.AmazonCloudSearch", new Version("13.3.7600")),
+            new DeprecatedPackage("PayPal", new Version("14.0.7700")),
+            new DeprecatedPackage("CsvHelper", new Version("14.0.7700")),
+            new DeprecatedPackage("payflow_dotNET", new Version("14.0.7700")),
+            new DeprecatedPackage("Progress.Sitefinity.Dec.Iris.Extension", new Version("14.0.7700")),
+            new DeprecatedPackage("Progress.Sitefinity.IdentityServer3", new Version("14.4.8100")),
+            new DeprecatedPackage("Progress.Sitefinity.IdentityServer3.AccessTokenValidation", new Version("14.4.8100")),
+            new DeprecatedPackage("Autofac", new Version("14.4.8100")),
+            new DeprecatedPackage("Autofac.WebApi2", new Version("14.4.8100")),
+            new DeprecatedPackage("Microsoft.AspNet.WebApi.Owin", new Version("14.4.8100")),
+            new DeprecatedPackage("Microsoft.AspNet.WebApi.Tracing", new Version("14.4.8100")),
+            new DeprecatedPackage("Telerik.Sitefinity.Analytics", new Version("15.0.8200")),
+            new DeprecatedPackage("Progress.Sitefinity.Ecommerce", new Version("15.0.8200")),
+            new DeprecatedPackage("AntiXSS", new Version("15.0.8200")),
+            new DeprecatedPackage("linqtotwitterNET40", new Version("15.2.8400")),
+            new DeprecatedPackage("Telerik.Sitefinity.Twitterizer", new Version("15.2.8400")),
+        };
     }
 }

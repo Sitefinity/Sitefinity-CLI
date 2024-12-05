@@ -34,7 +34,7 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
             return this.SFVersion;
         }
 
-        public void PrepareCsProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<(string FilePath, Version Version)> projectFilesToPrepare)
+        public void PrepareProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<string> projectFilesToPrepare)
         {
         }
     }
