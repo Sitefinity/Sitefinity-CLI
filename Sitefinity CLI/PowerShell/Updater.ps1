@@ -1,5 +1,5 @@
 param(
-    [string[]] PackagesToRemove
+    [string[]] $PackagesToRemove
 )
 
 function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
