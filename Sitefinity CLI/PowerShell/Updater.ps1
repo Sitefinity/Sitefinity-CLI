@@ -1,6 +1,5 @@
 param(
-    [bool] $RemoveDeprecatedPackages,
-    [System.Version] $SitefinityVersion
+    [string[]] $PackagesToRemove
 )
 
 function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
@@ -11,96 +10,19 @@ function IsUpgradeRequired($oldPackageVersion, $packageVersion) {
     return [System.Version]$packageVersion -gt [System.Version]$oldPackageVersion
 }
 
-function Remove-DeprecatedPackages {
+function Remove-Packages {
     param(
         [string] $ProjectName,
-        [System.Version] $SitefinityVersion
-    )
-
-    $deprecatedPackages = @(
-        @{
-            Name                = "Telerik.DataAccess.Fluent"
-            DeprecatedInVersion = [System.Version]"12.2.7200"
-        },
-        @{
-            Name                = "Telerik.Sitefinity.OpenAccess"
-            DeprecatedInVersion = [System.Version]"13.0.7300"
-        },
-        @{
-            Name                = "Telerik.Sitefinity.AmazonCloudSearch"
-            DeprecatedInVersion = [System.Version]"13.3.7600"
-        },
-        @{
-            Name                = "PayPal"
-            DeprecatedInVersion = [System.Version]"14.0.7700"
-        },
-        @{
-            Name                = "CsvHelper"
-            DeprecatedInVersion = [System.Version]"14.0.7700"
-        },
-        @{
-            Name                = "payflow_dotNET"
-            DeprecatedInVersion = [System.Version]"14.0.7700"
-        },
-        @{
-            Name                = "Progress.Sitefinity.Dec.Iris.Extension"
-            DeprecatedInVersion = [System.Version]"14.0.7700"
-        },
-        @{
-            Name                = "Progress.Sitefinity.IdentityServer3"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Progress.Sitefinity.IdentityServer3.AccessTokenValidation"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Autofac"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Autofac.WebApi2"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Microsoft.AspNet.WebApi.Owin"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Microsoft.AspNet.WebApi.Tracing"
-            DeprecatedInVersion = [System.Version]"14.4.8100"
-        },
-        @{
-            Name                = "Telerik.Sitefinity.Analytics"
-            DeprecatedInVersion = [System.Version]"15.0.8200"
-        },
-        @{
-            Name                = "Progress.Sitefinity.Ecommerce"
-            DeprecatedInVersion = [System.Version]"15.0.8200"
-        },
-	@{
-            Name                = "AntiXSS"
-            DeprecatedInVersion = [System.Version]"15.0.8200"
-        },
-	@{
-            Name                = "linqtotwitterNET40"
-            DeprecatedInVersion = [System.Version]"15.2.8400"
-        },
-	@{
-            Name                = "Telerik.Sitefinity.Twitterizer"
-            DeprecatedInVersion = [System.Version]"15.2.8400"
-        }
+        [string[]] $PackagesToRemove
     )
 
     "`nRemoving deprecated packages for '$ProjectName'"
-    foreach ($package in $deprecatedPackages) {
-        if ($SitefinityVersion -ge $package.DeprecatedInVersion) {
-            $deprecatedPackageMatches = Invoke-Expression "Get-Package `"$($package.Name)`" -ProjectName `"$ProjectName`"" 
-            $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $package.Name } | Select-Object -First 1
-            if ($null -ne $deprecatedPackage) {
-                "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
-                Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -RemoveDependencies -Force" 
-            }
+    foreach ($packageName in $PackagesToRemove) {
+        $deprecatedPackageMatches = Invoke-Expression "Get-Package `"$($packageName)`" -ProjectName `"$ProjectName`"" 
+        $deprecatedPackage = $deprecatedPackageMatches | Where-Object { $_.Id -eq $packageName } | Select-Object -First 1
+        if ($null -ne $deprecatedPackage) {
+            "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
+            Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -RemoveDependencies -Force" 
         }
     }
 }
@@ -132,9 +54,7 @@ try {
         $packageCounter = 1
         $totalCount = @($packages).Count
 
-        if ($RemoveDeprecatedPackages) {
-            Remove-DeprecatedPackages -ProjectName $projectName -SitefinityVersion $SitefinityVersion
-        }
+        Remove-Packages -ProjectName $projectName -PackagesToRemove $PackagesToRemove
 
         foreach ($package in $packages) {
             $packageName = $package.name

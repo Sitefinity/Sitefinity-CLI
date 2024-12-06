@@ -13,7 +13,7 @@ namespace Sitefinity_CLI.Services
             this.sitefinityProjectService = sitefinityProjectService;
         }
 
-        public IDictionary<string, string> GetConfigsForProjectsWithoutSitefinity(string solutionPath)
+        public IDictionary<string, string> GetConfigurtaionsForProjectsWithoutSitefinity(string solutionPath)
         {
             IEnumerable<string> projectsWithoutfreferencePaths = this.sitefinityProjectService.GetNonSitefinityProjectPaths(solutionPath);
             IDictionary<string, string> configsWithoutSitefinity = new Dictionary<string, string>();
@@ -31,7 +31,7 @@ namespace Sitefinity_CLI.Services
             return configsWithoutSitefinity;
         }
 
-        public void RestoreConfugrtionValues(IDictionary<string, string> configValuesToRestore)
+        public void RestoreConfigurationValues(IDictionary<string, string> configValuesToRestore)
         {
             foreach (KeyValuePair<string, string> item in configValuesToRestore)
             {

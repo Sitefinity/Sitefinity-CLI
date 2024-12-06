@@ -1,18 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sitefinity_CLI.Commands;
-using Sitefinity_CLI.VisualStudio;
-using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Threading.Tasks;
-using Sitefinity_CLI;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.IO;
 using System.Net.Http;
-using Sitefinity_CLI.Tests.UpgradeCommandTests;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sitefinity_CLI;
+using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
-using Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks;
 using Sitefinity_CLI.Services.Contracts;
-using Sitefinity_CLI.Services;
+using Sitefinity_CLI.Tests.UpgradeCommandTests;
+using Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks;
+using Sitefinity_CLI.VisualStudio;
 
 namespace SitefinityCLI.Tests.UpgradeCommandTests
 {
@@ -39,7 +38,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             var services = new ServiceCollection();
             services.AddHttpClient();
             services.AddTransient<ICsProjectFileEditor, CsProjectFileEditor>();
-            services.AddTransient<ISitefinityProjectService, SitefinityProjectService>();
+            services.AddTransient<ISitefinityProjectService, SitefinityProjectServiceMock>();
             services.AddTransient<INuGetDependencyParser, NuGetV2DependencyParser>();
             services.AddTransient<INuGetDependencyParser, NuGetV3DependencyParser>();
             services.AddTransient<INugetProvider, NuGetV2Provider>();
@@ -49,19 +48,19 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             services.AddTransient<IDotnetCliClient, DotnetCliClient>();
             services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
             services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
-            services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
-            services.AddTransient<ISitefinityConfigService, SitefinityConfigService>();
-            services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
+            services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGeneratorMock>();
+            services.AddTransient<ISitefinityConfigService, SitefinityConfigServiceMock>();
+            services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageServiceMock>();
             services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
-            services.AddScoped<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
             services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
-            services.AddSingleton<IVisualStudioService, VisualStudioService>();
+            services.AddSingleton<IVisualStudioService, VisualStudioServiceMock>();
             services.AddSingleton<IPromptService, PromptServiceMock>();
             services.AddSingleton<IVisualStudioWorkerFactory, VisualStuidoWorkerFactory>();
 
             this.serviceProvider = services.BuildServiceProvider();
-            
+
             this.sitefinityNugetPackageService = serviceProvider.GetService<ISitefinityNugetPackageService>();
+            this.sitefinityConfigService = serviceProvider.GetService<ISitefinityConfigService>();
             this.sitefinityProjectService = serviceProvider.GetService<ISitefinityProjectService>();
             this.visualStudioService = serviceProvider.GetService<IVisualStudioService>();
             this.sitefinityPackageManager = serviceProvider.GetService<ISitefinityPackageManager>();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sitefinity_CLI.Model;
 
 namespace Sitefinity_CLI.Services.Contracts
 {
@@ -13,6 +14,6 @@ namespace Sitefinity_CLI.Services.Contracts
 
         IEnumerable<string> GetNonSitefinityProjectPaths(string solutionPath);
 
-        void RemoveEnhancerAssemblyIfExists(string projectFilePath);
+        void PrepareProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<string> projectFilesToPrepare);
     }
 }
