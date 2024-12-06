@@ -21,10 +21,14 @@ namespace Sitefinity_CLI.Services
         public void ExecuteVisualStudioUpgrade(UpgradeOptions options)
         {
             string updaterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Updater.ps1");
-            List<string> scriptParameters = [$"-PackagesToRemove {string.Join(", ", options.DeprecatedPackagesList)}"];
 
             using IVisualStudioWorker worker = this.visualStudioWorkerFactory.CreateVisualStudioWorker();
             worker.Initialize(options.SolutionPath);
+            List<string> scriptParameters = new List<string>();
+            if (options.DeprecatedPackagesList.Count > 1)
+            {
+                scriptParameters.Add($"-PackagesToRemove {string.Join(", ", options.DeprecatedPackagesList)}");
+            }
             worker.ExecuteScript(updaterPath, scriptParameters);
 
             this.EnsureOperationSuccess();
