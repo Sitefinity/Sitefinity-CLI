@@ -25,7 +25,7 @@ namespace Sitefinity_CLI.Services
             using IVisualStudioWorker worker = this.visualStudioWorkerFactory.CreateVisualStudioWorker();
             worker.Initialize(options.SolutionPath);
             List<string> scriptParameters = new List<string>();
-            if (options.DeprecatedPackagesList.Count > 1)
+            if (options.DeprecatedPackagesList.Count > 0)
             {
                 scriptParameters.Add($"-PackagesToRemove {string.Join(", ", options.DeprecatedPackagesList)}");
             }
