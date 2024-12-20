@@ -30,12 +30,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<PackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
         {
-            // First, try to retrieve the data from the local cache
-            string packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, version));
-            if (File.Exists(packageDependenciesHashFilePath))
-            {
-                return JsonConvert.DeserializeObject<NuGetPackage>(File.ReadAllText(packageDependenciesHashFilePath));
-            }
+            //// First, try to retrieve the data from the local cache
+            //string packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, version));
+            //if (File.Exists(packageDependenciesHashFilePath))
+            //{
+            //    return JsonConvert.DeserializeObject<NuGetPackage>(File.ReadAllText(packageDependenciesHashFilePath));
+            //}
 
             PackageXmlDocumentModel nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources);
             if (nuGetPackageXmlDoc == null)
@@ -62,8 +62,8 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             // Include the current package in the local cache
-            Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder));
-            File.WriteAllText(packageDependenciesHashFilePath, JsonConvert.SerializeObject(nuGetPackage));
+            //Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder));
+            //File.WriteAllText(packageDependenciesHashFilePath, JsonConvert.SerializeObject(nuGetPackage));
 
             if (nuGetPackage.Id == null || nuGetPackage.Version == null)
             {
