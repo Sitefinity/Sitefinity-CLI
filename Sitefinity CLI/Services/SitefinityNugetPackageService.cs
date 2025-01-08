@@ -89,7 +89,9 @@ namespace Sitefinity_CLI.Services
 
         private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<PackageSource> packageSources)
         {
-            IEnumerable<string> versions = this.dotnetCliClient.GetPackageVersionsInNugetSources(packageId, null);
+            IEnumerable<string> versions = this.dotnetCliClient
+                .GetPackageVersionsInNugetSources(packageId, packageSources.Select(x => x.Source).ToArray())
+                .OrderByDescending(x => x);
 
             NuGetPackage compatiblePackage = null;
 
