@@ -16,8 +16,7 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests
             IPromptService promptService,
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
-            IUpgradeConfigGenerator upgradeConfigGenerator,
-            IBackupService backupService) : base(sitefinityPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, backupService)
+            IUpgradeConfigGenerator upgradeConfigGenerator) : base(sitefinityPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator)
         {
         }
 

@@ -64,8 +64,7 @@ namespace Sitefinity_CLI.Commands
             IPromptService promptService,
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
-            IUpgradeConfigGenerator upgradeConfigGenerator,
-            IBackupService resourcePackageBackupService)
+            IUpgradeConfigGenerator upgradeConfigGenerator)
         {
 
             this.sitefinityPackageService = sitefinityPackageService;
@@ -75,7 +74,6 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityProjectService = sitefinityProjectService;
             this.sitefinityConfigService = sitefinityConfigService;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
-            this.resourcePackageBackupService = resourcePackageBackupService;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -192,8 +190,6 @@ namespace Sitefinity_CLI.Commands
 
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
 
-            this.resourcePackageBackupService.Backup(upgradeOptions);
-
             this.sitefinityProjectService.PrepareProjectFilesForUpgrade(upgradeOptions, sitefinityProjectsFilePaths);
 
             IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigurtaionsForProjectsWithoutSitefinity(this.SolutionPath);
@@ -204,7 +200,7 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectsFilePaths, this.SolutionDir);
 
-            this.resourcePackageBackupService.Restore(upgradeOptions, true);
+            this.sitefinityProjectService.RestoreBackupFilesAfterUpgrade(upgradeOptions);
 
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
@@ -272,6 +268,5 @@ namespace Sitefinity_CLI.Commands
         private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly ISitefinityConfigService sitefinityConfigService;
         private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
-        private readonly IBackupService resourcePackageBackupService;
     }
 }
