@@ -64,7 +64,8 @@ namespace Sitefinity_CLI.Commands
             IPromptService promptService,
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
-            IUpgradeConfigGenerator upgradeConfigGenerator)
+            IUpgradeConfigGenerator upgradeConfigGenerator,
+            IBackupService resourcePackageBackupService)
         {
 
             this.sitefinityPackageService = sitefinityPackageService;
@@ -74,6 +75,7 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityProjectService = sitefinityProjectService;
             this.sitefinityConfigService = sitefinityConfigService;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
+            this.resourcePackageBackupService = resourcePackageBackupService;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -190,7 +192,7 @@ namespace Sitefinity_CLI.Commands
 
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
 
-            this.BackupResources(upgradeOptions);
+            this.resourcePackageBackupService.Backup(upgradeOptions);
 
             this.sitefinityProjectService.PrepareProjectFilesForUpgrade(upgradeOptions, sitefinityProjectsFilePaths);
 
@@ -202,60 +204,9 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectsFilePaths, this.SolutionDir);
 
-            this.RestoreResources(upgradeOptions);
+            this.resourcePackageBackupService.Restore(upgradeOptions, true);
 
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
-        }
-
-        private void BackupResources(UpgradeOptions upgradeOptions)
-        {
-            this.CopyResources(
-                upgradeOptions.ResourceBackupList, 
-                Path.Join(this.SolutionDir, Constants.ResourcePackagesFolderName),
-                Path.Join(this.SolutionDir, Constants.ResourcePackagesBackupFolderName));
-        }
-
-        private void RestoreResources(UpgradeOptions upgradeOptions)
-        {
-            this.CopyResources(
-                upgradeOptions.ResourceBackupList, 
-                Path.Join(this.SolutionDir, Constants.ResourcePackagesBackupFolderName),
-                Path.Join(this.SolutionDir, Constants.ResourcePackagesFolderName));
-
-            this.CleanupFolder(Path.Join(this.SolutionDir, Constants.ResourcePackagesBackupFolderName));
-        }
-
-        private void CleanupFolder(string folderPath)
-        {
-            try
-            {
-                Utils.RemoveDir(folderPath);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError($"Error during cleanup of {folderPath}: {ex.Message}");
-            }
-        }
-
-        private void CopyResources(List<DeprecatedPackage> resources, string sourcePath, string destinationPath)
-        { 
-            if (resources == null || !resources.Any())
-                return;
-
-            foreach (var resource in resources)
-            {
-                var resourceSourcePath = Path.Join(sourcePath, resource.Name);
-                var resourceDestinationPath = Path.Join(destinationPath, resource.Name);
-
-                try
-                {
-                    Utils.CopyDirectory(resourceSourcePath, resourceDestinationPath, true);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError($"Error during backup of {resourceSourcePath} to {resourceDestinationPath}: {ex.Message}");
-                }
-            }
         }
 
         private bool Validate()
@@ -321,5 +272,6 @@ namespace Sitefinity_CLI.Commands
         private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly ISitefinityConfigService sitefinityConfigService;
         private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
+        private readonly IBackupService resourcePackageBackupService;
     }
 }
