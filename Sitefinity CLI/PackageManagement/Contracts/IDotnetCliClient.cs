@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Sitefinity_CLI.Model;
+﻿using System.Collections.Generic;
 
 namespace Sitefinity_CLI.PackageManagement.Contracts
 {
@@ -14,6 +12,7 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
         void AddPackageToProject(string projectPath, string packageName, string version);
         void AddSourcesToNugetConfig(string[] sources, string filePath);
         IEnumerable<string> GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources);
+        IEnumerable<string> GetPackageVersionsInNugetSourcesUsingConfig(string sitefinityPackage, string nugetConfigFilePath);
         bool VersionExists(string version, string sitefinityPackage, string[] sources);
         string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage);
     }
