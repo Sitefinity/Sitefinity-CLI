@@ -100,7 +100,6 @@ namespace Sitefinity_CLI.Services
             var solutionDir = Path.GetDirectoryName(upgradeOptions.SolutionPath);
             var source = Path.Join(solutionDir, Constants.ResourcePackagesFolderName);
             var destination = Path.Join(solutionDir, Constants.ResourcePackagesBackupFolderName);
-
             var resources = upgradeOptions.ResourceBackupList;
 
             this.CopyResources(resources, source, destination);
