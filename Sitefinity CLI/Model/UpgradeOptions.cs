@@ -28,7 +28,7 @@ namespace Sitefinity_CLI.Model
             CalculatePackagesToBeRemoved(removeDeprecatedPackages, removeDeprecatedPackagesExcept);
 
             this.ResourceBackupList = this.DeprecatedResourcesRepository
-                   .Where(v => v.DeprecatedInVersion <= this.Version)
+                   .Where(v => this.Version >= v.DeprecatedInVersion)
                    .Select(p => p)
                    .ToList();
         }
@@ -95,7 +95,7 @@ namespace Sitefinity_CLI.Model
 
         private readonly List<DeprecatedPackage> DeprecatedResourcesRepository = new()
         {
-            new DeprecatedPackage(Constants.DefaultResourcePackageName_VersionsBefore14_1, new Version("15.2.8400")) 
+            new DeprecatedPackage(Constants.DefaultResourcePackageName_VersionsBefore14_1, new Version("15.3.8500")) 
         };
     }
 }
