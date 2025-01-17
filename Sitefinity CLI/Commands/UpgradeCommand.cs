@@ -49,14 +49,6 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.RemoveDeprecatedPackagesExcept, Description = Constants.RemoveDeprecatedPackagesExceptDescription)]
         public string RemoveDeprecatedPackagesExcept { get; set; }
 
-        private string SolutionDir
-        {
-            get
-            {
-                return Path.GetDirectoryName(this.SolutionPath);
-            }
-        }
-
         public UpgradeCommand(
             ISitefinityNugetPackageService sitefinityPackageService,
             IVisualStudioService visualStudioService,
@@ -155,7 +147,6 @@ namespace Sitefinity_CLI.Commands
             List<string> sitefinityProjectsFilePaths = projectFilePathsWithSitefinityVersion.Select(p => p.FilePath).ToList();
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectsFilePaths.Count));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
-
             NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
             if (!this.AcceptLicense)
@@ -198,7 +189,7 @@ namespace Sitefinity_CLI.Commands
 
             this.sitefinityConfigService.RestoreConfigurationValues(configsWithoutSitefinity);
 
-            this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectsFilePaths, this.SolutionDir);
+            this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectsFilePaths, Path.GetDirectoryName(this.SolutionPath));
 
             this.sitefinityProjectService.RestoreBackupFilesAfterUpgrade(upgradeOptions);
 
@@ -229,7 +220,7 @@ namespace Sitefinity_CLI.Commands
 
         private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage, string licensesFolder = "")
         {
-            string pathToPackagesFolder = Path.Combine(this.SolutionDir, Constants.PackagesFolderName);
+            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
             string pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", licensesFolder, "License.txt");
 
             if (!File.Exists(pathToTheLicense))
