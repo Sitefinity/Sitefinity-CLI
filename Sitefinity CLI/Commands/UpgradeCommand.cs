@@ -147,6 +147,7 @@ namespace Sitefinity_CLI.Commands
             List<string> sitefinityProjectsFilePaths = projectFilePathsWithSitefinityVersion.Select(p => p.FilePath).ToList();
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectsFilePaths.Count));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
+            
             NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
             if (!this.AcceptLicense)
@@ -180,7 +181,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
-
             this.sitefinityProjectService.PrepareProjectFilesForUpgrade(upgradeOptions, sitefinityProjectsFilePaths);
 
             IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigurtaionsForProjectsWithoutSitefinity(this.SolutionPath);
