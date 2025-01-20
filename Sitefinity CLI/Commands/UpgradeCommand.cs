@@ -190,6 +190,9 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityConfigService.RestoreConfigurationValues(configsWithoutSitefinity);
 
             this.sitefinityPackageService.SyncProjectReferencesWithPackages(sitefinityProjectsFilePaths, Path.GetDirectoryName(this.SolutionPath));
+
+            this.sitefinityProjectService.RestoreBackupFilesAfterUpgrade(upgradeOptions);
+
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
         }
 

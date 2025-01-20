@@ -9,6 +9,7 @@ namespace Sitefinity_CLI
 
         // Folder names
         public const string ResourcePackagesFolderName = "ResourcePackages";
+        public const string ResourcePackagesBackupFolderName = "ResourcePackagesBackup";
         public const string MVCFolderName = "MVC";
         public const string LocalPackagesInfoCacheFolder = "PackagesInfoCache";
         public const string ModuleFolderName = "Modules";

@@ -26,6 +26,11 @@ namespace Sitefinity_CLI.Model
             }
 
             CalculatePackagesToBeRemoved(removeDeprecatedPackages, removeDeprecatedPackagesExcept);
+
+            this.ResourceBackupList = this.DeprecatedResourcesRepository
+                   .Where(v => this.Version >= v.DeprecatedInVersion)
+                   .Select(p => p)
+                   .ToList();
         }
 
         public string SolutionPath { get; set; }
@@ -43,6 +48,8 @@ namespace Sitefinity_CLI.Model
         public string AdditionalPackagesString { get; set; }
 
         public List<string> DeprecatedPackagesList { get; set; } = new List<string>();
+
+        public List<DeprecatedPackage> ResourceBackupList { get; set; } = new List<DeprecatedPackage>();
 
         private void CalculatePackagesToBeRemoved(bool removeDeprecatedPackages, string removeDeprecatedPackagesExcept)
         {
@@ -84,6 +91,11 @@ namespace Sitefinity_CLI.Model
             new DeprecatedPackage("AntiXSS", new Version("15.0.8200")),
             new DeprecatedPackage("linqtotwitterNET40", new Version("15.2.8400")),
             new DeprecatedPackage("Telerik.Sitefinity.Twitterizer", new Version("15.2.8400")),
+        };
+
+        private readonly List<DeprecatedPackage> DeprecatedResourcesRepository = new()
+        {
+            new DeprecatedPackage(Constants.DefaultResourcePackageName_VersionsBefore14_1, new Version("15.3.8500")) 
         };
     }
 }

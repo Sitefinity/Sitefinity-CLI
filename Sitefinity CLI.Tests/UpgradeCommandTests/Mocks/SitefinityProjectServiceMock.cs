@@ -34,5 +34,9 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
         public void PrepareProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<string> projectFilesToPrepare)
         {
         }
+
+        public void RestoreBackupFilesAfterUpgrade(UpgradeOptions upgradeOptions, bool cleanup = true)
+        {
+        }
     }
 }
