@@ -28,15 +28,8 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.dependencyParsers = this.InitializeDependencyParsers(parsers);
         }
 
-        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<PackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> shouldBreakSearch = null)
+        public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<PackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> breakPackageCalculationPrediacte = null)
         {
-            //// First, try to retrieve the data from the local cache
-            //string packageDependenciesHashFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, version));
-            //if (File.Exists(packageDependenciesHashFilePath))
-            //{
-            //    return JsonConvert.DeserializeObject<NuGetPackage>(File.ReadAllText(packageDependenciesHashFilePath));
-            //}
-
             PackageXmlDocumentModel nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources);
             if (nuGetPackageXmlDoc == null)
             {
@@ -46,7 +39,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             NuGetPackage nuGetPackage = new();
             List<NuGetPackage> dependencies = dependencyParsers[nuGetPackageXmlDoc.ProtoVersion].ParseDependencies(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
 
-            if (shouldBreakSearch != null && dependencies.Any(shouldBreakSearch))
+            if (breakPackageCalculationPrediacte != null && dependencies.Any(breakPackageCalculationPrediacte))
             {
                 nuGetPackage.Dependencies = dependencies;
                 return nuGetPackage;
@@ -54,16 +47,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             foreach (NuGetPackage dependency in dependencies)
             {
-                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, shouldBreakSearch);
+                NuGetPackage nuGetPackageDependency = await this.GetPackageWithFullDependencyTree(dependency.Id, dependency.Version, sources, supportedFrameworksRegex, breakPackageCalculationPrediacte);
                 if (nuGetPackageDependency != null && nuGetPackageDependency.Id != null && nuGetPackageDependency.Version != null)
                 {
                     nuGetPackage.Dependencies.Add(nuGetPackageDependency);
                 }
             }
-
-            // Include the current package in the local cache
-            //Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder));
-            //File.WriteAllText(packageDependenciesHashFilePath, JsonConvert.SerializeObject(nuGetPackage));
 
             if (nuGetPackage.Id == null || nuGetPackage.Version == null)
             {

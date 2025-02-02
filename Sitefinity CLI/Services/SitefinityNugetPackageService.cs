@@ -99,18 +99,18 @@ namespace Sitefinity_CLI.Services
 
             foreach (string version in versions)
             {
-                bool isIncompatible = false;
+                bool notCompatible = false;
                 NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, packageSources, package =>
                 {
-                    if (package != null)
+                    if (package != null && this.IsTelerikSitefinityCore(package.Id))
                     {
-                        isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > options.Version;
+                        notCompatible = new Version(package.Version) > options.Version;
                     }
 
-                    return isIncompatible;
+                    return notCompatible;
                 });
 
-                if (!isIncompatible)
+                if (!notCompatible)
                 {
                     Version currentVersion = this.GetSitefinityVersionOfDependecies(package);
                     if (currentVersion <= options.Version)
@@ -150,7 +150,8 @@ namespace Sitefinity_CLI.Services
 
             return null;
         }
-        private bool IsSitefinityPackage(string packageId) => packageId.StartsWith(Constants.TelerikSitefinityReferenceKeyWords) || packageId.StartsWith(Constants.ProgressSitefinityReferenceKeyWords);
+
+        private bool IsTelerikSitefinityCore(string packageId) => packageId.StartsWith(Constants.SitefinityCoreNuGetPackageId);
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
         private readonly IDotnetCliClient dotnetCliClient;
