@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -34,7 +36,28 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             var currentProcesses = System.Diagnostics.Process.GetProcessesByName(VisualStudioProcessName);
 
             Type visualStudioType = Type.GetTypeFromProgID(latestVisualStudioVersion, true);
-            object obj = Activator.CreateInstance(visualStudioType, true);
+
+            int maxRetries = 5;
+            int retryDelayMs = 60000;
+            object obj;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    obj = Activator.CreateInstance(visualStudioType, true);
+                    break;
+                }
+                catch (COMException ex) when (ex.HResult == 0x80080005)
+                {
+                    this.logger.LogWarning("Visual Studio COM busy (attempt {Attempt}/{MaxRetries}). Retrying...", attempt, maxRetries);
+                    if (attempt == maxRetries)
+                    {
+                        throw new COMException($"Failed to launch Visual Studio after {maxRetries} retries.", ex);
+                    }
+                    Thread.Sleep(retryDelayMs);
+                }
+            }
 
             foreach (var process in System.Diagnostics.Process.GetProcessesByName(VisualStudioProcessName))
             {
