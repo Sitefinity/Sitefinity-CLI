@@ -10,6 +10,8 @@ using System.Management.Automation.Runspaces;
 using Sitefinity_CLI.Exceptions;
 using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.PackageManagement.Contracts;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -29,6 +31,9 @@ namespace Sitefinity_CLI.Commands
 
         [Option(Constants.CoreModulesOptionTemplate, Description = Constants.CoreModulesModeOptionDescription)]
         public bool CoreModules { get; set; }
+
+        [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
+        public string AdditionalPackagesString { get; set; }
 
         [Option(Constants.RendererOptionTemplate, Description = Constants.RendererOptionDescription)]
         public bool Renderer { get; set; }
@@ -133,6 +138,14 @@ namespace Sitefinity_CLI.Commands
                 this.Version = this.dotnetCliClient.GetLatestVersionInNugetSources(nugetSources, package);
             }
 
+            HashSet<string> packagesToInstall = new HashSet<string>() { package };
+            IEnumerable<string> additionalPackagesIds = this.AdditionalPackagesString?.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+            foreach (var pkg in additionalPackagesIds)
+            {
+                packagesToInstall.Add(pkg);
+                command += $";Install-Package {pkg}";
+            }
+
             var tcs = new TaskCompletionSource<bool>();
 
             string path = $"\"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNetFrameworkWebAppPath)}\"";
@@ -159,6 +172,7 @@ namespace Sitefinity_CLI.Commands
             watcher = new FileSystemWatcher
             {
                 Path = $"{this.Directory}\\packages",
+                NotifyFilter = NotifyFilters.DirectoryName,
                 EnableRaisingEvents = true
             };
 
@@ -166,10 +180,21 @@ namespace Sitefinity_CLI.Commands
             {
                 this.logger.LogInformation($"Package added: {e.Name}");
 
-                if (e.Name == $"{package}.{this.Version}")
+                foreach (var packageId in packagesToInstall.ToList())
                 {
-                    tcs.TrySetResult(true);
-                    watcher.Dispose();
+                    if (e.Name.StartsWith(packageId + ".", StringComparison.OrdinalIgnoreCase))
+                    {
+                        packagesToInstall.Remove(packageId);
+
+                        if (packagesToInstall.Count == 0)
+                        {
+                            this.logger.LogInformation("All packages installed successfully");
+                            tcs.TrySetResult(true);
+                            watcher.Dispose();
+                        }
+
+                        break;
+                    }
                 }
             };
 
