@@ -39,7 +39,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             int maxRetries = 5;
             int retryDelayMs = 60000;
-            object obj;
+            object obj = new object();
 
             for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
