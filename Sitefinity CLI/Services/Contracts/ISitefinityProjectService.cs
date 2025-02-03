@@ -15,5 +15,7 @@ namespace Sitefinity_CLI.Services.Contracts
         IEnumerable<string> GetNonSitefinityProjectPaths(string solutionPath);
 
         void PrepareProjectFilesForUpgrade(UpgradeOptions upgradeOptions, IEnumerable<string> projectFilesToPrepare);
+
+        void RestoreBackupFilesAfterUpgrade(UpgradeOptions upgradeOptions, bool cleanup = true);
     }
 }
