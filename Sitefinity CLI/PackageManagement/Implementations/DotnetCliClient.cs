@@ -136,7 +136,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             ArgumentNullException.ThrowIfNullOrEmpty(sitefinityPackage);
             ArgumentNullException.ThrowIfNullOrEmpty(nugetConfigFilePath);
 
-            string command = $"dotnet package search {sitefinityPackage} --exact-match --format json --verbosity minimal --configfile {nugetConfigFilePath}";
+            string command = $"dotnet package search {sitefinityPackage} --exact-match --format json --verbosity minimal --configfile \"{nugetConfigFilePath}\"";
 
             StringBuilder commandOutput = ExecuteCMDCommand(command);
 
