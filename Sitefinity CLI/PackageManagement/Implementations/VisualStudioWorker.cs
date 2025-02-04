@@ -48,7 +48,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                     obj = Activator.CreateInstance(visualStudioType, true);
                     break;
                 }
-                catch (COMException ex) when (ex.HResult == 0x80080005)
+                catch (COMException ex)
                 {
                     this.logger.LogWarning("Visual Studio COM busy (attempt {Attempt}/{MaxRetries}). Retrying...", attempt, maxRetries);
                     if (attempt == maxRetries)
