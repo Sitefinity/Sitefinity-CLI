@@ -11,6 +11,7 @@ using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services.Contracts;
 using NuGet.Configuration;
 using Sitefinity_CLI.Exceptions;
+using Microsoft.Extensions.Options;
 
 namespace Sitefinity_CLI.Services
 {
@@ -42,7 +43,6 @@ namespace Sitefinity_CLI.Services
 
         public async Task<IEnumerable<NuGetPackage>> PrepareAdditionalPackages(UpgradeOptions options)
         {
-            IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
             IEnumerable<string> additionalPackagesIds = this.GetAdditionalPackages(options.AdditionalPackagesString);
             ICollection<NuGetPackage> additionalPackagesToUpgrade = new List<NuGetPackage>();
 
@@ -50,7 +50,7 @@ namespace Sitefinity_CLI.Services
             {
                 foreach (string packageId in additionalPackagesIds)
                 {
-                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, options.Version, packageSources);
+                    NuGetPackage package = await this.GetLatestCompatibleVersion(packageId, options);
                     if (package != null)
                     {
                         additionalPackagesToUpgrade.Add(package);
@@ -87,29 +87,33 @@ namespace Sitefinity_CLI.Services
             return latestVersion;
         }
 
-        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, Version sitefinityVersion, IEnumerable<PackageSource> packageSources)
+        private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, UpgradeOptions options)
         {
-            IEnumerable<string> versions = this.dotnetCliClient.GetPackageVersionsInNugetSources(packageId, null);
+            IEnumerable<PackageSource> packageSources = this.sitefinityPackageManager.GetNugetPackageSources(options.NugetConfigPath);
+
+            IEnumerable<string> versions = this.dotnetCliClient
+                .GetPackageVersionsInNugetSourcesUsingConfig(packageId, options.NugetConfigPath)
+                .OrderByDescending(x => x);
 
             NuGetPackage compatiblePackage = null;
 
             foreach (string version in versions)
             {
-                bool isIncompatible = false;
+                bool notCompatible = false;
                 NuGetPackage package = await this.sitefinityPackageManager.GetPackageTree(packageId, version, packageSources, package =>
                 {
-                    if (package != null)
+                    if (package != null && this.IsTelerikSitefinityCore(package.Id))
                     {
-                        isIncompatible = this.IsSitefinityPackage(package.Id) && new Version(package.Version) > sitefinityVersion;
+                        notCompatible = new Version(package.Version) > options.Version;
                     }
 
-                    return isIncompatible;
+                    return notCompatible;
                 });
 
-                if (!isIncompatible)
+                if (!notCompatible)
                 {
                     Version currentVersion = this.GetSitefinityVersionOfDependecies(package);
-                    if (currentVersion <= sitefinityVersion)
+                    if (currentVersion <= options.Version)
                     {
                         compatiblePackage = package;
                         break;
@@ -146,7 +150,8 @@ namespace Sitefinity_CLI.Services
 
             return null;
         }
-        private bool IsSitefinityPackage(string packageId) => packageId.StartsWith(Constants.TelerikSitefinityReferenceKeyWords) || packageId.StartsWith(Constants.ProgressSitefinityReferenceKeyWords);
+
+        private bool IsTelerikSitefinityCore(string packageId) => packageId.StartsWith(Constants.SitefinityCoreNuGetPackageId);
 
         private readonly ISitefinityPackageManager sitefinityPackageManager;
         private readonly IDotnetCliClient dotnetCliClient;
