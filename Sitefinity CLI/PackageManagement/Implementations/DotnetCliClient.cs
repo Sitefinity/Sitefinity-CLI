@@ -123,6 +123,43 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             command += " --exact-match --format json --verbosity minimal";
 
+            StringBuilder commandOutput = ExecuteCMDCommand(command);
+
+            var nugetPackagesSearchResult = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(commandOutput.ToString());
+            var versions = nugetPackagesSearchResult.SearchResult.SelectMany(x => x.Packages.Select(p => p.Version));
+
+            return versions;
+        }
+
+        public IEnumerable<string> GetPackageVersionsInNugetSourcesUsingConfig(string sitefinityPackage, string nugetConfigFilePath)
+        {
+            ArgumentNullException.ThrowIfNullOrEmpty(sitefinityPackage);
+            ArgumentNullException.ThrowIfNullOrEmpty(nugetConfigFilePath);
+
+            string command = $"dotnet package search {sitefinityPackage} --exact-match --format json --verbosity minimal --configfile \"{nugetConfigFilePath}\"";
+
+            StringBuilder commandOutput = ExecuteCMDCommand(command);
+
+            var nugetPackagesSearchResult = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(commandOutput.ToString());
+            var versions = nugetPackagesSearchResult.SearchResult.SelectMany(x => x.Packages.Select(p => p.Version));
+
+            return versions;
+        }
+
+        public bool VersionExists(string version, string sitefinityPackage, string[] sources)
+        {
+            return GetPackageVersionsInNugetSources(sitefinityPackage, sources).Any(v => v == version);
+        }
+
+        public string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage)
+        {
+            return GetPackageVersionsInNugetSources(sitefinityPackage, sources)
+                   .Select(v => new Version(v))
+                   .Max()
+                   .ToString();
+        }
+        private StringBuilder ExecuteCMDCommand(string command)
+        {
             var commandOutput = new StringBuilder();
 
             using (Process process = new())
@@ -148,23 +185,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 process.WaitForExit();
             }
 
-            var nugetPackagesSearchResult = JsonConvert.DeserializeObject<DotnetPackageSearchResponseModel>(commandOutput.ToString());
-            var versions = nugetPackagesSearchResult.SearchResult.SelectMany(x => x.Packages.Select(p => p.Version));
-
-            return versions;
-        }
-
-        public bool VersionExists(string version, string sitefinityPackage, string[] sources)
-        {
-            return GetPackageVersionsInNugetSources(sitefinityPackage, sources).Any(v => v == version);
-        }
-
-        public string GetLatestVersionInNugetSources(string[] sources, string sitefinityPackage)
-        {
-            return GetPackageVersionsInNugetSources(sitefinityPackage, sources)
-                   .Select(v => new Version(v))
-                   .Max()
-                   .ToString();
+            return commandOutput;
         }
 
         private readonly ILogger<DotnetCliClient> logger;
