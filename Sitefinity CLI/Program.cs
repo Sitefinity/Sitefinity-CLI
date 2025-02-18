@@ -26,6 +26,7 @@ namespace Sitefinity_CLI
     [Subcommand(typeof(UpgradeCommand))]
     [Subcommand(typeof(CreateCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]
+    [Subcommand(typeof(MigrateCommand))]
     public class Program
     {
         internal delegate INugetProvider NugetProviderFactory(ProtocolVersion version);
