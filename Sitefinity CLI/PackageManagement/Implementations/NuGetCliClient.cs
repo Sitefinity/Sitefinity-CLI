@@ -9,10 +9,9 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class NuGetCliClient : INuGetCliClient
     {
-        public NuGetCliClient(ILogger<NuGetCliClient> logger, IHttpClientFactory httpClientFactory)
+        public NuGetCliClient(ILogger<NuGetCliClient> logger)
         {
             this.logger = logger;
-            this.httpClientFactory = httpClientFactory;
         }
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
@@ -74,7 +73,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         }
 
         private readonly ILogger<NuGetCliClient> logger;
-        private readonly IHttpClientFactory httpClientFactory;
         private const string NuGetExeFileName = "nuget.exe";
         private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/v6.11.1/nuget.exe";
     }
