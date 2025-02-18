@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 

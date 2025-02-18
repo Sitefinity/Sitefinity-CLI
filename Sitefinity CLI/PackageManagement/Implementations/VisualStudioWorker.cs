@@ -9,6 +9,8 @@ using Microsoft.Win32;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Thread = System.Threading.Thread;
 
+#pragma warning disable CA1416
+
 namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     public class VisualStudioWorker : IVisualStudioWorker
@@ -140,3 +142,4 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private const int UnblockingPSPScriptWaitTime = 5000;
     }
 }
+#pragma warning restore CA1416

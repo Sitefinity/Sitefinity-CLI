@@ -632,7 +632,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private readonly INuGetApiClient nuGetApiClient;
 
         private readonly INuGetCliClient nuGetCliClient;
-        private readonly IDotnetCliClient dotnetCliClient;
         private readonly IPackagesConfigFileEditor packagesConfigFileEditor;
 
         private readonly IProjectConfigFileEditor projectConfigFileEditor;
