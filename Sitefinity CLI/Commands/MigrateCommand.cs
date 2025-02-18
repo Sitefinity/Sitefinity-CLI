@@ -37,7 +37,7 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.MigrationReplaceTemplate, Description = Constants.ReplaceOption)]
         public bool Replace { get; set; }
 
-        [Option(Constants.DumpSourceLayoutTemplate, Description = Constants.DumpSourceLayoutTemplate)]
+        [Option(Constants.DumpSourceLayoutTemplate, Description = Constants.DumpOption)]
         public bool DumpSourceLayout { get; set; }
 
         [Option(Constants.MigrationActionTemplate, Description = Constants.MigrateAction)]
@@ -52,6 +52,10 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.MigrationTokenTemplate, Description = Constants.AuthToken)]
         [ConfigAttribute]
         public string Token { get; set; }
+
+        [Option(Constants.MigrationSiteTemplate, Description = Constants.SiteAction)]
+        [ConfigAttribute]
+        public string SiteId { get; set; }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
@@ -81,7 +85,8 @@ namespace Sitefinity_CLI.Commands
                     Action = action,
                     DefaultWidgetMigration = defaultMigration,
                     Log = log,
-                    ReplacePageContent = this.Replace
+                    ReplacePageContent = this.Replace,
+                    SiteId = this.SiteId
                 });
             }
             else if (this.Type == "template")
@@ -91,7 +96,8 @@ namespace Sitefinity_CLI.Commands
                     AttemptRecreate = this.Recreate,
                     Action = action,
                     DefaultWidgetMigration = defaultMigration,
-                    Log = log
+                    Log = log,
+                    SiteId = this.SiteId
                 });
             }
 

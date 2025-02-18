@@ -117,13 +117,14 @@ namespace Sitefinity_CLI
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
         public const string ProjectNameDescription = "The name of your project.";
         public const string CmsUrl = "The URL of the CMS.";
-        public const string PresentationTypeDescription = "The type of the resource to migrate.";
-        public const string AuthToken = "The authentication token to use.";
+        public const string PresentationTypeDescription = "The type of the page/template to migrate.";
+        public const string AuthToken = "The authentication token to use. Visit https://www.progress.com/documentation/sitefinity-cms/generate-access-key for instrictions on how to generate a token.";
         public const string ResourceId = "The id of the page/template.";
         public const string MigrateAction = "The action to execute at the end of the migration - SaveDraft/Publish.";
-        public const string RecreateOption = "Attempts to first delete the resouce and recreate it afterwords. Will not work on templates that have pages/templates based on them. Usefull for debugging.";
+        public const string SiteAction = "The site id parameter.";
+        public const string RecreateOption = "Attempts to first delete the page/template and recreate it afterwords. Will not work on templates that have pages/templates based on them. Usefull for debugging.";
         public const string ReplaceOption = "Replaces the content of the page. Valid only for pages";
-        public const string DumpOption = "Writes the resource to a file on the file system. Usefull for debugging.";
+        public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
@@ -143,6 +144,7 @@ namespace Sitefinity_CLI
         public const string MigrationActionTemplate = "--action";
         public const string MigrationReplaceTemplate = "--replace";
         public const string MigrationRecreateTemplate = "--recreate";
+        public const string MigrationSiteTemplate = "--site";
         public const string MigrationCmsUrlTemplate = "--cmsUrl";
         public const string MigrationTokenTemplate = "--token";
         public const string DumpSourceLayoutTemplate = "--dumpSourceLayout";
