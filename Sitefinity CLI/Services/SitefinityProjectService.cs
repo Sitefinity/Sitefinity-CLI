@@ -171,7 +171,6 @@ namespace Sitefinity_CLI.Services
         private bool IsSitefinityReference(CsProjectFileReference reference) => reference.Include.Contains(Constants.TelerikSitefinityReferenceKeyWords) && reference.Include.Contains($"PublicKeyToken={Constants.SitefinityPublicKeyToken}");
 
         private readonly ICsProjectFileEditor csProjectFileEditor;
-        private readonly HttpClient httpClient;
         private readonly ILogger<SitefinityProjectService> logger;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 
@@ -8,9 +9,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class NuGetCliClient : INuGetCliClient
     {
-        public NuGetCliClient(ILogger<NuGetCliClient> logger)
+        public NuGetCliClient(ILogger<NuGetCliClient> logger, IHttpClientFactory httpClientFactory)
         {
             this.logger = logger;
+            this.httpClientFactory = httpClientFactory;
         }
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
@@ -64,14 +66,17 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             if (!File.Exists(nugetFileLocation))
             {
-                using (var client = new WebClient())
-                {
-                    client.DownloadFile(NuGetExeDownloadUrl, nugetFileLocation);
-                }
+                var client = this.httpClientFactory.CreateClient();
+
+                var response = client.GetAsync(NuGetExeDownloadUrl).Result;
+                response.EnsureSuccessStatusCode();
+                var fileBytes = response.Content.ReadAsByteArrayAsync().Result;
+                File.WriteAllBytes(nugetFileLocation, fileBytes);
             }
         }
 
         private readonly ILogger<NuGetCliClient> logger;
+        private readonly IHttpClientFactory httpClientFactory;
         private const string NuGetExeFileName = "nuget.exe";
         private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/v6.11.1/nuget.exe";
     }
