@@ -66,12 +66,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             if (!File.Exists(nugetFileLocation))
             {
-                var client = this.httpClientFactory.CreateClient();
-
-                var response = client.GetAsync(NuGetExeDownloadUrl).Result;
-                response.EnsureSuccessStatusCode();
-                var fileBytes = response.Content.ReadAsByteArrayAsync().Result;
-                File.WriteAllBytes(nugetFileLocation, fileBytes);
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile(NuGetExeDownloadUrl, nugetFileLocation);
+                }
             }
         }
 
