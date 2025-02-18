@@ -33,6 +33,9 @@
     <Content Include="..\NOTICE.txt" Link="NOTICE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	  <Content Include="appsettings.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
     <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\.template.config\template.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -67,6 +70,7 @@
     <PackageReference Include="Handlebars.Net" Version="2.1.4" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageReference Include="McMaster.Extensions.Hosting.CommandLine" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />

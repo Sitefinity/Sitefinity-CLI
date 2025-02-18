@@ -143,6 +143,8 @@ namespace Sitefinity_CLI
         public const string MigrationActionTemplate = "--action";
         public const string MigrationReplaceTemplate = "--replace";
         public const string MigrationRecreateTemplate = "--recreate";
+        public const string MigrationCmsUrlTemplate = "--cmsUrl";
+        public const string MigrationTokenTemplate = "--token";
         public const string DumpSourceLayoutTemplate = "--dumpSourceLayout";
         public const string CoreModulesOptionTemplate = "--coreModules";
         public const string SkipPrompts = "--skipPrompts";

@@ -14,6 +14,7 @@ using Sitefinity_CLI.Enums;
 using AllowedValuesAttribute = McMaster.Extensions.CommandLineUtils.AllowedValuesAttribute;
 using Progress.Sitefinity.MigrationTool.Core;
 using Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations;
+using Microsoft.Extensions.Configuration;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -21,26 +22,14 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.MigrateCommandName, Description = "Migrate a Sitefinity page/template from Web Forms/MVC to NetCore/NextJS")]
     internal class MigrateCommand
     {
-        [Argument(0, Description = Constants.CmsUrl)]
-        [Required(ErrorMessage = "You must specify a CMS URL.")]
-        public string CmsUrl { get; set; }
-
-        [Argument(1, Description = Constants.AuthToken)]
-        [Required(ErrorMessage = "You must pass an authentication token. See https://www.progress.com/documentation/sitefinity-cms/generate-access-key on how to generate one.")]
-        public string Token { get; set; }
-
-        [Argument(2, Description = Constants.PresentationTypeDescription)]
+        [Argument(0, Description = Constants.PresentationTypeDescription)]
         [Required(ErrorMessage = "You must specify a resource type - page/template.")]
         [AllowedValues("page", "template", IgnoreCase = true)]
         public string Type { get; set; }
 
-        [Argument(3, Description = Constants.ResourceId)]
+        [Argument(1, Description = Constants.ResourceId)]
         [Required(ErrorMessage = "You must pass the id of the page/template. You can retrieve it from the analyzer page.")]
         public string Id { get; set; }
-
-        [Option(Constants.MigrationActionTemplate, Description = Constants.MigrateAction)]
-        [AllowedValues("draft", "publish", IgnoreCase = true)]
-        public string Action { get; set; } = "draft";
 
         [Option(Constants.MigrationRecreateTemplate, Description = Constants.RecreateOption)]
         public bool Recreate { get; set; }
@@ -51,8 +40,31 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.DumpSourceLayoutTemplate, Description = Constants.DumpSourceLayoutTemplate)]
         public bool DumpSourceLayout { get; set; }
 
+        [Option(Constants.MigrationActionTemplate, Description = Constants.MigrateAction)]
+        [AllowedValues("draft", "publish", IgnoreCase = true)]
+        [ConfigAttribute]
+        public string Action { get; set; } = "draft";
+
+        [ConfigAttribute]
+        [Option(Constants.MigrationCmsUrlTemplate, Description = Constants.CmsUrl)]
+        public string CmsUrl { get; set; }
+
+        [Option(Constants.MigrationTokenTemplate, Description = Constants.AuthToken)]
+        [ConfigAttribute]
+        public string Token { get; set; }
+
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
+            if (string.IsNullOrEmpty(this.CmsUrl))
+            {
+                throw new ValidationException("You must specify a CMS URL.");
+            }
+
+            if (string.IsNullOrEmpty(this.Token))
+            {
+                throw new ValidationException("You must pass an authentication token. See https://www.progress.com/documentation/sitefinity-cms/generate-access-key on how to generate one.");
+            }
+
             var log = new LogArgs()
             {
                 DumpOriginalLayoutStateToFile = this.DumpSourceLayout,
