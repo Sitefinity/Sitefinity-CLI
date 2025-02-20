@@ -30,7 +30,43 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public async Task<NuGetPackage> GetPackageWithFullDependencyTree(string id, string version, IEnumerable<PackageSource> sources, Regex supportedFrameworksRegex = null, Func<NuGetPackage, bool> breakPackageCalculationPrediacte = null)
         {
-            PackageXmlDocumentModel nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources);
+            var localSources = sources.Where( x=> x.SourceUri.AbsoluteUri.StartsWith("file"));
+            var otherSources = sources.Except(localSources);
+
+            PackageXmlDocumentModel nuGetPackageXmlDoc = null;
+            var packageFound = false;
+
+            foreach (var localSource in localSources) 
+            {
+                var sourcePath = Path.Combine(localSource.Source, string.Concat(id, ".", version, ".nupkg"));
+                var destinationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, ".", version, ".zip"));
+                var extractionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, ".", version));
+                var nuspecPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder, string.Concat(id, ".", version), string.Concat(id, ".nuspec"));
+
+                if (File.Exists(sourcePath))
+                {
+                    packageFound = true;
+
+                    if (!File.Exists(destinationPath))
+                        File.Copy(sourcePath, destinationPath);
+                    if (!Directory.Exists(extractionPath))
+                        System.IO.Compression.ZipFile.ExtractToDirectory(destinationPath, extractionPath);
+
+                    var responseContentString = File.ReadAllText(nuspecPath);
+                    XDocument xmlDoc = XDocument.Parse(responseContentString);
+                    nuGetPackageXmlDoc = new PackageXmlDocumentModel() { XDocumentData = xmlDoc, ProtoVersion = ProtocolVersion.NuGetAPIV3 };
+                }
+            }
+
+            if (!packageFound)
+            {
+                nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, otherSources);
+                if (nuGetPackageXmlDoc == null)
+                {
+                    return null;
+                }
+            }
+
             if (nuGetPackageXmlDoc == null)
             {
                 return null;
