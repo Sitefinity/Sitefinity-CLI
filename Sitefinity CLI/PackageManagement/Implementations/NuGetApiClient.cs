@@ -67,11 +67,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 }
             }
 
-            if (nuGetPackageXmlDoc == null)
-            {
-                return null;
-            }
-
             NuGetPackage nuGetPackage = new();
             List<NuGetPackage> dependencies = dependencyParsers[nuGetPackageXmlDoc.ProtoVersion].ParseDependencies(nuGetPackageXmlDoc, nuGetPackage, supportedFrameworksRegex);
 
