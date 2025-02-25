@@ -76,21 +76,43 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 }
             }
 
-            PackageSpecificationResponseModel specification = await this.GetPackageSpecification(id, version, sources);
+            PackageXmlDocumentModel packageXmlDocument = null;
 
-            if (specification?.SpecResponse == null || specification.SpecResponse.StatusCode != HttpStatusCode.OK)
+            var localSources = sources.Where(x => x.SourceUri.AbsoluteUri.StartsWith("file"));
+            var otherSources = sources.Except(localSources);
+
+            var localPackageFound = false;
+
+            if (localSources.Any())
             {
-                return null;
+                string responseContentString = GetPackageSpecificationFromLocalSource(id, version, localSources);
+
+                if (responseContentString != null)
+                {
+                    XDocument xmlDoc = XDocument.Parse(responseContentString);
+                    packageXmlDocument = new PackageXmlDocumentModel() { XDocumentData = xmlDoc, ProtoVersion = ProtocolVersion.NuGetAPIV3 };
+                    localPackageFound = true;
+                }
             }
 
-            string responseContentString = await this.GetResponseContentString(specification.SpecResponse);
-            if (string.IsNullOrWhiteSpace(responseContentString))
+            if (!localPackageFound)
             {
-                return null;
-            }
+                PackageSpecificationResponseModel specification = await this.GetPackageSpecification(id, version, otherSources);
 
-            XDocument nuGetPackageXmlDoc = XDocument.Parse(responseContentString);
-            PackageXmlDocumentModel packageXmlDocument = new PackageXmlDocumentModel() { XDocumentData = nuGetPackageXmlDoc, ProtoVersion = specification.ProtoVersion };
+                if (specification?.SpecResponse == null || specification.SpecResponse.StatusCode != HttpStatusCode.OK)
+                {
+                    return null;
+                }
+
+                string responseContentString = await this.GetResponseContentString(specification.SpecResponse);
+                if (string.IsNullOrWhiteSpace(responseContentString))
+                {
+                    return null;
+                }
+
+                XDocument nuGetPackageXmlDoc = XDocument.Parse(responseContentString);
+                packageXmlDocument = new PackageXmlDocumentModel() { XDocumentData = nuGetPackageXmlDoc, ProtoVersion = specification.ProtoVersion };
+            }
 
             if (this.nuGetPackageXmlDocumentCache != null && !this.nuGetPackageXmlDocumentCache.ContainsKey(cacheKey))
             {
@@ -127,6 +149,35 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             return packageSepc;
+        }
+
+        private string GetPackageSpecificationFromLocalSource(string id, string version, IEnumerable<PackageSource> localSources)
+        {
+            var localNuGetExtractionFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalNuGetExtractionFolder);
+            if (!Directory.Exists(localNuGetExtractionFolder))
+            {
+                Directory.CreateDirectory(localNuGetExtractionFolder);
+            }
+
+            foreach (var localSource in localSources)
+            {
+                var sourcePath = Path.Combine(localSource.Source, string.Concat(id, ".", version, ".nupkg"));
+                var destinationPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalNuGetExtractionFolder, string.Concat(id, ".", version, ".zip"));
+                var extractionPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalNuGetExtractionFolder, string.Concat(id, ".", version));
+                var nuspecPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalNuGetExtractionFolder, string.Concat(id, ".", version), string.Concat(id, ".nuspec"));
+
+                if (File.Exists(sourcePath))
+                {
+                    if (!File.Exists(destinationPath))
+                        File.Copy(sourcePath, destinationPath);
+                    if (!Directory.Exists(extractionPath))
+                        System.IO.Compression.ZipFile.ExtractToDirectory(destinationPath, extractionPath);
+
+                    return File.ReadAllText(nuspecPath);
+                }
+            }
+
+            return null;
         }
 
         private async Task<string> GetResponseContentString(HttpResponseMessage response)
