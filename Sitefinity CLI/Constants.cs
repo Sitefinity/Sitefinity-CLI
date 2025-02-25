@@ -31,7 +31,7 @@ namespace Sitefinity_CLI
         public const string PackagesFolderName = "packages";
         public const string LicenseAgreementsFolderName = "LicenseAgreements";
         public const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
-        public const string LocalPackagesInfoCacheFolder = "NugetCache";
+        public const string LocalNuGetExtractionFolder = "LocalNuGetExtraction";
 
         // Paths
         public static string PageTemplatesPath = Path.Combine("MVC", "Views", "Layouts");
