@@ -36,6 +36,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             PackageXmlDocumentModel nuGetPackageXmlDoc = null;
             var packageFound = false;
 
+            var cacheFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.LocalPackagesInfoCacheFolder);
+            if (!Directory.Exists(cacheFolderPath) && localSources.Any())
+            {
+                Directory.CreateDirectory(cacheFolderPath);
+            }
+
             foreach (var localSource in localSources) 
             {
                 var sourcePath = Path.Combine(localSource.Source, string.Concat(id, ".", version, ".nupkg"));
