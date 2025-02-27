@@ -154,7 +154,7 @@ The migration commands support migration of pages/templates that are build with 
 ### General flow of migration
 
 * Start with the migration of a template/templates that a subset of pages is based on OR migrate all of the page templates at once.
-* Make adjustments to the migrated structure:
+* Make adjustments to the migrated structure as needed:
   * Set a file system template
   * Manually configure the widgets that are migrated.
   * Make adjustment to the look and feel of the page.
@@ -162,6 +162,8 @@ The migration commands support migration of pages/templates that are build with 
 * Once selected the page templates are migrated, move on to the pages structure
   * Pages are duplicated by default and excluded from the navigation.
   * Once the page is fully migrated, specify the --replace option
+
+**NOTE** The tool uses the page/page template's title to identify the page/page template that it created. The format has a suffix of (migrated to Decoupled). This is done to avoid conflicts with existing pages/page templates.
 
 ### Migrating hierarchies
 * When a page/page template is selected, first the parent page templates are migrated. Migration cannot happen otherwise.
@@ -254,6 +256,9 @@ From base class MigrationBase
 * ProcessProperties -> Copes and renames properties.
 * GetMasterIds -> Gets the master ids of the live content items (usually referenced in WebForms widgets).
 * GetSingleItemMixedContentValue, GetMixedContentValue -> Helper for generating properties of type MixedContentContext
+
+### Limitations
+* The migration tool does not migrate code in any form. It is a tool for migrating content and structure only.
 
 ## Known issues
 #### Visual Studio 2015 integration
