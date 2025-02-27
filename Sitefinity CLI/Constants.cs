@@ -118,13 +118,13 @@ namespace Sitefinity_CLI
         public const string ProjectNameDescription = "The name of your project.";
         public const string CmsUrl = "The URL of the CMS.";
         public const string PresentationTypeDescription = "The type of the page/template to migrate.";
-        public const string AuthToken = "The authentication token to use. Visit https://www.progress.com/documentation/sitefinity-cms/generate-access-key for instrictions on how to generate a token.";
+        public const string AuthToken = "The authentication token to use. Visit https://www.progress.com/documentation/sitefinity-cms/generate-access-key for instructions on how to generate a token.";
         public const string ResourceId = "The id of the page/template.";
-        public const string MigrateAction = "The action to execute at the end of the migration - SaveDraft/Publish.";
+        public const string MigrateAction = "The action to execute at the end of the migration - Save as Draft/Publish. Allowed values are: draft, publish";
         public const string SiteAction = "The site id parameter.";
-        public const string RecreateOption = "Attempts to first delete the page/template and recreate it afterwords. Will not work on templates that have pages/templates based on them. Usefull for debugging.";
+        public const string RecreateOption = "Instructs the command to recreate the selected page/template AND its parent templates. Useful when testing and experimenting with custom configurations/custom widget migrations.";
         public const string RecursiveOption = "Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.";
-        public const string ReplaceOption = "Replaces the content of the page. Valid only for pages";
+        public const string ReplaceOption = "Replaces the content of the page. Valid only for pages.";
         public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
