@@ -123,6 +123,7 @@ namespace Sitefinity_CLI
         public const string MigrateAction = "The action to execute at the end of the migration - SaveDraft/Publish.";
         public const string SiteAction = "The site id parameter.";
         public const string RecreateOption = "Attempts to first delete the page/template and recreate it afterwords. Will not work on templates that have pages/templates based on them. Usefull for debugging.";
+        public const string RecursiveOption = "Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.";
         public const string ReplaceOption = "Replaces the content of the page. Valid only for pages";
         public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
@@ -144,6 +145,7 @@ namespace Sitefinity_CLI
         public const string MigrationActionTemplate = "--action";
         public const string MigrationReplaceTemplate = "--replace";
         public const string MigrationRecreateTemplate = "--recreate";
+        public const string MigrationRecursiveTemplate = "--recursive";
         public const string MigrationSiteTemplate = "--site";
         public const string MigrationCmsUrlTemplate = "--cmsUrl";
         public const string MigrationTokenTemplate = "--token";

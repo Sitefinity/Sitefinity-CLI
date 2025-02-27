@@ -34,6 +34,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.MigrationRecreateTemplate, Description = Constants.RecreateOption)]
         public bool Recreate { get; set; }
 
+        [Option(Constants.MigrationRecursiveTemplate, Description = Constants.RecursiveOption)]
+        public bool Recursive { get; set; }
+
         [Option(Constants.MigrationReplaceTemplate, Description = Constants.ReplaceOption)]
         public bool Replace { get; set; }
 
@@ -86,7 +89,8 @@ namespace Sitefinity_CLI.Commands
                     DefaultWidgetMigration = defaultMigration,
                     Log = log,
                     ReplacePageContent = this.Replace,
-                    SiteId = this.SiteId
+                    SiteId = this.SiteId,
+                    Recursive = this.Recursive
                 });
             }
             else if (this.Type == "template")
@@ -97,7 +101,8 @@ namespace Sitefinity_CLI.Commands
                     Action = action,
                     DefaultWidgetMigration = defaultMigration,
                     Log = log,
-                    SiteId = this.SiteId
+                    SiteId = this.SiteId,
+                    Recursive = this.Recursive,
                 });
             }
 

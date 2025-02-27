@@ -11,6 +11,6 @@ internal class PlaceholderWidget : IWidgetMigration
     public async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
         await context.LogWarning($"Failed to find a mapping or custom migration for widget -> {context.Source.Name}. Using default Placeholder migrated widget.");
-        return new MigratedWidget("Placeholder", context.Source.Properties);
+        return new MigratedWidget("Placeholder", context.Source.Properties.Where(x => x.Key.Length < 50).ToDictionary(x => x.Key, y => y.Value));
     }
 }

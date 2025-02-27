@@ -22,10 +22,27 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, null);
         var contentType = context.Source.Properties["ControlDefinition-ContentType"];
-        var contentProvider = context.Source.Properties["ControlDefinition-ProviderName"] ?? "OpenAccessDataProvider";
+        var contentProvider = context.Source.Properties["ControlDefinition-ProviderName"];
+        if (string.IsNullOrEmpty(contentProvider))
+        {
+            if (contentType.StartsWith("Telerik.Sitefinity.DynamicTypes.Model", StringComparison.Ordinal))
+            {
+                contentProvider = "OpenAccessProvider";
+            }
+            else
+            {
+                contentProvider = "OpenAccessDataProvider";
+            }
+        }
 
         await MigrateItemInDetails(context, migratedProperties, contentType, contentProvider);
         await MigrateAdditionalFilter(context, migratedProperties, contentType, contentProvider);
+        if (!migratedProperties.ContainsKey("SelectedItems"))
+        {
+            var selectedItemsValue = GetMixedContentValue(null, contentType, contentProvider);
+            migratedProperties.Add("SelectedItems", selectedItemsValue);
+        }
+
         await MigrateDetailsPage(context, migratedProperties);
 
         await MigrateViews(context, migratedProperties, contentType);
@@ -222,7 +239,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                                 var dateFilter = new DateOffsetPeriod()
                                 {
                                     DateFieldName = query.Condition.FieldName,
-                                    OffsetType = DateOffsetType.Days,
+                                    OffsetType = DateOffsetType.Months,
                                     OffsetValue = (int)Math.Abs(months),
                                 };
 
@@ -240,7 +257,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                                 var dateFilter = new DateOffsetPeriod()
                                 {
                                     DateFieldName = query.Condition.FieldName,
-                                    OffsetType = DateOffsetType.Days,
+                                    OffsetType = DateOffsetType.Years,
                                     OffsetValue = (int)Math.Abs(years),
                                 };
                                 allItemsFilter.ChildFilters.Add(dateFilter);

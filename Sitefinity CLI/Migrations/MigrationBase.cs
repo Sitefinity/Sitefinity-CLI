@@ -26,7 +26,7 @@ internal abstract class MigrationBase
 
     public MigrationBase()
     {
-        this.jsonSerializerOptionsForContentFilterSerialization.Converters.Add(new JsonStringEnumConverter());
+        this.jsonSerializerOptionsForContentFilterSerialization.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
     }
 
     internal static IDictionary<string, string> ProcessProperties(IDictionary<string, string> source, string[] propertiesToCopy, IDictionary<string, string> propertiesToRename)
@@ -126,7 +126,7 @@ internal abstract class MigrationBase
                             Filter = new
                             {
                                 Key = "Complex",
-                                Value = JsonSerializer.Serialize(filter, this.jsonSerializerOptionsForContentFilterSerialization)
+                                Value = filter == null ? null : JsonSerializer.Serialize(filter, this.jsonSerializerOptionsForContentFilterSerialization)
                             }
                         }
                     }
