@@ -85,9 +85,23 @@ You can use the add command with the following subcommands:
 
 ```sf add [command name] -?```
 
+## CLI migration commands
+
+* To migrate a page, execute the following command:
+
+  ```sf migrate page "PageId"```
+
+* To migrate a page template, execute the following command:
+
+  ```sf migrate template "TemplateId"```
+
+**NOTE** For a list of all available options, execute the following command(or refer to docs [here](#migration-commands)):
+
+  ``` sf migrate help ```
+
 ## Sitefinity CMS version
 
-Every command has an option ```--version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Telates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
+Every command has an option ```--version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Templates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
 
 When running a command the CLI will try to automatically detect your Sitefinity CMS project version and use the corresponding template. If it cannot detect the version or your Sitefinity CMS version is higher than latest templates version, CLI will use the latest available. 
 
@@ -133,6 +147,111 @@ You can easily create custom templates. To do this, create a file with extension
 ]
 ```
 **NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
+
+## Migration Commands
+The migration commands support migration of pages/templates that are build with the WebForms/MVC to the decoupled architecture.
+
+### General flow of migration
+
+* Start with the migration of a template/templates that a subset of pages is based on OR migrate all of the page templates at once. 
+* Make adjustments to the migrated structure:
+  * Set a file system template
+  * Manually configure the widgets that are migrated.
+  * Make adjustment to the look and feel of the page.
+
+* Once selected the page templates are migrated, move on to the pages structure
+  * Pages are duplicated by default and excluded from the navigation.
+  * Once the page is fully migrated, specify the --replace option
+
+**NOTE** Parent templates are automatically migrated by default.
+
+### Safe box & Testing
+All pages and page templates are duplicated by default with a suffix in the Title(migrated to Decoupled). This provides a level of isolation for existing pages/page templates, so that the migration can happen seamless and without downtime. Additionally, this is a great way to test the changes before they go live. 
+
+**NOTE** Pages support the option (--replace. See [Migration options](#migration-options)). This replaces the page contents on the **ACTUAL** page and saves them as draft. Thanks to this option, existing links from content blocks/html fields/related data are kept and no effort is required to update those references. When using the Replace option, the page is automatically saved as Draft (regardless of the value of the --action option)
+
+**Duplicated Pages are hidden from navigation by default.**
+
+### Required parameters
+* Cms Url ('--cmsUrl' parameter) - The URL of the CMS
+* Token ('--token' parameter) - The authentication token to use. Visit https://www.progress.com/documentation/sitefinity-cms/generate-access-key for instructions on how to generate a token.
+
+### Optional parameters
+* Recreate ('--recreate' parameter) - instructs the command to recreate the selected page/template AND its parent templates. Useful when testing and experimenting with custom configurations/custom widget migrations
+* Recursive ('--recursive' parameter) -  Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
+* Replace ('--replace' parameter) - Replaces the content of the page. Valid only for pages. 
+* Action ('--action' parameter) - The action to execute at the end of the migration - Save as Draft/Publish. Allowed values are: draft, publish.
+
+**NOTE** All parameters can be manually specified in the appsettings.json file. **You need to manually create this file next to the sf.exe binary.**
+**EXAMPLE**
+
+``` json
+
+{
+  "Commands": {
+    "Migrate": {
+      "CmsUrl": "http://localhost",
+      "Token": "TOKEN",
+      "Recreate": true
+    }
+  }
+}
+
+```
+
+You can mix both appsettings.json parameters and direct cmd parameters, with the latter having precedence.
+
+### Widget migration
+There are two options for migration widgets. 
+* Through configuration
+* Through custom widget migrations
+
+### Migration through configuration
+This can be specified in the appsettings.json file.
+``` json
+
+{
+  "Commands": {
+    "Migrate": {
+      ...
+      "Widgets": {
+          "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock": {
+              "Name": "SitefinityContentBlock", // the name of the new widget in NetCore/NextJs renderers
+              "Whitelist": ["Html", "ProviderName", "SharedContentID"], // the whitelist of properties to keep during the migration
+              "Rename": { // the properties to be renamed
+                "Html": "Content"
+              },
+              "CleanNullProperties": true
+          }
+      }
+    }
+  }
+}
+
+```
+
+### Custom widget migrations
+
+Custom widget migrations can be used when the configuration is not sufficient and more complex logic is required. All OOB widget migrations are located under the Migrations folder for reference.
+
+Widget migrations are invoked for each **occurrence** of the widget found on the page/template. For each invocation a **WidgetMigrationContext** is passed. It contains:
+* SourceClient -> The IRestClient for interfacing with the CMS
+* Source -> The original widget, from which we are migrating.
+* ParentId -> The new parent id.
+* Language -> The current language.
+* SegmentId -> The page segment (for personalized pages)
+* WidgetSegmentId -> The widget segment (for personalized widgets)
+* LogWarning -> logs a warning message
+* LogInfo -> logs an informational message
+
+A return parameter **MigratedWidget** is required as the output of the migration. It contains the new widget name and the new properties.
+
+**Helpful functions**
+From base class MigrationBase
+
+* ProcessProperties -> Copes and renames properties.
+* GetMasterIds -> Gets the master ids of the live content items (usually referenced in WebForms widgets).
+* GetSingleItemMixedContentValue, GetMixedContentValue -> Helper for generating properties of type MixedContentContext
 
 ## Known issues
 #### Visual Studio 2015 integration
