@@ -13,16 +13,13 @@ public static class WidgetMigrationDefaults
 {
     public static ReadOnlyDictionary<string, WidgetMigrationArgs> MigrationMap = new ReadOnlyDictionary<string, WidgetMigrationArgs>(new Dictionary<string, WidgetMigrationArgs>()
     {
-        { "ContentBlock", new WidgetMigrationArgs("SitefinityContentBlock")
-        {
-            Whitelist = ["Content", "ProviderName", "SharedContentID"] }
-        },
+        { "ContentBlock", new WidgetMigrationArgs("SitefinityContentBlock") { Whitelist = ["Content"] } },
         { "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock", new WidgetMigrationArgs("SitefinityContentBlock")
             {
-                Whitelist = ["Html", "ProviderName", "SharedContentID"],
+                Whitelist = ["Html"],
                 Rename = new Dictionary<string, string>()
                 {
-                    { "Html", "Content" },
+                    { "Html", "Content" }
                 }
             }
         },
