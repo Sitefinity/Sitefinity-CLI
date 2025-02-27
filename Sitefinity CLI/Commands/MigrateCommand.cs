@@ -15,6 +15,9 @@ using AllowedValuesAttribute = McMaster.Extensions.CommandLineUtils.AllowedValue
 using Progress.Sitefinity.MigrationTool.Core;
 using Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Linq;
+using static Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WidgetMigrationDefaults;
 
 namespace Sitefinity_CLI.Commands
 {
@@ -31,34 +34,41 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = "You must pass the id of the page/template. You can retrieve it from the analyzer page.")]
         public string Id { get; set; }
 
+        [Config]
         [Option(Constants.MigrationRecreateTemplate, Description = Constants.RecreateOption)]
         public bool Recreate { get; set; }
 
+        [Config]
         [Option(Constants.MigrationRecursiveTemplate, Description = Constants.RecursiveOption)]
         public bool Recursive { get; set; }
 
+        [Config]
         [Option(Constants.MigrationReplaceTemplate, Description = Constants.ReplaceOption)]
         public bool Replace { get; set; }
 
+        [Config]
         [Option(Constants.DumpSourceLayoutTemplate, Description = Constants.DumpOption)]
         public bool DumpSourceLayout { get; set; }
 
         [Option(Constants.MigrationActionTemplate, Description = Constants.MigrateAction)]
         [AllowedValues("draft", "publish", IgnoreCase = true)]
-        [ConfigAttribute]
+        [Config]
         public string Action { get; set; } = "draft";
 
-        [ConfigAttribute]
+        [Config]
         [Option(Constants.MigrationCmsUrlTemplate, Description = Constants.CmsUrl)]
         public string CmsUrl { get; set; }
 
         [Option(Constants.MigrationTokenTemplate, Description = Constants.AuthToken)]
-        [ConfigAttribute]
+        [Config]
         public string Token { get; set; }
 
         [Option(Constants.MigrationSiteTemplate, Description = Constants.SiteAction)]
-        [ConfigAttribute]
+        [Config]
         public string SiteId { get; set; }
+
+        [Config]
+        public Dictionary<string, WidgetMigrationArgs> Widgets { get; set; }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
@@ -86,7 +96,6 @@ namespace Sitefinity_CLI.Commands
                 {
                     AttemptRecreate = true,
                     Action = action,
-                    DefaultWidgetMigration = defaultMigration,
                     Log = log,
                     ReplacePageContent = this.Replace,
                     SiteId = this.SiteId,
@@ -99,7 +108,6 @@ namespace Sitefinity_CLI.Commands
                 {
                     AttemptRecreate = this.Recreate,
                     Action = action,
-                    DefaultWidgetMigration = defaultMigration,
                     Log = log,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,

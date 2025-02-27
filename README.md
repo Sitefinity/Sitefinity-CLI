@@ -163,7 +163,9 @@ The migration commands support migration of pages/templates that are build with 
   * Pages are duplicated by default and excluded from the navigation.
   * Once the page is fully migrated, specify the --replace option
 
-**NOTE** Parent templates are automatically migrated by default.
+### Migrating hierarchies
+* When a page/page template is selected, first the parent page templates are migrated. Migration cannot happen otherwise.
+* If there are parent page templates automatically migrated, they will be automatically published
 
 ### Safe box & Testing
 All pages and page templates are duplicated by default with a suffix in the Title(migrated to Decoupled). This provides a level of isolation for existing pages/page templates, so that the migration can happen seamless and without downtime. Additionally, this is a great way to test the changes before they go live. 
