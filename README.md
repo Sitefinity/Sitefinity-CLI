@@ -190,6 +190,7 @@ All pages and page templates are duplicated by default with a suffix in the Titl
 * Recursive ('--recursive' parameter) -  Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
 * Replace ('--replace' parameter) - Replaces the content of the page. Valid only for pages.
 * Action ('--action' parameter) - The action to execute at the end of the migration - Save as Draft/Publish. Allowed values are: draft, publish.
+* SiteId ('--siteid' parameter) - The site id. When working with the non default site.
 
 **NOTE** All parameters can be manually specified in the appsettings.json file. **You need to manually create this file next to the sf.exe binary.**
 **EXAMPLE**
@@ -201,7 +202,22 @@ All pages and page templates are duplicated by default with a suffix in the Titl
     "Migrate": {
       "CmsUrl": "http://localhost",
       "Token": "TOKEN",
-      "Recreate": true
+      "Recreate": false,
+      "Recursive": false,
+      "Replace": false,
+      "Action": "publish",
+      "SiteId": "00000000-0000-0000-0000-000000000000",
+      "Widgets": {
+          "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock": {
+              "Name": "SitefinityContentBlock",
+              "Whitelist": ["Html", "ProviderName", "SharedContentID"],
+              "Rename": {
+                "Html": "Content"
+              },
+              "CleanNullProperties": true
+          }
+      }
+
     }
   }
 }
@@ -252,6 +268,7 @@ Widget migrations are invoked for each **occurrence** of the widget found on the
 * WidgetSegmentId -> The widget segment (for personalized widgets)
 * LogWarning -> logs a warning message
 * LogInfo -> logs an informational message
+* SiteId -> The site id. When working with the non default site.
 
 A return parameter **MigratedWidget** is required as the output of the migration. It contains the new widget name and the new properties.
 
