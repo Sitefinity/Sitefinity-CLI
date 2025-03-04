@@ -82,19 +82,13 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         public void AddPackageToProject(string projectPath, string packageName, string version)
         {
             string versionParameter = "";
-            string prereleaseParameter = "";
 
             if (version != null)
             {
                 versionParameter = $"-v {version}";
-
-                if (version.Contains("beta", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    prereleaseParameter = "--prerelease";
-                }
             }
 
-            ExecuteCommand($"dotnet add \"{projectPath}\" package {packageName} {versionParameter} {prereleaseParameter}");
+            ExecuteCommand($"dotnet add \"{projectPath}\" package {packageName} {versionParameter}");
         }
 
         public void AddSourcesToNugetConfig(string[] sources, string projectDirectory)
