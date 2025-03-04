@@ -94,7 +94,7 @@ namespace Sitefinity_CLI.Commands
             {
                 await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
-                    AttemptRecreate = true,
+                    Recreate = true,
                     Action = action,
                     Log = log,
                     ReplacePageContent = this.Replace,
@@ -106,7 +106,7 @@ namespace Sitefinity_CLI.Commands
             {
                 await Migrator.MigrateTemplates(new TemplateMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
-                    AttemptRecreate = this.Recreate,
+                    Recreate = this.Recreate,
                     Action = action,
                     Log = log,
                     SiteId = this.SiteId,
