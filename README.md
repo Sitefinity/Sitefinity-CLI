@@ -168,6 +168,8 @@ For more information, see [Technology migration](https://www.progress.com/docume
 
 **NOTE** The tool uses the page's 'UrlName' property OR the page template's 'Name' property to identify the page/page template that it created. The format has a suffix of (migrated to Decoupled). This is done to avoid conflicts with existing pages/page templates.
 
+**NOTE** The tool only uses data from the published pages/page templates. Draft/temp changes are not migrated.
+
 ### Migrating hierarchies
 * When a page template is selected, first the parent page templates are migrated. Migration cannot happen otherwise.
 * If there are parent page templates automatically migrated, they will be automatically published.
