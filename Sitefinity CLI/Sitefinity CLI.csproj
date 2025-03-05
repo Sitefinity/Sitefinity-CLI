@@ -5,9 +5,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>sf</AssemblyName>
     <RootNamespace>Sitefinity_CLI</RootNamespace>
-    <AssemblyVersion>1.1.0.66</AssemblyVersion>
+    <AssemblyVersion>1.1.0.67</AssemblyVersion>
     <Version>1.1.0</Version>
-    <FileVersion>1.1.0.66</FileVersion>
+    <FileVersion>1.1.0.67</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
