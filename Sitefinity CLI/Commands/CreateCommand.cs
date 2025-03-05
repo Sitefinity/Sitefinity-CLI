@@ -152,7 +152,7 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
             this.logger.LogInformation("Running Sitefinity installation...");
 
-            command += "-IncludePrerelease";
+            command += " -IncludePrerelease";
 
             this.visualStudioWorker.ExecutePackageManagerConsoleCommand(command);
 
