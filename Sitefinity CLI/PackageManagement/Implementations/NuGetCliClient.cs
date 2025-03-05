@@ -16,7 +16,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\" -prerelease");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoCache -ConfigFile \"{nugetConfigPath}\"");
         }
 
         public void Restore(string solutionFilePath)
