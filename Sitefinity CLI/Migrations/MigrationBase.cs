@@ -73,17 +73,23 @@ internal abstract class MigrationBase
         return response.Value.Select(x => x.MasterId).ToArray();
     }
 
-    internal async Task<string> GetSingleItemMixedContentValue(WidgetMigrationContext context, string[] contentIds, string contentType, string contentProvider, bool convertIds)
+    internal async Task<string> GetMixedContentValue(WidgetMigrationContext context, string[] contentIds, string contentType, string contentProvider, bool convertIds)
     {
         var masterIds = contentIds;
         if (convertIds)
         {
             masterIds = await GetMasterIds(context, contentIds, contentType, contentProvider);
+
+            // centralized hack for dynamic types
+            if (masterIds.Length == 0 && contentType.StartsWith("Telerik.Sitefinity.DynamicTypes.Model", StringComparison.Ordinal))
+            {
+                masterIds = contentIds;
+            }
         }
 
         var mixedContentValue = new
         {
-            ItemIdsOrdered = new string[] { masterIds[0] },
+            ItemIdsOrdered = masterIds,
             Content = new object[]
             {
                 new
@@ -97,7 +103,7 @@ internal abstract class MigrationBase
                             Filter = new
                             {
                                 Key = "Ids",
-                                Value = masterIds[0]
+                                Value =  string.Join( ",", masterIds) //list should be string
                             }
                         }
                     }
@@ -108,7 +114,12 @@ internal abstract class MigrationBase
         return JsonSerializer.Serialize(mixedContentValue, this.jsonSerializerOptionsForContentFilterSerialization);
     }
 
-    internal string GetMixedContentValue(object filter, string contentType, string contentProvider)
+    internal async Task<string> GetSingleItemMixedContentValue(WidgetMigrationContext context, string[] contentIds, string contentType, string contentProvider, bool convertIds)
+    {
+        return await GetMixedContentValue(context, [contentIds[0]], contentType, contentProvider, convertIds);
+    }
+
+    internal string GetMixedContentValue(object filter, string contentType, string contentProvider, bool filterByParent = false)
     {
         var mixedContentValue = new
         {
@@ -127,7 +138,8 @@ internal abstract class MigrationBase
                             {
                                 Key = "Complex",
                                 Value = filter == null ? null : JsonSerializer.Serialize(filter, this.jsonSerializerOptionsForContentFilterSerialization)
-                            }
+                            },
+                            DynamicFilterByParent = filterByParent
                         }
                     }
                 }

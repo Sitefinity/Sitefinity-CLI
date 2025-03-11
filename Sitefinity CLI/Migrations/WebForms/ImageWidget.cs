@@ -31,7 +31,7 @@ internal class ImageWidget : MigrationBase, IWidgetMigration
 
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);
 
-        if (context.Source.Properties.TryGetValue("ImageId", out string imageId) && context.Source.Properties.TryGetValue("ProviderName", out string providerName))
+        if (context.Source.Properties.TryGetValue("ImageId", out string imageId) && context.Source.Properties.TryGetValue("ProviderName", out string providerName) && providerName != null)
         {
             var response = await GetMasterIds(context, [imageId], "Telerik.Sitefinity.Libraries.Model.Image", providerName);
 
