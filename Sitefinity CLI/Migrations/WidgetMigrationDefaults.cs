@@ -49,7 +49,7 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.LoginFormController", new Mvc.LoginWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.ProfileController", new Mvc.ProfileWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.RegistrationController", new Mvc.RegistrationWidget() },
-        { "Telerik.Sitefinity.Frontend.Media.Mvc.Controllers.ImageController", new Mvc.MvcImageWidget() },
+        { "Telerik.Sitefinity.Frontend.Media.Mvc.Controllers.ImageController", new Mvc.ImageWidget() },
         { "Telerik.Sitefinity.Frontend.DynamicContent.Mvc.Controllers.DynamicContentController", new Mvc.ContentWidget() },
         { "Telerik.Sitefinity.Frontend.News.Mvc.Controllers.NewsController", new Mvc.ContentWidget() },
         { "Telerik.Sitefinity.Frontend.Blogs.Mvc.Controllers.BlogPostController", new Mvc.ContentWidget() },

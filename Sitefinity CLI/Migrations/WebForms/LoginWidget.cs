@@ -17,14 +17,14 @@ internal class LoginWidget : MigrationBase, IWidgetMigration
             { "UsernameLabel", "EmailLabel" },
             { "LoginButtonLabel", "SubmitButtonLabel" },
             { "LoginHeadingLabel", "Header" },
-            { "IncorrectLoginMessage", "IncorrectLoginMessage" },
+            { "IncorrectLoginMessage", "ErrorMessage" },
             { "RegisterUserLabel", "RegisterLinkText" },
         };
 
         var propertiesToCopy = new[] { "PasswordLabel", "CssClass" };
 
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);
-        migratedProperties.Add("PostLoginAction", "RedirectToPage");
+        migratedProperties["PostLoginAction"] = "StayOnSamePage";
 
         if (context.Source.Properties.TryGetValue("DestinationPageUrl", out string destinationPageUrl))
         {
@@ -33,6 +33,7 @@ internal class LoginWidget : MigrationBase, IWidgetMigration
                 var pageModel = await context.SourceClient.LayoutService().GetPageModel(destinationPageUrl.TrimStart('~'));
                 var pageWithMixedValue = await GetSingleItemMixedContentValue(context, new string[] { pageModel.Id.ToString() }, RestClientContentTypes.Pages, null, false);
                 migratedProperties.Add("PostLoginRedirectPage", pageWithMixedValue);
+                migratedProperties["PostLoginAction"] = "RedirectToPage";
             }
             catch (System.Exception)
             {

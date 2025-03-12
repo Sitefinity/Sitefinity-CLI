@@ -11,7 +11,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.Mvc;
-internal class MvcImageWidget : MigrationBase, IWidgetMigration
+internal class ImageWidget : MigrationBase, IWidgetMigration
 {
     public async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {

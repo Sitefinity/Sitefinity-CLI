@@ -26,7 +26,7 @@ internal class ImageWidget : MigrationBase, IWidgetMigration
         var propertiesToCopy = new[] { "Title", "CssClass" };
         var propertiesToRename = new Dictionary<string, string>()
         {
-            { "Tooltip", "AlternativeText" }
+            { "AlternateText", "AlternativeText" }
         };
 
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);

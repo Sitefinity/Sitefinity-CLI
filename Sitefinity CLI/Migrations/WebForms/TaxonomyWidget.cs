@@ -11,11 +11,15 @@ namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
 internal class TaxonomyWidget : MigrationBase, IWidgetMigration
 {
     private static readonly string[] propertiesToCopy = ["CssClass", "ShowItemCount", "SortExpression"];
-    internal static readonly char[] separator = [','];
+    private static readonly IDictionary<string, string> propertiesToRename = new Dictionary<string, string>()
+    {
+        { "ShowEmptyTaxa", "ShowEmpty" },
+    };
+    internal static readonly char[] separator = [',', ';'];
 
     public Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
-        var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, null);
+        var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);
 
         if (context.Source.Properties.TryGetValue("TaxonomyId", out string taxonomyId))
         {
@@ -45,6 +49,15 @@ internal class TaxonomyWidget : MigrationBase, IWidgetMigration
                 classificationSettings.Add("selectedTaxaIds", rootTaxonId);
             }
 
+            context.Source.Properties.TryGetValue("ContentType", out string contentTypeName);
+            context.Source.Properties.TryGetValue("DynamicContentType", out string dynamicContentTypeName);
+            var selectedContentTypeName = contentTypeName ?? dynamicContentTypeName;
+            if (!string.IsNullOrEmpty(selectedContentTypeName))
+            {
+                classificationSettings["selectionMode"] = "ByContentType";
+                classificationSettings["byContentType"] = selectedContentTypeName;
+            }
+
             if (!classificationSettings.ContainsKey("selectionMode"))
             {
                 if (context.Source.Properties.TryGetValue("TaxaToDisplay", out string selectionMode) && selectionMode != null)
@@ -64,6 +77,21 @@ internal class TaxonomyWidget : MigrationBase, IWidgetMigration
             }
 
             migratedProperties.Add("ClassificationSettings", JsonSerializer.Serialize(classificationSettings));
+
+            migratedProperties.TryGetValue("SortExpression", out string sortExpression);
+            migratedProperties["OrderBy"] = "Custom";
+            if (sortExpression.Equals("title asc", StringComparison.OrdinalIgnoreCase))
+            {
+                migratedProperties["OrderBy"] = "Title asc";
+            }
+            else if (sortExpression.Equals("title desc", StringComparison.OrdinalIgnoreCase))
+            {
+                migratedProperties["OrderBy"] = "Title desc";
+            }
+            else if (sortExpression.Equals("AsSetManually", StringComparison.OrdinalIgnoreCase))
+            {
+                migratedProperties["OrderBy"] = "Manually";
+            }
         }
 
         return Task.FromResult(new MigratedWidget("SitefinityClassification", migratedProperties));

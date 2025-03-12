@@ -1,8 +1,7 @@
-﻿using Progress.Sitefinity.MigrationTool.Core.Widgets;
-using Progress.Sitefinity.RestSdk;
-using Progress.Sitefinity.RestSdk.Dto;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Progress.Sitefinity.MigrationTool.Core.Widgets;
+using Progress.Sitefinity.RestSdk;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
 
@@ -22,6 +21,15 @@ internal class SearchWidget : MigrationBase, IWidgetMigration
         if (context.Source.Properties.TryGetValue("IndexCatalogue", out string searchIndexName))
         {
             migratedProperties.Add("SearchIndex", searchIndexName);
+        }
+
+        migratedProperties.Add("SuggestionsTriggerCharCount", "0");
+        if (context.Source.Properties.TryGetValue("DisableSuggestions", out string disableSuggestions) && bool.TryParse(disableSuggestions, out bool disableSuggestionsBool))
+        {
+            if (!disableSuggestionsBool)
+            {
+                migratedProperties["SuggestionsTriggerCharCount"] = "3";
+            }
         }
 
         return new MigratedWidget("SitefinitySearchBox", migratedProperties);

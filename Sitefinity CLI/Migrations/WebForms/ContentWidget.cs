@@ -133,17 +133,12 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         if (contentType == RestClientContentTypes.ListItems && string.IsNullOrEmpty(sortValue))
         {
             sortValue = "Ordinal ASC";
+        }
+
+        if (!string.IsNullOrEmpty(sortValue))
+        {
             migratedProperties.Add("OrderBy", "Custom");
             migratedProperties.Add("SortExpression", sortValue);
-        }
-        else if (!string.IsNullOrEmpty(sortProperty.Value))
-        {
-            var sortSplit = sortProperty.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (sortSplit.Length == 2)
-            {
-                var sortDirection = sortSplit[1].ToLowerInvariant();
-                migratedProperties.Add("OrderBy", $"{sortSplit[0]} {sortDirection}");
-            }
         }
     }
 
@@ -274,7 +269,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                         Operator = FilterClause.Operators.ContainsOr,
                         FieldValue = taxa.Value
                     };
-                    allItemsFilter.ChildFilters.Add(childFilter);
+                    AddToChildFilters(allItemsFilter, childFilter);
                 }
 
                 var deserialized = Array.Empty<string>();
@@ -295,19 +290,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                         FieldValue = deserialized,
                         Operator = FilterClause.Operators.ContainsOr
                     };
-
-                    var groupParentFilter = new CombinedFilter();
-                    groupParentFilter.Operator = CombinedFilter.LogicalOperators.And;
-                    groupParentFilter.ChildFilters = [parentFilter];
-
-                    if (allItemsFilter.ChildFilters.Count == 0)
-                    {
-                        allItemsFilter.ChildFilters.Add(groupParentFilter);
-                    }
-                    else
-                    {
-                        allItemsFilter.ChildFilters.Add(parentFilter);
-                    }
+                    AddToChildFilters(allItemsFilter, parentFilter);
                 }
 
                 object filterValue = allItemsFilter;
@@ -331,6 +314,22 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
     }
 
+    private static void AddToChildFilters(CombinedFilter allItemsFilter, object filter)
+    {
+        var groupParentFilter = new CombinedFilter();
+        groupParentFilter.Operator = CombinedFilter.LogicalOperators.And;
+        groupParentFilter.ChildFilters = [filter];
+
+        if (allItemsFilter.ChildFilters.Count == 0)
+        {
+            allItemsFilter.ChildFilters.Add(groupParentFilter);
+        }
+        else
+        {
+            allItemsFilter.ChildFilters.Add(filter);
+        }
+    }
+
     private static void AddDateFilter(CombinedFilter allItemsFilter, QueryItem query)
     {
         var daysString = "DateTime.UtcNow.AddDays";
@@ -348,7 +347,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetValue = (int)Math.Abs(days),
                 };
 
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(dateFilter);
+                AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
         else if (query.Value.StartsWith(monthsString, StringComparison.Ordinal))
@@ -363,7 +362,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetValue = (int)Math.Abs(months),
                 };
 
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(dateFilter);
+                AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
         else if (query.Value.StartsWith(yearsString, StringComparison.Ordinal))
@@ -377,7 +376,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetType = DateOffsetType.Years,
                     OffsetValue = (int)Math.Abs(years),
                 };
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(dateFilter);
+                AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
         else

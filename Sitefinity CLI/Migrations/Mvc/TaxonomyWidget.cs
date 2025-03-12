@@ -9,7 +9,7 @@ using Progress.Sitefinity.RestSdk.Client;
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.Mvc;
 internal class TaxonomyWidget : MigrationBase, IWidgetMigration
 {
-    private static readonly string[] propertiesToCopy = ["CssClass", "ShowItemCount"];
+    private static readonly string[] propertiesToCopy = ["CssClass", "ShowItemCount", "SortExpression"];
     private static readonly IDictionary<string, string> propertiesToRename = new Dictionary<string, string>()
     {
         { "ShowEmptyTaxa", "ShowEmpty" },
@@ -68,13 +68,19 @@ internal class TaxonomyWidget : MigrationBase, IWidgetMigration
                 }
             }
 
-            if (propsToRead.TryGetValue("SortExpression", out string sortExpression) && !string.IsNullOrEmpty(sortExpression))
+            migratedProperties.TryGetValue("SortExpression", out string sortExpression);
+            migratedProperties["OrderBy"] = "Custom";
+            if (sortExpression.Equals("title asc", StringComparison.OrdinalIgnoreCase))
             {
-                if (sortExpression != "AsSetManually")
-                {
-                    migratedProperties.Add("OrderBy", "Custom");
-                    migratedProperties.Add("SortExpression", sortExpression);
-                }
+                migratedProperties["OrderBy"] = "Title asc";
+            }
+            else if (sortExpression.Equals("title desc", StringComparison.OrdinalIgnoreCase))
+            {
+                migratedProperties["OrderBy"] = "Title desc";
+            }
+            else if (sortExpression.Equals("AsSetManually", StringComparison.OrdinalIgnoreCase))
+            {
+                migratedProperties["OrderBy"] = "Manually";
             }
 
             migratedProperties.Add("ClassificationSettings", JsonSerializer.Serialize(classificationSettings));

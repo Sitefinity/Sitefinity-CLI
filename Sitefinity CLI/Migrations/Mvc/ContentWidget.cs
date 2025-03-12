@@ -350,7 +350,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                         Operator = FilterClause.Operators.ContainsOr,
                         FieldValue = taxa.Value
                     };
-                    allItemsFilter.ChildFilters.Add(childFilter);
+                    AddToChildFilters(allItemsFilter, childFilter);
                 }
 
                 string selectedListIdsJson = null;
@@ -368,18 +368,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                             Operator = FilterClause.Operators.ContainsOr
                         };
 
-                        var groupParentFilter = new CombinedFilter();
-                        groupParentFilter.Operator = CombinedFilter.LogicalOperators.And;
-                        groupParentFilter.ChildFilters = [parentFilter];
-
-                        if (allItemsFilter.ChildFilters.Count == 0)
-                        {
-                            allItemsFilter.ChildFilters.Add(groupParentFilter);
-                        }
-                        else
-                        {
-                            allItemsFilter.ChildFilters.Add(parentFilter);
-                        }
+                        AddToChildFilters(allItemsFilter, parentFilter);
                     }
                 }
 
@@ -400,6 +389,21 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 #pragma warning restore CA1031
         }
     }
+    private static void AddToChildFilters(CombinedFilter allItemsFilter, object filter)
+    {
+        var groupParentFilter = new CombinedFilter();
+        groupParentFilter.Operator = CombinedFilter.LogicalOperators.And;
+        groupParentFilter.ChildFilters = [filter];
+
+        if (allItemsFilter.ChildFilters.Count == 0)
+        {
+            allItemsFilter.ChildFilters.Add(groupParentFilter);
+        }
+        else
+        {
+            allItemsFilter.ChildFilters.Add(filter);
+        }
+    }
 
     private static void AddDateFilter(CombinedFilter allItemsFilter, QueryItem query)
     {
@@ -418,7 +422,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetValue = (int)Math.Abs(days),
                 };
 
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(dateFilter);
+                AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
         else if (query.Value.StartsWith(monthsString, StringComparison.Ordinal))
@@ -433,7 +437,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetValue = (int)Math.Abs(months),
                 };
 
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(dateFilter);
+                AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
         else if (query.Value.StartsWith(yearsString, StringComparison.Ordinal))
@@ -447,7 +451,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetType = DateOffsetType.Years,
                     OffsetValue = (int)Math.Abs(years),
                 };
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(dateFilter);
+                AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
         else
@@ -475,7 +479,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
     private async Task MigrateSelectedItems(WidgetMigrationContext context, Dictionary<string, string> propsToRead, IDictionary<string, string> migratedProperties, string contentType, string contentProvider)
     {
-        if (propsToRead.TryGetValue("SerializedSelectedItemsIds", out string selectedListIdsJson) && !migratedProperties.ContainsKey("SelectedItems"))
+        if (propsToRead.TryGetValue("SerializedSelectedItemsIds", out string selectedListIdsJson) && selectedListIdsJson != null && !migratedProperties.ContainsKey("SelectedItems"))
         {
             try
             {

@@ -1,39 +1,24 @@
-﻿using Progress.Sitefinity.MigrationTool.Core.Widgets;
-using Progress.Sitefinity.RestSdk;
-using Progress.Sitefinity.RestSdk.Filters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Progress.Sitefinity.MigrationTool.Core.Widgets;
+using Progress.Sitefinity.RestSdk;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
 internal class NavigationWidget : MigrationBase, IWidgetMigration
 {
+    private static readonly string[] propertiesToCopy = ["SelectionMode", "ShowParentPage", "LevelsToInclude"];
+    private static readonly IDictionary<string, string> propertiesToRename = new Dictionary<string, string>()
+    {
+        { "CssClass", "WrapperCssClass" },
+    };
     public async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
-        //var propertiesToRename = new Dictionary<string, string>()
-        //{
-        //    { "LevelsToExpand", "LevelsToInclude" },
-        //    { "CssClass", "WrapperCssClass" },
-        //};
+        var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);
 
-        bool levelsToIncludeParsed = false;
-        var propertiesToCopy = new List<string>() { "SelectionMode", "ShowParentPage", "CssClass" };
-        if (context.Source.Properties.TryGetValue("LevelsToInclude", out string levelsToInclude))
-        {
-            if (int.TryParse(levelsToInclude, out int levelsToIncludeInt))
-            {
-                propertiesToCopy.Add("LevelsToInclude");
-                levelsToIncludeParsed = true;
-            }
-        }
-
-        var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy.ToArray(), null);
-        if (!levelsToIncludeParsed)
+        if (!migratedProperties.ContainsKey("LevelsToInclude"))
         {
             migratedProperties.Add("LevelsToInclude", null);
         }
@@ -70,7 +55,7 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
 
             if (filteredPageIds.Count > 0)
             {
-                var mixedContentValue = await GetSingleItemMixedContentValue(context, filteredPageIds.ToArray(), RestClientContentTypes.Pages, null, false);
+                var mixedContentValue = await GetMixedContentValue(context, filteredPageIds.ToArray(), RestClientContentTypes.Pages, null, false);
                 migratedProperties.Add("CustomSelectedPages", mixedContentValue);
             }
         }
