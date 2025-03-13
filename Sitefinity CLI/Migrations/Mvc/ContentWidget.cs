@@ -301,7 +301,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 foreach (var query in queryData.QueryItems)
                 {
                     var fieldName = query.Name ?? query.Condition.FieldName;
-                    if (isDateGroup && (fieldName != null && (fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase) || fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
+                    if (query.Value != null && isDateGroup && (fieldName != null && (fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase) || fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
                     {
                         AddDateFilter(allItemsFilter, query);
 

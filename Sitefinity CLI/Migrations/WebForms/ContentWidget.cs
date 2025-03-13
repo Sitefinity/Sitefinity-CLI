@@ -148,14 +148,15 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
     private static void MigratePaginationAndOrdering(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType)
     {
+        context.Source.Properties.TryGetValue("MasterViewName", out string listViewName);
         string displayMode = "Paging";
-        var allowPaging = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith("-AllowPaging", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
+        var allowPaging = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith(listViewName + "-AllowPaging", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
         if (string.Equals(allowPaging.Value, bool.FalseString, StringComparison.Ordinal))
         {
             displayMode = "Limit";
         }
 
-        var itemsPerPage = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith("-ItemsPerPage", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
+        var itemsPerPage = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith(listViewName + "-ItemsPerPage", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
         if (!string.IsNullOrEmpty(itemsPerPage.Value))
         {
             var serializedPageValue = JsonSerializer.Serialize(new
@@ -222,7 +223,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 foreach (var query in queryData.QueryItems)
                 {
                     var fieldName = query.Name ?? query.Condition.FieldName;
-                    if (isDateGroup && (fieldName != null && (fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase) || fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
+                    if (query.Value != null && isDateGroup && (fieldName != null && (fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase) || fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
                     {
                         AddDateFilter(allItemsFilter, query);
 
@@ -337,7 +338,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         var daysString = "DateTime.UtcNow.AddDays";
         var monthsString = "DateTime.UtcNow.AddMonths";
         var yearsString = "DateTime.UtcNow.AddYears";
-        if (query.Value.StartsWith(daysString, StringComparison.Ordinal))
+        if (query.Value != null && query.Value.StartsWith(daysString, StringComparison.Ordinal))
         {
             var substringValue = query.Value.Substring(daysString.Length + 1).Trim('(').Trim(')');
             if (int.TryParse(substringValue, out int days))
@@ -352,7 +353,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
-        else if (query.Value.StartsWith(monthsString, StringComparison.Ordinal))
+        else if (query.Value != null && query.Value.StartsWith(monthsString, StringComparison.Ordinal))
         {
             var substringValue = query.Value.Substring(monthsString.Length + 1).Trim('(').Trim(')');
             if (int.TryParse(substringValue, out int months))
@@ -367,7 +368,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 AddToChildFilters(allItemsFilter, dateFilter);
             }
         }
-        else if (query.Value.StartsWith(yearsString, StringComparison.Ordinal))
+        else if (query.Value != null && query.Value.StartsWith(yearsString, StringComparison.Ordinal))
         {
             var substringValue = query.Value.Substring(yearsString.Length + 1).Trim('(').Trim(')');
             if (int.TryParse(substringValue, out int years))
