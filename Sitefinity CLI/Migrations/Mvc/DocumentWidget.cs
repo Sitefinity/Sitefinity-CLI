@@ -20,7 +20,7 @@ internal class DocumentWidget : MigrationBase, IWidgetMigration
 {
     public async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
-        await context.LogWarning("Now we use the SitefinityDocumentList widget for displaying single document. You may need to add new List view to use when dispaling single document.");
+        await context.LogWarning("Now we use the SitefinityDocumentList widget for displaying single document. You may need to add new Details view to use when displaying single document.");
 
         var propsToRead = context.Source.Properties.ToDictionary(x => x.Key.Replace("Model-", string.Empty, StringComparison.InvariantCultureIgnoreCase), x => x.Value);
 
@@ -33,11 +33,7 @@ internal class DocumentWidget : MigrationBase, IWidgetMigration
         {
             var mixedContentValue = await GetSingleItemMixedContentValue(context, [id], contentType, contentProvider, true);
             migratedProperties.Add("SelectedItems", mixedContentValue);
-        }
-        else
-        {
-            var mixedContentValue = await GetSingleItemMixedContentValue(context, null, contentType, contentProvider, true);
-            migratedProperties.Add("SelectedItems", mixedContentValue);
+            migratedProperties.Add("ContentViewDisplayMode", "Detail");
         }
 
         migratedProperties.Add("SfViewName", "DocumentList");
@@ -54,6 +50,7 @@ internal class DocumentWidget : MigrationBase, IWidgetMigration
         if (propsToRead.TryGetValue("CssClass", out string cssClass))
         {
             cssClasses.Add(new { FieldName = "Document list", CssClass = cssClass });
+            cssClasses.Add(new { FieldName = "Details view", CssClass = cssClass });
         }
 
         if (cssClasses.Count != 0)

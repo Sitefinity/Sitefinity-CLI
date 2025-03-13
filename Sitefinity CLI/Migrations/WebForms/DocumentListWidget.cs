@@ -23,15 +23,15 @@ internal class DocumentListWidget : ContentWidget
     protected override async Task MigrateViews(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType)
     {
         await context.LogWarning($"Defaulting to view DocumentList for content type {contentType}");
-        context.Source.Properties.TryGetValue("ListTemplateName", out string listViewName);
+        context.Source.Properties.TryGetValue("MasterViewName", out string listViewName);
 
         string rendererListViewName;
         switch (listViewName)
         {
-            case "DocumentsList":
+            case "MasterListView":
                 rendererListViewName = "DocumentList";
                 break;
-            case "DocumentsTable":
+            case "MasterTableView":
                 rendererListViewName = "DocumentTable";
                 break;
             default:
