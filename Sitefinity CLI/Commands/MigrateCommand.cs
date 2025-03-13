@@ -111,6 +111,10 @@ namespace Sitefinity_CLI.Commands
                     Log = log,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
+                    PlaceholderMap = new Dictionary<string, string>()
+                    {
+                        { "Contentplaceholder1", "Body" }
+                    }
                 });
             }
 
