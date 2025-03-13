@@ -36,7 +36,7 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
             migratedProperties.Add("SelectedPage", mixedContentValue);
         }
 
-        if (propsToRead.TryGetValue("SerializedSelectedPages", out string customSelectedPagesString))
+        if (propsToRead.TryGetValue("SerializedSelectedPages", out string customSelectedPagesString) && !string.IsNullOrEmpty(customSelectedPagesString))
         {
             var selectedPagesParsed = JsonSerializer.Deserialize<SerializedSelectedPage[]>(customSelectedPagesString);
             var filteredPageIds = new List<string>(selectedPagesParsed.Length);

@@ -19,7 +19,7 @@ internal class ChangePasswordWidget : MigrationBase, IWidgetMigration
         {
             if (changePasswordCompleteAction == "ShowMessage")
             {
-                changePasswordCompleteAction = "ShowAMessage";
+                changePasswordCompleteAction = "ViewAMessage";
             }
 
             migratedProperties.Add("PostPasswordChangeAction", changePasswordCompleteAction);

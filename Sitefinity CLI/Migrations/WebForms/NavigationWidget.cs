@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Progress.Sitefinity.MigrationTool.Core.Widgets;
@@ -49,7 +50,7 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
             if (otherPages.Count > 0)
             {
                 var titleUrlMap = string.Join(',', otherPages.Select(p => $"{p.Title} ({p.Url})"));
-                var widgetTitle = $"{context.Source.Caption ?? context.Source.Name} ({context.Source.Id})" ;
+                var widgetTitle = $"{context.Source.Caption ?? context.Source.Name} ({context.Source.Id})";
                 await context.LogWarning($"Migration of external pages is not supported. Affected widget -> {widgetTitle}. Affected pages -> {titleUrlMap}. A possible workaround is to make redirect pages in the page sitemap structure.");
             }
 
@@ -60,27 +61,50 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
             }
         }
 
+        await MigrateViewName(context, migratedProperties);
+
         return new MigratedWidget("SitefinityNavigation", migratedProperties);
     }
 
-    private static async Task MigrateViewName(WidgetMigrationContext context, IDictionary<string, string> properties)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "")]
+    private static async Task MigrateViewName(WidgetMigrationContext context, IDictionary<string, string> migratedProperties)
     {
         string mappedView = null;
-        if (context.Source.Properties.TryGetValue("ViewName", out string viewName))
+        try
         {
-            if (viewName.EndsWith("HorizontalList.ascx", StringComparison.Ordinal) || viewName.EndsWith("HorizontalWithDropDownMenusList.ascx", StringComparison.Ordinal))
+            context.Source.Properties.TryGetValue("ViewName", out string viewName);
+            if (string.IsNullOrEmpty(viewName))
             {
-                mappedView = "Horizontal";
+                if (context.Source.Properties.TryGetValue("TemplateKey", out string templateKey) && !string.IsNullOrEmpty(templateKey))
+                {
+                    using (var httpClient = new HttpClient())
+                    {
+                        httpClient.DefaultRequestHeaders.Add("X-SF-Access-Key", context.SourceCmsToken);
+                        var responseMessage = await httpClient.GetAsync($"{context.SourceCmsUrl}/Sitefinity/Services/ControlTemplates/ControlTemplateService.svc/{templateKey}/");
+                        var responseAsString = await responseMessage.Content.ReadAsStringAsync();
+                        var controlTemplate = JsonSerializer.Deserialize<ControlTemplateDto>(responseAsString);
+                        viewName = controlTemplate.Item.EmbeddedTemplateName;
+                    }
+                }
             }
-            else if (viewName.EndsWith("HorizontalWithTabsList.ascx", StringComparison.Ordinal))
+
+            if (!string.IsNullOrEmpty(viewName))
             {
-                mappedView = "Tabs";
-            }
-            else if (viewName.EndsWith("VerticalList.ascx", StringComparison.Ordinal) || viewName.EndsWith("VerticalWithSubLevelsList.ascx", StringComparison.Ordinal))
-            {
-                mappedView = "Vertical";
+                if (viewName.EndsWith("HorizontalList.ascx", StringComparison.Ordinal) || viewName.EndsWith("HorizontalWithDropDownMenusList.ascx", StringComparison.Ordinal))
+                {
+                    mappedView = "Horizontal";
+                }
+                else if (viewName.EndsWith("HorizontalWithTabsList.ascx", StringComparison.Ordinal))
+                {
+                    mappedView = "Tabs";
+                }
+                else if (viewName.EndsWith("VerticalList.ascx", StringComparison.Ordinal) || viewName.EndsWith("VerticalWithSubLevelsList.ascx", StringComparison.Ordinal))
+                {
+                    mappedView = "Vertical";
+                }
             }
         }
+        catch (Exception) { }
 
         if (mappedView == null)
         {
@@ -88,7 +112,7 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
             await context.LogWarning($"Failed to map view name for widget {context.Source.Caption ?? context.Source.Name}({context.Source.Id}). Defaulted to 'Horizontal'.");
         }
 
-        properties.Add("SfViewName", mappedView);
+        migratedProperties.Add("SfViewName", mappedView);
     }
 
     public class SelectedPage
@@ -100,5 +124,15 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
         public string Url { get; set; }
 
         public bool IsExternal { get; set; }
+    }
+
+    public class ControlTemplateDto
+    {
+        public ControlTemplateItemDto Item { get; set; }
+    }
+
+    public class ControlTemplateItemDto
+    {
+        public string EmbeddedTemplateName { get; set; }
     }
 }

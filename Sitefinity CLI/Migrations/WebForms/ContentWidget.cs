@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
 internal class ContentWidget : MigrationBase, IWidgetMigration
 {
+    protected virtual string RendererWidgetName { get { return "SitefinityContentList"; } }
+
     public async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
         var propertiesToCopy = new[] { "ContentViewDisplayMode", "PageTitleMode" };
@@ -52,7 +54,45 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         MigrateUrlEvaluationMode(context, migratedProperties);
         MigratePaginationAndOrdering(context, migratedProperties, contentType);
 
-        return new MigratedWidget("SitefinityContentList", migratedProperties);
+        return new MigratedWidget(RendererWidgetName, migratedProperties);
+    }
+
+    protected virtual async Task MigrateViews(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType)
+    {
+        await context.LogWarning($"Defaulting to view ListWithSummary for content type {contentType}");
+
+        migratedProperties.Add("SfViewName", "ListWithSummary");
+
+        var fieldMappingList = new List<FieldMapping>()
+        {
+            new FieldMapping() { FriendlyName = "Title", Name = "Title" },
+            new FieldMapping() { FriendlyName = "Text", Name = "Title" },
+            new FieldMapping() { FriendlyName = "Publication date", Name = "LastModified" }
+        };
+
+        migratedProperties.Add("ListFieldMapping", JsonSerializer.Serialize(fieldMappingList));
+
+        string migratedDetailsViewName = null;
+        switch (contentType)
+        {
+            case RestClientContentTypes.News:
+                migratedDetailsViewName = "Details.News.Default";
+                break;
+            case RestClientContentTypes.BlogPost:
+                migratedDetailsViewName = "Details.Blogs.Default";
+                break;
+            case RestClientContentTypes.Events:
+                migratedDetailsViewName = "Details.Events.Default";
+                break;
+            case RestClientContentTypes.ListItems:
+                migratedDetailsViewName = "Details.ListItems.Default";
+                break;
+            default:
+                migratedDetailsViewName = "Details.Dynamic.Default";
+                break;
+        }
+
+        migratedProperties.Add("SfDetailViewName", migratedDetailsViewName);
     }
 
     private static void MigrateUrlEvaluationMode(WidgetMigrationContext context, IDictionary<string, string> migratedProperties)
@@ -159,44 +199,6 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 }
             }
         }
-    }
-
-    private static async Task MigrateViews(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType)
-    {
-        await context.LogWarning($"Defaulting to view ListWithSummary for content type {contentType}");
-
-        migratedProperties.Add("SfViewName", "ListWithSummary");
-
-        var fieldMappingList = new List<FieldMapping>()
-        {
-            new FieldMapping() { FriendlyName = "Title", Name = "Title" },
-            new FieldMapping() { FriendlyName = "Text", Name = "Title" },
-            new FieldMapping() { FriendlyName = "Publication date", Name = "LastModified" }
-        };
-
-        migratedProperties.Add("ListFieldMapping", JsonSerializer.Serialize(fieldMappingList));
-
-        string migratedDetailsViewName = null;
-        switch (contentType)
-        {
-            case RestClientContentTypes.News:
-                migratedDetailsViewName = "Details.News.Default";
-                break;
-            case RestClientContentTypes.BlogPost:
-                migratedDetailsViewName = "Details.Blogs.Default";
-                break;
-            case RestClientContentTypes.Events:
-                migratedDetailsViewName = "Details.Events.Default";
-                break;
-            case RestClientContentTypes.ListItems:
-                migratedDetailsViewName = "Details.ListItems.Default";
-                break;
-            default:
-                migratedDetailsViewName = "Details.Dynamic.Default";
-                break;
-        }
-
-        migratedProperties.Add("SfDetailViewName", migratedDetailsViewName);
     }
 
     private async Task MigrateAdditionalFilter(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType, string contentProvider)

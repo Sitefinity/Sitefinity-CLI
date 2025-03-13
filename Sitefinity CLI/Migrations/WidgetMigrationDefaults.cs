@@ -59,6 +59,8 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Frontend.Media.Mvc.Controllers.DocumentsListController", new Mvc.DocumentListWidget() },
         { "Telerik.Sitefinity.DynamicModules.Web.UI.Frontend.DynamicContentView", new ContentWidget() },
         { "Telerik.Sitefinity.Web.UI.PublicControls.ImageControl", new ImageWidget() },
+        { "Telerik.Sitefinity.Modules.Libraries.Web.UI.Documents.DocumentLink", new DocumentWidget() },
+        { "Telerik.Sitefinity.Modules.Libraries.Web.UI.Documents.DownloadListView", new DocumentListWidget() },
         { "Telerik.Sitefinity.Modules.News.Web.UI.NewsView", new ContentWidget() },
         { "Telerik.Sitefinity.Modules.Blogs.Web.UI.BlogPostView", new ContentWidget() },
         { "Telerik.Sitefinity.Modules.Events.Web.UI.EventsView", new ContentWidget() },

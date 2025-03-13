@@ -36,7 +36,7 @@ internal class SearchBoxWidget : MigrationBase, IWidgetMigration
             }
         }
 
-        if (propsToRead.TryGetValue("ScoringProfiles-ScoringParameters", out string scoringParameters))
+        if (propsToRead.TryGetValue("ScoringProfiles-ScoringParameters", out string scoringParameters) && !string.IsNullOrEmpty(scoringParameters))
         {
             // testparam1:value1,value2;testparam2:value1,value2
             var scoringParametersList = new List<string>();

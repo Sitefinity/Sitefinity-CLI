@@ -34,7 +34,7 @@ internal class LoginWidget : MigrationBase, IWidgetMigration
             migratedProperties["RegistrationPage"] = mixedContentContext;
         }
 
-        if (propsToRead.TryGetValue("SerializedExternalProviders", out string serializedExternalProviders))
+        if (propsToRead.TryGetValue("SerializedExternalProviders", out string serializedExternalProviders) && !string.IsNullOrEmpty(serializedExternalProviders))
         {
             var externalProviders = JsonSerializer.Deserialize<Dictionary<string, string>>(serializedExternalProviders);
             var externalProvidersToPersist = externalProviders.Select(x => x.Key).ToArray();
