@@ -151,6 +151,8 @@ You can easily create custom templates. To do this, create a file with extension
 ## Migration Commands
 The migration commands support migration of pages and page templates that are built using Web Forms or MVC to the decoupled architecture.
 
+**NOTE** The migration tool does not migrate code in any form. It is a tool for migrating content and structure only.
+
 ### General flow of migration
 
 **RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.
@@ -166,6 +168,8 @@ For more information, see [Technology migration](https://www.progress.com/docume
   * Pages are duplicated by default and excluded from the navigation.
   * Once the page is fully migrated, specify the --replace option
 
+**NOTE** You will only be allowed to specify the --replace option when the page has a duplicate.
+  
 **NOTE** The tool uses the page's 'UrlName' property OR the page template's 'Name' property to identify the page/page template that it created. The format has a suffix of (migrated to Decoupled). This is done to avoid conflicts with existing pages/page templates.
 
 **NOTE** The tool only uses data from the published pages/page templates. Draft/temp changes are not migrated.
@@ -175,6 +179,8 @@ For more information, see [Technology migration](https://www.progress.com/docume
 * If there are parent page templates automatically migrated, they will be automatically published.
 
 **NOTE** When migrating pages, the tool will not migrate the parent page templates. All dependent page templates must be migrated prior to migrating pages.
+
+**NOTE** Migration of forms is automatic of there is a form widget on the page.
 
 ### Safe box & Testing
 All pages and page templates are duplicated by default with a suffix in the Title(migrated to Decoupled). This provides a level of isolation for existing pages/page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
