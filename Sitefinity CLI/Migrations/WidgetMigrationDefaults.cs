@@ -8,8 +8,14 @@ namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations;
 
 #pragma warning disable CA2211
 
+/// <summary>
+/// Provides default settings for widget migrations.
+/// </summary>
 public static class WidgetMigrationDefaults
 {
+    /// <summary>
+    /// Default mapping for widget migration arguments, keyed by the widget's type name.
+    /// </summary>
     public static ReadOnlyDictionary<string, WidgetMigrationArgs> MigrationMap = new ReadOnlyDictionary<string, WidgetMigrationArgs>(new Dictionary<string, WidgetMigrationArgs>()
     {
         { "ContentBlock", new WidgetMigrationArgs("SitefinityContentBlock")
@@ -33,6 +39,9 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Security.Web.UI.UserChangePasswordWidget", new WidgetMigrationArgs("SitefinityChangePassword") { Whitelist = ["CssClass"] } },
     });
 
+    /// <summary>
+    /// Stores custom widget migrations for specific widget types.
+    /// </summary>
     public static ReadOnlyDictionary<string, IWidgetMigration> CustomMigrations = new ReadOnlyDictionary<string, IWidgetMigration>(new Dictionary<string, IWidgetMigration>()
     {
         { "Layout", new Mvc.LayoutMigration() },
@@ -76,6 +85,9 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Modules.Forms.Web.UI.FormsControl", new WebForms.FormWidget() }
     });
 
+    /// <summary>
+    /// Stores custom form migrations for specific widget types.
+    /// </summary>
     public static ReadOnlyDictionary<string, IWidgetMigration> CustomFormMigrations = new ReadOnlyDictionary<string, IWidgetMigration>(new Dictionary<string, IWidgetMigration>()
     {
         { "Layout", new Mvc.LayoutMigration() },
