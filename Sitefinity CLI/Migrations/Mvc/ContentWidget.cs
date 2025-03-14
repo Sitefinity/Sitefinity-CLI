@@ -279,6 +279,9 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         var additionalFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedAdditionalFilters", StringComparison.Ordinal));
         var parentIdsFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedSelectedParentsIds", StringComparison.Ordinal));
         propsToRead.TryGetValue("ParentFilterMode", out string parentFilterMode);
+        if (migratedProperties.ContainsKey("SelectedItems"))
+            return;
+
         if (!string.IsNullOrEmpty(additionalFilter.Value) || !string.IsNullOrEmpty(parentIdsFilter.Value) || parentFilterMode == "CurrentlyOpen")
         {
             try

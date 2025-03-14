@@ -199,6 +199,9 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
     private async Task MigrateAdditionalFilter(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType, string contentProvider)
     {
+        if (migratedProperties.ContainsKey("SelectedItems"))
+            return;
+
         var propsToRead = context.Source.Properties;
         var additionalFilter = propsToRead.FirstOrDefault(x => (x.Key.EndsWith("-AdditionalFilter", StringComparison.Ordinal) || x.Key.EndsWith("AdditionalFilters", StringComparison.Ordinal)) && !string.IsNullOrEmpty(x.Value));
         var parentIdsFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("ItemsParentsIds", StringComparison.Ordinal));

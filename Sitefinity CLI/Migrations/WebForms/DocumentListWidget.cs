@@ -30,8 +30,16 @@ internal class DocumentListWidget : ContentWidget
         {
             case "MasterListView":
                 rendererListViewName = "DocumentList";
+                migratedProperties["ContentViewDisplayMode"] = "Master";
                 break;
             case "MasterTableView":
+                rendererListViewName = "DocumentTable";
+                migratedProperties["ContentViewDisplayMode"] = "Master";
+                break;
+            case "MasterListDetailView":
+                rendererListViewName = "DocumentList";
+                break;
+            case "MasterTableDetailView":
                 rendererListViewName = "DocumentTable";
                 break;
             default:
