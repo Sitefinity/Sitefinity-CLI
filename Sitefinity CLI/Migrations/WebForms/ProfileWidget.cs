@@ -30,12 +30,11 @@ internal class ProfileWidget : MigrationBase, IWidgetMigration
             }
 
             var readWriteModeFlag = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith("Read-ShowAdditionalModesLinks", System.StringComparison.Ordinal));
-            if (readWriteModeFlag.Key != null && bool.TryParse(readWriteModeFlag.Value, out bool result) && result)
+            if (readWriteModeFlag.Key != null && bool.TryParse(readWriteModeFlag.Value, out bool result) && result && profileViewMode == "Read")
             {
                 mappedProfileViewModel = "ReadEdit";
             }
 
-            migratedProperties.Add("ProfileViewMode", mappedProfileViewModel);
             migratedProperties.Add("ViewMode", mappedProfileViewModel);
 
             var redirectPageId = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith("Write-RedirectOnSubmitPageId", System.StringComparison.Ordinal));
@@ -43,7 +42,7 @@ internal class ProfileWidget : MigrationBase, IWidgetMigration
             {
                 var redirectPageInEditMode = await GetSingleItemMixedContentValue(context, [redirectPageId.Value], RestClientContentTypes.Pages, null, false);
                 var migratedPropertyName = "EditModeRedirectPage";
-                if (mappedProfileViewModel == "ReadWrite")
+                if (mappedProfileViewModel == "ReadEdit")
                 {
                     migratedPropertyName = "ReadEditModeRedirectPage";
                 }

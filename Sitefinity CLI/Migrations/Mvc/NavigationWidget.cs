@@ -66,8 +66,9 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
                 migratedProperties.Add("CustomSelectedPages", mixedContentValue);
             }
 
-            await TryMigrateViewName(context, migratedProperties);
         }
+
+        await TryMigrateViewName(context, migratedProperties);
 
         return new MigratedWidget("SitefinityNavigation", migratedProperties);
     }
