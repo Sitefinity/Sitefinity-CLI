@@ -6,13 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Mime;
-using System.Reflection.Metadata;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.Mvc;
@@ -116,7 +110,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 migratedDetailsViewName = "Details.News.Default";
                 break;
             case RestClientContentTypes.BlogPost:
-                migratedDetailsViewName = "Details.Blogs.Default";
+                migratedDetailsViewName = "Details.BlogPosts.Default";
                 break;
             case RestClientContentTypes.Events:
                 migratedDetailsViewName = "Details.Events.Default";
@@ -285,6 +279,9 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         var additionalFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedAdditionalFilters", StringComparison.Ordinal));
         var parentIdsFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedSelectedParentsIds", StringComparison.Ordinal));
         propsToRead.TryGetValue("ParentFilterMode", out string parentFilterMode);
+        if (migratedProperties.ContainsKey("SelectedItems"))
+            return;
+
         if (!string.IsNullOrEmpty(additionalFilter.Value) || !string.IsNullOrEmpty(parentIdsFilter.Value) || parentFilterMode == "CurrentlyOpen")
         {
             try
@@ -350,7 +347,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                         Operator = FilterClause.Operators.ContainsOr,
                         FieldValue = taxa.Value
                     };
-                    AddToChildFilters(allItemsFilter, childFilter);
+                    allItemsFilter.ChildFilters.Add(childFilter);
                 }
 
                 string selectedListIdsJson = null;
@@ -368,15 +365,11 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                             Operator = FilterClause.Operators.ContainsOr
                         };
 
-                        AddToChildFilters(allItemsFilter, parentFilter);
+                        allItemsFilter.ChildFilters.Add(parentFilter);
                     }
                 }
 
                 object filterValue = allItemsFilter;
-                if (allItemsFilter.ChildFilters.Count == 1)
-                {
-                    filterValue = allItemsFilter.ChildFilters[0];
-                }
 
                 var selectedItemsValue = GetMixedContentValue(filterValue, contentType, contentProvider, parentFilterMode == "CurrentlyOpen");
                 migratedProperties.Add("SelectedItems", selectedItemsValue);
@@ -389,7 +382,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 #pragma warning restore CA1031
         }
     }
-    private static void AddToChildFilters(CombinedFilter allItemsFilter, object filter)
+    private static void AddToChildFilters(CombinedFilter allItemsFilter, object filter, bool addInInnerGroup = false)
     {
         var groupParentFilter = new CombinedFilter();
         groupParentFilter.Operator = CombinedFilter.LogicalOperators.And;
@@ -398,6 +391,10 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         if (allItemsFilter.ChildFilters.Count == 0)
         {
             allItemsFilter.ChildFilters.Add(groupParentFilter);
+        }
+        else if (addInInnerGroup)
+        {
+            (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(filter);
         }
         else
         {
@@ -413,7 +410,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         if (query.Value.StartsWith(daysString, StringComparison.Ordinal))
         {
             var substringValue = query.Value.Substring(daysString.Length + 1).Trim('(').Trim(')');
-            if (int.TryParse(substringValue, out int days))
+            if (double.TryParse(substringValue, out double days))
             {
                 var dateFilter = new DateOffsetPeriod()
                 {
@@ -422,7 +419,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetValue = (int)Math.Abs(days),
                 };
 
-                AddToChildFilters(allItemsFilter, dateFilter);
+                allItemsFilter.ChildFilters.Add(dateFilter);
             }
         }
         else if (query.Value.StartsWith(monthsString, StringComparison.Ordinal))
@@ -436,8 +433,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetType = DateOffsetType.Months,
                     OffsetValue = (int)Math.Abs(months),
                 };
-
-                AddToChildFilters(allItemsFilter, dateFilter);
+                allItemsFilter.ChildFilters.Add(dateFilter);
             }
         }
         else if (query.Value.StartsWith(yearsString, StringComparison.Ordinal))
@@ -451,7 +447,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     OffsetType = DateOffsetType.Years,
                     OffsetValue = (int)Math.Abs(years),
                 };
-                AddToChildFilters(allItemsFilter, dateFilter);
+                allItemsFilter.ChildFilters.Add(dateFilter);
             }
         }
         else
@@ -472,7 +468,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     FieldValue = dateTime.ToString("O", CultureInfo.InvariantCulture)
                 };
 
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(childFilter);
+                AddToChildFilters(allItemsFilter, childFilter, true);
             }
         }
     }

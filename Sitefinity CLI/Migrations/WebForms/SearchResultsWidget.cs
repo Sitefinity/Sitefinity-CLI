@@ -41,6 +41,16 @@ internal class SearchResultsWidget : MigrationBase, IWidgetMigration
             migratedProperties.Add("ListSettings", serializedPageValue);
         }
 
+        if (migratedProperties.TryGetValue("SearchFields", out string searchFields) && searchFields != null)
+        {
+            migratedProperties["SearchFields"] = searchFields.Replace(';', ',');
+        }
+
+        if (migratedProperties.TryGetValue("HighlightedFields", out string highlightedFields) && highlightedFields != null)
+        {
+            migratedProperties["HighlightedFields"] = highlightedFields.Replace(';', ',');
+        }
+
         return Task.FromResult(new MigratedWidget("SitefinitySearchResults", migratedProperties));
     }
 }
