@@ -220,8 +220,14 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 var taxaValueDictionary = new Dictionary<string, List<string>>();
                 foreach (var query in queryData.QueryItems)
                 {
-                    var fieldName = query.Name ?? query.Condition.FieldName;
-                    if (query.Value != null && isDateGroup && (fieldName != null && (fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase) || fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
+                    var queryName = query.Name ?? query.Condition.FieldName;
+                    var fieldName = query.Condition?.FieldName ?? string.Empty;
+                    if (fieldName.Contains("Parent.Id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldName = "ParentId";
+                    }
+
+                    if (query.Value != null && isDateGroup && (queryName != null && (queryName.Contains("Date", StringComparison.OrdinalIgnoreCase) || queryName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
                     {
                         AddDateFilter(allItemsFilter, query);
 
@@ -233,14 +239,14 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                         isDateGroup = false;
                         if (query.Condition.Operator == "Contains")
                         {
-                            taxaValueDictionary.TryAdd(query.Condition.FieldName, new List<string>());
-                            taxaValueDictionary[query.Condition.FieldName].Add(query.Value);
+                            taxaValueDictionary.TryAdd(fieldName, new List<string>());
+                            taxaValueDictionary[fieldName].Add(query.Value);
                         }
                         else
                         {
                             var childFilter = new FilterClause()
                             {
-                                FieldName = query.Condition.FieldName,
+                                FieldName = fieldName,
                                 Operator = FilterClause.Operators.Equal,
                                 FieldValue = query.Value
                             };

@@ -277,17 +277,23 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
     private async Task MigrateAdditionalFilter(WidgetMigrationContext context, Dictionary<string, string> propsToRead, IDictionary<string, string> migratedProperties, string contentType, string contentProvider)
     {
         var additionalFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedAdditionalFilters", StringComparison.Ordinal));
+        var narrowSelectionFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedNarrowSelectionFilters", StringComparison.Ordinal));
         var parentIdsFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedSelectedParentsIds", StringComparison.Ordinal));
         propsToRead.TryGetValue("ParentFilterMode", out string parentFilterMode);
         if (migratedProperties.ContainsKey("SelectedItems"))
             return;
 
-        if (!string.IsNullOrEmpty(additionalFilter.Value) || !string.IsNullOrEmpty(parentIdsFilter.Value) || parentFilterMode == "CurrentlyOpen")
+        if (!string.IsNullOrEmpty(additionalFilter.Value) || !string.IsNullOrEmpty(parentIdsFilter.Value) || !string.IsNullOrEmpty(narrowSelectionFilter.Value) || parentFilterMode == "CurrentlyOpen")
         {
             try
             {
                 propsToRead.TryGetValue("SelectionGroupLogicalOperator", out string logicalOperator);
                 var queryData = string.IsNullOrEmpty(additionalFilter.Value) ? new QueryData() { QueryItems = [] } : JsonSerializer.Deserialize<QueryData>(additionalFilter.Value);
+                if (queryData.QueryItems.Length == 0)
+                {
+                    queryData = string.IsNullOrEmpty(narrowSelectionFilter.Value) ? new QueryData() { QueryItems = [] } : JsonSerializer.Deserialize<QueryData>(narrowSelectionFilter.Value);
+                }
+
                 var allItemsFilter = new CombinedFilter()
                 {
                     Operator = logicalOperator == "AND" ? CombinedFilter.LogicalOperators.And : CombinedFilter.LogicalOperators.Or
@@ -297,8 +303,14 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 var taxaValueDictionary = new Dictionary<string, List<string>>();
                 foreach (var query in queryData.QueryItems)
                 {
-                    var fieldName = query.Name ?? query.Condition.FieldName;
-                    if (query.Value != null && isDateGroup && (fieldName != null && (fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase) || fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
+                    var queryName = query.Name ?? query.Condition.FieldName;
+                    var fieldName = query.Condition?.FieldName ?? string.Empty;
+                    if (fieldName.Contains("Parent.Id", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldName = "ParentId";
+                    }
+
+                    if (query.Value != null && isDateGroup && (queryName != null && (queryName.Contains("Date", StringComparison.OrdinalIgnoreCase) || queryName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
                     {
                         AddDateFilter(allItemsFilter, query);
 
@@ -310,14 +322,14 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                         isDateGroup = false;
                         if (query.Condition.Operator == "Contains")
                         {
-                            taxaValueDictionary.TryAdd(query.Condition.FieldName, new List<string>());
-                            taxaValueDictionary[query.Condition.FieldName].Add(query.Value);
+                            taxaValueDictionary.TryAdd(fieldName, new List<string>());
+                            taxaValueDictionary[fieldName].Add(query.Value);
                         }
                         else
                         {
                             var childFilter = new FilterClause()
                             {
-                                FieldName = query.Condition.FieldName,
+                                FieldName = fieldName,
                                 Operator = FilterClause.Operators.Equal,
                                 FieldValue = query.Value
                             };
