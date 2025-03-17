@@ -94,7 +94,7 @@ namespace Sitefinity_CLI.Commands
             {
                 await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
-                    Recreate = true,
+                    Recreate = this.Recreate,
                     Action = action,
                     Log = log,
                     ReplacePageContent = this.Replace,
