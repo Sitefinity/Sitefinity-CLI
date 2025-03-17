@@ -31,14 +31,18 @@ internal class ImageWidget : MigrationBase, IWidgetMigration
 
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);
 
-        if (context.Source.Properties.TryGetValue("ImageId", out string imageId) && context.Source.Properties.TryGetValue("ProviderName", out string providerName) && providerName != null)
+        string masterImageId = null;
+        string providerName = null;
+
+        if (context.Source.Properties.TryGetValue("ImageId", out string imageId) && context.Source.Properties.TryGetValue("ProviderName", out providerName) && providerName != null)
         {
             var response = await GetMasterIds(context, [imageId], "Telerik.Sitefinity.Libraries.Model.Image", providerName);
+            masterImageId = response[0];
 
             var serializedItem = JsonSerializer.Serialize(new
             {
-                Id = response[0],
-                ProviderName = providerName,
+                Id = masterImageId,
+                Provider = providerName,
             });
 
             migratedProperties.Add("Item", serializedItem);
@@ -54,12 +58,20 @@ internal class ImageWidget : MigrationBase, IWidgetMigration
             await context.LogWarning("Cannot migrate images with display mode 'Custom'");
         }
 
-        if (context.Source.Properties.TryGetValue("ThumbnailName", out string thumbnailName) && thumbnailName != null)
+        if (context.Source.Properties.TryGetValue("ThumbnailName", out string thumbnailName) && thumbnailName != null && masterImageId != null && providerName != null)
         {
+            var item = await context.SourceClient.GetItem<SdkItem>(new GetItemArgs()
+            {
+                Type = RestClientContentTypes.Images,
+                Id = masterImageId,
+                Provider = providerName
+            });
+
             migratedProperties.Add("ImageSize", "Thumbnail");
             migratedProperties.Add("Thumnail", JsonSerializer.Serialize(new
             {
                 Name = thumbnailName,
+                OriginalUrl = item?.GetValue<string>("Url")
             }));
         }
 

@@ -22,14 +22,18 @@ internal class ImageWidget : MigrationBase, IWidgetMigration
 
         var migratedProperties = ProcessProperties(propsToRead, propertiesToCopy, propertiesToRename);
 
-        if (propsToRead.TryGetValue("Id", out string imageId) && propsToRead.TryGetValue("ProviderName", out string providerName) && providerName != null)
+        string masterImageId = null;
+        string providerName = null;
+
+        if (propsToRead.TryGetValue("Id", out string imageId) && propsToRead.TryGetValue("ProviderName", out providerName) && providerName != null)
         {
             var response = await GetMasterIds(context, [imageId], "Telerik.Sitefinity.Libraries.Model.Image", providerName);
+            masterImageId = response[0];
 
             var serializedItem = JsonSerializer.Serialize(new
             {
-                Id = response[0],
-                ProviderName = providerName,
+                Id = masterImageId,
+                Provider = providerName
             });
 
             migratedProperties.Add("Item", serializedItem);
@@ -83,12 +87,20 @@ internal class ImageWidget : MigrationBase, IWidgetMigration
             migratedProperties.Add("ImageSize", "Responsive");
         }
 
-        if (propsToRead.TryGetValue("ThumbnailName", out string thumbnailName) && thumbnailName != null)
+        if (propsToRead.TryGetValue("ThumbnailName", out string thumbnailName) && thumbnailName != null && masterImageId != null && providerName != null)
         {
+            var item = await context.SourceClient.GetItem<SdkItem>(new GetItemArgs()
+            {
+                Type = RestClientContentTypes.Images,
+                Id = masterImageId,
+                Provider = providerName
+            });
+
             migratedProperties.Add("ImageSize", "Thumbnail");
             migratedProperties.Add("Thumnail", JsonSerializer.Serialize(new
             {
                 Name = thumbnailName,
+                OriginalUrl = item?.GetValue<string>("Url")
             }));
         }
 

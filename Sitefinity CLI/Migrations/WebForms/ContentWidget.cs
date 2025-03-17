@@ -74,7 +74,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 migratedDetailsViewName = "Details.News.Default";
                 break;
             case RestClientContentTypes.BlogPost:
-                migratedDetailsViewName = "Details.Blogs.Default";
+                migratedDetailsViewName = "Details.BlogPosts.Default";
                 break;
             case RestClientContentTypes.Events:
                 migratedDetailsViewName = "Details.Events.Default";
