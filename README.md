@@ -89,7 +89,7 @@ You can use the add command with the following subcommands:
 
 ```sf add [command name] -?```
 
-## CLI migration commands
+### CLI migration commands
 
 You use the migration commands to migrate the front-end resources written in Web Forms or MVC to a decoupled renderer.
 
@@ -157,7 +157,8 @@ You can easily create custom templates. To do this, create a file with extension
 ## Migration Commands
 The migration commands support migration of pages and page templates that are built using Web Forms or MVC to the decoupled architecture.
 
-**NOTE**: The migration tool does not migrate your code. It migrates content and structure only.
+**IMPORTANT**: The migration tool helps you migrating only the content and structure of the page templates and pages. You still need to re-implement all custom widgets you are using on your site.<br>
+The migration tool is not a complete solution and can generate warnings or incomplete front-end resources. You are responsible to check its results.
 
 ### General flow of migration
 
