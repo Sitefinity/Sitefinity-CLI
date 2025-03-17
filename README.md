@@ -1,5 +1,9 @@
 # Sitefinity CLI
 
+## Overview
+
+You use Sitefinity CLI to perform maintainance tasks on your Sitefinity project, such as creating a new project, adding resources to an existing project, updating the project to a newer version, or migrating the front-end rendering framework.
+
 ## Prerequisites
 
   To use or build the CLI, you need to install the corresponding version of the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0).
@@ -87,6 +91,8 @@ You can use the add command with the following subcommands:
 
 ## CLI migration commands
 
+You use the migration commands to migrate the front-end resources written in Web Forms or MVC to a decoupled renderer.
+
 * To migrate a page, execute the following command:
 
   ```sf migrate page "PageId"```
@@ -95,15 +101,15 @@ You can use the add command with the following subcommands:
 
   ```sf migrate template "TemplateId"```
 
-**NOTE** For a list of all available options, execute the following command(or refer to docs [here](#migration-commands)):
+**NOTE** For a list of all available options, execute the following command or refer to documentation [here](#migration-commands)):
 
   ``` sf migrate help ```
 
 ## Sitefinity CMS version
 
-Every command has an option ```--version```. It is used to tell the CLI which template version should be used in the generation process. Templates can be found in the ```Templates``` folder, in separate folders for each Sitefinity CMS version, starting from 10.2.
+Every command has an option ```--version```. You use it to tell the CLI which template version is used in the generation process. You can find the templates in the ```Templates``` folder, which contains separate folders for each Sitefinity CMS version, starting from 10.2.
 
-When running a command the CLI will try to automatically detect your Sitefinity CMS project version and use the corresponding template. If it cannot detect the version or your Sitefinity CMS version is higher than latest templates version, CLI will use the latest available.
+When running a command, the CLI tries to automatically detect your Sitefinity CMS project version and use the corresponding template. If it cannot detect the version or your Sitefinity CMS version is higher than latest templates version, CLI will use the latest available one.
 
 You can use the ```--version``` option to explicitly set the templates version that CLI should use.
 
@@ -111,7 +117,7 @@ You can use the ```--version``` option to explicitly set the templates version t
 ```
 sf add package "New resource package" --version "11.0"
 ```
-In this case, the CLI will look for a folder named ```11.0``` inside folder ```Templates```. Folder 11.0 must have ```ResourcePackage``` folder containing templates for a resource package.
+In this case, the CLI will look for a folder named ```11.0``` inside folder ```Templates```. Folder 11.0 must have a ```ResourcePackage``` folder containing templates for a resource package.
 
 ## Template generation
 
@@ -151,58 +157,73 @@ You can easily create custom templates. To do this, create a file with extension
 ## Migration Commands
 The migration commands support migration of pages and page templates that are built using Web Forms or MVC to the decoupled architecture.
 
-**NOTE** The migration tool does not migrate code in any form. It is a tool for migrating content and structure only.
+**NOTE**: The migration tool does not migrate your code. It migrates content and structure only.
 
 ### General flow of migration
 
 **RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.
-For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration)
+For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration).
+
+To migrate your Sitefinity CMS project, perform the following procedure:
 
 * Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
 * Make adjustments to the migrated structure as needed:
-  * Set a file system template
-  * Manually configure the widgets that are migrated.
+  * Set a file system template.
+  * Migrate the widgets used on the template
+    * Take a business decision if you can stop using some of the existing widgets. For example, drop widgets if the busness need is no longer there.
+    * Manually configure the widgets that are migrated.
   * Make adjustment to the look and feel of the page.
+* Once you complete the migrationof the chosen page templates, move on to the pages structure.
+  * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
+  * Once you fully migrate the page, specify the --replace option to the CLI `migrate page` command.
 
-* Once selected the page templates are migrated, move on to the pages structure
-  * Pages are duplicated by default and excluded from the navigation.
-  * Once the page is fully migrated, specify the --replace option
+**NOTE**: You can specify the `--replace` option only when the page has a duplicate.
 
-**NOTE** You will only be allowed to specify the --replace option when the page has a duplicate.
-  
-**NOTE** The tool uses the page's 'UrlName' property OR the page template's 'Name' property to identify the page/page template that it created. The format has a suffix of (migrated to Decoupled). This is done to avoid conflicts with existing pages/page templates.
+**NOTE**: The CLI uses the page's and the template's `Title` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
 
-**NOTE** The tool only uses data from the published pages/page templates. Draft/temp changes are not migrated.
+**NOTE**: The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
+
+**NOTE**: Migration of forms is automatic if there is a form widget on the page.
 
 ### Migrating hierarchies
-* When a page template is selected, first the parent page templates are migrated. Migration cannot happen otherwise.
-* If there are parent page templates automatically migrated, they will be automatically published.
+* When you select a page template, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
+* If parent page templates are migrated automatically, they will be also published automatically.
 
-**NOTE** When migrating pages, the tool will not migrate the parent page templates. All dependent page templates must be migrated prior to migrating pages.
-
-**NOTE** Migration of forms is automatic of there is a form widget on the page.
+**NOTE**: When migrating pages, the CLI will not migrate the parent page templates. All dependent page templates must be migrated before migrating pages.
 
 ### Safe box & Testing
-All pages and page templates are duplicated by default with a suffix in the Title(migrated to Decoupled). This provides a level of isolation for existing pages/page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
+All pages and page templates are duplicated by default with a suffix in the their `Title` `(migrated to Decoupled)`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
 
-**NOTE** Pages support the option `--replace`. See [Migration options](#migration-options). This replaces the page contents on the **ACTUAL** page and saves them as a draft. Thanks to this option, existing links from content blocks, html fields, and related data are kept and you do not need to update these references. When using the `Replace` option, the page is automatically saved as Draft, regardless of the value of the --action option.
+**NOTE**: Pages support the option `--replace`. See [Migration options](#migration-options). This replaces the page contents on the **ACTUAL** page and saves them as a draft. Thanks to this option, existing links from content blocks, html fields, and related data are kept and you do not need to update these references. When using the `--replace` option, the page is automatically saved as Draft, regardless of the value of the --action option.
 
-**Duplicated Pages are hidden from navigation by default.**
+**NOTE**: Duplicated Pages are hidden from navigation by default.
 
 ### Required parameters
-* CMS URL ('--cmsUrl' parameter) - The URL of the CMS
-* Token ('--token' parameter) - The authentication token to use. To learn how to generate a token, see https://www.progress.com/documentation/sitefinity-cms/generate-access-key .
+* CMS URL ('--cmsUrl')<br>
+The URL of the deployed Sitefinity CMS.<br>
+For example, `https://www.example.com/en`
+* Token ('--token')<br>
+The authentication token to use.<br>
+To learn how to generate a token, see [Generate access key](https://www.progress.com/documentation/sitefinity-cms/generate-access-key). You must use a token of an account with full `Administrator` privileges.
 
 ### Optional parameters
-* Recreate ('--recreate' parameter) - Instructs the command to recreate the selected page/template AND its parent templates. Useful when testing and experimenting with custom configurations/custom widget migrations
-* Recursive ('--recursive' parameter) -  Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
-* Replace ('--replace' parameter) - Replaces the content of the page. Valid only for pages.
-* Action ('--action' parameter) - The action to execute at the end of the migration - Save as Draft/Publish. Allowed values are: draft, publish.
-* SiteId ('--siteid' parameter) - The site id. When working with the non default site.
+* `--recreate`<br>
+Recreates the selected page or template **and** its parent templates.<br>
+Useful when testing and experimenting with custom configurations/custom widget migrations
+* `--recursive`<br>
+Recursively migrates all the child pages or templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
+* '--replace'<br>
+Replaces the content of the page. Valid only for pages.
+* '--action'<br>
+The action to execute at the end of the migration. Allowed values are:
+  - `draft` - Save the migrated resource as Draft. 
+  - `publish` - Publish the migrated resource.
+* `--siteid`<br>
+The site id. You use the --siteid parameter to specify the site id when you work with a non-default site.
 
-**NOTE** All parameters can be manually specified in the appsettings.json file. **You need to manually create this file next to the sf.exe binary.**
-**EXAMPLE**
+**NOTE**: All parameters can be manually specified in the appsettings.json file. **You need to manually create this file next to the sf.exe binary.**
 
+**EXAMPLE**: 
 ``` json
 
 {
@@ -235,12 +256,12 @@ All pages and page templates are duplicated by default with a suffix in the Titl
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
 
 ### Widget migration
-There are two options for migration widgets.
+You have two options for migration of widgets:
 * Through configuration
 * Through custom widget migrations
 
 ### Migration through configuration
-This can be specified in the appsettings.json file.
+This can be specified in the appsettings.json file. For example:
 ``` json
 
 {
@@ -265,32 +286,34 @@ This can be specified in the appsettings.json file.
 
 ### Custom widget migrations
 
-Custom widget migrations can be used when the configuration is not sufficient and more complex logic is required. All OOB widget migrations are located under the Migrations folder for reference.
+Custom widget migrations can be used when the configuration is not sufficient and a more complex logic is required. All built-in widget migrations are located under the `Migrations` folder for reference.
 
-Widget migrations are invoked for each **occurrence** of the widget found on the page/template. For each invocation a **WidgetMigrationContext** is passed. It contains:
-* SourceClient -> The IRestClient for interfacing with the CMS
-* Source -> The original widget, from which we are migrating.
-* ParentId -> The new parent id.
-* Language -> The current language.
-* SegmentId -> The page segment (for personalized pages)
-* WidgetSegmentId -> The widget segment (for personalized widgets)
-* LogWarning -> logs a warning message
-* LogInfo -> logs an informational message
-* SiteId -> The site id. When working with the non default site.
+Widget migrations are invoked for each **occurrence** of the widget found on the page or page template. For each invocation, a `WidgetMigrationContext` is passed. It contains:
 
-A return parameter **MigratedWidget** is required as the output of the migration. It contains the new widget name and the new properties.
+* `SourceClient` -> The `IRestClient` for interfacing with the CMS
+* `Source` -> The original widget, from which you are migrating.
+* `ParentId` -> The new parent id for the migrated widget.
+* `Language` -> The current language.
+* `SegmentId` -> The page segment when working with personalized pages.
+* `WidgetSegmentId` -> The widget segment when working with personalized widgets.
+* `LogWarning` -> specifies a warning message to be shown in the Terminal during during the migration of the widget.
+* `LogInfo` -> specifies an informational message to be shown in the Terminal during during the migration of the widget.
+* `SiteId` -> The site id. You use the SiteId parameter to specify the site id when you work with a non-default site.
 
-**Helpful functions**
-From base class MigrationBase
+A return value of type `MigratedWidget` is required as the output of the migration. It contains the new widget name and properties.
 
-* ProcessProperties -> Copes and renames properties.
-* GetMasterIds -> Gets the master ids of the live content items (usually referenced in WebForms widgets).
-* GetSingleItemMixedContentValue, GetMixedContentValue -> Helper for generating properties of type MixedContentContext
+### Helpful functions
+
+From base class `MigrationBase`
+
+* `ProcessProperties` -> Copes and renames properties.
+* `GetMasterIds` -> Gets the master ids of the live content items (usually referenced in Web Forms widgets).
+* `GetSingleItemMixedContentValue`, `GetMixedContentValue` -> Helper for generating properties of type `MixedContentContext`.
 
 ### Limitations
-* The migration tool does not migrate code in any form. It is a tool for migrating content and structure only.
+* The CLI migration command does not migrate the code in any form. It can migrate only the content and structure of your project.
 
 ## Known issues
 #### Visual Studio 2015 integration
-Sitefinity VSIX/CLI correctly updates the csproj and sln files but Visual Studio 2015 won't refresh the solution correctly.
-The workaround is to reopen the solution.
+Visual Studio 2015 won't refresh the solution correctly after the Sitefinity VSIX/CLI correctly update the .csproj and .sln files.
+To work around the issue, reopen the solution after the CLI modifies it.
