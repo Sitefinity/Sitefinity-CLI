@@ -21,17 +21,6 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, null);
         var contentType = context.Source.Properties["ControlDefinition-ContentType"];
         var contentProvider = context.Source.Properties["ControlDefinition-ProviderName"];
-        if (string.IsNullOrEmpty(contentProvider))
-        {
-            if (contentType.StartsWith("Telerik.Sitefinity.DynamicTypes.Model", StringComparison.Ordinal))
-            {
-                contentProvider = "OpenAccessProvider";
-            }
-            else
-            {
-                contentProvider = "OpenAccessDataProvider";
-            }
-        }
 
         await MigrateItemInDetails(context, migratedProperties, contentType, contentProvider);
         await MigrateAdditionalFilter(context, migratedProperties, contentType, contentProvider);

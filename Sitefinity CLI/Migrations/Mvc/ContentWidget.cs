@@ -56,17 +56,6 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         }
 
         propsToRead.TryGetValue("ProviderName", out string contentProvider);
-        if (string.IsNullOrEmpty(contentProvider))
-        {
-            if (contentType.StartsWith("Telerik.Sitefinity.DynamicTypes.Model", StringComparison.Ordinal))
-            {
-                contentProvider = "OpenAccessProvider";
-            }
-            else
-            {
-                contentProvider = "OpenAccessDataProvider";
-            }
-        }
 
         await MigrateItemInDetails(context, propsToRead, migratedProperties, contentType, contentProvider);
         await MigrateAdditionalFilter(context, propsToRead, migratedProperties, contentType, contentProvider);
@@ -159,7 +148,10 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
             });
             var entitySet = (model["entityContainer"]["entitySets"] as JObject).Properties();
             var setName = context.Source.Caption.Replace(" ", string.Empty, StringComparison.OrdinalIgnoreCase);
-            var contentSet = entitySet.FirstOrDefault(set => string.Equals(set.Name, setName, StringComparison.OrdinalIgnoreCase));
+            var dynamicContentPrefix = "#/definitions/Telerik.Sitefinity.DynamicTypes.Model.";
+            var contentSet = entitySet.FirstOrDefault(set => set.Value["entityType"]["$ref"].ToString().Contains(dynamicContentPrefix, StringComparison.OrdinalIgnoreCase) &&
+            set.Name.StartsWith(setName, StringComparison.OrdinalIgnoreCase));
+
             if (contentSet != null)
             {
                 contentType = contentSet.Value["entityType"]["$ref"].ToString().Replace("#/definitions/", string.Empty, StringComparison.OrdinalIgnoreCase);
