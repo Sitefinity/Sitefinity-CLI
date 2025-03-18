@@ -15,7 +15,8 @@ internal class TextBox : FormMigrationBase
         { "Title", "Label" },
         { "Example", "InstructionalText" },
         { "DefaultValue", "PredefinedValue" },
-        { "ValidatorDefinition-MaxLengthViolationMessage", "TextLengthViolationMessage" }
+        { "ValidatorDefinition-MaxLengthViolationMessage", "TextLengthViolationMessage" },
+        { "ValidatorDefinition-Required", "Required" }
     };
 
     private static readonly string[] propertiesToCopy = new string[] { "CssClass" };
