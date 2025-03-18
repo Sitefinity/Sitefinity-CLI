@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
+using Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.Common;
 using Progress.Sitefinity.MigrationTool.Core.Widgets;
 using Progress.Sitefinity.RestSdk;
+using Progress.Sitefinity.RestSdk.Dto;
 using Progress.Sitefinity.RestSdk.Filters;
 using System;
 using System.Collections.Generic;
@@ -56,6 +58,12 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         }
 
         propsToRead.TryGetValue("ProviderName", out string contentProvider);
+
+        if (contentProvider == null)
+        {
+            var availableProviders = await context.SourceClient.ExecuteBoundFunction<ODataWrapper<Provider[]>>(new BoundFunctionArgs() { Type = contentType, Name = "sfproviders" });
+            contentProvider = availableProviders.Value.FirstOrDefault(p => p.IsDefault)?.Name;
+        }
 
         await MigrateItemInDetails(context, propsToRead, migratedProperties, contentType, contentProvider);
         await MigrateAdditionalFilter(context, propsToRead, migratedProperties, contentType, contentProvider);
@@ -601,40 +609,5 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
             }
 #pragma warning restore CA1031
         }
-    }
-
-    private class FieldMapping
-    {
-        public string FriendlyName { get; set; }
-
-        public string Name { get; set; }
-    }
-
-
-    private class QueryData
-    {
-        public QueryItem[] QueryItems { get; set; }
-    }
-
-    private class QueryItem
-    {
-        public bool IsGroup { get; set; }
-
-        public string Join { get; set; }
-
-        public string Name { get; set; }
-
-        public string Value { get; set; }
-
-        public Condition Condition { get; set; }
-    }
-
-    private class Condition
-    {
-        public string FieldName { get; set; }
-
-        public string FieldType { get; set; }
-
-        public string Operator { get; set; }
     }
 }

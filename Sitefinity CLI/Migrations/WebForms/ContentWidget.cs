@@ -1,5 +1,7 @@
-﻿using Progress.Sitefinity.MigrationTool.Core.Widgets;
+﻿using Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.Common;
+using Progress.Sitefinity.MigrationTool.Core.Widgets;
 using Progress.Sitefinity.RestSdk;
+using Progress.Sitefinity.RestSdk.Dto;
 using Progress.Sitefinity.RestSdk.Filters;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,12 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, null);
         var contentType = context.Source.Properties["ControlDefinition-ContentType"];
         var contentProvider = context.Source.Properties["ControlDefinition-ProviderName"];
+
+        if (contentProvider == null)
+        {
+            var availableProviders = await context.SourceClient.ExecuteBoundFunction<ODataWrapper<Provider[]>>(new BoundFunctionArgs() { Type = contentType, Name = "sfproviders" });
+            contentProvider = availableProviders.Value.FirstOrDefault(p => p.IsDefault)?.Name;
+        }
 
         await MigrateItemInDetails(context, migratedProperties, contentType, contentProvider);
         await MigrateAdditionalFilter(context, migratedProperties, contentType, contentProvider);
@@ -502,40 +510,5 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 AddToChildFilters(allItemsFilter, childFilter, true);
             }
         }
-    }
-
-    private class FieldMapping
-    {
-        public string FriendlyName { get; set; }
-
-        public string Name { get; set; }
-    }
-
-
-    private class QueryData
-    {
-        public QueryItem[] QueryItems { get; set; }
-    }
-
-    private class QueryItem
-    {
-        public bool IsGroup { get; set; }
-
-        public string Join { get; set; }
-
-        public string Name { get; set; }
-
-        public string Value { get; set; }
-
-        public Condition Condition { get; set; }
-    }
-
-    private class Condition
-    {
-        public string FieldName { get; set; }
-
-        public string FieldType { get; set; }
-
-        public string Operator { get; set; }
     }
 }
