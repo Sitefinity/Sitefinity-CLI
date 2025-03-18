@@ -27,7 +27,10 @@ internal class DocumentWidget : MigrationBase, IWidgetMigration
         var migratedProperties = ProcessProperties(propsToRead, null, null);
 
         var contentType = RestClientContentTypes.Documents;
-        var contentProvider = propsToRead["ProviderName"] ?? "OpenAccessDataProvider";
+        if (propsToRead.TryGetValue("ProviderName", out string contentProvider))
+        {
+            contentProvider = await GetDefaultProvider(context, contentType);
+        }
 
         if (propsToRead.TryGetValue("DocumentId", out string id) && !string.IsNullOrEmpty(id))
         {

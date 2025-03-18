@@ -13,6 +13,7 @@ using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.Common;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations;
 internal abstract class MigrationBase
@@ -147,5 +148,14 @@ internal abstract class MigrationBase
         };
 
         return JsonSerializer.Serialize(mixedContentValue, this.jsonSerializerOptionsForContentFilterSerialization);
+    }
+
+    internal static async Task<string> GetDefaultProvider(WidgetMigrationContext context, string contentType)
+    {
+
+        var availableProviders = await context.SourceClient.ExecuteBoundFunction<ODataWrapper<Provider[]>>(new BoundFunctionArgs() { Type = contentType, Name = "sfproviders" });
+        var contentProvider = availableProviders.Value.FirstOrDefault(p => p.IsDefault)?.Name;
+
+        return contentProvider;
     }
 }

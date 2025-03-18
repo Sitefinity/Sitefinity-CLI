@@ -18,6 +18,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
     public virtual async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
+        context.Source.Properties.Remove("Model-DisableCanonicalUrlMetaTag");
         var propsToRead = context.Source.Properties.ToDictionary(x => x.Key.Replace("Model-", string.Empty, StringComparison.InvariantCultureIgnoreCase), x => x.Value);
 
         var propertiesToCopy = new[] { "ContentViewDisplayMode", "PageTitleMode", "SelectionGroupLogicalOperator", "DisableCanonicalUrlMetaTag", "ShowDetailsViewOnChildDetailsView" };
@@ -61,8 +62,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
         if (contentProvider == null)
         {
-            var availableProviders = await context.SourceClient.ExecuteBoundFunction<ODataWrapper<Provider[]>>(new BoundFunctionArgs() { Type = contentType, Name = "sfproviders" });
-            contentProvider = availableProviders.Value.FirstOrDefault(p => p.IsDefault)?.Name;
+            contentProvider = await GetDefaultProvider(context, contentType);
         }
 
         await MigrateItemInDetails(context, propsToRead, migratedProperties, contentType, contentProvider);

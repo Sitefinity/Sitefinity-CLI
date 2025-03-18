@@ -26,8 +26,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
         if (contentProvider == null)
         {
-            var availableProviders = await context.SourceClient.ExecuteBoundFunction<ODataWrapper<Provider[]>>(new BoundFunctionArgs() { Type = contentType, Name = "sfproviders" });
-            contentProvider = availableProviders.Value.FirstOrDefault(p => p.IsDefault)?.Name;
+            contentProvider = await GetDefaultProvider(context, contentType);
         }
 
         await MigrateItemInDetails(context, migratedProperties, contentType, contentProvider);
