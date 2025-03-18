@@ -55,7 +55,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
             migratedProperties.Add("ShowListViewOnChildDetailsView", showListViewOnChildDetailsView.ToString());
         }
 
-        var contentProvider = propsToRead["ProviderName"];
+        propsToRead.TryGetValue("ProviderName", out string contentProvider);
         if (string.IsNullOrEmpty(contentProvider))
         {
             if (contentType.StartsWith("Telerik.Sitefinity.DynamicTypes.Model", StringComparison.Ordinal))
