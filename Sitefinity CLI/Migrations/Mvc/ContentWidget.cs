@@ -28,7 +28,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
             { "MetadataFields-OpenGraphType", "OpenGraphType" },
             { "MetadataFields-OpenGraphImage", "OpenGraphImage" },
             { "MetadataFields-OpenGraphVideo", "OpenGraphVideo" },
-            { "MetadataFields-SEOEnabled", "SEOEnabled" },
+            { "MetadataFields-SEOEnabled", "SeoEnabled" },
             { "MetadataFields-PageTitleMode", "PageTitleMode" },
             { "MetadataFields-OpenGraphEnabled", "OpenGraphEnabled" },
             { "ShowListViewOnEmpyParentFilter", "ShowListViewOnEmptyParentFilter" }
@@ -234,16 +234,24 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         propsToRead.TryGetValue("DisplayMode", out string displayMode);
         propsToRead.TryGetValue("ItemsPerPage", out string itemsPerPage);
         propsToRead.TryGetValue("LimitCount", out string limitCount);
+        int itemsPerPageInt = 20;
+        _ = int.TryParse(itemsPerPage, out itemsPerPageInt);
+        int limitInt = 20;
+        _ = int.TryParse(limitCount, out limitInt);
 
         var serializedPageValue = JsonSerializer.Serialize(new
         {
-            ItemsPerPage = itemsPerPage ?? "20",
-            LimitItemsCount = limitCount ?? "20",
-            DisplayMode = displayMode ?? "Paging"
+            ItemsPerPage = itemsPerPageInt <= 100 ? itemsPerPageInt : 100,
+            LimitItemsCount = limitInt <= 100 ? limitInt : 100,
+            DisplayMode = displayMode == "Limit" ? "Limit" : "Paging"
         });
 
         migratedProperties.Add("ListSettings", serializedPageValue);
+        AddSorting(propsToRead, migratedProperties, contentType);
+    }
 
+    private static void AddSorting(Dictionary<string, string> propsToRead, IDictionary<string, string> migratedProperties, string contentType)
+    {
         var sortProperty = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SortExpression", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
         var sortValue = sortProperty.Value;
         if (contentType == RestClientContentTypes.ListItems && string.IsNullOrEmpty(sortValue))
@@ -253,8 +261,18 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
         if (!string.IsNullOrEmpty(sortValue))
         {
-            migratedProperties.Add("OrderBy", "Custom");
-            migratedProperties.Add("SortExpression", sortValue);
+            var sortSplit = sortValue.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var defaultSortFields = new List<string> { "Title", "PublicationDate", "LastModified" };
+            if (sortSplit.Length == 2 && defaultSortFields.Contains(sortSplit[0]))
+            {
+                var sortDirection = sortSplit[1].ToLowerInvariant();
+                migratedProperties.Add("OrderBy", $"{sortSplit[0]} {sortDirection}");
+            }
+            else
+            {
+                migratedProperties.Add("OrderBy", "Custom");
+                migratedProperties.Add("SortExpression", sortValue);
+            }
         }
     }
 

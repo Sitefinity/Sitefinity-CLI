@@ -146,24 +146,34 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         context.Source.Properties.TryGetValue("MasterViewName", out string listViewName);
         string displayMode = "Paging";
         var allowPaging = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith(listViewName + "-AllowPaging", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
-        if (string.Equals(allowPaging.Value, bool.FalseString, StringComparison.Ordinal))
+        var itemsPerPage = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith(listViewName + "-ItemsPerPage", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
+        if (string.Equals(allowPaging.Value, bool.FalseString, StringComparison.Ordinal) && itemsPerPage.Value != "0")
         {
             displayMode = "Limit";
         }
 
-        var itemsPerPage = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith(listViewName + "-ItemsPerPage", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
         if (!string.IsNullOrEmpty(itemsPerPage.Value))
         {
+            int itemsPerPageInt = 20;
+            _ = int.TryParse(itemsPerPage.Value, out itemsPerPageInt);
+
+            itemsPerPageInt = itemsPerPageInt == 0 ? 20 : itemsPerPageInt;
+
             var serializedPageValue = JsonSerializer.Serialize(new
             {
-                ItemsPerPage = itemsPerPage.Value,
-                LimitItemsCount = itemsPerPage.Value,
+                ItemsPerPage = itemsPerPageInt <= 100 ? itemsPerPageInt : 100,
+                LimitItemsCount = itemsPerPageInt <= 100 ? itemsPerPageInt : 100,
                 DisplayMode = displayMode
             });
 
             migratedProperties.Add("ListSettings", serializedPageValue);
         }
 
+        AddSorting(context, migratedProperties, contentType);
+    }
+
+    private static void AddSorting(WidgetMigrationContext context, IDictionary<string, string> migratedProperties, string contentType)
+    {
         var sortProperty = context.Source.Properties.FirstOrDefault(x => x.Key.EndsWith("SortExpression", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
         var sortValue = sortProperty.Value;
         if (contentType == RestClientContentTypes.ListItems && string.IsNullOrEmpty(sortValue))
@@ -173,8 +183,18 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
         if (!string.IsNullOrEmpty(sortValue))
         {
-            migratedProperties.Add("OrderBy", "Custom");
-            migratedProperties.Add("SortExpression", sortValue);
+            var sortSplit = sortValue.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var defaultSortFields = new List<string> { "Title", "PublicationDate", "LastModified" };
+            if (sortSplit.Length == 2 && defaultSortFields.Contains(sortSplit[0]))
+            {
+                var sortDirection = sortSplit[1].ToLowerInvariant();
+                migratedProperties.Add("OrderBy", $"{sortSplit[0]} {sortDirection}");
+            }
+            else
+            {
+                migratedProperties.Add("OrderBy", "Custom");
+                migratedProperties.Add("SortExpression", sortValue);
+            }
         }
     }
 
