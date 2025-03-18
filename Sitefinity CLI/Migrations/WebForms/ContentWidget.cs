@@ -216,20 +216,35 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     Operator = CombinedFilter.LogicalOperators.And
                 };
 
+                var advancedFilter = new CombinedFilter()
+                {
+                    Operator = CombinedFilter.LogicalOperators.And
+                };
+
                 var isDateGroup = false;
+                var dateGroupName = string.Empty;
                 var taxaValueDictionary = new Dictionary<string, List<string>>();
                 foreach (var query in queryData.QueryItems)
                 {
                     var queryName = query.Name ?? query.Condition.FieldName;
-                    var fieldName = query.Condition?.FieldName ?? string.Empty;
+                    var fieldName = query.Condition?.FieldName ?? query.Name ?? string.Empty;
                     if (fieldName.Contains("Parent.Id", StringComparison.OrdinalIgnoreCase))
                     {
                         fieldName = "ParentId";
                     }
 
-                    if (query.Value != null && isDateGroup && (queryName != null && (queryName.Contains("Date", StringComparison.OrdinalIgnoreCase) || queryName.Contains("Event", StringComparison.OrdinalIgnoreCase))))
+                    if (dateGroupName == "Current")
+                        continue;
+
+                    if (query.Value != null && isDateGroup && fieldName != null && fieldName.Contains("Date", StringComparison.OrdinalIgnoreCase))
                     {
-                        AddDateFilter(allItemsFilter, query);
+                        AddDateFilter(allItemsFilter, query, false);
+
+                        continue;
+                    }
+                    else if (query.Value != null && isDateGroup && fieldName != null && fieldName.Contains("Event", StringComparison.OrdinalIgnoreCase))
+                    {
+                        AddDateFilter(advancedFilter, query, dateGroupName == "Upcoming");
 
                         continue;
                     }
@@ -255,57 +270,53 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     }
                     else
                     {
-                        if (query.Name.Contains("Date", StringComparison.OrdinalIgnoreCase) || query.Name == "Past" || query.Name == "Upcomming")
+                        if (query.Name.Contains("Date", StringComparison.OrdinalIgnoreCase) || query.Name == "Past" || query.Name == "Upcomming" || query.Name == "Current")
                         {
                             isDateGroup = true;
+                            dateGroupName = query.Name;
+
+                            if (dateGroupName == "Upcoming")
+                            {
+                                await context.LogWarning($"Some of the filters may not be migrated for upcoming events!");
+                            }
 
                             var groupFilter = new CombinedFilter();
                             groupFilter.Operator = CombinedFilter.LogicalOperators.And;
                             groupFilter.ChildFilters = new List<object>();
-                            allItemsFilter.ChildFilters.Add(groupFilter);
+                            if (query.Name.Contains("Date", StringComparison.OrdinalIgnoreCase))
+                            {
+                                allItemsFilter.ChildFilters.Add(groupFilter);
+                            }
+                            else
+                            {
+                                advancedFilter.ChildFilters?.Add(groupFilter);
+                            }
+                        }
+                        else if (query.Name == "Current")
+                        {
+                            isDateGroup = true;
+                            dateGroupName = query.Name;
+                            CombinedFilter groupFilter = CreateCurrentDateFilter(query);
+
+                            advancedFilter.ChildFilters.Add(groupFilter);
                         }
                     }
                 }
 
-                foreach (var taxa in taxaValueDictionary) // this is need to visualize the taxons in the new designer. It works with ["1","2"] contains tag
-                                                          //the old designer did different filter condition for each tag: (tag equals "1") OR (tag equals "2")
-                {
-                    var childFilter = new FilterClause()
-                    {
-                        FieldName = taxa.Key,
-                        Operator = FilterClause.Operators.ContainsOr,
-                        FieldValue = taxa.Value
-                    };
-                    allItemsFilter.ChildFilters.Add(childFilter);
-                }
+                CreateTaxaFilter(allItemsFilter, taxaValueDictionary);
 
-                var deserialized = Array.Empty<string>();
-                if (contentType == RestClientContentTypes.ListItems && propsToRead.TryGetValue("SelectedListIds", out string selectedListIdsJson))
-                {
-                    deserialized = JsonSerializer.Deserialize<string[]>(selectedListIdsJson);
-                }
-                else if (!string.IsNullOrEmpty(parentIdsFilter.Value))
-                {
-                    deserialized = JsonSerializer.Deserialize<string[]>(parentIdsFilter.Value);
-                }
-
-                if (deserialized.Length > 0)
-                {
-                    var parentFilter = new FilterClause()
-                    {
-                        FieldName = "ParentId",
-                        FieldValue = deserialized,
-                        Operator = FilterClause.Operators.ContainsOr
-                    };
-                    allItemsFilter.ChildFilters.Add(parentFilter);
-                }
-
-                object filterValue = allItemsFilter;
+                CreateParentFilter(contentType, propsToRead, parentIdsFilter, allItemsFilter);
 
                 propsToRead.TryGetValue("FilterByParentUrl", out string filterByParentUrlString);
                 var filterByCurrentParent = filterByParentUrlString == "True";
-                var selectedItemsValue = GetMixedContentValue(filterValue, contentType, contentProvider, filterByCurrentParent);
+                var selectedItemsValue = GetMixedContentValue(allItemsFilter, contentType, contentProvider, filterByCurrentParent);
                 migratedProperties.Add("SelectedItems", selectedItemsValue);
+
+                if (advancedFilter.ChildFilters != null && advancedFilter.ChildFilters.Count > 0)
+                {
+                    var advancedFilterSerialized = JsonSerializer.Serialize(advancedFilter);
+                    migratedProperties.Add("FilterExpression", advancedFilterSerialized);
+                }
             }
 #pragma warning disable CA1031
             catch (Exception ex)
@@ -315,6 +326,71 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 #pragma warning restore CA1031
         }
 
+    }
+
+    private static void CreateTaxaFilter(CombinedFilter allItemsFilter, Dictionary<string, List<string>> taxaValueDictionary)
+    {
+        foreach (var taxa in taxaValueDictionary) // this is need to visualize the taxons in the new designer. It works with ["1","2"] contains tag
+                                                  //the old designer did different filter condition for each tag: (tag equals "1") OR (tag equals "2")
+        {
+            var childFilter = new FilterClause()
+            {
+                FieldName = taxa.Key,
+                Operator = FilterClause.Operators.ContainsOr,
+                FieldValue = taxa.Value
+            };
+            allItemsFilter.ChildFilters.Add(childFilter);
+        }
+    }
+
+    private static void CreateParentFilter(string contentType, IDictionary<string, string> propsToRead, KeyValuePair<string, string> parentIdsFilter, CombinedFilter allItemsFilter)
+    {
+        var deserialized = Array.Empty<string>();
+        if (contentType == RestClientContentTypes.ListItems && propsToRead.TryGetValue("SelectedListIds", out string selectedListIdsJson))
+        {
+            deserialized = JsonSerializer.Deserialize<string[]>(selectedListIdsJson);
+        }
+        else if (!string.IsNullOrEmpty(parentIdsFilter.Value))
+        {
+            deserialized = JsonSerializer.Deserialize<string[]>(parentIdsFilter.Value);
+        }
+
+        if (deserialized.Length > 0)
+        {
+            var parentFilter = new FilterClause()
+            {
+                FieldName = "ParentId",
+                FieldValue = deserialized,
+                Operator = FilterClause.Operators.ContainsOr
+            };
+            allItemsFilter.ChildFilters.Add(parentFilter);
+        }
+    }
+
+    private static CombinedFilter CreateCurrentDateFilter(QueryItem query)
+    {
+        var groupFilter = new CombinedFilter();
+        groupFilter.Operator = query.Name == "Upcoming" ? CombinedFilter.LogicalOperators.Not : CombinedFilter.LogicalOperators.And;
+        groupFilter.ChildFilters = new List<object>();
+
+        var childFilter = new DateOffsetPeriod()
+        {
+            DateFieldName = "EventStart",
+            OffsetType = DateOffsetType.Years,
+            OffsetValue = 100,
+        };
+        groupFilter.ChildFilters.Add(childFilter);
+        var eventEndGroup = new CombinedFilter();
+        eventEndGroup.Operator = CombinedFilter.LogicalOperators.Not;
+        eventEndGroup.ChildFilters = [
+            new DateOffsetPeriod()
+                                    {
+                                        DateFieldName = "EventEnd",
+                                        OffsetType = DateOffsetType.Years,
+                                        OffsetValue = 100,
+                                    }];
+        groupFilter.ChildFilters.Add(eventEndGroup);
+        return groupFilter;
     }
 
     private static void AddToChildFilters(CombinedFilter allItemsFilter, object filter, bool addInInnerGroup = false)
@@ -337,12 +413,12 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         }
     }
 
-    private static void AddDateFilter(CombinedFilter allItemsFilter, QueryItem query)
+    private static void AddDateFilter(CombinedFilter allItemsFilter, QueryItem query, bool isUpcoming)
     {
         var daysString = "DateTime.UtcNow.AddDays";
         var monthsString = "DateTime.UtcNow.AddMonths";
         var yearsString = "DateTime.UtcNow.AddYears";
-        if (query.Value != null && query.Value.StartsWith(daysString, StringComparison.Ordinal))
+        if (query.Value != null && query.Value.StartsWith(daysString, StringComparison.Ordinal) && !isUpcoming)
         {
             var substringValue = query.Value.Substring(daysString.Length + 1).Trim('(').Trim(')');
             if (double.TryParse(substringValue, out double days))
@@ -357,7 +433,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 allItemsFilter.ChildFilters.Add(dateFilter);
             }
         }
-        else if (query.Value != null && query.Value.StartsWith(monthsString, StringComparison.Ordinal))
+        else if (query.Value != null && query.Value.StartsWith(monthsString, StringComparison.Ordinal) && !isUpcoming)
         {
             var substringValue = query.Value.Substring(monthsString.Length + 1).Trim('(').Trim(')');
             if (int.TryParse(substringValue, out int months))
@@ -371,7 +447,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 allItemsFilter.ChildFilters.Add(dateFilter);
             }
         }
-        else if (query.Value != null && query.Value.StartsWith(yearsString, StringComparison.Ordinal))
+        else if (query.Value != null && query.Value.StartsWith(yearsString, StringComparison.Ordinal) && !isUpcoming)
         {
             var substringValue = query.Value.Substring(yearsString.Length + 1).Trim('(').Trim(')');
             if (int.TryParse(substringValue, out int years))
@@ -403,7 +479,17 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                     FieldValue = dateTime.ToString("O", CultureInfo.InvariantCulture)
                 };
 
-                (allItemsFilter.ChildFilters.Last() as CombinedFilter).ChildFilters.Add(childFilter);
+                AddToChildFilters(allItemsFilter, childFilter, true);
+            }
+            else if (query.Value == "DateTime.UtcNow")
+            {
+                var childFilter = new DateOffsetPeriod()
+                {
+                    DateFieldName = query.Condition.FieldName,
+                    OffsetType = DateOffsetType.Years,
+                    OffsetValue = 100,
+                };
+
                 AddToChildFilters(allItemsFilter, childFilter, true);
             }
         }
