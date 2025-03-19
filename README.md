@@ -254,6 +254,7 @@ To migrate your Sitefinity CMS project, perform the following procedure:
 
 ### Migrating pages
 * When migrating pages, the option recursive can be used to migrate all child pages of the selected page.
+* During the diplication of the page(without the --replace option) the Title & Properties are not copied. Only the content of the page is copied.
 
 ### Migrating hierarchies
 
