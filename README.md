@@ -198,6 +198,9 @@ The site id. You use the --siteid parameter to specify the site id when you work
       "Replace": false,
       "Action": "publish",
       "SiteId": "00000000-0000-0000-0000-000000000000",
+      "PlaceholerMap": { // set to null if not used
+        "ContentPlaceholder1": "Body"
+      },
       "Widgets": {
           "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock": {
               "Name": "SitefinityContentBlock",
@@ -245,7 +248,7 @@ To migrate your Sitefinity CMS project, perform the following procedure:
 
 ### Migrating templates
 * When migrating templates, be sure to create the corresponding file system layout files in advance. The migration assumes that those would be in place and it will create the duplicate page templates with a reference to the file system layout files.
-* An option to provide a mapping for the placeholders in the layout files is available both in the CLI and in the appsettings.json file. The mapping is used adjust the names of the placeholders in the layout files to match the names of the placeholders in the migrated page templates.
+* An option to provide a mapping for the placeholders in the layout files is available both in the CLI API(TemplateMigrationArgs/PageMigrationArgs::PlaceholderMap) and in the appsettings.json file. The mapping is used adjust the names of the placeholders in the layout files to match the names of the placeholders in the migrated page templates.
 * When migrating templates, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
 * If parent page templates are migrated automatically, they will be also published automatically.
 
