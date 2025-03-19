@@ -160,45 +160,6 @@ The migration commands support migration of pages and page templates that are bu
 **IMPORTANT**: The migration tool helps you migrating only the content and structure of the page templates and pages. You still need to re-implement all custom widgets you are using on your site.<br>
 The migration tool is not a complete solution and can generate warnings or incomplete front-end resources. You are responsible to check its results.
 
-### General flow of migration
-
-**RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.
-For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration).
-
-To migrate your Sitefinity CMS project, perform the following procedure:
-
-* Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
-* Make adjustments to the migrated structure as needed:
-  * Set a file system template.
-  * Migrate the widgets used on the template
-    * Take a business decision if you can stop using some of the existing widgets. For example, drop widgets if the busness need is no longer there.
-    * Manually configure the widgets that are migrated.
-  * Make adjustment to the look and feel of the page.
-* Once you complete the migrationof the chosen page templates, move on to the pages structure.
-  * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
-  * Once you fully migrate the page, specify the --replace option to the CLI `migrate page` command.
-
-**NOTE**: You can specify the `--replace` option only when the page has a duplicate.
-
-**NOTE**: The CLI uses the page's and the template's `Title` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
-
-**NOTE**: The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
-
-**NOTE**: Migration of forms is automatic if there is a form widget on the page.
-
-### Migrating hierarchies
-* When you select a page template, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
-* If parent page templates are migrated automatically, they will be also published automatically.
-
-**NOTE**: When migrating pages, the CLI will not migrate the parent page templates. All dependent page templates must be migrated before migrating pages.
-
-### Safe box & Testing
-All pages and page templates are duplicated by default with a suffix in the their `Title` `(migrated to Decoupled)`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
-
-**NOTE**: Pages support the option `--replace`. See [Migration options](#migration-options). This replaces the page contents on the **ACTUAL** page and saves them as a draft. Thanks to this option, existing links from content blocks, html fields, and related data are kept and you do not need to update these references. When using the `--replace` option, the page is automatically saved as Draft, regardless of the value of the --action option.
-
-**NOTE**: Duplicated Pages are hidden from navigation by default.
-
 ### Required parameters
 * CMS URL ('--cmsUrl')<br>
 The URL of the deployed Sitefinity CMS.<br>
@@ -255,6 +216,52 @@ The site id. You use the --siteid parameter to specify the site id when you work
 ```
 
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
+
+### General flow of migration
+
+**RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.
+For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration).
+
+To migrate your Sitefinity CMS project, perform the following procedure:
+
+* Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
+* Make adjustments to the migrated structure as needed:
+  * Set a file system template.
+  * Migrate the widgets used on the template
+    * Take a business decision if you can stop using some of the existing widgets. For example, drop widgets if the busness need is no longer there.
+    * Manually configure the widgets that are migrated.
+  * Make adjustment to the look and feel of the page.
+* Once you complete the migration of the chosen page templates, move on to the pages structure.
+  * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
+  * Once you fully migrate the page, specify the --replace option to the CLI `migrate page` command.
+
+**NOTE**: You can specify the `--replace` option only when the page has a duplicate.
+
+**NOTE**: The CLI uses the page's and the template's `Title` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
+
+**NOTE**: The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
+
+**NOTE**: Migration of forms is automatic if there is a form widget on the page.
+
+### Migrating templates
+* When migrating templates, be sure to create the corresponding file system layout files in advance. The migration assumes that those would be in place and it will create the duplicate page templates with a reference to the file system layout files.
+* An option to provide a mapping for the placeholders in the layout files is available both in the CLI and in the appsettings.json file. The mapping is used adjust the names of the placeholders in the layout files to match the names of the placeholders in the migrated page templates.
+* When migrating templates, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
+* If parent page templates are migrated automatically, they will be also published automatically.
+
+### Migrating pages
+* When migrating pages, the option recursive can be used to migrate all child pages of the selected page.
+
+### Migrating hierarchies
+
+**NOTE**: When migrating **pages**, the CLI will not migrate the **parent page templates**. All dependent page templates must be migrated before migrating pages.
+
+### Safe box & Testing
+All pages and page templates are duplicated by default with a suffix in the their `Title` `(migrated to Decoupled)`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
+
+**NOTE**: Pages support the option `--replace`. See [Migration options](#migration-options). This replaces the page contents on the **ACTUAL** page and saves them as a draft. Thanks to this option, existing links from content blocks, html fields, and related data are kept and you do not need to update these references. When using the `--replace` option, the page is automatically saved as Draft, regardless of the value of the --action option.
+
+**NOTE**: Duplicated Pages are hidden from navigation by default.
 
 ### Widget migration
 You have two options for migration of widgets:

@@ -2,6 +2,7 @@
 using McMaster.Extensions.CommandLineUtils.Conventions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Progress.Sitefinity.MigrationTool.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,7 +27,25 @@ namespace Sitefinity_CLI.Commands
 
                     var configuration = context.Application.GetRequiredService<IConfiguration>();
                     var propertyKeyInConfig = $"Commands:{commandName}:{propertyName}";
-                    var value = configuration.GetValue(property.PropertyType, propertyKeyInConfig);
+                    object value = null;
+                    if (property.PropertyType == typeof(Dictionary<string, string>))
+                    {
+                        value = configuration.GetSection(propertyKeyInConfig).GetChildren().ToDictionary(x => x.Key, x => x.Value);
+                    }
+                    else if (property.PropertyType == typeof(Dictionary<string, WidgetMigrationArgs>))
+                    {
+                        value = configuration.GetSection(propertyKeyInConfig).GetChildren().ToDictionary(x => x.Key, (x) =>
+                        {
+                            var widgetMigrationArgs = new WidgetMigrationArgs(x.Key);
+                            x.Bind(widgetMigrationArgs);
+                            return widgetMigrationArgs;
+                        });
+                    }
+                    else
+                    {
+                        value = configuration.GetValue(property.PropertyType, propertyKeyInConfig);
+                    }
+                    
                     if (value != null)
                     {
                         var currentValue = property.GetValue(context.ModelAccessor.GetModel());

@@ -70,6 +70,9 @@ namespace Sitefinity_CLI.Commands
         [Config]
         public Dictionary<string, WidgetMigrationArgs> Widgets { get; set; }
 
+        [Config]
+        public Dictionary<string, string> PlaceholderMap { get; set; }
+
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
             if (string.IsNullOrEmpty(this.CmsUrl))
@@ -111,10 +114,7 @@ namespace Sitefinity_CLI.Commands
                     Log = log,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
-                    PlaceholderMap = new Dictionary<string, string>()
-                    {
-                        { "Contentplaceholder1", "Body" }
-                    }
+                    PlaceholderMap = this.PlaceholderMap,
                 });
             }
 
