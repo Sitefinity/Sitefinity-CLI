@@ -234,7 +234,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
 
                 var advancedFilter = new CombinedFilter()
                 {
-                    Operator = CombinedFilter.LogicalOperators.And
+                    Operator = contentType != RestClientContentTypes.Events ? CombinedFilter.LogicalOperators.And : CombinedFilter.LogicalOperators.Or
                 };
 
                 var isDateGroup = false;

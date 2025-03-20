@@ -297,6 +297,12 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         var additionalFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedAdditionalFilters", StringComparison.Ordinal));
         var narrowSelectionFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedNarrowSelectionFilters", StringComparison.Ordinal));
         var parentIdsFilter = propsToRead.FirstOrDefault(x => x.Key.EndsWith("SerializedSelectedParentsIds", StringComparison.Ordinal));
+        var filterExpression = propsToRead.FirstOrDefault(x => x.Key.EndsWith("FilterExpression", StringComparison.Ordinal));
+        if (!string.IsNullOrEmpty(filterExpression.Value))
+        {
+            await context.LogWarning($"The 'FilterExpression' field was not migrated.");
+        }
+
         propsToRead.TryGetValue("ParentFilterMode", out string parentFilterMode);
         if (migratedProperties.ContainsKey("SelectedItems"))
             return;
@@ -318,7 +324,7 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
                 };
                 var advancedFilter = new CombinedFilter()
                 {
-                    Operator = logicalOperator == "AND" ? CombinedFilter.LogicalOperators.And : CombinedFilter.LogicalOperators.Or
+                    Operator = logicalOperator == "AND" && contentType != RestClientContentTypes.Events ? CombinedFilter.LogicalOperators.And : CombinedFilter.LogicalOperators.Or
                 };
 
                 var isDateGroup = false;
