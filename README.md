@@ -180,8 +180,8 @@ Replaces the content of the page. Valid only for pages.
 The action to execute at the end of the migration. Allowed values are:
   - `draft` - Save the migrated resource as Draft. 
   - `publish` - Publish the migrated resource.
-* `--siteid`<br>
-The site id. You use the --siteid parameter to specify the site id when you work with a non-default site.
+* `--site`<br>
+The site id. You use the --site parameter to specify the site id when you work with a non-default site.
 
 **NOTE**: All parameters can be manually specified in the appsettings.json file. **You need to manually create this file next to the sf.exe binary.**
 
