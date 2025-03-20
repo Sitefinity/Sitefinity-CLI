@@ -91,16 +91,14 @@ namespace Sitefinity_CLI.Commands
             };
 
             var defaultMigration = new PlaceholderWidget();
-            var action = Enum.Parse<SaveAction>(this.Action, true);
 
             if (this.Type == "page")
             {
                 await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
                     Recreate = this.Recreate,
-                    Action = action,
                     Log = log,
-                    ReplacePageContent = this.Replace,
+                    Replace = this.Replace,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive
                 });
@@ -110,7 +108,6 @@ namespace Sitefinity_CLI.Commands
                 await Migrator.MigrateTemplates(new TemplateMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
                     Recreate = this.Recreate,
-                    Action = action,
                     Log = log,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
