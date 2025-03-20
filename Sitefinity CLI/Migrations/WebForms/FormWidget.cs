@@ -23,7 +23,6 @@ internal class FormWidget : MigrationBase, IWidgetMigration
         {
             var migratedFormMap = await Migrator.MigrateForms(new FormMigrationArgs([formId], context.SourceCmsUrl, context.SourceCmsToken, null, WidgetMigrationDefaults.CustomFormMigrations)
             {
-                Action = SaveAction.Publish,
                 Recreate = true,
                 Log = new LogArgs()
                 {
