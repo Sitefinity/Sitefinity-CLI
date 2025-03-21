@@ -24,6 +24,7 @@ internal class FormWidget : MigrationBase, IWidgetMigration
             var migratedFormMap = await Migrator.MigrateForms(new FormMigrationArgs([formId], context.SourceCmsUrl, context.SourceCmsToken, null, WidgetMigrationDefaults.CustomFormMigrations)
             {
                 Recreate = true,
+                SiteId = context.SiteId
             });
 
             var migratedFormId = migratedFormMap[formId];
