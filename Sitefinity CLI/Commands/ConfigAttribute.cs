@@ -36,7 +36,8 @@ namespace Sitefinity_CLI.Commands
                     {
                         value = configuration.GetSection(propertyKeyInConfig).GetChildren().ToDictionary(x => x.Key, (x) =>
                         {
-                            var widgetMigrationArgs = new WidgetMigrationArgs(x.Key);
+                            var widgetName = x.GetSection("Name").Value;
+                            var widgetMigrationArgs = new WidgetMigrationArgs(widgetName);
                             x.Bind(widgetMigrationArgs);
                             return widgetMigrationArgs;
                         });

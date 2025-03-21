@@ -101,8 +101,6 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            var defaultMigration = new PlaceholderWidget();
-
             if (this.Type == "page")
             {
                 await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, allWidgets, WidgetMigrationDefaults.CustomMigrations)
