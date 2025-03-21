@@ -84,11 +84,28 @@ namespace Sitefinity_CLI.Commands
             {
                 throw new ValidationException("You must pass an authentication token. See https://www.progress.com/documentation/sitefinity-cms/generate-access-key on how to generate one.");
             }
+
+            var allWidgets = new Dictionary<string, WidgetMigrationArgs>(WidgetMigrationDefaults.MigrationMap);
+            if (this.Widgets != null)
+            {
+                foreach (var widget in this.Widgets)
+                {
+                    if (allWidgets.TryGetValue(widget.Key, out var existing))
+                    {
+                        allWidgets[widget.Key] = widget.Value;
+                    }
+                    else
+                    {
+                        allWidgets.Add(widget.Key, widget.Value);
+                    }
+                }
+            }
+
             var defaultMigration = new PlaceholderWidget();
 
             if (this.Type == "page")
             {
-                await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
+                await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, allWidgets, WidgetMigrationDefaults.CustomMigrations)
                 {
                     Recreate = this.Recreate,
                     Replace = this.Replace,
@@ -98,7 +115,7 @@ namespace Sitefinity_CLI.Commands
             }
             else if (this.Type == "template")
             {
-                await Migrator.MigrateTemplates(new TemplateMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
+                await Migrator.MigrateTemplates(new TemplateMigrationArgs([this.Id], this.CmsUrl, this.Token, allWidgets, WidgetMigrationDefaults.CustomMigrations)
                 {
                     Recreate = this.Recreate,
                     SiteId = this.SiteId,
