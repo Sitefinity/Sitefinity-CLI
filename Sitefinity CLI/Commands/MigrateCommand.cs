@@ -46,14 +46,14 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.MigrationReplaceTemplate, Description = Constants.ReplaceOption)]
         public bool Replace { get; set; }
 
-        [Config]
+        /*[Config]
         [Option(Constants.DumpSourceLayoutTemplate, Description = Constants.DumpOption)]
         public bool DumpSourceLayout { get; set; }
 
         [Option(Constants.MigrationActionTemplate, Description = Constants.MigrateAction)]
         [AllowedValues("draft", "publish", IgnoreCase = true)]
         [Config]
-        public string Action { get; set; } = "draft";
+        public string Action { get; set; } = "draft";*/
 
         [Config]
         [Option(Constants.MigrationCmsUrlTemplate, Description = Constants.CmsUrl)]
@@ -84,12 +84,6 @@ namespace Sitefinity_CLI.Commands
             {
                 throw new ValidationException("You must pass an authentication token. See https://www.progress.com/documentation/sitefinity-cms/generate-access-key on how to generate one.");
             }
-
-            var log = new LogArgs()
-            {
-                DumpOriginalLayoutStateToFile = this.DumpSourceLayout,
-            };
-
             var defaultMigration = new PlaceholderWidget();
 
             if (this.Type == "page")
@@ -97,7 +91,6 @@ namespace Sitefinity_CLI.Commands
                 await Migrator.MigratePages(new PageMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
                     Recreate = this.Recreate,
-                    Log = log,
                     Replace = this.Replace,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive
@@ -108,7 +101,6 @@ namespace Sitefinity_CLI.Commands
                 await Migrator.MigrateTemplates(new TemplateMigrationArgs([this.Id], this.CmsUrl, this.Token, WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomMigrations)
                 {
                     Recreate = this.Recreate,
-                    Log = log,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
                     PlaceholderMap = this.PlaceholderMap,
