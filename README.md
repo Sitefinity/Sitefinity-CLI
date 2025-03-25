@@ -174,9 +174,9 @@ Recreates the selected page or template **and** its parent templates.<br>
 Useful when testing and experimenting with custom configurations/custom widget migrations
 * `--recursive`<br>
 Recursively migrates all the child pages or templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
-* '--replace'<br>
+* `--replace`<br>
 Replaces the content of the page. Valid only for pages.
-* '--action'<br>
+* `--action`<br>
 The action to execute at the end of the migration. Allowed values are:
   - `draft` - Save the migrated resource as Draft. 
   - `publish` - Publish the migrated resource.
