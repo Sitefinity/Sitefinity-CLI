@@ -43,7 +43,7 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
             var otherPages = new List<SerializedSelectedPage>(selectedPagesParsed.Length);
             foreach (var page in selectedPagesParsed)
             {
-                if (!page.IsExternal)
+                if (!page.IsExternal || page.UrlName != null)
                 {
                     filteredPageIds.Add(page.Id);
                 }
@@ -55,7 +55,7 @@ internal class NavigationWidget : MigrationBase, IWidgetMigration
 
             if (otherPages.Count > 0)
             {
-                var titleUrlMap = string.Join(',', otherPages.Select(p => $"{p.UrlName}"));
+                var titleUrlMap = string.Join(',', otherPages.Select(p => $"{p.UrlName ?? p.Id}"));
                 var widgetTitle = $"{context.Source.Caption ?? context.Source.Name} ({context.Source.Id})";
                 await context.LogWarning($"Migration of external pages is not supported. Affected widget -> {widgetTitle}. Affected pages -> {titleUrlMap}. A possible workaround is to make redirect pages in the page sitemap structure.");
             }
