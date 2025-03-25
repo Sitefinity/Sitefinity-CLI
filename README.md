@@ -174,12 +174,8 @@ Recreates the selected page or template **and** its parent templates.<br>
 Useful when testing and experimenting with custom configurations/custom widget migrations
 * `--recursive`<br>
 Recursively migrates all the child pages or templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
-* '--replace'<br>
+* `--replace`<br>
 Replaces the content of the page. Valid only for pages.
-* '--action'<br>
-The action to execute at the end of the migration. Allowed values are:
-  - `draft` - Save the migrated resource as Draft. 
-  - `publish` - Publish the migrated resource.
 * `--site`<br>
 The site id. You use the --site parameter to specify the site id when you work with a non-default site.
 
@@ -324,6 +320,8 @@ From base class `MigrationBase`
 
 ### Limitations
 * The CLI migration command does not migrate the code in any form. It can migrate only the content and structure of your project.
+* A/B testing is currently not supported.
+* Template widgets editable in pages are not currently supported.
 
 ## Known issues
 #### Visual Studio 2015 integration
