@@ -366,9 +366,18 @@ internal class ContentWidget : MigrationBase, IWidgetMigration
         {
             deserialized = JsonSerializer.Deserialize<string[]>(selectedListIdsJson);
         }
-        else if (!string.IsNullOrEmpty(parentIdsFilter.Value))
+        else
         {
-            deserialized = JsonSerializer.Deserialize<string[]>(parentIdsFilter.Value);
+            propsToRead.TryGetValue("MasterViewName", out string listViewName);
+            var parentIdsJson = propsToRead.FirstOrDefault(x => x.Key.EndsWith(listViewName + "-ItemsParentId", StringComparison.Ordinal) && !string.IsNullOrEmpty(x.Value));
+            if (parentIdsJson.Value != null)
+            {
+                deserialized = [parentIdsJson.Value];
+            }
+            else if (!string.IsNullOrEmpty(parentIdsFilter.Value))
+            {
+                deserialized = JsonSerializer.Deserialize<string[]>(parentIdsFilter.Value);
+            }
         }
 
         if (deserialized.Length > 0)
