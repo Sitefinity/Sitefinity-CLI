@@ -72,7 +72,7 @@
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NuGet.Configuration" Version="6.11.1" />
-    <PackageReference Include="Progress.Sitefinity.MigrationTool.Core" Version="1.0.7.59131" />
+    <PackageReference Include="Progress.Sitefinity.MigrationTool.Core" Version="1.0.7.59366" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Templates/**">
