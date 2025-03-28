@@ -7,6 +7,7 @@ You use Sitefinity CLI to perform maintainance tasks on your Sitefinity project,
 ## Prerequisites
 
   To use or build the CLI, you need to install the corresponding version of the [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0).
+  Some CLI operations require a supported version of Visual Studio to be installed and configured for Sitefinity CMS development. For more information, see [Install Sitefinity CMS](https://www.progress.com/documentation/sitefinity-cms/install-sitefinity).
 
 ## Installation
 
@@ -20,7 +21,9 @@ You use Sitefinity CLI to perform maintainance tasks on your Sitefinity project,
 
   ```dotnet publish -c release -r [rid]```
 
-  **NOTE**: Replace [rid] with the identifier for your OS. For more information, see the [.NET Core RID Catalogue](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog).
+  Replace [rid] with the identifier for your OS. For more information, see the [.NET Core RID Catalogue](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog).
+
+  **IMPORTANT**: Progress supports the Sitefinity CLI only as Windows x64 build.
 
   **EXAMPLE**: To build the app for Windows x64, enter the following command:
 
@@ -155,10 +158,56 @@ You can easily create custom templates. To do this, create a file with extension
 **NOTE**: The partial ```{{> sign}}``` is automatically populated by the CLI.
 
 ## Migration Commands
-The migration commands support migration of pages and page templates that are built using Web Forms or MVC to the decoupled architecture.
+The migration commands support migration of pages and page templates that are built using Web Forms or MVC to the decoupled architecture based on ASP.NET Core.
 
 **IMPORTANT**: The migration tool helps you migrating only the content and structure of the page templates and pages. You still need to re-implement all custom widgets you are using on your site.<br>
 The migration tool is not a complete solution and can generate warnings or incomplete front-end resources. You are responsible to check its results.
+
+**IMPORTANT**: Currently, the `--migrate` command of Sitefinity CLI supports only migration from Web Forms and MVC widgets to ASP.NET Core widgets.
+
+**PREREQUISITES**: The migration commands support only projects based on Sitefinity 15.3, 15.2.15.2.8428, and later.
+When used with Sitefinity CMS 15.2.8428 and later 15.2 versions, the following limitation applies:
+
+- The custom layout widgets (*.ascx files) are not resolved from the file system
+
+### General flow of migration
+
+**RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.
+For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration).
+
+To migrate your Sitefinity CMS project, perform the following procedure:
+
+* Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
+* Make adjustments to the migrated structure as needed:
+  * Set a file system template.
+  * Migrate the widgets used on the template
+    * Take a business decision if you can stop using some of the existing widgets. For example, drop widgets if the busness need is no longer there.
+    * Manually configure the widgets that are migrated.
+  * Make adjustment to the look and feel of the page.
+* Once you complete the migrationof the chosen page templates, move on to the pages structure.
+  * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
+  * Once you fully migrate the page, specify the --replace option to the CLI `migrate page` command.
+
+**NOTE**: You can specify the `--replace` option only when the page has a duplicate.
+
+**NOTE**: The CLI uses the page's `UrlName` property OR the page template's `Name` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
+
+**NOTE**: The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
+
+**NOTE**: Migration of forms is automatic if there is a form widget on the page.
+
+### Migrating hierarchies
+* When you select a page template, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
+* If parent page templates are migrated automatically, they will be also published automatically.
+
+**NOTE**: When migrating pages, the CLI will not migrate the parent page templates. All dependent page templates must be migrated before migrating pages.
+
+### Safe box & Testing
+All pages and page templates are duplicated by default with a suffix in the their `Title` `(migrated to Decoupled)`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
+
+**NOTE**: Pages support the option `--replace`. See [Migration options](#migration-options). This replaces the page contents on the **ACTUAL** page and saves them as a draft. Thanks to this option, existing links from content blocks, html fields, and related data are kept and you do not need to update these references. When using the `--replace` option, the page is automatically saved as Draft, regardless of the value of the --action option.
+
+**NOTE**: Duplicated Pages are hidden from navigation by default.
 
 ### Required parameters
 * CMS URL ('--cmsUrl')<br>
@@ -176,8 +225,9 @@ Useful when testing and experimenting with custom configurations/custom widget m
 Recursively migrates all the child pages or templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.
 * `--replace`<br>
 Replaces the content of the page. Valid only for pages.
-* `--site`<br>
-The site id. You use the --site parameter to specify the site id when you work with a non-default site.
+
+* `--siteid`<br>
+The site id. You use the --siteid parameter to specify the site id when you work with a non-default site.
 
 **NOTE**: All parameters can be manually specified in the appsettings.json file. **You need to manually create this file next to the sf.exe binary.**
 
@@ -216,53 +266,6 @@ The site id. You use the --site parameter to specify the site id when you work w
 
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
 
-### General flow of migration
-
-**RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.
-For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration).
-
-To migrate your Sitefinity CMS project, perform the following procedure:
-
-* Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
-* Make adjustments to the migrated structure as needed:
-  * Set a file system template.
-  * Migrate the widgets used on the template
-    * Take a business decision if you can stop using some of the existing widgets. For example, drop widgets if the busness need is no longer there.
-    * Manually configure the widgets that are migrated.
-  * Make adjustment to the look and feel of the page.
-* Once you complete the migration of the chosen page templates, move on to the pages structure.
-  * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
-  * Once you fully migrate the page, specify the --replace option to the CLI `migrate page` command.
-
-**NOTE**: You can specify the `--replace` option only when the page has a duplicate.
-
-**NOTE**: The CLI uses the page's and the template's `Title` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
-
-**NOTE**: The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
-
-**NOTE**: Migration of forms is automatic if there is a form widget on the page.
-
-### Migrating templates
-* When migrating templates, be sure to create the corresponding file system layout files in advance. The migration assumes that those would be in place and it will create the duplicate page templates with a reference to the file system layout files.
-* An option to provide a mapping for the placeholders in the layout files is available both in the CLI API(TemplateMigrationArgs/PageMigrationArgs::PlaceholderMap) and in the appsettings.json file. The mapping is used adjust the names of the placeholders in the layout files to match the names of the placeholders in the migrated page templates.
-* When migrating templates, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
-* If parent page templates are migrated automatically, they will be also published automatically.
-
-### Migrating pages
-* When migrating pages, the option recursive can be used to migrate all child pages of the selected page.
-* During the diplication of the page(without the --replace option) the Title & Properties are not copied. Only the content of the page is copied.
-
-### Migrating hierarchies
-
-**NOTE**: When migrating **pages**, the CLI will not migrate the **parent page templates**. All dependent page templates must be migrated before migrating pages.
-
-### Safe box & Testing
-All pages and page templates are duplicated by default with a suffix in the their `Title` `(migrated to Decoupled)`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
-
-**NOTE**: Pages support the option `--replace`. See [Migration options](#migration-options). This replaces the page contents on the **ACTUAL** page and saves them as a draft. Thanks to this option, existing links from content blocks, html fields, and related data are kept and you do not need to update these references. When using the `--replace` option, the page is automatically saved as Draft, regardless of the value of the --action option.
-
-**NOTE**: Duplicated Pages are hidden from navigation by default.
-
 ### Widget migration
 You have two options for migration of widgets:
 * Through configuration
@@ -294,7 +297,9 @@ This can be specified in the appsettings.json file. For example:
 
 ### Custom widget migrations
 
-Custom widget migrations can be used when the configuration is not sufficient and a more complex logic is required. All built-in widget migrations are located under the `Migrations` folder for reference.
+You can perform custom widget migrations when the configuration using the CLI is insufficient and a more complex logic is required.
+
+You can reference the built-in widget migrations, located under the `Migrations` folder in the CLI source code.
 
 Widget migrations are invoked for each **occurrence** of the widget found on the page or page template. For each invocation, a `WidgetMigrationContext` is passed. It contains:
 
@@ -320,10 +325,59 @@ From base class `MigrationBase`
 
 ### Limitations
 * The CLI migration command does not migrate the code in any form. It can migrate only the content and structure of your project.
-* A/B testing is currently not supported.
-* Template widgets editable in pages are not currently supported.
+
+#### Migrating List widget to Content list widget
+
+When you migrate a List widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/list-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/list-widget-mvc)) to a Content list ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)), and the existing widget shows two separate lists, the new Content list will show a single view, containing merged items from all original lists.
+
+To show the multiple original lists separately, perform one of the following:
+
+- create a new view to perform custom sorting and iterate the lists separately
+- use multiple separate Content List widgets, each configured to display only one of the lists.
+
+#### Migrating Web Forms Image widget to Image widget
+
+When you migrate a [Web Forms Image widget](https://www.progress.com/documentation/sitefinity-cms/133/image-widget-webforms) with display mode set to `Custom`, the custom display setting is not migrated.
+
+To work around, manually configure the image size through the widget designer.
+
+#### Migrating Dynamic widget to Content list widget
+
+When migrating a [Dynamic content widget](https://www.progress.com/documentation/sitefinity-cms/dynamic-content-widgets) to a Content list ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) and the main field is changed to a value different from the one in the `Title` field, you need to perform the following:
+
+1. Manually change the list mapping in the widget designer
+2. Update the mapping for the `Details` view in the `ViewsMetadata.json` file.<br>
+For more information, see [Create custom views for the Content list widget](https://www.progress.com/documentation/sitefinity-cms/create-custom-views-for-the-content-list-widget) » *Field Mappings*.
+
+#### Migrating Blogs to Content list
+
+The current version of Sitefinity CLI migration command does not support migrating Blogs widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/blogs-list-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/blogs-widget-mvc)). 
+
+You need to implement a custom one in ASP.NET Core and manually migrate. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) to implement your custom widget.
+
+#### Migrate Events widget to Content list widget
+
+The new Content list widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) comes with different predefined basic filter options than the MVC and Web Forms widgets.
+
+Migration process transfers the old filters for past, current, and upcoming events into the *Filter Expression* field in Advanced mode of the widget designer. 
+
+Because of the difference in the filtering functionality between the different widgets, after the migration, you need to check the filters directly in the *Filter Expression* field. 
+
+If the filters expressions cannot be matched, you need to create a custom widget. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) to implement your custom widget.
+
+#### Migrate Calendar widget
+
+The current version of Sitefinity CLI cannot migrate the Calendar widget.
+
+You need to create a custom widget, based on Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) to implement your custom widget.
+
+#### Migrate Login form with Reset password mode set to Reset password widget
+
+If you have configured the Login form widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/login-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/login-form-widget-mvc)) with `Allow users to reset password` to ASP.NET Core renderer, it is migrated without the option to reset the password because there is a separate widget providing that functionality.
+You need to manually add the new Reset password widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/reset-password-widget)) on the page and configure it.
 
 ## Known issues
-#### Visual Studio 2015 integration
+
+### Visual Studio 2015 integration
 Visual Studio 2015 won't refresh the solution correctly after the Sitefinity VSIX/CLI correctly update the .csproj and .sln files.
 To work around the issue, reopen the solution after the CLI modifies it.
