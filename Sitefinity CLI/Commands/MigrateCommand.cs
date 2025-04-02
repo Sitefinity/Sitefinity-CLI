@@ -108,7 +108,8 @@ namespace Sitefinity_CLI.Commands
                     Recreate = this.Recreate,
                     Replace = this.Replace,
                     SiteId = this.SiteId,
-                    Recursive = this.Recursive
+                    Recursive = this.Recursive,
+                    DefaultWidgetMigration = new PlaceholderWidget()
                 });
             }
             else if (this.Type == "template")
@@ -119,6 +120,7 @@ namespace Sitefinity_CLI.Commands
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
                     PlaceholderMap = this.PlaceholderMap,
+                    DefaultWidgetMigration = new PlaceholderWidget()
                 });
             }
 
