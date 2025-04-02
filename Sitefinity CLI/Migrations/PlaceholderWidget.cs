@@ -1,16 +1,18 @@
-﻿using Progress.Sitefinity.MigrationTool.Core.Widgets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Progress.Sitefinity.MigrationTool.Core.Widgets;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations;
 internal class PlaceholderWidget : IWidgetMigration
 {
     public async Task<MigratedWidget> Migrate(WidgetMigrationContext context)
     {
-        await context.LogWarning($"Failed to find a mapping or custom migration for widget -> {context.Source.Name}. Using default Placeholder migrated widget.");
-        return new MigratedWidget("Placeholder", context.Source.Properties.Where(x => x.Key.Length < 50).ToDictionary(x => x.Key, y => y.Value));
+        var message = $"Failed to find a mapping or custom migration for widget -> {context.Source.Caption ?? context.Source.Name}. Using default Placeholder migrated widget.";
+        await context.LogWarning(message);
+
+        return new MigratedWidget("SitefinityContentBlock", new Dictionary<string, string>
+        {
+            ["Content"] = $"<h4 style=\"color:orange;\">{message}</h4>"
+        });
     }
 }
