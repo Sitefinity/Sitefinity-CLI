@@ -165,10 +165,7 @@ The migration tool is not a complete solution and can generate warnings or incom
 
 **IMPORTANT**: Currently, the `--migrate` command of Sitefinity CLI supports only migration from Web Forms and MVC widgets to ASP.NET Core widgets.
 
-**PREREQUISITES**: The migration commands support only projects based on Sitefinity 15.3, 15.2.15.2.8428, and later.
-When used with Sitefinity CMS 15.2.8428 and later 15.2 versions, the following limitation applies:
-
-- The custom layout widgets (*.ascx files) are not resolved from the file system
+**PREREQUISITES**: The migration commands support only projects based on Sitefinity 15.3 and later.
 
 ### General flow of migration
 
@@ -244,9 +241,6 @@ The site id. You use the --siteid parameter to specify the site id when you work
       "Replace": false,
       "Action": "publish",
       "SiteId": "00000000-0000-0000-0000-000000000000",
-      "PlaceholerMap": { // set to null if not used
-        "ContentPlaceholder1": "Body"
-      },
       "Widgets": {
           "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock": {
               "Name": "SitefinityContentBlock",
