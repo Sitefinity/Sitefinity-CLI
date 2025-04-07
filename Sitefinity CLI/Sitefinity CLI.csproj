@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -12,32 +11,30 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Optimize>false</Optimize>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="VisualStudio\Templates\Renderer\Program.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="PowerShell\Installer.ps1" />
     <None Remove="PowerShell\Updater.ps1" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="..\NOTICE.txt" Link="NOTICE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\.template.config\template.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="PowerShell\Installer.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -46,7 +43,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <None Include="..\LICENSE.md" Link="LICENSE.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -61,12 +57,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="EnvDTE" Version="17.9.37000" />
     <PackageReference Include="Handlebars.Net" Version="2.1.4" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageReference Include="McMaster.Extensions.Hosting.CommandLine" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
@@ -75,20 +71,18 @@
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	<PackageReference Include="NuGet.Configuration" Version="6.11.1" />
+    <PackageReference Include="NuGet.Configuration" Version="6.11.1" />
+    <PackageReference Include="Progress.Sitefinity.MigrationTool.Core" Version="0.1.0" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="Templates/**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Templates\13.3\ResourcePackage\" />
     <Folder Include="Templates\14.0\" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="PackageManagement\NuGet.Config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

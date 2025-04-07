@@ -1,4 +1,5 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,7 @@ namespace Sitefinity_CLI
     [Subcommand(typeof(UpgradeCommand))]
     [Subcommand(typeof(CreateCommand))]
     [Subcommand(typeof(GenerateConfigCommand))]
+    [Subcommand(typeof(MigrateCommand))]
     public class Program
     {
         internal delegate INugetProvider NugetProviderFactory(ProtocolVersion version);
@@ -35,6 +37,10 @@ namespace Sitefinity_CLI
             try
             {
                 return await new HostBuilder()
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", true);
+                })
                 .ConfigureLogging((context, logging) =>
                 {
                     logging.AddConsole(options => options.FormatterName = "sitefinityCLICustomFormatter")

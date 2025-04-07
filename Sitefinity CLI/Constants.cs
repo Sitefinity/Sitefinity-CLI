@@ -117,6 +117,16 @@ namespace Sitefinity_CLI
         public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
         public const string ProjectNameDescription = "The name of your project.";
+        public const string CmsUrl = "The URL of the CMS.";
+        public const string PresentationTypeDescription = "The type of the page/template to migrate.";
+        public const string AuthToken = "The authentication token to use. Visit https://www.progress.com/documentation/sitefinity-cms/generate-access-key for instructions on how to generate a token.";
+        public const string ResourceId = "The id of the page/template.";
+        public const string MigrateAction = "The action to execute at the end of the migration - Save as Draft/Publish. Allowed values are: draft, publish";
+        public const string SiteAction = "The site id parameter.";
+        public const string RecreateOption = "Instructs the command to recreate the selected page/template AND its parent templates. Useful when testing and experimenting with custom configurations/custom widget migrations.";
+        public const string RecursiveOption = "Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.";
+        public const string ReplaceOption = "Replaces the content of the page. Valid only for pages.";
+        public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
@@ -133,6 +143,14 @@ namespace Sitefinity_CLI
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
         public const string HeadlessOptionTemplate = "--headless";
+        public const string MigrationActionTemplate = "--action";
+        public const string MigrationReplaceTemplate = "--replace";
+        public const string MigrationRecreateTemplate = "--recreate";
+        public const string MigrationRecursiveTemplate = "--recursive";
+        public const string MigrationSiteTemplate = "--site";
+        public const string MigrationCmsUrlTemplate = "--cmsUrl";
+        public const string MigrationTokenTemplate = "--token";
+        public const string DumpSourceLayoutTemplate = "--dumpSourceLayout";
         public const string CoreModulesOptionTemplate = "--coreModules";
         public const string SkipPrompts = "--skipPrompts";
         public const string AcceptLicense = "--acceptLicense";
@@ -170,6 +188,7 @@ namespace Sitefinity_CLI
         public const string GenerateConfigCommandName = "config";
         public const string UpgradeCommandName = "upgrade";
         public const string CreateCommandName = "create";
+        public const string MigrateCommandName = "migrate";
 
         public const string DefaultResourcePackageName_VersionsBefore14_1 = "Bootstrap4";
         public const string DefaultResourcePackageName = "Bootstrap5";
