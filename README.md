@@ -84,7 +84,9 @@ You can use the add command with the following subcommands:
 
 * To **Upgrade** your project, execute the following command:
 
-  ```sf upgrade "(path-to-your-project)\SitefinityWebApp.sln" "13.0.7300"```
+  ```sf upgrade "(path-to-your-project)\SitefinityWebApp.sln" "15.3.8500"```
+
+  Add ```--removeDeprecatedPackages``` to the command to automatically remove deprecated packages during the upgrade process to ensure a clean and up-to-date codebase.
 
   For more information, see [Upgrade using Sitefinity CLI](https://www.progress.com/documentation/sitefinity-cms/upgrade-using-sitefinity-cli).
 
