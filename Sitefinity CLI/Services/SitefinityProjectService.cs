@@ -159,11 +159,17 @@ namespace Sitefinity_CLI.Services
 
                 try
                 {
+                    if (!Path.Exists(resourceSourcePath))
+                    {
+                        this.logger.LogWarning("Skipping backup of Resource Packages");
+                        return;
+                    }
+
                     Utils.CopyDirectory(resourceSourcePath, resourceDestinationPath, true);
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError($"Error during backup of {resourceSourcePath} to {resourceDestinationPath}: {ex.Message}");
+                    this.logger.LogWarning($"Error during backup of {resourceSourcePath} to {resourceDestinationPath}: {ex.Message}");
                 }
             }
         }
