@@ -90,7 +90,11 @@ You can use the add command with the following subcommands:
 
   For more information, see [Upgrade using Sitefinity CLI](https://www.progress.com/documentation/sitefinity-cms/upgrade-using-sitefinity-cli).
 
-**NOTE**: For more information about the arguments and options for each command, run the help option:
+* To show the version of Sitefinity CLI, execute the following command:
+
+  ```sf version```
+
+**NOTE**: For more information about the arguments and options for each command, run the help option. For example:
 
 ```sf add [command name] -?```
 
