@@ -189,6 +189,7 @@ namespace Sitefinity_CLI
         public const string UpgradeCommandName = "upgrade";
         public const string CreateCommandName = "create";
         public const string MigrateCommandName = "migrate";
+        public const string VersionCommandName = "version";
 
         public const string DefaultResourcePackageName_VersionsBefore14_1 = "Bootstrap4";
         public const string DefaultResourcePackageName = "Bootstrap5";
