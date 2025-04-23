@@ -79,6 +79,11 @@ You can use the add command with the following subcommands:
   Add ```--headless``` to the command to install the headless version of Sitefinity.
 
   Add ```--coreModules```  to the command to install the core modules only version of Sitefinity.
+  
+  Add ```--renderer``` to the command to create a new ASP.NET Core renderer project for Sitefinity.
+
+  **NOTE**: After creating the renderer project, you have to set your Sitefinity CMS url in the *appsettings.json* and update *launchSettings.json*. For more information, see [Configure the ASP.NET Core Renderer](https://www.progress.com/documentation/sitefinity-cms/install-sitefinity-in-.net-core-mode-dp#configure-the-asp-net-core-renderer).
+  
 
   Run the help option to see all available install options and configurations.
 
