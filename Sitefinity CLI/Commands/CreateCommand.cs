@@ -170,6 +170,9 @@ namespace Sitefinity_CLI.Commands
 
                 if (e.Name == $"{package}.{this.Version}")
                 {
+                    this.logger.LogInformation("Waiting for project transformations to complete...");
+                    System.Threading.Thread.Sleep(15000);
+
                     tcs.TrySetResult(true);
                     watcher.Dispose();
                 }
