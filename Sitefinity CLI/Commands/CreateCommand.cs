@@ -77,7 +77,11 @@ namespace Sitefinity_CLI.Commands
                     System.Threading.Thread.Sleep(10000);
                 }
 
-                this.logger.LogInformation("Installation completed.");
+                this.logger.LogInformation(
+                    $"Installation completed successfully!" + Environment.NewLine +
+                    $"- Project Name: {this.Name}" + Environment.NewLine +
+                    $"- Version:" + (this.Version != null ? $" {this.Version}" : "") + Environment.NewLine +
+                    $"- Location: {this.Directory}");
 
                 return 0;
             }
@@ -170,7 +174,7 @@ namespace Sitefinity_CLI.Commands
 
                 if (e.Name == $"{package}.{this.Version}")
                 {
-                    this.logger.LogInformation("Waiting for project transformations to complete...");
+                    this.logger.LogInformation("Finalizing installation...");
                     System.Threading.Thread.Sleep(15000);
 
                     tcs.TrySetResult(true);
