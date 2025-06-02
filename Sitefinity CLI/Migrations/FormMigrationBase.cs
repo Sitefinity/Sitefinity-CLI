@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
+namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations;
 internal abstract class FormMigrationBase : MigrationBase, IWidgetMigration
 {
     public abstract string FieldType { get; }
