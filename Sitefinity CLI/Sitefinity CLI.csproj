@@ -18,6 +18,7 @@
     <OutputPath>bin\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="VisualStudio\Templates\EmptyNetFrameworkWebApp\Properties\AssemblyInfo.cs" />
     <Compile Remove="VisualStudio\Templates\Renderer\Program.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +52,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\EmptyNetFrameworkWebApp.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="VisualStudio\Templates\EmptyNetFrameworkWebApp\Properties\AssemblyInfo.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="VisualStudio\Templates\Renderer\Program.cs">

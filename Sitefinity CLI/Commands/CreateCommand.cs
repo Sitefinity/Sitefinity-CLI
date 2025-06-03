@@ -77,7 +77,11 @@ namespace Sitefinity_CLI.Commands
                     System.Threading.Thread.Sleep(10000);
                 }
 
-                this.logger.LogInformation("Installation completed.");
+                this.logger.LogInformation(
+                    $"Installation completed successfully!" + Environment.NewLine +
+                    $"- Project Name: {this.Name}" + Environment.NewLine +
+                    $"- Version:" + (this.Version != null ? $" {this.Version}" : "") + Environment.NewLine +
+                    $"- Location: {this.Directory}");
 
                 return 0;
             }
@@ -146,6 +150,8 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
 
+            this.ConfigureAssemblyInfoFile();
+
             int waitTime = 10000;
             this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);
 
@@ -170,6 +176,9 @@ namespace Sitefinity_CLI.Commands
 
                 if (e.Name == $"{package}.{this.Version}")
                 {
+                    this.logger.LogInformation("Finalizing installation...");
+                    System.Threading.Thread.Sleep(15000);
+
                     tcs.TrySetResult(true);
                     watcher.Dispose();
                 }
@@ -262,6 +271,27 @@ namespace Sitefinity_CLI.Commands
             var json = appsettings.ToString(Formatting.Indented);
 
             File.WriteAllText($"{this.Directory}\\appsettings.json", json);
+        }
+
+        private void ConfigureAssemblyInfoFile()
+        {
+            var assemblyInfoPath = Path.Combine(this.Directory, "Properties", "AssemblyInfo.cs");
+            if (!File.Exists(assemblyInfoPath))
+            {
+                this.logger.LogWarning("AssemblyInfo file not found");
+                return;
+            }
+
+            var assemblyInfoContent = File.ReadAllText(assemblyInfoPath);
+
+            assemblyInfoContent = assemblyInfoContent.Replace("[assembly: AssemblyTitle(\"\")]", $"[assembly: AssemblyTitle(\"{this.Name}\")]");
+            assemblyInfoContent = assemblyInfoContent.Replace("[assembly: AssemblyProduct(\"\")]", $"[assembly: AssemblyProduct(\"{this.Name}\")]");
+
+            // Generate and set COM GUID
+            var newGuid = Guid.NewGuid().ToString();
+            assemblyInfoContent = assemblyInfoContent.Replace("[assembly: Guid(\"\")]", $"[assembly: Guid(\"{newGuid}\")]");
+
+            File.WriteAllText(assemblyInfoPath, assemblyInfoContent);
         }
 
         private void ConfigureRendererProgramCsFile()
