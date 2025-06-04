@@ -1,0 +1,60 @@
+﻿/* {{> sign}} */
+
+using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Telerik.Sitefinity.TestIntegration.Framework.MSTest;
+
+namespace {{pascalCaseName}}
+{
+    /// <summary>
+    /// Represents sample integration tests class to demonstrate the usage of some attributes.
+    /// For sample integration tests see this project in the Sitefinity GitHub repo: https://github.com/Sitefinity/Telerik.Sitefinity.Samples.IntegrationTests
+    /// </summary>
+    [TestClass]
+	public class DemoTests : SitefinityIntegrationTestsBase
+	{
+        /// <summary>
+        /// This method is invoked once prior to executing any tests in the test class.
+        /// </summary>
+        public override void ClassInitialize()
+        {
+            base.ClassInitialize();
+        }
+
+        /// <summary>
+        /// This method is invoked once after all tests in the test class have been executed.
+        /// </summary>
+        public override void ClassCleanup()
+        {
+            base.ClassCleanup();
+        }
+
+        /// <summary>
+        /// This method is invoked just before each test method is executed.
+        /// </summary>
+        public override void TestInitialize()
+        {
+            base.TestInitialize();
+        }
+
+        /// <summary>
+        /// This method is invoked after each test method.
+        /// </summary>
+        public override void TestCleanup()
+        {
+            base.TestCleanup();
+        }
+
+		/// <summary>
+		/// Write your integration test
+		/// </summary>
+        [SitefinityIntegrationTest]
+        [TestCategory("Demo")]
+        [Owner("Sitefinity CLI")]
+        [Description("Write your integration test")]
+        public void Test()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
