@@ -117,7 +117,7 @@ The following commands are available:
 
   Migrates a page template.
 
-* ```sf migrate help```
+* ```sf migrate --help```
 
   Prints online the same help as this article.
 
