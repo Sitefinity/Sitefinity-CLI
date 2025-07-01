@@ -108,7 +108,7 @@ You use the migration commands to migrate the front-end resources written in Web
 
 **NOTE** For a list of all available options, execute the following command or refer to documentation [here](#migration-commands)):
 
-  ``` sf migrate help ```
+  ``` sf migrate --help ```
 
 ## Sitefinity CMS version
 
