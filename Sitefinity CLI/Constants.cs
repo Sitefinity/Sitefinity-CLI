@@ -126,6 +126,7 @@ namespace Sitefinity_CLI
         public const string RecreateOption = "Instructs the command to recreate the selected page/template AND its parent templates. Useful when testing and experimenting with custom configurations/custom widget migrations.";
         public const string RecursiveOption = "Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.";
         public const string ReplaceOption = "Replaces the content of the page. Valid only for pages.";
+        public const string MigrationFrameworkOption = "Specifies the target rednderer framework. Valid only for templates and forms.";
         public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
@@ -147,6 +148,7 @@ namespace Sitefinity_CLI
         public const string MigrationReplaceTemplate = "--replace";
         public const string MigrationRecreateTemplate = "--recreate";
         public const string MigrationRecursiveTemplate = "--recursive";
+        public const string MigrationFrameworkTemplate = "--framework";
         public const string MigrationSiteTemplate = "--site";
         public const string MigrationCmsUrlTemplate = "--cmsUrl";
         public const string MigrationTokenTemplate = "--token";
