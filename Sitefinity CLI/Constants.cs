@@ -250,7 +250,6 @@ namespace Sitefinity_CLI
         // Nuget sources
         public const string DefaultNugetSource = "https://api.nuget.org/v3/index.json";
         public const string SitefinityDefaultNugetSource = "https://nuget.sitefinity.com/nuget";
-        public const string SfAllNugetUrl = "https://nuget.sitefinity.com/api/packages/ids?page=1&contains=Telerik.Sitefinity.All";
 
         // Install command
         public const string InstallCommandName = "install";
