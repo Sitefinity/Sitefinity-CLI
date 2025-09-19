@@ -26,8 +26,8 @@ namespace Sitefinity_CLI.Commands
     internal class MigrateCommand
     {
         [Argument(0, Description = Constants.PresentationTypeDescription)]
-        [Required(ErrorMessage = "You must specify a resource type - page/template.")]
-        [AllowedValues("page", "template", IgnoreCase = true)]
+        [Required(ErrorMessage = "You must specify a resource type - page/template/responses.")]
+        [AllowedValues("page", "template, responses", IgnoreCase = true)]
         public string Type { get; set; }
 
         [Argument(1, Description = Constants.ResourceId)]
@@ -129,7 +129,7 @@ namespace Sitefinity_CLI.Commands
                     DefaultWidgetMigration = new PlaceholderWidget()
                 });
             }
-            else if (this.Type == "response")
+            else if (this.Type == "responses")
             {
                 await Migrator.MigrateFormResponses(new FormResponsesMigrationArgs([this.Id], this.CmsUrl, this.Token));
             }

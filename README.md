@@ -117,6 +117,10 @@ The following commands are available:
 
   Migrates a page template.
 
+* ```sf migrate responses "FormId"```
+
+  Migrates all responses for the specified form.
+
 * ```sf migrate --help```
 
   Prints online the same help as this article.
@@ -252,6 +256,8 @@ The following CLI paramaters are optional.
   * `publish` - Publish the migrated resource.
 * `--siteid`<br>
   The site id. You use the `--siteid` parameter to specify the site id when you work with a non-default site.
+* `--framework`<br>
+  Specifies the target renderer framework. Valid only for templates and forms. If none is specified, the default ASP.NET Core renderer will be used.
 
 **NOTE**: You can set the parameters manually in the appsettings.json file. You need to manually create the appsettings.json file next to the _sf.exe_ binary.<br>
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
