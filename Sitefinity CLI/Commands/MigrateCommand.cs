@@ -22,7 +22,7 @@ using static Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WidgetMigra
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.MigrateCommandName, Description = "Migrate a Sitefinity page/template from Web Forms/MVC to NetCore/NextJS. See https://www.progress.com/documentation/sitefinity-cms/migrate-your-project-with-cli\")]")]
+    [Command(Constants.MigrateCommandName, Description = "Migrate a Sitefinity page/template from Web Forms/MVC to ASP.NET Core/Next.js. See https://www.progress.com/documentation/sitefinity-cms/migrate-your-project-with-cli\")]")]
     internal class MigrateCommand
     {
         [Argument(0, Description = Constants.PresentationTypeDescription)]
