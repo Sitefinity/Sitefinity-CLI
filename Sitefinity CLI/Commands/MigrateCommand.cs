@@ -27,7 +27,7 @@ namespace Sitefinity_CLI.Commands
     {
         [Argument(0, Description = Constants.PresentationTypeDescription)]
         [Required(ErrorMessage = "You must specify a resource type - page/template.")]
-        [AllowedValues("page", "template", "form", IgnoreCase = true)]
+        [AllowedValues("page", "template", IgnoreCase = true)]
         public string Type { get; set; }
 
         [Argument(1, Description = Constants.ResourceId)]
@@ -48,7 +48,7 @@ namespace Sitefinity_CLI.Commands
 
         [Config]
         [Option(Constants.MigrationFrameworkTemplate, Description = Constants.MigrationFrameworkOption)]
-        [AllowedValues("NetCore", "NextJs", IgnoreCase = true)]
+        [AllowedValues("NetCore", "NextJS", IgnoreCase = true)]
         public string Framework { get; set; }
 
         /*[Config]
