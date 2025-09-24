@@ -27,7 +27,7 @@ namespace Sitefinity_CLI.Commands
     {
         [Argument(0, Description = Constants.PresentationTypeDescription)]
         [Required(ErrorMessage = "You must specify a resource type - page/template/responses.")]
-        [AllowedValues("page", "template, responses", IgnoreCase = true)]
+        [AllowedValues("page", "template", "responses", IgnoreCase = true)]
         public string Type { get; set; }
 
         [Argument(1, Description = Constants.ResourceId)]
