@@ -22,12 +22,12 @@ using static Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WidgetMigra
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.MigrateCommandName, Description = "Migrate a Sitefinity page/template from Web Forms/MVC to NetCore/NextJS")]
+    [Command(Constants.MigrateCommandName, Description = "Migrate a Sitefinity page/template from Web Forms and MVC to ASP.NET Core or Next.js. See https://www.progress.com/documentation/sitefinity-cms/migrate-your-project-with-cli")]
     internal class MigrateCommand
     {
         [Argument(0, Description = Constants.PresentationTypeDescription)]
-        [Required(ErrorMessage = "You must specify a resource type - page/template.")]
-        [AllowedValues("page", "template", IgnoreCase = true)]
+        [Required(ErrorMessage = "You must specify a resource type - page/template/responses.")]
+        [AllowedValues("page", "template", "responses", IgnoreCase = true)]
         public string Type { get; set; }
 
         [Argument(1, Description = Constants.ResourceId)]
@@ -45,6 +45,11 @@ namespace Sitefinity_CLI.Commands
         [Config]
         [Option(Constants.MigrationReplaceTemplate, Description = Constants.ReplaceOption)]
         public bool Replace { get; set; }
+
+        [Config]
+        [Option(Constants.MigrationFrameworkTemplate, Description = Constants.MigrationFrameworkOption)]
+        [AllowedValues("NetCore", "NextJS", IgnoreCase = true)]
+        public string Framework { get; set; }
 
         /*[Config]
         [Option(Constants.DumpSourceLayoutTemplate, Description = Constants.DumpOption)]
@@ -120,8 +125,13 @@ namespace Sitefinity_CLI.Commands
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
                     PlaceholderMap = this.PlaceholderMap,
+                    Framework = string.Equals("NextJS", this.Framework, StringComparison.OrdinalIgnoreCase) ? RendererFramework.NextJS : RendererFramework.NetCore,
                     DefaultWidgetMigration = new PlaceholderWidget()
                 });
+            }
+            else if (this.Type == "responses")
+            {
+                await Migrator.MigrateFormResponses(new FormResponsesMigrationArgs([this.Id], this.CmsUrl, this.Token));
             }
 
             return (int)ExitCode.OK;
