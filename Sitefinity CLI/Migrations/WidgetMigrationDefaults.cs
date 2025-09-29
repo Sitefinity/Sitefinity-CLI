@@ -27,6 +27,16 @@ public static class WidgetMigrationDefaults
                 }
             }
         },
+        {
+            "Telerik.Sitefinity.Frontend.ContentBlock.Mvc.Controllers.ContentBlockController", new WidgetMigrationArgs("SitefinityContentBlock")
+            {
+                Whitelist = ["Content", "ProviderName", "SharedContentID", "WrapperCssClass"],
+                Rename = new Dictionary<string, string>()
+                {
+                    { "Html", "Content" },
+                }
+            }
+        },
         { "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock", new WidgetMigrationArgs("SitefinityContentBlock")
             {
                 Whitelist = ["Html", "ProviderName", "SharedContentID"],
@@ -36,7 +46,7 @@ public static class WidgetMigrationDefaults
                 }
             }
         },
-        { "Telerik.Sitefinity.Security.Web.UI.UserChangePasswordWidget", new WidgetMigrationArgs("SitefinityChangePassword") { Whitelist = ["CssClass"] } },
+        { "Telerik.Sitefinity.Security.Web.UI.UserChangePasswordWidget", new WidgetMigrationArgs("SitefinityChangePassword") { Whitelist = ["CssClass"] } }
     });
 
     /// <summary>
@@ -49,11 +59,11 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Frontend.Taxonomies.Mvc.Controllers.HierarchicalTaxonomyController", new Mvc.TaxonomyWidget() },
         { "Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers.BreadcrumbController", new Mvc.BreadcrumbWidget() },
         { "Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers.NavigationController", new Mvc.NavigationWidget() },
+        { "Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers.LanguageSelectorController", new Mvc.LanguageSelectorWidget() },
         { "Telerik.Sitefinity.Frontend.Search.Mvc.Controllers.SearchBoxController", new Mvc.SearchBoxWidget() },
         { "Telerik.Sitefinity.Frontend.Search.Mvc.Controllers.SearchResultsController", new Mvc.SearchResultsWidget() },
         { "Telerik.Sitefinity.Frontend.Search.Mvc.Controllers.FacetsController", new Mvc.FacetsWidget() },
         { "Telerik.Sitefinity.Frontend.Recommendations.Mvc.Controllers.RecommendationsController", new Mvc.RecommendationsWidget() },
-        { "Telerik.Sitefinity.NativeChatConnector.Mvc.Controllers.NativeChatController", new Mvc.NativeChatWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.ChangePasswordController", new Mvc.ChangePasswordWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.LoginFormController", new Mvc.LoginWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.ProfileController", new Mvc.ProfileWidget() },
@@ -66,6 +76,7 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Frontend.Lists.Mvc.Controllers.ListsController", new Mvc.ContentWidget() },
         { "Telerik.Sitefinity.Frontend.Media.Mvc.Controllers.DocumentController", new Mvc.DocumentWidget() },
         { "Telerik.Sitefinity.Frontend.Media.Mvc.Controllers.DocumentsListController", new Mvc.DocumentListWidget() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.FormController", new Mvc.FormWidget() },
         { "Telerik.Sitefinity.DynamicModules.Web.UI.Frontend.DynamicContentView", new ContentWidget() },
         { "Telerik.Sitefinity.Web.UI.PublicControls.ImageControl", new ImageWidget() },
         { "Telerik.Sitefinity.Modules.Libraries.Web.UI.Documents.DocumentLink", new DocumentWidget() },
@@ -82,6 +93,7 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Services.Search.Web.UI.Public.SearchBox", new SearchWidget() },
         { "Telerik.Sitefinity.Services.Search.Web.UI.Public.SearchResults", new SearchResultsWidget() },
         { "Telerik.Sitefinity.Web.UI.PublicControls.TaxonomyControl", new WebForms.TaxonomyWidget() },
+        { "Telerik.Sitefinity.Localization.Web.UI.LanguageSelectorControl", new WebForms.LanguageSelectorWidget() },
         { "Telerik.Sitefinity.Modules.Forms.Web.UI.FormsControl", new WebForms.FormWidget() }
     });
 
@@ -91,7 +103,25 @@ public static class WidgetMigrationDefaults
     public static ReadOnlyDictionary<string, IWidgetMigration> CustomFormMigrations = new ReadOnlyDictionary<string, IWidgetMigration>(new Dictionary<string, IWidgetMigration>()
     {
         { "Layout", new Mvc.LayoutMigration() },
-        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormTextBox", new TextBox() }
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.TextFieldController", new Mvc.Forms.TextBox() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.EmailTextFieldController", new Mvc.Forms.TextBox() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.SubmitButtonController", new Mvc.Forms.SubmitButton() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.MultipleChoiceFieldController", new Mvc.Forms.MultipleChoice() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.CheckboxesFieldController", new Mvc.Forms.Checkboxes() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.DropdownListFieldController", new Mvc.Forms.Dropdown() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.ParagraphTextFieldController", new Mvc.Forms.Paragraph() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.FileFieldController", new Mvc.Forms.File() },
+        { "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.SectionHeaderController", new Mvc.Forms.SectionHeader() }, // Migrate to ContentBlock
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormTextBox", new WebForms.Forms.TextBox() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormEmailTextBox", new WebForms.Forms.TextBox() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormSubmitButton", new WebForms.Forms.SubmitButton() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormMultipleChoice", new WebForms.Forms.MultipleChoice() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormCheckboxes", new WebForms.Forms.Checkboxes() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormDropDownList", new WebForms.Forms.Dropdown() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormParagraphTextBox", new WebForms.Forms.Paragraph() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormFileUpload", new WebForms.Forms.File() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormSectionHeader", new WebForms.Forms.SectionHeader() },
+        { "Telerik.Sitefinity.Modules.Forms.Web.UI.Fields.FormInstructionalText", new WebForms.Forms.InstructionalText() },
     });
 }
 #pragma warning restore CA2211
