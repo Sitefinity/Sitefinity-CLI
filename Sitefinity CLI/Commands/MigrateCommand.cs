@@ -78,6 +78,9 @@ namespace Sitefinity_CLI.Commands
         [Config]
         public Dictionary<string, string> PlaceholderMap { get; set; }
 
+        [Config]
+        public Dictionary<string, string> FormFieldNameMap { get; set; }
+
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
             if (string.IsNullOrEmpty(this.CmsUrl))
@@ -131,7 +134,7 @@ namespace Sitefinity_CLI.Commands
             }
             else if (this.Type == "responses")
             {
-                await Migrator.MigrateFormResponses(new FormResponsesMigrationArgs([this.Id], this.CmsUrl, this.Token));
+                await Migrator.MigrateFormResponses(new FormResponsesMigrationArgs([this.Id], this.CmsUrl, this.Token, this.FormFieldNameMap));
             }
 
             return (int)ExitCode.OK;
