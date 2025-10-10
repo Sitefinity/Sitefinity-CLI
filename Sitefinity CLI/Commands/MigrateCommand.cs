@@ -134,7 +134,10 @@ namespace Sitefinity_CLI.Commands
             }
             else if (this.Type == "responses")
             {
-                await Migrator.MigrateFormResponses(new FormResponsesMigrationArgs([this.Id], this.CmsUrl, this.Token, this.FormFieldNameMap));
+                await Migrator.MigrateFormResponses(new FormResponsesMigrationArgs([this.Id], this.CmsUrl, this.Token, this.FormFieldNameMap) 
+                {
+                    SiteId = this.SiteId
+                });
             }
 
             return (int)ExitCode.OK;
