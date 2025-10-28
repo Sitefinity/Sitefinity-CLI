@@ -21,11 +21,15 @@ internal class FormWidget : MigrationBase, IWidgetMigration
                 SiteId = context.SiteId,
                 Framework = context.Framework
             });
-
-            var migratedFormId = migratedFormMap[formId];
-
-            var selectedItemsValueForDetailsPage = await GetSingleItemMixedContentValue(context, [migratedFormId], RestClientContentTypes.Forms, null, false);
-            migratedProperties.Add("SelectedItems", selectedItemsValueForDetailsPage);
+            if (migratedFormMap.TryGetValue(formId, out string migratedFormId))
+            {
+                var selectedItemsValueForDetailsPage = await GetSingleItemMixedContentValue(context, [migratedFormId], RestClientContentTypes.Forms, null, false);
+                migratedProperties.Add("SelectedItems", selectedItemsValueForDetailsPage);
+            }
+            else
+            {
+                await context.LogWarning($"Form with ID '{formId}' was not migrated for the Form widget. Most probable reason is that the original form was deleted or unpublished.");
+            }
         }
 
         if (context.Source.Properties.TryGetValue("Model-CustomConfirmationMode", out string confirmationMode))
