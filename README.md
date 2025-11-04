@@ -373,7 +373,7 @@ Widget migrations are invoked for each **occurrence** of the widget found on the
 
 A return value of type `MigratedWidget` is required as the output of the migration. It contains the new widget name and properties.
 
-### Useful functions
+#### Useful functions
 
 From base class `MigrationBase`:
 
@@ -383,6 +383,60 @@ From base class `MigrationBase`:
   Gets the master ids of the live content items (usually referenced in Web Forms widgets).
 * `GetSingleItemMixedContentValue`, `GetMixedContentValue`
    Helper for generating properties of type `MixedContentContext`.
+
+### Map form fields when migrating form responses
+
+When migrating forms responses, you may want to change the type of fields you are migrating.<br>
+For example, you may want to migrate a custom field to a built-in one, or migrate a built-in one, which is no longer supported, to a custom one.<br>
+To do this, you create a mapping configuration in the sf.exe's `appsettings.json` file.<br>
+In the `FormFieldNameMap` object, you create a name/value pair, containing the names of the developer types of the respective form fields.<br>
+For example, to map a MVC text form field to an ASP.NET Core form field, the configuration should look like:
+
+```json
+"FormFieldNameMap": {
+  "sf_contactus.TextFieldController": "SitefinityTextFieldFormControl"
+}
+```
+
+You construct the JSON key using the name of the source form (the one you migrate from), DOT, and the name of the form field. The JSON value is the name of the target form field (the one you migrate to).<br>
+In the Migration Analyzer, you navigate to the form you want to migrate. You take the form name from the _'Form name' form info_ table, under the _Form name_ column, and the field name from the _Fields used in this form_ table under the _Name (used in code)_ column.<br>
+You can take both names from the Sitefinity Migration Analyzer. For more information see [Sitefinity Migration Analyzer Forms](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer-forms).
+
+**EXAMPLE**:
+
+```json
+{
+  "Commands": {
+    "Migrate": {
+      "CmsUrl": "https://yoursitefinityinstance.net",
+      "Token": "authentication-token",
+      "PlaceholderMap": {
+        "Contentplaceholder1": "Body"
+      },
+      "Widgets": {
+        "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock": {
+          "Name": "SitefinityContentBlock", // the name of the new widget in NetCore/NextJs renderers
+          "Whitelist": [ "Html", "ProviderName", "SharedContentID" ], // the whitelist of properties to keep during the migration
+          "Rename": { // the properties to be renamed
+            "Html": "Content"
+          },
+          "CleanNullProperties": true
+        },
+        "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.CaptchaController": {
+          "Name": "Captcha2", // the name of the new widget in NetCore/NextJs renderers
+          "Whitelist": [], // the whitelist of properties to keep during the migration
+          "Rename": {
+          },
+          "CleanNullProperties": true
+        }
+      },
+      "FormFieldNameMap": {
+          "sf_contactus.TextFieldController": "SitefinityTextFieldFormControl"
+      }
+    }
+  }
+}
+```
 
 ### Limitations
 
