@@ -35,8 +35,8 @@ You use Sitefinity CLI to perform maintainance tasks on your Sitefinity project,
 
 ## How to use
 
-* Open command prompt and navigate to the root of your Sitefinity project (`SitefinityWebApp` folder).
-* Run ```sf``` command.
+1. Open command prompt and navigate to the root of your Sitefinity project (`SitefinityWebApp` folder).
+1. Run ```sf``` command.
 
   A help will appear describing the available commands and options.
 
@@ -103,22 +103,24 @@ You can use the add command with the following subcommands:
 
 ```sf add [command name] -?```
 
-### CLI migration commands
+### Migration commands
 
-You use the migration commands to migrate front-end resources (pages and page templates), written in Web Forms or MVC, to a decoupled renderer architecture based on ASP.NET Core.
+You use the migration commands to migrate front-end resources to a decoupled renderer architecture based on ASP.NET Core or Next.js.
 
-The following commands are available:
+These include page templates, pages, built-in widgets, forms, and form responses - written in Web Forms or MVC. You use Sitefinity CLI to migrate a top-level resource - a page template or a page. Afterwards, the CLI automatically migrates the resources used on it, such as widgets, and forms.
 
-* ```sf migrate page "PageId"```
-  
+Sitefinity CLI has the following commands:
+
+* ```sf migrate page "PageId"```<br>
   Migrates a page.
 
-* ```sf migrate template "TemplateId"```
-
+* ```sf migrate template "TemplateId"```<br>
   Migrates a page template.
 
-* ```sf migrate --help```
+* ```sf migrate responses "FormId"```<br>
+  Migrates the form responses for the form with the specified `FormId`.
 
+* ```sf migrate --help```<br>
   Prints online the same help as this article.
 
 ## Sitefinity CMS version
@@ -172,53 +174,77 @@ You can easily create custom templates. To do this, create a file with extension
 
 ## Migration Commands
 
-You use the migration commands to migrate front-end resources (pages and page templates), written in Web Forms or MVC, to a decoupled renderer architecture based on ASP.NET Core.
+You use the migration commands to migrate frontend resources to a decoupled renderer architecture based on ASP.NET Core or Next.js.
 
-**IMPORTANT**: The migration tool helps you migrat only the content and structure of the page templates and pages. You still need to re-implement all custom widgets you are using on your site.<br>
+These include page templates, pages, built-in widgets, forms, and form responses - written in Web Forms or MVC. You use Sitefinity CLI to migrate a top-level resource - a page template or a page. Afterwards, the CLI automatically migrates the resources used on it, such as widgets, and forms.
+
+**NOTE**: The `PageId`, `TemplateId`, and `FormId` are the internal GUIDs that Sitefinity CMS uses to identify the respective frontend resource. You can use the Sitefinity Migration Analyzer to conveniently get these GUIDs. For more information, see [Sitefinity Migration Analyzer](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer).
+
+<div>
+**IMPORTANT**: The Sitefinity CLI tool helps you migrate only  the following frontend resources:
+
+* the content and structure of the page templates and pages.
+* built-in widgets, if they have equivalent in the decoupled renderers.<br>
+  For more information, see [Widgets](https://www.progress.com/documentation/sitefinity-cms/widgets-site-components).
+* form responses
+
+You still need to re-implement all custom widgets you are using on your site.<br>
 The migration tool is not a complete solution and can generate warnings or incomplete front-end resources.<br>
 You are responsible to check its results.
+</div>
 
-**IMPORTANT**: The `--migrate` command supports only migration from Web Forms and MVC widgets to ASP.NET Core widgets.
+**IMPORTANT**: The `migrate` command supports migration from Web Forms and MVC widgets to ASP.NET Core and Next.js widgets only.
 
-**PREREQUISITES**: The migration commands support only projects based on Sitefinity 15.3 and later.
+**PREREQUISITES**: The migration commands support only projects based on Sitefinity 15.3 and later.<br>
+If you want to migrate a project based on an earlier Sitefinity CMS version, you need to first upgrade your project to at least Sitefinity 15.3.
 
 ### General flow of migration
 
-**RECOMMENDATION**: We recommend to analyze and evaluate the state of your Sitefinity project and to estimate the resources needed for migration before starting the migration itself.<br>
+**RECOMMENDATION**: We recommend analyzing and evaluating the state of your Sitefinity project and estimating the resources needed for migration before starting the migration itself.<br>
 For more information, see [Technology migration](https://www.progress.com/documentation/sitefinity-cms/technology-migration).
 
 To migrate your Sitefinity CMS project, perform the following procedure:
 
-* Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
-* Make adjustments to the migrated structure as needed:
-  * Set a file system template.
-  * Migrate the widgets used on the template
-    * Take a business decision if you can stop using some of the existing widgets. For example, drop widgets if the busness need is no longer there.
-    * Manually configure the widgets that are migrated.
-  * Make adjustment to the look and feel of the page.
-* Once you complete the migrationof the chosen page templates, move on to the pages structure.
-  * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
-  * Once you fully migrate the page, specify the `--replace` option to the CLI `migrate page` command.
+1. Migrate the templates.<br>
+  Start with the migration of templates that a subset of pages is based on OR migrate all of the page templates at once.
+1. Adjust the migrated structure as needed:
+    * Set a file system template.
+    * Migrate the widgets used on the template
+      * Take a business decision whether you can stop using some of the existing widgets. For example, remove existing widgets if the busness need is no longer there.
+      * Manually configure the widgets that are migrated.
+    * Adjust the look and feel of the page.
+1. Once you complete the migration of the chosen page templates, move on to the pages structure.
+    * Sitefinity CLI duplicates the Pages by default and excludes the copies from the navigation.
+    * Once you fully migrate the page, specify the `--replace` option to the CLI `migrate page` command.
+1. Migrate the forms.<br>
+  For each form you are using, perform the following:
+    * Complete the migration of all pages and page templates where you are using this form in one step.
+    * Ensure that only the migrated form is used on the frontend and the initial form is hidden from all MVC and Web Forms resources.
+    * Run the CLI command `migrate responses` to migrate form responses.
 
-**NOTE**: You can specify the `--replace` option only when the page has a duplicate.
+**IMPORTANT**: Sitefinity CLI migrates fully all form responses every time you run the command. Therefore, if you run the command multiple times, Sitefinity CLI will create duplicated form responses.
+To avoid duplications, delete the common responses before running the `migrate responses` command for second time.
 
-**NOTE**: The CLI uses the page's `UrlName` property OR the page template's `Name` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
+#### Considerations
 
-**NOTE**: The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
-
-**NOTE**: Sitefinity CLI automatically migrates forms if there is a form widget on the page.
+* You can specify the `--replace` option only when the page has a duplicate.
+* The CLI uses the page's `UrlName` property OR the page template's `Name` property to identify the page or the page template that it created. The format has a suffix of `(migrated to Decoupled)`. This process avoids conflicts with existing pages and page templates.
+* The CLI uses only data from the published pages and page templates. `Draft` and `Temp` changes are not migrated.
+* Sitefinity CLI automatically migrates forms, if there is a form widget on the page.
 
 ### Migrating hierarchies
 
 * When you select a page template, the CLI migrates first the parent page templates. Migration cannot happen otherwise.
-* If parent page templates are migrated automatically, they will be also published automatically.
+* If parent page templates are migrated automatically, they will be published automatically.
 
 **NOTE**: When migrating pages, the CLI will not migrate the parent page templates. You must migrate all dependent page templates before migrating pages.
 
 ### Safe box & Testing
-All pages and page templates are duplicated by default with a suffix `(migrated to Decoupled)` appended to their `Title`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a great way to test the changes before they go live.
 
-**NOTE**: When migrating pages, you can use the option `--replace`. This option replaces the page contents on the **actual** page and saves the page automatically as a `Draft`. This option keeps the existing links from content blocks, html fields, and related data and you do not need to update these references.
+All pages and page templates are duplicated by default with a suffix `(migrated to Decoupled)` appended to their `Title`. This provides a level of isolation for existing pages and page templates, so that the migration can happen seamlessly and without downtime. This is a useful way to test the changes before they go live.
+
+**NOTE**: When migrating pages, you can use the option `--replace`. This option replaces the page contents on the **actual** page and saves the page automatically as a `Draft`, regardless of the value of the `--action` option.<br>
+This option keeps the existing links from content blocks, HTML fields, and related data; thus, you do not need to update these references.
 
 **NOTE**: Duplicated Pages are hidden from navigation by default.
 
@@ -226,7 +252,7 @@ All pages and page templates are duplicated by default with a suffix `(migrated 
 
 #### Required parameters
 
-The following CLI parameters are required.
+The following CLI parameters are required:
 
 * `--cmsUrl`<br>
   The URL of the deployed Sitefinity CMS.<br>
@@ -237,8 +263,10 @@ The following CLI parameters are required.
 
 #### Optional parameters
 
-The following CLI paramaters are optional.
+The following CLI paramaters are optional:
 
+* `--framework`<br>
+  Specifies the target renderer framework. Valid only for page templates and forms. The accepted values are `NetCore` for ASP.NET Core and `NextJS` for Next.js. If you omit this option, the default ASP.NET Core renderer is used.
 * `--recreate`<br>
   Recreates the selected page or template **and** its parent templates.<br>
   Useful when testing and experimenting with custom configurations/custom widget migrations
@@ -248,10 +276,10 @@ The following CLI paramaters are optional.
   Replaces the content of the page. Valid only for pages.
 * `--action`<br>
   The action to execute at the end of the migration. Allowed values are:
-  * `draft` - Save the migrated resource as a `Draft`.
-  * `publish` - Publish the migrated resource.
+  * `draft` - saves the migrated resource as a `Draft`.
+  * `publish` - publishes the migrated resource.
 * `--siteid`<br>
-  The site id. You use the `--siteid` parameter to specify the site id when you work with a non-default site.
+  The site id. You use the `--siteid` parameter to specify the site id when you work with a site different from the default site.
 
 **NOTE**: You can set the parameters manually in the appsettings.json file. You need to manually create the appsettings.json file next to the _sf.exe_ binary.<br>
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
@@ -345,7 +373,7 @@ Widget migrations are invoked for each **occurrence** of the widget found on the
 
 A return value of type `MigratedWidget` is required as the output of the migration. It contains the new widget name and properties.
 
-### Helpful functions
+#### Useful functions
 
 From base class `MigrationBase`:
 
@@ -356,18 +384,72 @@ From base class `MigrationBase`:
 * `GetSingleItemMixedContentValue`, `GetMixedContentValue`
    Helper for generating properties of type `MixedContentContext`.
 
+### Map form fields when migrating form responses
+
+When migrating forms responses, you may want to change the type of fields you are migrating.<br>
+For example, you may want to migrate a custom field to a built-in one, or migrate a built-in one, which is no longer supported, to a custom one.<br>
+To do this, you create a mapping configuration in the sf.exe's `appsettings.json` file.<br>
+In the `FormFieldNameMap` object, you create a name/value pair, containing the names of the developer types of the respective form fields.<br>
+For example, to map a MVC text form field to an ASP.NET Core form field, the configuration should look like:
+
+```json
+"FormFieldNameMap": {
+  "sf_contactus.TextFieldController": "SitefinityTextFieldFormControl"
+}
+```
+
+You construct the JSON key using the name of the source form (the one you migrate from), DOT, and the name of the form field. The JSON value is the name of the target form field (the one you migrate to).<br>
+In the Migration Analyzer, you navigate to the form you want to migrate. You take the form name from the _'Form name' form info_ table, under the _Form name_ column, and the field name from the _Fields used in this form_ table under the _Name (used in code)_ column.<br>
+You can take both names from the Sitefinity Migration Analyzer. For more information see [Sitefinity Migration Analyzer Forms](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer-forms).
+
+**EXAMPLE**:
+
+```json
+{
+  "Commands": {
+    "Migrate": {
+      "CmsUrl": "https://yoursitefinityinstance.net",
+      "Token": "authentication-token",
+      "PlaceholderMap": {
+        "Contentplaceholder1": "Body"
+      },
+      "Widgets": {
+        "Telerik.Sitefinity.Modules.GenericContent.Web.UI.ContentBlock": {
+          "Name": "SitefinityContentBlock", // the name of the new widget in NetCore/NextJs renderers
+          "Whitelist": [ "Html", "ProviderName", "SharedContentID" ], // the whitelist of properties to keep during the migration
+          "Rename": { // the properties to be renamed
+            "Html": "Content"
+          },
+          "CleanNullProperties": true
+        },
+        "Telerik.Sitefinity.Frontend.Forms.Mvc.Controllers.CaptchaController": {
+          "Name": "Captcha2", // the name of the new widget in NetCore/NextJs renderers
+          "Whitelist": [], // the whitelist of properties to keep during the migration
+          "Rename": {
+          },
+          "CleanNullProperties": true
+        }
+      },
+      "FormFieldNameMap": {
+          "sf_contactus.TextFieldController": "SitefinityTextFieldFormControl"
+      }
+    }
+  }
+}
+```
+
 ### Limitations
 
 The CLI migration command does not migrate the code in any form. It can migrate only the content and structure of your project.
 
 #### Migrating List widget to Content list widget
 
-When you migrate a List widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/list-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/list-widget-mvc)) to a Content list ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)), and the existing widget shows two separate lists, the new Content list will show a single view, containing merged items from all original lists.
+When you migrate a List widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/list-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/list-widget-mvc)) to a Content list widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)), and the existing widget shows two separate lists, the new Content list will show a single view, containing merged items from all original lists.
 
 To show the multiple original lists separately, perform one of the following:
 
-- create a new view to perform custom sorting and iterate the lists separately
-- use multiple separate Content List widgets, each configured to display only one of the lists.
+* create a new view to perform custom sorting and iterate the lists separately
+* use multiple separate Content List widgets, each configured to display only one of the lists.
 
 #### Migrating Web Forms Image widget to Image widget
 
@@ -377,39 +459,41 @@ To work around, manually configure the image size through the widget designer.
 
 #### Migrating Dynamic widget to Content list widget
 
-When migrating a [Dynamic content widget](https://www.progress.com/documentation/sitefinity-cms/dynamic-content-widgets) to a Content list ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) and the main field is changed to a value different from the one in the `Title` field, you need to perform the following:
+When migrating a [Dynamic content widget](https://www.progress.com/documentation/sitefinity-cms/dynamic-content-widgets) to a Content list ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) and the main field is changed to a value different from the one in the `Title` field, you need to perform the following:
 
 1. Manually change the list mapping in the widget designer
-2. Update the mapping for the `Details` view in the `ViewsMetadata.json` file.<br>
+2. Update the mapping for the `Details` view.<br>
+  For ASP.NET Core, you use the `ViewsMetadata.json` file.
   For more information, see [Create custom views for the Content list widget](https://www.progress.com/documentation/sitefinity-cms/create-custom-views-for-the-content-list-widget) » *Field Mappings*.
+  For Next.js, you modify the `ListFieldMapping` property. For more information, see [Extend the Content list widget](https://www.progress.com/documentation/sitefinity-cms/next.js-extend-content-list-widget).
 
 #### Migrating Blogs to Content list
 
-Sitefinity CLI migration command does not support migrating Blogs widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/blogs-list-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/blogs-widget-mvc)). 
+Sitefinity CLI migration command does not support migrating Blogs widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/blogs-list-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/blogs-widget-mvc)).
 
-You need to implement a custom widget in ASP.NET Core and manually migrate. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) to implement your custom widget.
+You need to implement a custom widget in ASP.NET Core and manually migrate. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) to implement your custom widget.
 
 #### Migrate Events widget to Content list widget
 
-The new Content list widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) comes with different predefined basic filter options than the MVC and Web Forms widgets.
+The new Content list widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) comes with different predefined basic filter options than the MVC and Web Forms widgets.
 
 Migration process transfers the old filters for past, current, and upcoming events into the *Filter Expression* field in Advanced mode of the widget designer. 
 
 Because of the difference in the filtering functionality between the different widgets, after the migration, you need to check the filters directly in the *Filter Expression* field. 
 
-If the filters expressions cannot be matched, you need to implement a custom widget in ASP.NET Core and manually migrate using this new widget. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) to implement your custom widget.
+If the filters expressions cannot be matched, you need to implement a custom widget in ASP.NET Core and manually migrate using this new widget. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) to implement your custom widget.
 
 #### Migrate Calendar widget
 
 Sitefinity CLI cannot migrate the Calendar widget.
 
-You need to create a custom widget, based on Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core)) to implement your custom widget.
+You need to create a custom widget, based on Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) to implement your custom widget.
 
 #### Migrate Login form with Reset password mode set to Reset password widget
 
 If you have configured the Login form widget ([Web Forms](https://www.progress.com/documentation/sitefinity-cms/133/login-widget-webforms), [MVC](https://www.progress.com/documentation/sitefinity-cms/login-form-widget-mvc)) with `Allow users to reset password` to ASP.NET Core renderer, it is migrated without the option to reset the password because there is a separate widget providing that functionality.
 
-You need to manually add the new Reset password widget ([ASP.NET Core](https://www.progress.com/documentation/sitefinity-cms/reset-password-widget)) on the page and configure it.
+You need to manually add the new Reset password widget ([ASP.NET Core](https://www.progress.com/documentation/sitefinity-cms/reset-password-widget), [Next.js](https://www.progress.com/documentation/sitefinity-cms/nextjs-reset-password-widget)) on the page and configure it.
 
 #### Replacement of multilingual pages
 
@@ -421,6 +505,13 @@ The following scenario is not supported:
 
 In this scenario, only the single original language of the original page is preserved.
 
+#### Migrating form responses
+
+Sitefinity CLI gives you the flexibility to work on the original and migrated pages at the same time.
+If the page that you are migrating has a form, and you migrate the form responses while you have the same form on the two variants of the page (using the original and the target frameworks), then Sitefinity CLI will duplicate all form responses for the old and new form.
+To avoid duplications, delete the entries from the old form before you run the migrate responses command for a second time.
+
+**RECOMMENDATION**: We recommend that you complete the page (or page template) migration first, hide the original form, based on MVC or Web Forms; and only then migrate the form responses for the forms on that page (or page template).
 
 ## Known issues
 

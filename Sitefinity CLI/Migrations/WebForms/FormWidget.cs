@@ -1,13 +1,11 @@
-﻿using Progress.Sitefinity.Clients.LayoutService.Dto;
+﻿using System;
+using System.Threading.Tasks;
+using System.Web;
+using Progress.Sitefinity.Clients.LayoutService.Dto;
 using Progress.Sitefinity.MigrationTool.Core;
 using Progress.Sitefinity.MigrationTool.Core.Widgets;
 using Progress.Sitefinity.RestSdk;
-using Progress.Sitefinity.RestSdk.Dto;
 using Progress.Sitefinity.RestSdk.Exceptions;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
 
@@ -21,16 +19,22 @@ internal class FormWidget : MigrationBase, IWidgetMigration
 
         if (context.Source.Properties.TryGetValue("FormId", out string formId) && Guid.TryParse(formId, out _))
         {
-            var migratedFormMap = await Migrator.MigrateForms(new FormMigrationArgs([formId], context.SourceCmsUrl, context.SourceCmsToken, null, WidgetMigrationDefaults.CustomFormMigrations)
+            var migratedFormMap = await Migrator.MigrateForms(new FormMigrationArgs([formId], context.SourceCmsUrl, context.SourceCmsToken, context.WidgetsMigrationMap ?? WidgetMigrationDefaults.MigrationMap, WidgetMigrationDefaults.CustomFormMigrations)
             {
-                Recreate = true,
-                SiteId = context.SiteId
+                Recreate = false,
+                SiteId = context.SiteId,
+                Framework = context.Framework
             });
 
-            var migratedFormId = migratedFormMap[formId];
-
-            var selectedItemsValueForDetailsPage = await GetSingleItemMixedContentValue(context, [migratedFormId], RestClientContentTypes.Forms, null, false);
-            migratedProperties.Add("SelectedItems", selectedItemsValueForDetailsPage);
+            if (migratedFormMap.TryGetValue(formId, out string migratedFormId))
+            {
+                var selectedItemsValueForDetailsPage = await GetSingleItemMixedContentValue(context, [migratedFormId], RestClientContentTypes.Forms, null, false);
+                migratedProperties.Add("SelectedItems", selectedItemsValueForDetailsPage);
+            }
+            else
+            {
+                await context.LogWarning($"Form with ID '{formId}' was not migrated for the Form widget. Most probable reason is that the original form was deleted or unpublished.");
+            }
         }
 
         if (context.Source.Properties.TryGetValue("SubmitAction", out string submitAction))
