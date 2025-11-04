@@ -59,11 +59,11 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Frontend.Taxonomies.Mvc.Controllers.HierarchicalTaxonomyController", new Mvc.TaxonomyWidget() },
         { "Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers.BreadcrumbController", new Mvc.BreadcrumbWidget() },
         { "Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers.NavigationController", new Mvc.NavigationWidget() },
+        { "Telerik.Sitefinity.Frontend.Navigation.Mvc.Controllers.LanguageSelectorController", new Mvc.LanguageSelectorWidget() },
         { "Telerik.Sitefinity.Frontend.Search.Mvc.Controllers.SearchBoxController", new Mvc.SearchBoxWidget() },
         { "Telerik.Sitefinity.Frontend.Search.Mvc.Controllers.SearchResultsController", new Mvc.SearchResultsWidget() },
         { "Telerik.Sitefinity.Frontend.Search.Mvc.Controllers.FacetsController", new Mvc.FacetsWidget() },
         { "Telerik.Sitefinity.Frontend.Recommendations.Mvc.Controllers.RecommendationsController", new Mvc.RecommendationsWidget() },
-        { "Telerik.Sitefinity.NativeChatConnector.Mvc.Controllers.NativeChatController", new Mvc.NativeChatWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.ChangePasswordController", new Mvc.ChangePasswordWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.LoginFormController", new Mvc.LoginWidget() },
         { "Telerik.Sitefinity.Frontend.Identity.Mvc.Controllers.ProfileController", new Mvc.ProfileWidget() },
@@ -93,6 +93,7 @@ public static class WidgetMigrationDefaults
         { "Telerik.Sitefinity.Services.Search.Web.UI.Public.SearchBox", new SearchWidget() },
         { "Telerik.Sitefinity.Services.Search.Web.UI.Public.SearchResults", new SearchResultsWidget() },
         { "Telerik.Sitefinity.Web.UI.PublicControls.TaxonomyControl", new WebForms.TaxonomyWidget() },
+        { "Telerik.Sitefinity.Localization.Web.UI.LanguageSelectorControl", new WebForms.LanguageSelectorWidget() },
         { "Telerik.Sitefinity.Modules.Forms.Web.UI.FormsControl", new WebForms.FormWidget() }
     });
 
