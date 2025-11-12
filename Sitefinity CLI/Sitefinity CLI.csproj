@@ -4,9 +4,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>sf</AssemblyName>
     <RootNamespace>Sitefinity_CLI</RootNamespace>
-    <AssemblyVersion>1.1.0.72</AssemblyVersion>
+    <AssemblyVersion>1.1.0.73</AssemblyVersion>
     <Version>1.1.0</Version>
-    <FileVersion>1.1.0.72</FileVersion>
+    <FileVersion>1.1.0.73</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -87,6 +87,7 @@
     <Folder Include="Templates\13.3\ResourcePackage\" />
     <Folder Include="Templates\14.0\" />
     <Folder Include="Templates\15.3\ResourcePackage\" />
+    <Folder Include="Templates\15.4\ResourcePackage\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="PackageManagement\NuGet.Config">
