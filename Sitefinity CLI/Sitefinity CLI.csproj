@@ -84,8 +84,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Templates\13.3\ResourcePackage\" />
-    <Folder Include="Templates\14.0\" />
     <Folder Include="Templates\15.3\ResourcePackage\" />
     <Folder Include="Templates\15.4\ResourcePackage\" />
   </ItemGroup>
