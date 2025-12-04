@@ -37,10 +37,8 @@ namespace Sitefinity_CLI.VisualStudio
         /// <summary>
         /// Adds reference to a csproj file in a solution. 
         /// </summary>
-        /// <param name="slnFilePath">The solution file path</param>
-        /// <param name="csProjFilePath">The csproj file path</param>
-        /// <param name="projectGuid">The guid of the project</param>
-        /// <param name="webAppName">The name of the SitefinityWebAWpp</param>
+        /// <param name="solutionFilePath">The solution file path</param>
+        /// <param name="solutionProject">The project to add</param>
         public static void AddProject(string solutionFilePath, SlnSolutionProject solutionProject)
         {
             string solutionFileContent = GetSolutionFileContentAsString(solutionFilePath);

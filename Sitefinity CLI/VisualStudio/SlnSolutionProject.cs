@@ -49,7 +49,7 @@ namespace Sitefinity_CLI.VisualStudio
         public Guid ProjectTypeGuid { get; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="SolutionProject"/>.
+        /// Initializes a new instance of <see cref="SlnSolutionProject"/>.
         /// </summary>
         /// <param name="projectGuid">The guid of the project.</param>
         /// <param name="csProjFilePath">The project file path.</param>
@@ -74,7 +74,7 @@ namespace Sitefinity_CLI.VisualStudio
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="SolutionProject"/>.
+        /// Initializes a new instance of <see cref="SlnSolutionProject"/>.
         /// </summary>
         /// <param name="projectGuid">The guid of the project.</param>
         /// <param name="projectName">The name of the project.</param>

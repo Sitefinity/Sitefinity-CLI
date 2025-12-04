@@ -4,7 +4,7 @@ using System.IO;
 namespace Sitefinity_CLI.VisualStudio
 {
     /// <summary>
-    /// This class represents a project (or solution folder) that is read in from a solution file.
+    /// This class represents a project (or solution folder) that is read in from an .slnx solution file.
     /// </summary>
     public class SlnxSolutionProject
     {
@@ -34,12 +34,12 @@ namespace Sitefinity_CLI.VisualStudio
         public SolutionProjectType ProjectType { get; }
 
         /// <summary>
-        /// Gets the project type guid string.
+        /// Gets the project file extension (e.g., .csproj, .vbproj).
         /// </summary>
         public string ProjectTypeExtension { get; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="SolutionProject"/>.
+        /// Initializes a new instance of <see cref="SlnxSolutionProject"/>.
         /// </summary>
         /// <param name="csProjFilePath">The project file path.</param>
         /// <param name="solutionFilePath">The solution file path.</param>
@@ -57,12 +57,9 @@ namespace Sitefinity_CLI.VisualStudio
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="SolutionProject"/>.
+        /// Initializes a new instance of <see cref="SlnxSolutionProject"/>.
         /// </summary>
-        /// <param name="projectGuid">The guid of the project.</param>
-        /// <param name="projectName">The name of the project.</param>
         /// <param name="relativePath">The relative path of the project from the solution file.</param>
-        /// <param name="projectTypeGuid">The project type guid.</param>
         /// <param name="solutionFilePath">The file path to the solution.</param>
         public SlnxSolutionProject(string relativePath, string solutionFilePath)
         {
