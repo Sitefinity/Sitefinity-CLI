@@ -6,7 +6,7 @@ namespace Sitefinity_CLI.VisualStudio
     /// <summary>
     /// This class represents a project (or solution folder) that is read in from a solution file.
     /// </summary>
-    public class SolutionProject
+    public class SlnSolutionProject
     {
         /// <summary>
         /// Gets the project guid.
@@ -55,7 +55,7 @@ namespace Sitefinity_CLI.VisualStudio
         /// <param name="csProjFilePath">The project file path.</param>
         /// <param name="solutionFilePath">The solution file path.</param>
         /// <param name="projectType">The project type.</param>
-        public SolutionProject(Guid projectGuid, string csProjFilePath, string solutionFilePath, SolutionProjectType projectType)
+        public SlnSolutionProject(Guid projectGuid, string csProjFilePath, string solutionFilePath, SolutionProjectType projectType)
         {
             this.ProjectGuid = projectGuid;
             this.ProjectName = Path.GetFileName(csProjFilePath);
@@ -81,7 +81,7 @@ namespace Sitefinity_CLI.VisualStudio
         /// <param name="relativePath">The relative path of the project from the solution file.</param>
         /// <param name="projectTypeGuid">The project type guid.</param>
         /// <param name="solutionFilePath">The file path to the solution.</param>
-        public SolutionProject(Guid projectGuid, string projectName, string relativePath, Guid projectTypeGuid, string solutionFilePath)
+        public SlnSolutionProject(Guid projectGuid, string projectName, string relativePath, Guid projectTypeGuid, string solutionFilePath)
         {
             this.ProjectGuid = projectGuid;
             this.ProjectName = projectName;
@@ -125,37 +125,16 @@ namespace Sitefinity_CLI.VisualStudio
 
         private Guid? GetProjectTypeGuidFromProjectTypeEnum(SolutionProjectType solutionProjectType)
         {
-            if (solutionProjectType == SolutionProjectType.ManagedCsProject)
+            return solutionProjectType switch
             {
-                return csProjectGuid;
-            }
-
-            if (solutionProjectType == SolutionProjectType.ManagedVbProject)
-            {
-                return vbProjectGuid;
-            }
-
-            if (solutionProjectType == SolutionProjectType.ManagedVjProject)
-            {
-                return vjProjectGuid;
-            }
-
-            if (solutionProjectType == SolutionProjectType.SolutionFolder)
-            {
-                return solutionFolderGuid;
-            }
-
-            if (solutionProjectType == SolutionProjectType.VCProject)
-            {
-                return vcProjectGuid;
-            }
-
-            if (solutionProjectType == SolutionProjectType.WebProject)
-            {
-                return webProjectGuid;
-            }
-
-            return null;
+                SolutionProjectType.ManagedCsProject => csProjectGuid,
+                SolutionProjectType.ManagedVbProject => vbProjectGuid,
+                SolutionProjectType.ManagedVjProject => vjProjectGuid,
+                SolutionProjectType.SolutionFolder => solutionFolderGuid,
+                SolutionProjectType.VCProject => vcProjectGuid,
+                SolutionProjectType.WebProject => webProjectGuid,
+                _ => null
+            };
         }
 
         private static Guid vbProjectGuid = new Guid("F184B08F-C81C-45F6-A57F-5ABD9991F28F");

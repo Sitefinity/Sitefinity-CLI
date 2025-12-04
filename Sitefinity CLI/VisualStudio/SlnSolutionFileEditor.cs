@@ -8,18 +8,18 @@ namespace Sitefinity_CLI.VisualStudio
     /// <summary>
     /// A class used to manage the contents of a solution file.
     /// </summary>
-    public static class SolutionFileEditor
+    public static class SlnSolutionFileEditor
     {
         /// <summary>
         /// Returns the projects from a solution file.
         /// </summary>
         /// <param name="solutionFilePath">The path to the solution file.</param>
-        /// <returns>Collection of <see cref="SolutionProject"/>.</returns>
-        public static IEnumerable<SolutionProject> GetProjects(string solutionFilePath)
+        /// <returns>Collection of <see cref="SlnSolutionProject"/>.</returns>
+        public static IEnumerable<SlnSolutionProject> GetProjects(string solutionFilePath)
         {
             string solutionFileContent = GetSolutionFileContentAsString(solutionFilePath);
 
-            IList<SolutionProject> solutionProjects = new List<SolutionProject>();
+            IList<SlnSolutionProject> solutionProjects = new List<SlnSolutionProject>();
             foreach (Match match in projectLineRegex.Matches(solutionFileContent))
             {
                 Guid projectTypeGuid = Guid.Parse(match.Groups[ProjectTypeGuidRegexGroupName].Value.Trim());
@@ -27,7 +27,7 @@ namespace Sitefinity_CLI.VisualStudio
                 string relativePath = match.Groups[ProjectRelativePathRegexGroupName].Value.Trim();
                 Guid projectGuid = Guid.Parse(match.Groups[ProjectGuidRegexGroupName].Value.Trim());
 
-                SolutionProject solutionProject = new SolutionProject(projectGuid, projectName, relativePath, projectTypeGuid, solutionFilePath);
+                SlnSolutionProject solutionProject = new SlnSolutionProject(projectGuid, projectName, relativePath, projectTypeGuid, solutionFilePath);
                 solutionProjects.Add(solutionProject);
             }
 
@@ -41,7 +41,7 @@ namespace Sitefinity_CLI.VisualStudio
         /// <param name="csProjFilePath">The csproj file path</param>
         /// <param name="projectGuid">The guid of the project</param>
         /// <param name="webAppName">The name of the SitefinityWebAWpp</param>
-        public static void AddProject(string solutionFilePath, SolutionProject solutionProject)
+        public static void AddProject(string solutionFilePath, SlnSolutionProject solutionProject)
         {
             string solutionFileContent = GetSolutionFileContentAsString(solutionFilePath);
 
@@ -77,7 +77,7 @@ namespace Sitefinity_CLI.VisualStudio
             }
         }
 
-        private static string AddProjectInfoInSolutionFileContent(string solutionFileContent, SolutionProject solutionProject)
+        private static string AddProjectInfoInSolutionFileContent(string solutionFileContent, SlnSolutionProject solutionProject)
         {
             var endProjectIndex = solutionFileContent.LastIndexOf("EndProject");
             if (endProjectIndex < 0)
@@ -92,7 +92,7 @@ namespace Sitefinity_CLI.VisualStudio
             return solutionFileContent;
         }
 
-        private static string AddProjectGlobalSectionInSolutionFileContent(string solutionFileContent, SolutionProject solutionProject)
+        private static string AddProjectGlobalSectionInSolutionFileContent(string solutionFileContent, SlnSolutionProject solutionProject)
         {
             int beginGlobalSectionIndex = solutionFileContent.IndexOf("GlobalSection(ProjectConfigurationPlatforms)");
             int endGlobalSectionIndex = solutionFileContent.IndexOf("EndGlobalSection", beginGlobalSectionIndex);
@@ -108,12 +108,12 @@ namespace Sitefinity_CLI.VisualStudio
             return solutionFileContent;
         }
 
-        private static string GenerateGlobalSectionFromSolutionProject(SolutionProject solutionProject)
+        private static string GenerateGlobalSectionFromSolutionProject(SlnSolutionProject solutionProject)
         {
             return string.Format(GlobalSectionMask, solutionProject.ProjectGuid.ToString().ToUpper());
         }
 
-        private static string GenerateProjectInfoFromSolutionProject(SolutionProject solutionProject)
+        private static string GenerateProjectInfoFromSolutionProject(SlnSolutionProject solutionProject)
         {
             return string.Format(ProjectInfoMask,
                 solutionProject.ProjectTypeGuid.ToString().ToUpper(),

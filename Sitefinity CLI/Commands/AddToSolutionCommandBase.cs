@@ -92,7 +92,25 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            this.SolutionPath = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            while (!string.IsNullOrEmpty(currentPath))
+            {
+                var files = Directory.EnumerateFiles(currentPath, "*.*", SearchOption.TopDirectoryOnly);
+
+                this.SolutionPath = files.FirstOrDefault(f =>
+                    f.EndsWith(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase) ||
+                    f.EndsWith(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase));
+
+                if (this.SolutionPath != null)
+                    break;
+
+                currentPath = Directory.GetParent(currentPath)?.FullName;
+            }
+
+            if (this.SolutionPath == null)
+            {
+                Utils.WriteLine(Constants.SolutionNotFoundMessage, ConsoleColor.Red);
+                return (int)ExitCode.GeneralError;
+            }
 
             var sitefinityPath = Directory.EnumerateFiles(currentPath, "Telerik.Sitefinity.dll", SearchOption.AllDirectories).FirstOrDefault();
 
@@ -125,8 +143,18 @@ namespace Sitefinity_CLI.Commands
 
             try
             {
-                SolutionProject solutionProject = new SolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
-                SolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
+                string extension = Path.GetExtension(this.SolutionPath);
+
+                if (extension.Equals(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase))
+                {
+                    SlnSolutionProject solutionProject = new SlnSolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
+                    SlnSolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
+                }
+                else if (extension.Equals(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
+                {
+                    SlnxSolutionProject solutionProject = new SlnxSolutionProject(project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
+                    SlnxSolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
+                }
 
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
             }

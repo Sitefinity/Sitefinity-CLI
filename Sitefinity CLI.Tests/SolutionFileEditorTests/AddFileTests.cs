@@ -38,13 +38,13 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         [TestMethod]
         public void SuccessfullyAddNewProject_When_AllIsCorrect()
         {
-            SolutionProject solutionProject = new SolutionProject(this.projectGuid, this.csProjFilePath, this.slnFilePathWithElements, SolutionProjectType.WebProject);
-            SolutionFileEditor.AddProject(this.slnFilePathWithElements, solutionProject);
+            SlnSolutionProject solutionProject = new SlnSolutionProject(this.projectGuid, this.csProjFilePath, this.slnFilePathWithElements, SolutionProjectType.WebProject);
+            SlnSolutionFileEditor.AddProject(this.slnFilePathWithElements, solutionProject);
 
             var slnContents = File.ReadAllText(this.slnFilePathWithElements);
             Assert.IsFalse(string.IsNullOrEmpty(slnContents));
 
-            IEnumerable<SolutionProject> solutionProjects = SolutionFileEditor.GetProjects(this.slnFilePathWithElements);
+            IEnumerable<SlnSolutionProject> solutionProjects = SlnSolutionFileEditor.GetProjects(this.slnFilePathWithElements);
             bool hasProject = solutionProjects.Any(sp => sp.ProjectGuid == this.projectGuid &&
                 sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) && 
                 sp.ProjectType == SolutionProjectType.WebProject);

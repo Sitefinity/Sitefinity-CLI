@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Sitefinity_CLI
@@ -170,6 +171,7 @@ namespace Sitefinity_CLI
         public const string JavaScriptFileExtension = ".js";
         public const string CsprojFileExtension = ".csproj";
         public const string SlnFileExtension = ".sln";
+        public const string SlnxFileExtension = ".slnx";
         public const string ConfigFileExtension = ".config";
         public const string VBProjFileExtension = ".vbproj";
 
