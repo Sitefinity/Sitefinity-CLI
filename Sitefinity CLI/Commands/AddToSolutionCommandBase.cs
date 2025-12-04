@@ -82,16 +82,6 @@ namespace Sitefinity_CLI.Commands
 
             var webAppProjectName = Path.GetFileName(Directory.EnumerateFiles(currentPath, "*.csproj", SearchOption.TopDirectoryOnly).FirstOrDefault());
 
-            while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
-            {
-                currentPath = Directory.GetParent(currentPath)?.ToString();
-                if (string.IsNullOrEmpty(currentPath))
-                {
-                    Utils.WriteLine(Constants.SolutionNotFoundMessage, ConsoleColor.Red);
-                    return (int)ExitCode.GeneralError;
-                }
-            }
-
             while (!string.IsNullOrEmpty(currentPath))
             {
                 var files = Directory.EnumerateFiles(currentPath, "*.*", SearchOption.TopDirectoryOnly);

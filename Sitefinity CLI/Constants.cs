@@ -48,14 +48,14 @@ namespace Sitefinity_CLI
         public const string TemplateNotFoundMessage = "The {0} you want to replicate is not found. Path: \"{1}\"";
         public const string ResourceExistsMessage = "{0} with name {1} already exists. Path: \"{2}\"";
         public const string ProjectNotFound = "Unable to find csproj file";
-        public const string SolutionNotFoundMessage = "Unable to find sln file";
+        public const string SolutionNotFoundMessage = "Unable to find solution file";
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
         public const string FileNotFoundMessage = "File \"{0}\" not found";
         public const string InvalidVersionMessage = "Version \"{0}\" is not valid.";
         public const string InvalidSitefinityMode = "Please select only 1 mode for Sitefinity.";
         public const string InvalidOptionForRendererMessage = "Invalid options for a renderer project: \"{0}\"";
-        public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
+        public const string FileIsNotSolutionMessage = "File \"{0}\" is not a solution file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";

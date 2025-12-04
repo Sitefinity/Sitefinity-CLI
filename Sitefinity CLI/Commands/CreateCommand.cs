@@ -153,9 +153,11 @@ namespace Sitefinity_CLI.Commands
             this.ConfigureAssemblyInfoFile();
 
             int waitTime = 10000;
-            this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);
+            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{Constants.SlnFileExtension}");
 
-            this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
+            this.visualStudioWorker.Initialize(solutionFilePath, waitTime);
+
+            this.logger.LogInformation($"Installing Sitefinity packages to {solutionFilePath}");
             this.logger.LogInformation("Running Sitefinity installation...");
 
             command += " -IncludePrerelease";

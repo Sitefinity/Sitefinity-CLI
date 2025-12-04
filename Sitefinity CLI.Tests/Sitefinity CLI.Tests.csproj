@@ -26,7 +26,10 @@
     <None Include="CsProjectFileEditorTests\Data\WithElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="UpgradeCommandTests\Mocks\fake.sln">
+    <None Include="UpgradeCommandTests\Mocks\fakeSln.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="UpgradeCommandTests\Mocks\fakeSlnx.slnx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
