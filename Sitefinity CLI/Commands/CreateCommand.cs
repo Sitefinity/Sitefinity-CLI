@@ -146,6 +146,7 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.InstallProjectTemplate(path);
             this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
+            this.dotnetCliClient.MigrateSlnToSlnx(this.Name, this.Directory);
             this.dotnetCliClient.UninstallProjectTemplate(path);
 
             this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
@@ -153,7 +154,7 @@ namespace Sitefinity_CLI.Commands
             this.ConfigureAssemblyInfoFile();
 
             int waitTime = 10000;
-            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{Constants.SlnFileExtension}");
+            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{Constants.SlnxFileExtension}");
 
             this.visualStudioWorker.Initialize(solutionFilePath, waitTime);
 

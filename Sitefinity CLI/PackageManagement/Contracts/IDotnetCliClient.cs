@@ -7,6 +7,7 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
         void InstallProjectTemplate(string path);
         void UninstallProjectTemplate(string path);
         void CreateProjectFromTemplate(string templateName, string projectName, string directory);
+        void MigrateSlnToSlnx(string projectName, string directory);
         void CreateSolution(string name, string directory);
         void AddProjectToSolution(string solutionName, string projectDirectory, string projectName);
         void AddPackageToProject(string projectPath, string packageName, string version);

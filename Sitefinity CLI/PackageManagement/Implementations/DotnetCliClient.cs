@@ -5,6 +5,7 @@ using Sitefinity_CLI.PackageManagement.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -68,15 +69,29 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             ExecuteCommand($"dotnet new {templateName} -n {projectName} -o \"{directory}\"");
         }
+        
+        public void MigrateSlnToSlnx(string projectName, string directory)
+        {
+            string slnPath = Path.Combine(directory, $"{projectName}{Constants.SlnFileExtension}");
+            string slnxPath = Path.Combine(directory, $"{projectName}{Constants.SlnxFileExtension}");
+            
+            ExecuteCommand($"dotnet sln {slnPath} migrate");
+
+            // Remove old .sln file if migration was successful
+            if (File.Exists(slnPath) && File.Exists(slnxPath))
+            {
+                File.Delete(slnPath);
+            }
+        }
 
         public void CreateSolution(string name, string directory)
         {
-            ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\"");
+            ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\" -f slnx");
         }
 
         public void AddProjectToSolution(string solutionName, string projectDirectory, string projectName)
         {
-            ExecuteCommand($"dotnet sln \"{projectDirectory}\\{solutionName}.sln\" add \"{projectDirectory}\\{projectName}.csproj\"");
+            ExecuteCommand($"dotnet sln \"{projectDirectory}\\{solutionName}{Constants.SlnxFileExtension}\" add \"{projectDirectory}\\{projectName}{Constants.CsprojFileExtension}\"");
         }
 
         public void AddPackageToProject(string projectPath, string packageName, string version)
