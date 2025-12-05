@@ -84,7 +84,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
             else
             {
-                this.logger.LogError($"Migration of {slnPath} to slnx failed! Continuing with existing sln file");
+                this.logger.LogError("Migration of {0} to slnx failed! Continuing with existing sln file", slnPath);
             }
         }
 
