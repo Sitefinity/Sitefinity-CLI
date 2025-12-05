@@ -1,9 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using EnvDTE;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sitefinity_CLI.VisualStudio;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Sitefinity_CLI.VisualStudio;
 
 namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
 {
@@ -12,20 +13,28 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
     {
         private string slnFilePathWithElements = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements.sln";
         private string slnFilePathWithoutElements = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements.sln";
-        private string slnFilePathWithElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements.template";
-        private string slnFilePathWithoutElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements.template";
+        private string slnFilePathWithElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElementsSln.template";
+        private string slnFilePathWithoutElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElementsSln.template";
+        private string slnxFilePathWithElements = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements.slnx";
+        private string slnxFilePathWithoutElements = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements.slnx";
+        private string slnxFilePathWithElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElementsSlnx.template";
+        private string slnxFilePathWithoutElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElementsSlnx.template";
         private string incorrectSlnFilePath = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\Pesho.sln";
         private string csProjFilePath = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\SomeProj\\SomeProj.csproj";
         private Guid projectGuid = Guid.NewGuid();
 
         private string WithElementsContents => File.ReadAllText(this.slnFilePathWithElementsSource);
         private string WithoutElementsContents => File.ReadAllText(this.slnFilePathWithoutElementsSource);
+        private string WithElementsSlnxContents => File.ReadAllText(this.slnxFilePathWithElementsSource);
+        private string WithoutElementsSlnxContents => File.ReadAllText(this.slnxFilePathWithoutElementsSource);
 
         [TestInitialize]
         public void SetUp()
         {
             File.WriteAllText(this.slnFilePathWithElements, this.WithElementsContents);
             File.WriteAllText(this.slnFilePathWithoutElements, this.WithoutElementsContents);
+            File.WriteAllText(this.slnxFilePathWithElements, this.WithElementsSlnxContents);
+            File.WriteAllText(this.slnxFilePathWithoutElements, this.WithoutElementsSlnxContents);
         }
 
         [TestCleanup]
@@ -33,6 +42,8 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         {
             File.Delete(this.slnFilePathWithElements);
             File.Delete(this.slnFilePathWithoutElements);
+            File.Delete(this.slnxFilePathWithElements);
+            File.Delete(this.slnxFilePathWithoutElements);
         }
 
         [TestMethod]
@@ -49,6 +60,27 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
                 sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) && 
                 sp.ProjectType == SolutionProjectType.WebProject);
 
+            Assert.IsTrue(hasProject);
+        }
+
+        [TestMethod]
+        public void SuccessfullyAddNewProjectSlnx_When_AllIsCorrect()
+        {
+            string solutionDir = Path.GetDirectoryName(this.slnFilePathWithElements);
+            string relativePath = Path.GetRelativePath(solutionDir, csProjFilePath);
+            SlnxSolutionProject solutionProject = new SlnxSolutionProject(this.projectGuid, relativePath, this.slnxFilePathWithElements);
+            SlnxSolutionFileEditor.AddProject(this.slnxFilePathWithElements, solutionProject);
+
+            var slnxContents = File.ReadAllText(this.slnxFilePathWithElements);
+            Assert.IsFalse(string.IsNullOrEmpty(slnxContents));
+
+            IEnumerable<SlnxSolutionProject> solutionProjects = SlnxSolutionFileEditor.GetProjects(this.slnxFilePathWithElements);
+            bool hasProject = solutionProjects.Any(sp => sp.ProjectId == this.projectGuid &&
+                sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) &&
+                sp.ProjectType == SolutionProjectType.ManagedCsProject);
+
+            Assert.AreEqual(2, solutionProjects.Count());
+            Assert.IsTrue(solutionProjects.All(x => x.ProjectType == SolutionProjectType.ManagedCsProject));
             Assert.IsTrue(hasProject);
         }
 

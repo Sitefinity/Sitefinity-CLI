@@ -142,7 +142,9 @@ namespace Sitefinity_CLI.Commands
                 }
                 else if (extension.Equals(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
                 {
-                    SlnxSolutionProject solutionProject = new SlnxSolutionProject(project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
+                    string solutionDir = Path.GetDirectoryName(this.SolutionPath);
+                    string relativePath = Path.GetRelativePath(solutionDir, project);
+                    SlnxSolutionProject solutionProject = new SlnxSolutionProject(this.ProjectGuid, relativePath, this.SolutionPath);
                     SlnxSolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
                 }
 

@@ -1010,19 +1010,19 @@ namespace Sitefinity_CLI.Tests
 
         private string CreateDummySolution(string folderPath, bool valid = true)
         {
-            var slnPath = Path.Combine(folderPath, "Test.sln");
-            string slnContents;
+            var slnxPath = Path.Combine(folderPath, "Test.slnx");
+            string slnxContents;
 
             if (valid)
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements.template");
+                slnxContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElementsSlnx.template");
             }
             else
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements.template");
+                slnxContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElementsSlnx.template");
             }
 
-            File.WriteAllText(slnPath, slnContents);
+            File.WriteAllText(slnxPath, slnxContents);
 
             var webAppFolderPath = Path.Combine(folderPath, "SitefinityWebApp");
             Directory.CreateDirectory(webAppFolderPath);

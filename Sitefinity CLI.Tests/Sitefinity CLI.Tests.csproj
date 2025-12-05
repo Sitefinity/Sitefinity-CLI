@@ -35,10 +35,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SolutionFileEditorTests\Data\WithElements.template">
+    <None Update="SolutionFileEditorTests\Data\WithElementsSln.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SolutionFileEditorTests\Data\WithoutElements.template">
+    <None Update="SolutionFileEditorTests\Data\WithoutElementsSln.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SolutionFileEditorTests\Data\WithElementsSlnx.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SolutionFileEditorTests\Data\WithoutElementsSlnx.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetStandardOnlyAssemblies\lib\netstandard1.0\netstandard1.0.dll">

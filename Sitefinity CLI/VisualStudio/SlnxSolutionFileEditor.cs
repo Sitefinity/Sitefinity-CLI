@@ -11,6 +11,10 @@ namespace Sitefinity_CLI.VisualStudio
 {
     public static class SlnxSolutionFileEditor
     {
+        private const string ProjectElementName = "Project";
+        private const string PathAttributeName = "Path";
+        private const string IdAttributeName = "Id";
+
         /// <summary>
         /// Returns the projects from a solution file.
         /// </summary>
@@ -21,13 +25,15 @@ namespace Sitefinity_CLI.VisualStudio
             var solutionProjects = new List<SlnxSolutionProject>();
             XDocument doc = XDocument.Load(solutionFilePath);
 
-            foreach (var projectElement in doc.Descendants("Project"))
+            foreach (var projectElement in doc.Descendants(ProjectElementName))
             {
-                var pathAttr = projectElement.Attribute("Path");
-                if (pathAttr != null && !string.IsNullOrWhiteSpace(pathAttr.Value))
+                var pathAttr = projectElement.Attribute(PathAttributeName);
+                var idAttr = projectElement.Attribute(IdAttributeName);
+                if (pathAttr != null && idAttr != null)
                 {
                     string normalizedPath = pathAttr.Value.Replace('/', Path.DirectorySeparatorChar);
-                    SlnxSolutionProject project = new SlnxSolutionProject(normalizedPath, solutionFilePath);
+                    Guid projectId = Guid.Parse(idAttr.Value);
+                    SlnxSolutionProject project = new SlnxSolutionProject(projectId, normalizedPath, solutionFilePath);
                     solutionProjects.Add(project);
                 }
             }
@@ -52,7 +58,8 @@ namespace Sitefinity_CLI.VisualStudio
                 XDocument doc = XDocument.Load(solutionFilePath);
                 string normalizedPath = solutionProject.RelativePath.Replace(Path.DirectorySeparatorChar, '/');
 
-                var projectExisting = doc.Descendants("Project").Any(p => p.Attribute("Path")?.Value == normalizedPath);
+                var projectExisting = doc.Descendants(ProjectElementName).Any(p => p.Attribute(PathAttributeName)?.Value == normalizedPath &&
+                    p.Attribute(IdAttributeName)?.Value == solutionProject.ProjectId.ToString());
 
                 if (!projectExisting)
                 {
@@ -63,7 +70,10 @@ namespace Sitefinity_CLI.VisualStudio
                         throw new Exception(Constants.SolutionNotReadable);
                     }
 
-                    var newProject = new XElement("Project", new XAttribute("Path", normalizedPath));
+                    var newProject = new XElement(
+                        ProjectElementName, 
+                        new XAttribute(PathAttributeName, normalizedPath),
+                        new XAttribute(IdAttributeName, solutionProject.ProjectId.ToString()));
 
                     root.Add(newProject);
                     doc.Save(solutionFilePath);
