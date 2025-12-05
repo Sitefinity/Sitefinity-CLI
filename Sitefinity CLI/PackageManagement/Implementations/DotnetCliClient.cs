@@ -82,6 +82,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             {
                 File.Delete(slnPath);
             }
+            else
+            {
+                this.logger.LogError($"Migration of {slnPath} to slnx failed");
+            }
         }
 
         public void CreateSolution(string name, string directory)
