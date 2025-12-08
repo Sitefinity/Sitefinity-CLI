@@ -88,9 +88,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
         }
 
-        public void CreateSolution(string name, string directory)
+        public void CreateSolution(string name, string directory, bool useSlnFormat)
         {
-            ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\" -f slnx");
+            string format = useSlnFormat ? "sln" : "slnx";
+            ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\" -f {format}");
         }
 
         public void AddProjectToSolution(string solutionName, string projectDirectory, string projectName)

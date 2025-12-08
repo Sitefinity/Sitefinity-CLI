@@ -114,6 +114,7 @@ namespace Sitefinity_CLI
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
         public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
+        public const string UseSlnSolutionOptionDescription = "Use this to create a .sln solution file instead of the default .slnx format."; 
         public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
         public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
@@ -145,6 +146,7 @@ namespace Sitefinity_CLI
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
         public const string HeadlessOptionTemplate = "--headless";
+        public const string UseSlnSolutionOptionTemplate = "--use-sln";
         public const string MigrationActionTemplate = "--action";
         public const string MigrationReplaceTemplate = "--replace";
         public const string MigrationRecreateTemplate = "--recreate";
