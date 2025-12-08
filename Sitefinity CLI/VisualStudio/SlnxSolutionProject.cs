@@ -6,7 +6,7 @@ namespace Sitefinity_CLI.VisualStudio
     /// <summary>
     /// This class represents a project (or solution folder) that is read in from an .slnx solution file.
     /// </summary>
-    public class SlnxSolutionProject
+    public class SlnxSolutionProject : ISolutionProject
     {
         /// <summary>
         /// Gets the project id.
@@ -39,22 +39,33 @@ namespace Sitefinity_CLI.VisualStudio
         public SolutionProjectType ProjectType { get; }
 
         /// <summary>
-        /// Gets the project file extension (e.g., .csproj, .vbproj).
+        /// Initializes a new instance of <see cref="SlnxSolutionProject"/>.
         /// </summary>
-        public string ProjectTypeExtension { get; }
+        /// <param name="projectId">The id of the project.</param>
+        /// <param name="csProjFilePath">The project file path.</param>
+        /// <param name="solutionFilePath">The solution file path.</param>
+        /// <param name="projectType">The project type.</param>
+        public SlnxSolutionProject(Guid projectId, string csProjFilePath, string solutionFilePath, SolutionProjectType projectType)
+        {
+            this.ProjectId = projectId;
+            this.ProjectType = projectType;
+            this.SolutionFilePath = solutionFilePath;
+            this.SolutionDirectory = Path.GetDirectoryName(solutionFilePath);
+            this.RelativePath = Path.GetRelativePath(this.SolutionDirectory, csProjFilePath);
+            this.AbsolutePath = Path.Combine(this.SolutionDirectory, this.RelativePath);
+        }
 
         /// <summary>
         /// Initializes a new instance of <see cref="SlnxSolutionProject"/>.
         /// </summary>
+        /// <param name="projectId">The id of the project.</param>
         /// <param name="relativePath">The relative path of the project from the solution file.</param>
         /// <param name="solutionFilePath">The solution file path.</param>
-        /// <param name="projectType">The project type.</param>
-        public SlnxSolutionProject(Guid Id, string relativePath, string solutionFilePath)
+        public SlnxSolutionProject(Guid projectId, string relativePath, string solutionFilePath)
         {
             string ext = Path.GetExtension(relativePath).ToLowerInvariant();
 
-            this.ProjectId = Id;
-            this.ProjectTypeExtension = ext;
+            this.ProjectId = projectId;
             this.ProjectType = GetProjectTypeFromExtension(ext);
             this.SolutionFilePath = solutionFilePath;
             this.SolutionDirectory = Path.GetDirectoryName(solutionFilePath);

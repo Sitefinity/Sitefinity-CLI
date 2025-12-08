@@ -129,26 +129,13 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            var project = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
+            var csprojFilePath = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
 
             try
             {
-                string extension = Path.GetExtension(this.SolutionPath);
+                SolutionFileEditor.AddProject(this.ProjectGuid, this.SolutionPath, csprojFilePath);
 
-                if (extension.Equals(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase))
-                {
-                    SlnSolutionProject solutionProject = new SlnSolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
-                    SlnSolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
-                }
-                else if (extension.Equals(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
-                {
-                    string solutionDir = Path.GetDirectoryName(this.SolutionPath);
-                    string relativePath = Path.GetRelativePath(solutionDir, project);
-                    SlnxSolutionProject solutionProject = new SlnxSolutionProject(this.ProjectGuid, relativePath, this.SolutionPath);
-                    SlnxSolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
-                }
-
-                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
+                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, csprojFilePath), ConsoleColor.Green);
             }
             catch (Exception ex)
             {

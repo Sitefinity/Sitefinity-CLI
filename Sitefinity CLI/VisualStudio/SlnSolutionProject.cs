@@ -6,12 +6,12 @@ namespace Sitefinity_CLI.VisualStudio
     /// <summary>
     /// This class represents a project (or solution folder) that is read in from a solution file.
     /// </summary>
-    public class SlnSolutionProject
+    public class SlnSolutionProject : ISolutionProject
     {
         /// <summary>
-        /// Gets the project guid.
+        /// Gets the project id.
         /// </summary>
-        public Guid ProjectGuid { get; }
+        public Guid ProjectId { get; }
 
         /// <summary>
         /// Gets the project name.
@@ -51,13 +51,13 @@ namespace Sitefinity_CLI.VisualStudio
         /// <summary>
         /// Initializes a new instance of <see cref="SlnSolutionProject"/>.
         /// </summary>
-        /// <param name="projectGuid">The guid of the project.</param>
+        /// <param name="projectId">The id of the project.</param>
         /// <param name="csProjFilePath">The project file path.</param>
         /// <param name="solutionFilePath">The solution file path.</param>
         /// <param name="projectType">The project type.</param>
-        public SlnSolutionProject(Guid projectGuid, string csProjFilePath, string solutionFilePath, SolutionProjectType projectType)
+        public SlnSolutionProject(Guid projectId, string csProjFilePath, string solutionFilePath, SolutionProjectType projectType)
         {
-            this.ProjectGuid = projectGuid;
+            this.ProjectId = projectId;
             this.ProjectName = Path.GetFileName(csProjFilePath);
             this.ProjectType = projectType;
             this.SolutionFilePath = solutionFilePath;
@@ -76,14 +76,14 @@ namespace Sitefinity_CLI.VisualStudio
         /// <summary>
         /// Initializes a new instance of <see cref="SlnSolutionProject"/>.
         /// </summary>
-        /// <param name="projectGuid">The guid of the project.</param>
+        /// <param name="projectId">The id of the project.</param>
         /// <param name="projectName">The name of the project.</param>
         /// <param name="relativePath">The relative path of the project from the solution file.</param>
         /// <param name="projectTypeGuid">The project type guid.</param>
         /// <param name="solutionFilePath">The file path to the solution.</param>
-        public SlnSolutionProject(Guid projectGuid, string projectName, string relativePath, Guid projectTypeGuid, string solutionFilePath)
+        public SlnSolutionProject(Guid projectId, string projectName, string relativePath, Guid projectTypeGuid, string solutionFilePath)
         {
-            this.ProjectGuid = projectGuid;
+            this.ProjectId = projectId;
             this.ProjectName = projectName;
             this.ProjectType = GetProjectTypeEnumFromProjectTypeGuid(projectTypeGuid);
             this.ProjectTypeGuid = projectTypeGuid;
