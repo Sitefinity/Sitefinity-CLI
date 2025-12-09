@@ -86,9 +86,9 @@ namespace Sitefinity_CLI.Commands
             {
                 var files = Directory.EnumerateFiles(currentPath, "*.*", SearchOption.TopDirectoryOnly);
 
-                this.SolutionPath = files.FirstOrDefault(f =>
-                    f.EndsWith(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase) ||
-                    f.EndsWith(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase));
+                // Take slnx solution file with priority
+                this.SolutionPath = files.FirstOrDefault(f => f.EndsWith(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
+                    ?? files.FirstOrDefault(f => f.EndsWith(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase));
 
                 if (this.SolutionPath != null)
                     break;
