@@ -49,7 +49,7 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         [TestMethod]
         public void SuccessfullyAddNewProject_When_AllIsCorrect()
         {
-            SolutionFileEditor.AddProject(this.projectGuid, this.slnFilePathWithElements, this.csProjFilePath);
+            SolutionFileEditor.AddProject(this.projectGuid, this.slnFilePathWithElements, this.csProjFilePath, SolutionProjectType.WebProject);
 
             var slnContents = File.ReadAllText(this.slnFilePathWithElements);
             Assert.IsFalse(string.IsNullOrEmpty(slnContents));
@@ -65,8 +65,7 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         [TestMethod]
         public void SuccessfullyAddNewProjectSlnx_When_AllIsCorrect()
         {
-            SolutionFileEditor.AddProject(this.projectGuid, this.slnxFilePathWithElements, this.csProjFilePath);
-
+            SolutionFileEditor.AddProject(this.projectGuid, this.slnxFilePathWithElements, this.csProjFilePath, SolutionProjectType.ManagedCsProject);
 
             var slnxContents = File.ReadAllText(this.slnxFilePathWithElements);
             Assert.IsFalse(string.IsNullOrEmpty(slnxContents));
