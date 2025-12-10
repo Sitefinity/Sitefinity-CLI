@@ -26,6 +26,9 @@ namespace Sitefinity_CLI.Commands
 
         [Option(Constants.HeadlessOptionTemplate, Description = Constants.HeadlessModeOptionDescription)]
         public bool Headless { get; set; }
+        
+        [Option(Constants.UseSlnSolutionOptionTemplate, Description = Constants.UseSlnSolutionOptionDescription)]
+        public bool UseSlnSolution { get; set; }
 
         [Option(Constants.CoreModulesOptionTemplate, Description = Constants.CoreModulesModeOptionDescription)]
         public bool CoreModules { get; set; }
@@ -146,6 +149,12 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.InstallProjectTemplate(path);
             this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
+
+            if (!this.UseSlnSolution)
+            {
+                this.dotnetCliClient.MigrateSlnToSlnx(this.Name, this.Directory);
+            }
+
             this.dotnetCliClient.UninstallProjectTemplate(path);
 
             this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
@@ -153,9 +162,11 @@ namespace Sitefinity_CLI.Commands
             this.ConfigureAssemblyInfoFile();
 
             int waitTime = 10000;
-            this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);
+            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{Constants.SlnxFileExtension}");
 
-            this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
+            this.visualStudioWorker.Initialize(solutionFilePath, waitTime);
+
+            this.logger.LogInformation($"Installing Sitefinity packages to {solutionFilePath}");
             this.logger.LogInformation("Running Sitefinity installation...");
 
             command += " -IncludePrerelease";
@@ -204,7 +215,7 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation("Creating renderer project....");
 
             this.dotnetCliClient.CreateProjectFromTemplate("web", this.Name, this.Directory);
-            this.dotnetCliClient.CreateSolution(this.Name, this.Directory);
+            this.dotnetCliClient.CreateSolution(this.Name, this.Directory, this.UseSlnSolution);
             this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name);
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);

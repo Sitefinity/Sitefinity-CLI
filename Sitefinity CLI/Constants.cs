@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Sitefinity_CLI
@@ -47,14 +48,14 @@ namespace Sitefinity_CLI
         public const string TemplateNotFoundMessage = "The {0} you want to replicate is not found. Path: \"{1}\"";
         public const string ResourceExistsMessage = "{0} with name {1} already exists. Path: \"{2}\"";
         public const string ProjectNotFound = "Unable to find csproj file";
-        public const string SolutionNotFoundMessage = "Unable to find sln file";
+        public const string SolutionNotFoundMessage = "Unable to find solution file";
         public const string ConfigFileNotCreatedMessage = "Unable to create configuration file! Path: \"{0}\"";
         public const string ConfigFileNotCreatedPermissionsMessage = "Insufficient permissions to create configuration file! Path: \"{0}\"";
         public const string FileNotFoundMessage = "File \"{0}\" not found";
         public const string InvalidVersionMessage = "Version \"{0}\" is not valid.";
         public const string InvalidSitefinityMode = "Please select only 1 mode for Sitefinity.";
         public const string InvalidOptionForRendererMessage = "Invalid options for a renderer project: \"{0}\"";
-        public const string FileIsNotSolutionMessage = "File \"{0}\" is not a sln file";
+        public const string FileIsNotSolutionMessage = "File \"{0}\" is not a solution file";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
@@ -113,6 +114,7 @@ namespace Sitefinity_CLI
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
         public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
+        public const string UseSlnSolutionOptionDescription = "Use this to create a .sln solution file instead of the default .slnx format."; 
         public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
         public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
@@ -144,6 +146,7 @@ namespace Sitefinity_CLI
         public const string VersionOptionTemplate = "-v|--version";
         public const string SourcesOptionTemplate = "--sources";
         public const string HeadlessOptionTemplate = "--headless";
+        public const string UseSlnSolutionOptionTemplate = "--use-sln";
         public const string MigrationActionTemplate = "--action";
         public const string MigrationReplaceTemplate = "--replace";
         public const string MigrationRecreateTemplate = "--recreate";
@@ -170,6 +173,7 @@ namespace Sitefinity_CLI
         public const string JavaScriptFileExtension = ".js";
         public const string CsprojFileExtension = ".csproj";
         public const string SlnFileExtension = ".sln";
+        public const string SlnxFileExtension = ".slnx";
         public const string ConfigFileExtension = ".config";
         public const string VBProjFileExtension = ".vbproj";
 

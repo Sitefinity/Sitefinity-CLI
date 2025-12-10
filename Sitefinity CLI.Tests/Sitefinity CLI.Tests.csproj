@@ -11,8 +11,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.8.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.8.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.8.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.8.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,16 +26,25 @@
     <None Include="CsProjectFileEditorTests\Data\WithElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="UpgradeCommandTests\Mocks\fake.sln">
+    <None Include="UpgradeCommandTests\Mocks\fakeSln.sln">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="UpgradeCommandTests\Mocks\fakeSlnx.slnx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SolutionFileEditorTests\Data\WithElements.template">
+    <None Update="SolutionFileEditorTests\Data\WithElementsSln.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="SolutionFileEditorTests\Data\WithoutElements.template">
+    <None Update="SolutionFileEditorTests\Data\WithoutElementsSln.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SolutionFileEditorTests\Data\WithElementsSlnx.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SolutionFileEditorTests\Data\WithoutElementsSlnx.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="UpgradeCommandTests\SitefinityPackageManagerTests\Data\NetStandardOnlyAssemblies\lib\netstandard1.0\netstandard1.0.dll">
