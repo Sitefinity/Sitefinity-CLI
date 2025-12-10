@@ -145,7 +145,7 @@ namespace Sitefinity_CLI.VisualStudio
                 {
                     // Find the root element (should be <Solution>)
                     var root = doc.Root;
-                    if (root == null)
+                    if (root == null || root.Name.LocalName != SolutionRootName)
                     {
                         throw new Exception(Constants.SolutionNotReadable);
                     }
@@ -274,6 +274,7 @@ Project(""{{{0}}}"") = ""{2}"", ""{3}"", ""{{{1}}}""
     ";
 
         private const string ProjectElementName = "Project";
+        private const string SolutionRootName = "Solution";
         private const string PathAttributeName = "Path";
         private const string IdAttributeName = "Id";
     }
