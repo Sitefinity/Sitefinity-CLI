@@ -94,9 +94,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\" -f {format}");
         }
 
-        public void AddProjectToSolution(string solutionName, string projectDirectory, string projectName)
+        public void AddProjectToSolution(string solutionName, string projectDirectory, string projectName, bool useSln)
         {
-            ExecuteCommand($"dotnet sln \"{projectDirectory}\\{solutionName}{Constants.SlnxFileExtension}\" add \"{projectDirectory}\\{projectName}{Constants.CsprojFileExtension}\"");
+            string solutionExtension = useSln ? Constants.SlnFileExtension : Constants.SlnxFileExtension;
+            ExecuteCommand($"dotnet sln \"{projectDirectory}\\{solutionName}{solutionExtension}\" add \"{projectDirectory}\\{projectName}{Constants.CsprojFileExtension}\"");
         }
 
         public void AddPackageToProject(string projectPath, string packageName, string version)

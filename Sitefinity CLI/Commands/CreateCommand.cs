@@ -162,7 +162,8 @@ namespace Sitefinity_CLI.Commands
             this.ConfigureAssemblyInfoFile();
 
             int waitTime = 10000;
-            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{Constants.SlnxFileExtension}");
+            string solutionExtension = this.UseSlnSolution ? Constants.SlnFileExtension : Constants.SlnxFileExtension;
+            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{solutionExtension}");
 
             this.visualStudioWorker.Initialize(solutionFilePath, waitTime);
 
@@ -216,7 +217,7 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.CreateProjectFromTemplate("web", this.Name, this.Directory);
             this.dotnetCliClient.CreateSolution(this.Name, this.Directory, this.UseSlnSolution);
-            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name);
+            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name, this.UseSlnSolution);
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);
 
