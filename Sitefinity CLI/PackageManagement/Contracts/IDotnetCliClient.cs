@@ -9,7 +9,7 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
         void CreateProjectFromTemplate(string templateName, string projectName, string directory);
         void MigrateSlnToSlnx(string projectName, string directory);
         void CreateSolution(string name, string directory, bool useSlnFormat);
-        void AddProjectToSolution(string solutionName, string projectDirectory, string projectName);
+        void AddProjectToSolution(string solutionName, string projectDirectory, string projectName, bool useSln);
         void AddPackageToProject(string projectPath, string packageName, string version);
         void AddSourcesToNugetConfig(string[] sources, string filePath);
         IEnumerable<string> GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources);

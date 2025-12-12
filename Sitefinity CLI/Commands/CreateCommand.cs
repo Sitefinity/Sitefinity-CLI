@@ -217,7 +217,7 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.CreateProjectFromTemplate("web", this.Name, this.Directory);
             this.dotnetCliClient.CreateSolution(this.Name, this.Directory, this.UseSlnSolution);
-            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name);
+            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name, this.UseSlnSolution);
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);
 
