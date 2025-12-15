@@ -16,12 +16,12 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void InstallPackage(string packageId, string version, string solutionDirectory, string nugetConfigPath)
         {
-            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" -NoHttpCache -ConfigFile \"{nugetConfigPath}\" -prerelease");
+            this.RunProcess($"install \"{packageId}\" -Version {version} -SolutionDirectory \"{solutionDirectory}\" {NoHttpCacheFlag} -ConfigFile \"{nugetConfigPath}\" -prerelease");
         }
 
         public void Restore(string solutionFilePath)
         {
-            this.RunProcess($"restore \"{solutionFilePath}\" -NoHttpCache");
+            this.RunProcess($"restore \"{solutionFilePath}\" {NoHttpCacheFlag}");
         }
 
         private void RunProcess(string arguments)
@@ -79,5 +79,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private const string NuGetExeFileName = "nuget.exe";
         private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/v7.0.1/nuget.exe";
         private static readonly Version NuGetExeVersion = new Version("7.0.1.1");
+        private const string NoHttpCacheFlag = "-NoHttpCache";
     }
 }
