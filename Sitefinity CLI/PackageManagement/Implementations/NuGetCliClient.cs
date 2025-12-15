@@ -63,10 +63,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private void EnsureNugetExecutable(string nugetFileLocation)
         {
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(nugetFileLocation);
-            Version nugetVersion = new Version(fileVersionInfo.FileVersion);
-
-            if (!File.Exists(nugetFileLocation) || nugetVersion < NuGetExeVersion)
+            if (!File.Exists(nugetFileLocation) || new Version(FileVersionInfo.GetVersionInfo(nugetFileLocation).FileVersion) < NuGetExeVersion)
             {
                 using (var client = new WebClient())
                 {
