@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 
@@ -21,7 +21,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void Restore(string solutionFilePath)
         {
-            this.RunProcess($"restore \"{solutionFilePath}\" -NoCache");
+            this.RunProcess($"restore \"{solutionFilePath}\" -NoHttpCache");
         }
 
         private void RunProcess(string arguments)
@@ -63,7 +63,10 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private void EnsureNugetExecutable(string nugetFileLocation)
         {
-            if (!File.Exists(nugetFileLocation))
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(nugetFileLocation);
+            Version nugetVersion = new Version(fileVersionInfo.FileVersion);
+
+            if (!File.Exists(nugetFileLocation) || nugetVersion < NuGetExeVersion)
             {
                 using (var client = new WebClient())
                 {
@@ -74,6 +77,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private readonly ILogger<NuGetCliClient> logger;
         private const string NuGetExeFileName = "nuget.exe";
-        private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/v6.11.1/nuget.exe";
+        private const string NuGetExeDownloadUrl = "https://dist.nuget.org/win-x86-commandline/v7.0.1/nuget.exe";
+        private static readonly Version NuGetExeVersion = new Version("7.0.1.1");
     }
 }
