@@ -82,14 +82,17 @@ You can use the add command with the following subcommands:
   
   Add ```--renderer``` to the command to create a new ASP.NET Core renderer project for Sitefinity.
 
+  Add ```--use-sln``` to the command to use .sln solution type insted of the default one .slnx type.
+
   **NOTE**: After creating the renderer project, you have to set your Sitefinity CMS url in the *appsettings.json* and update *launchSettings.json*. For more information, see [Configure the ASP.NET Core Renderer](https://www.progress.com/documentation/sitefinity-cms/install-sitefinity-in-.net-core-mode-dp#configure-the-asp-net-core-renderer).
   
 
   Run the help option to see all available install options and configurations.
 
 * To **Upgrade** your project, execute the following command:
+  * **For .sln**: ```sf upgrade "(path-to-your-project)\SitefinityWebApp.sln" "15.3.8500"```
 
-  ```sf upgrade "(path-to-your-project)\SitefinityWebApp.sln" "15.3.8500"```
+  * **For .slnx**: ```sf upgrade "(path-to-your-project)\SitefinityWebApp.slnx" "15.3.8500"```
 
   Add ```--removeDeprecatedPackages``` to the command to automatically remove deprecated packages during the upgrade process to ensure a clean and up-to-date codebase.
 
