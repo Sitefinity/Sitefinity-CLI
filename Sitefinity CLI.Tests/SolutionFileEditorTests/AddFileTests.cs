@@ -21,7 +21,6 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         private string slnxFilePathWithoutElementsSource = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElementsSlnx.template";
         private string incorrectSlnFilePath = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\Pesho.sln";
         private string csProjFilePath = $"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\SomeProj\\SomeProj.csproj";
-        private Guid projectGuid = Guid.NewGuid();
 
         private string WithElementsContents => File.ReadAllText(this.slnFilePathWithElementsSource);
         private string WithoutElementsContents => File.ReadAllText(this.slnFilePathWithoutElementsSource);
@@ -55,7 +54,7 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
             Assert.IsFalse(string.IsNullOrEmpty(slnContents));
 
             IEnumerable<SlnSolutionProject> solutionProjects = SolutionFileEditor.GetProjects<SlnSolutionProject>(this.slnFilePathWithElements);
-            bool hasProject = solutionProjects.Any(sp => sp.ProjectId == this.projectGuid &&
+            bool hasProject = solutionProjects.Any(sp => sp.ProjectId != Guid.Empty &&
                 sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) && 
                 sp.ProjectType == SolutionProjectType.WebProject);
 
