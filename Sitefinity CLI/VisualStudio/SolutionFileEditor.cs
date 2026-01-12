@@ -61,13 +61,14 @@ namespace Sitefinity_CLI.VisualStudio
         /// </summary>
         /// <param name="solutionFilePath">The solution file path</param>
         /// <param name="projectAbsoluteFilePath">The project absolute file path to add</param>
-        public static void AddProject(string solutionFilePath, string projectAbsoluteFilePath, SolutionProjectType projectType, Guid? projectId = null)
+        public static void AddProject(string solutionFilePath, string projectAbsoluteFilePath, SolutionProjectType projectType)
         {
             string extension = Path.GetExtension(solutionFilePath);
 
-            if (projectId.HasValue && extension.Equals(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase))
+            if (extension.Equals(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase))
             {
-                SlnSolutionProject solutionProject = new SlnSolutionProject(projectId.Value, projectAbsoluteFilePath, solutionFilePath, projectType);
+                Guid projectId = Guid.NewGuid();
+                SlnSolutionProject solutionProject = new SlnSolutionProject(projectId, projectAbsoluteFilePath, solutionFilePath, projectType);
                 AddProjectToSln(solutionFilePath, solutionProject);
             }
             else if (extension.Equals(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
