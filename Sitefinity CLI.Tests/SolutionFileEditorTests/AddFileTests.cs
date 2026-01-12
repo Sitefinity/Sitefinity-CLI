@@ -49,12 +49,12 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         [TestMethod]
         public void SuccessfullyAddNewProject_When_AllIsCorrect()
         {
-            SolutionFileEditor.AddProject(this.projectGuid, this.slnFilePathWithElements, this.csProjFilePath, SolutionProjectType.WebProject);
+            SolutionFileEditor.AddProject(this.slnFilePathWithElements, this.csProjFilePath, SolutionProjectType.WebProject, this.projectGuid);
 
             var slnContents = File.ReadAllText(this.slnFilePathWithElements);
             Assert.IsFalse(string.IsNullOrEmpty(slnContents));
 
-            IEnumerable<ISolutionProject> solutionProjects = SolutionFileEditor.GetProjects(this.slnFilePathWithElements);
+            IEnumerable<SlnSolutionProject> solutionProjects = SolutionFileEditor.GetProjects<SlnSolutionProject>(this.slnFilePathWithElements);
             bool hasProject = solutionProjects.Any(sp => sp.ProjectId == this.projectGuid &&
                 sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) && 
                 sp.ProjectType == SolutionProjectType.WebProject);
@@ -65,14 +65,13 @@ namespace Sitefinity_CLI.Tests.SolutionFileEditorTests
         [TestMethod]
         public void SuccessfullyAddNewProjectSlnx_When_AllIsCorrect()
         {
-            SolutionFileEditor.AddProject(this.projectGuid, this.slnxFilePathWithElements, this.csProjFilePath, SolutionProjectType.ManagedCsProject);
+            SolutionFileEditor.AddProject(this.slnxFilePathWithElements, this.csProjFilePath, SolutionProjectType.ManagedCsProject, this.projectGuid);
 
             var slnxContents = File.ReadAllText(this.slnxFilePathWithElements);
             Assert.IsFalse(string.IsNullOrEmpty(slnxContents));
 
-            IEnumerable<ISolutionProject> solutionProjects = SolutionFileEditor.GetProjects(this.slnxFilePathWithElements);
-            bool hasProject = solutionProjects.Any(sp => sp.ProjectId == this.projectGuid &&
-                sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) &&
+            IEnumerable<SlnxSolutionProject> solutionProjects = SolutionFileEditor.GetProjects<SlnxSolutionProject>(this.slnxFilePathWithElements);
+            bool hasProject = solutionProjects.Any(sp => sp.AbsolutePath.Equals(this.csProjFilePath, StringComparison.InvariantCultureIgnoreCase) &&
                 sp.ProjectType == SolutionProjectType.ManagedCsProject);
 
             Assert.AreEqual(2, solutionProjects.Count());

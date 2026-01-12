@@ -133,7 +133,7 @@ namespace Sitefinity_CLI.Commands
 
             try
             {
-                SolutionFileEditor.AddProject(this.ProjectGuid, this.SolutionPath, csprojFilePath, SolutionProjectType.ManagedCsProject);
+                SolutionFileEditor.AddProject(this.SolutionPath, csprojFilePath, SolutionProjectType.ManagedCsProject, this.ProjectGuid);
 
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, csprojFilePath), ConsoleColor.Green);
             }

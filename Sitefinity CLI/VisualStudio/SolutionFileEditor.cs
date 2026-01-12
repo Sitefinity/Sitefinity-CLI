@@ -36,22 +36,43 @@ namespace Sitefinity_CLI.VisualStudio
         }
 
         /// <summary>
+        /// Returns the projects from a solution file as their concrete type.
+        /// </summary>
+        /// <typeparam name="T">The concrete solution project type (SlnSolutionProject or SlnxSolutionProject).</typeparam>
+        /// <param name="solutionFilePath">The path to the solution file.</param>
+        /// <returns>Collection of the concrete project type.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the requested type doesn't match the solution file format.</exception>
+        public static IEnumerable<T> GetProjects<T>(string solutionFilePath) where T : ISolutionProject
+        {
+            if (typeof(T) == typeof(SlnSolutionProject))
+            {
+                return (IEnumerable<T>)GetProjectsFromSln(solutionFilePath);
+            }
+            else if (typeof(T) == typeof(SlnxSolutionProject))
+            {
+                return (IEnumerable<T>)GetProjectsFromSlnx(solutionFilePath);
+            }
+
+            throw new InvalidOperationException($"Cannot return {typeof(T).Name}");
+        }
+
+        /// <summary>
         /// Adds reference to a project file in a solution. 
         /// </summary>
         /// <param name="solutionFilePath">The solution file path</param>
         /// <param name="projectAbsoluteFilePath">The project absolute file path to add</param>
-        public static void AddProject(Guid projectId, string solutionFilePath, string projectAbsoluteFilePath, SolutionProjectType projectType)
+        public static void AddProject(string solutionFilePath, string projectAbsoluteFilePath, SolutionProjectType projectType, Guid? projectId = null)
         {
             string extension = Path.GetExtension(solutionFilePath);
 
-            if (extension.Equals(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase))
+            if (projectId.HasValue && extension.Equals(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase))
             {
-                SlnSolutionProject solutionProject = new SlnSolutionProject(projectId, projectAbsoluteFilePath, solutionFilePath, projectType);
+                SlnSolutionProject solutionProject = new SlnSolutionProject(projectId.Value, projectAbsoluteFilePath, solutionFilePath, projectType);
                 AddProjectToSln(solutionFilePath, solutionProject);
             }
             else if (extension.Equals(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
             {
-                SlnxSolutionProject solutionProject = new SlnxSolutionProject(projectId, projectAbsoluteFilePath, solutionFilePath, projectType);
+                SlnxSolutionProject solutionProject = new SlnxSolutionProject(projectAbsoluteFilePath, solutionFilePath, projectType);
                 AddProjectToSlnx(solutionFilePath, solutionProject);
             }
         }
@@ -108,12 +129,11 @@ namespace Sitefinity_CLI.VisualStudio
             foreach (var projectElement in doc.Descendants(ProjectElementName))
             {
                 var pathAttr = projectElement.Attribute(PathAttributeName);
-                var idAttr = projectElement.Attribute(IdAttributeName);
-                if (pathAttr != null && idAttr != null)
+                
+                if (pathAttr != null)
                 {
                     string normalizedPath = pathAttr.Value.Replace('/', Path.DirectorySeparatorChar);
-                    Guid projectId = Guid.Parse(idAttr.Value);
-                    SlnxSolutionProject project = new SlnxSolutionProject(projectId, normalizedPath, solutionFilePath);
+                    SlnxSolutionProject project = new SlnxSolutionProject(normalizedPath, solutionFilePath);
                     solutionProjects.Add(project);
                 }
             }
@@ -138,8 +158,7 @@ namespace Sitefinity_CLI.VisualStudio
                 XDocument doc = XDocument.Load(solutionFilePath);
                 string normalizedPath = solutionProject.RelativePath.Replace(Path.DirectorySeparatorChar, '/');
 
-                var projectExisting = doc.Descendants(ProjectElementName).Any(p => p.Attribute(PathAttributeName)?.Value == normalizedPath &&
-                    p.Attribute(IdAttributeName)?.Value == solutionProject.ProjectId.ToString());
+                var projectExisting = doc.Descendants(ProjectElementName).Any(p => p.Attribute(PathAttributeName)?.Value == normalizedPath);
 
                 if (!projectExisting)
                 {
@@ -150,10 +169,7 @@ namespace Sitefinity_CLI.VisualStudio
                         throw new Exception(Constants.SolutionNotReadable);
                     }
 
-                    var newProject = new XElement(
-                        ProjectElementName,
-                        new XAttribute(PathAttributeName, normalizedPath),
-                        new XAttribute(IdAttributeName, solutionProject.ProjectId.ToString()));
+                    var newProject = new XElement(ProjectElementName, new XAttribute(PathAttributeName, normalizedPath));
 
                     root.Add(newProject);
                     doc.Save(solutionFilePath);
@@ -276,6 +292,5 @@ Project(""{{{0}}}"") = ""{2}"", ""{3}"", ""{{{1}}}""
         private const string ProjectElementName = "Project";
         private const string SolutionRootName = "Solution";
         private const string PathAttributeName = "Path";
-        private const string IdAttributeName = "Id";
     }
 }
