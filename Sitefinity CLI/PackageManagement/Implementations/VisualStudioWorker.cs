@@ -102,7 +102,15 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             if (this.visualStudioProcess != null)
             {
                 this.logger.LogInformation("Closing Visual Studio instance...");
-                this.visualStudioProcess.Kill();
+
+                bool wasClosed = this.visualStudioProcess.CloseMainWindow();
+                
+                if (!wasClosed)
+                {
+                    this.logger.LogInformation("Visual Studio instance did not close gracefully. Killing process...");
+                    this.visualStudioProcess.Kill();
+                }
+
                 this.logger.LogInformation("Closing Visual Studio instance closed.");
             }
         }
