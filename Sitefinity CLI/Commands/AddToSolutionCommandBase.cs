@@ -124,10 +124,6 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            // Flush any buffered output to ensure logger messages appear before direct console writes
-            Console.Out.Flush();
-            Console.Error.Flush();
-
             var csprojFilePath = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
 
             try
