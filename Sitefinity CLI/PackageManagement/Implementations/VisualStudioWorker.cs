@@ -109,6 +109,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 if (!killedProcess)
                 {
                     this.logger.LogError("Visual Studio process did not exit within {WaitTime}ms timeout.", WaitTime);
+                    throw new TimeoutException("Timed out waiting for Visual Studio process to exit.");
                 }
 
                 this.logger.LogInformation("Closing Visual Studio instance closed.");
