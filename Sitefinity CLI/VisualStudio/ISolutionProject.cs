@@ -12,11 +12,6 @@ namespace Sitefinity_CLI.VisualStudio
     public interface ISolutionProject
     {
         /// <summary>
-        /// Gets the project id.
-        /// </summary>
-        public Guid ProjectId { get; }
-
-        /// <summary>
         /// Gets the relative path of the project from the solution file.
         /// </summary>
         string RelativePath { get; }

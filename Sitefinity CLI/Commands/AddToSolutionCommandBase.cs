@@ -18,11 +18,6 @@ namespace Sitefinity_CLI.Commands
         }
 
         /// <summary>
-        /// The guid of the project to be added to solution
-        /// </summary>
-        protected Guid ProjectGuid { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The solution path
         /// </summary>
         protected string SolutionPath { get; set; }
@@ -50,7 +45,7 @@ namespace Sitefinity_CLI.Commands
             if (data is IDictionary<string, string> dictionary)
             {
                 dictionary["binFolder"] = this.BinFolder;
-                dictionary["projectGuid"] = this.ProjectGuid.ToString();
+                dictionary["projectGuid"] = Guid.NewGuid().ToString();
                 dictionary["sitefinityVersion"] = this.SitefinityVersion;
 
                 if (!string.IsNullOrEmpty(this.SitefinityVersion))
@@ -133,7 +128,7 @@ namespace Sitefinity_CLI.Commands
 
             try
             {
-                SolutionFileEditor.AddProject(this.ProjectGuid, this.SolutionPath, csprojFilePath, SolutionProjectType.ManagedCsProject);
+                SolutionFileEditor.AddProject(this.SolutionPath, csprojFilePath, SolutionProjectType.ManagedCsProject);
 
                 Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, csprojFilePath), ConsoleColor.Green);
             }
