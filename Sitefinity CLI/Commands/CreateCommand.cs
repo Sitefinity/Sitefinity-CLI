@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations;
 using EnvDTE;
 using System.IO;
 using System.Threading.Tasks;
-using System.Management.Automation.Runspaces;
 using Sitefinity_CLI.Exceptions;
 using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.PackageManagement.Contracts;
