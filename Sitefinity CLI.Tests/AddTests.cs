@@ -16,8 +16,6 @@ namespace Sitefinity_CLI.Tests
 
         private Dictionary<string, string> testFolderPaths;
         private string workingDirectory;
-        private const string LoggerInfo = "info: ";
-        private const string LoggerFail = "fail: ";
 
         [TestInitialize]
         public void Initialize()
@@ -210,8 +208,8 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.CustomWidgetCreatedMessage, resourceName)));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.CustomWidgetCreatedMessage, resourceName));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -244,7 +242,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ResourceExistsMessage, Constants.AddResourcePackageCommandFullName, resourceName, expectedFolderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.ResourceExistsMessage, Constants.AddResourcePackageCommandFullName, resourceName, expectedFolderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -283,7 +281,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -322,7 +320,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -360,8 +358,8 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
+                expectedOutputString.AppendLine(string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath));
 
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
@@ -474,7 +472,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.DirectoryNotFoundMessage, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -695,8 +693,8 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.ModuleCreatedMessage, resourceName)));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.ModuleCreatedMessage, resourceName));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
@@ -900,8 +898,8 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.IntegrationTestsCreatedMessage, resourceName)));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.IntegrationTestsCreatedMessage, resourceName));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
@@ -1019,7 +1017,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
 
-                if (useSln) 
+                if (useSln)
                 {
                     expectedOutputString.AppendLine(Constants.SolutionNotReadable);
                 }
@@ -1151,7 +1149,7 @@ namespace Sitefinity_CLI.Tests
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.TemplateNotFoundMessage, commandFullName, expectedFolderPath)));
+            expectedOutputString.AppendLine(string.Format(Constants.TemplateNotFoundMessage, commandFullName, expectedFolderPath));
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -1180,7 +1178,7 @@ namespace Sitefinity_CLI.Tests
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.DirectoryNotFoundMessage, folderPath)));
+            expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -1201,7 +1199,7 @@ namespace Sitefinity_CLI.Tests
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = this.workingDirectory                 
+                    WorkingDirectory = this.workingDirectory
                 }
             };
         }
