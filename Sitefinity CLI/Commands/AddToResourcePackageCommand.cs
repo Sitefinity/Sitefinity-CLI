@@ -39,7 +39,7 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
             {
-                this.Logger.LogError(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath)));
+                Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, Path.GetDirectoryName(filePath), ConsoleColor.Red));
                 return 1;
             }
 
