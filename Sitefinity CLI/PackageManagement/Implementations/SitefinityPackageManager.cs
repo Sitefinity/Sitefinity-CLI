@@ -190,8 +190,9 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                 XmlNode referenceElement = referenceElements[i];
                 XmlAttribute includeAttribute = referenceElement.Attributes[Constants.IncludeAttribute];
 
-                if (!string.IsNullOrWhiteSpace(includeAttribute.Value) &&
-                    (includeAttribute.Value.Equals(assemblyName, StringComparison.OrdinalIgnoreCase) || includeAttribute.Value.StartsWith(assemblyName + ",", StringComparison.OrdinalIgnoreCase)))
+                if (includeAttribute != null &&
+                    !string.IsNullOrWhiteSpace(includeAttribute.Value) &&
+                    GetAssemblySimpleNameFromInclude(includeAttribute.Value).Equals(assemblyName, StringComparison.OrdinalIgnoreCase))
                 {
                     Version currentAssemblyVersion = this.ExtractAssemblyVersionFromIncludeAttribute(includeAttribute.Value);
 
@@ -266,6 +267,19 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             return null;
+        }
+
+        private static string GetAssemblySimpleNameFromInclude(string includeAttributeValue)
+        {
+            // An Include attribute looks like "Name" or "Name, Version=..., Culture=..., PublicKeyToken=...".
+            // MSBuild trims whitespace around the simple name, so do the same here to make matching tolerant
+            // of hand-edited csproj files (e.g. "AjaxControlToolkit , Version=..." with a stray space).
+            int commaIndex = includeAttributeValue.IndexOf(',');
+            string simpleName = commaIndex >= 0
+                ? includeAttributeValue.Substring(0, commaIndex)
+                : includeAttributeValue;
+
+            return simpleName.Trim();
         }
 
         private IEnumerable<string> GetRelativeFilePathsFromNuGetPackages(IEnumerable<NuGetPackage> nuGetPackages, string projectDir, string solutionDir)
