@@ -27,6 +27,75 @@ function Remove-Packages {
     }
 }
 
+# Known major dependency transitions by Sitefinity version boundary.
+# When upgrading across these boundaries, transitive dependencies change major
+# versions. Because Update-Package processes packages one at a time in
+# packages.config projects, the old major-version packages conflict with the
+# new ones before the full set is updated. Removing them first avoids resolver
+# failures.
+$KnownDependencyTransitions = @{
+    "15.4.8626" = @(
+        @{ Prefix = "AWSSDK.";       OldMajorVersion = 3 }
+        @{ Prefix = "ServiceStack."; OldMajorVersion = 8 }
+    )
+}
+
+function Remove-ConflictingTransitiveDependencies {
+    param(
+        [string] $ProjectName,
+        [array]  $Packages
+    )
+
+    # Determine the highest target version from the upgrade config
+    $highestTargetVersion = $null
+    foreach ($package in $Packages) {
+        $ver = $package.version.split('-')[0]
+        $parsed = [System.Version]$ver
+        if ($null -eq $highestTargetVersion -or $parsed -gt $highestTargetVersion) {
+            $highestTargetVersion = $parsed
+        }
+    }
+
+    if ($null -eq $highestTargetVersion) {
+        return
+    }
+
+    # Collect all transitions that apply (target version >= boundary)
+    $applicableTransitions = @()
+    foreach ($boundary in $KnownDependencyTransitions.Keys) {
+        $boundaryVersion = [System.Version]$boundary
+        if ($highestTargetVersion -ge $boundaryVersion) {
+            $applicableTransitions += $KnownDependencyTransitions[$boundary]
+        }
+    }
+
+    if ($applicableTransitions.Count -eq 0) {
+        return
+    }
+
+    "`nChecking for conflicting transitive dependencies in '$ProjectName'..."
+    $projectPackages = Get-Package -ProjectName $ProjectName
+
+    foreach ($transition in $applicableTransitions) {
+        $prefix = $transition.Prefix
+        $oldMajor = $transition.OldMajorVersion
+
+        $conflictingPackages = $projectPackages | Where-Object {
+            $_.Id.StartsWith($prefix) -and $_.Version.Major -eq $oldMajor
+        }
+
+        foreach ($pkg in $conflictingPackages) {
+            "`nRemoving conflicting transitive dependency: '$($pkg.Id)' version '$($pkg.Version)' from '$ProjectName' (major version $oldMajor will be superseded)"
+            try {
+                Invoke-Expression "Uninstall-Package `"$($pkg.Id)`" -ProjectName `"$ProjectName`" -Force"
+            }
+            catch {
+                "`nWarning: Could not remove '$($pkg.Id)': $($_.Exception.Message). Upgrade will attempt to proceed."
+            }
+        }
+    }
+}
+
 $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
 $upgradeTraceLog = $basePath + '\upgrade.log'
@@ -55,6 +124,11 @@ try {
         $totalCount = @($packages).Count
 
         Remove-Packages -ProjectName $projectName -PackagesToRemove $PackagesToRemove
+
+        # Remove transitive dependencies that conflict with major version changes
+        # in the target packages. This prevents NuGet resolver failures when
+        # Update-Package processes packages sequentially.
+        Remove-ConflictingTransitiveDependencies -ProjectName $projectName -Packages $packages
 
         foreach ($package in $packages) {
             $packageName = $package.name
