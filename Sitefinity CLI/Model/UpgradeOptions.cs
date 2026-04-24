@@ -75,6 +75,7 @@ namespace Sitefinity_CLI.Model
         {
             new DeprecatedPackage("Telerik.DataAccess.Fluent", new Version("12.2.7200")),
             new DeprecatedPackage("Telerik.Sitefinity.OpenAccess", new Version("13.0.7300")),
+            new DeprecatedPackage("Telerik.Sitefinity.Octopus", new Version("13.0.7300")),
             new DeprecatedPackage("Telerik.Sitefinity.AmazonCloudSearch", new Version("13.3.7600")),
             new DeprecatedPackage("Telerik.Sitefinity.CloudSearch", new Version("13.3.7600")),
             new DeprecatedPackage("AWSSDK.CloudSearch", new Version("13.3.7600")),
@@ -93,7 +94,7 @@ namespace Sitefinity_CLI.Model
             new DeprecatedPackage("Progress.Sitefinity.Ecommerce", new Version("15.0.8200")),
             new DeprecatedPackage("AntiXSS", new Version("15.0.8200")),
             new DeprecatedPackage("linqtotwitterNET40", new Version("15.2.8400")),
-            new DeprecatedPackage("Telerik.Sitefinity.Twitterizer", new Version("15.2.8400")),
+            new DeprecatedPackage("Telerik.Sitefinity.Twitterizer", new Version("15.2.8400"))
         };
 
         private readonly List<DeprecatedPackage> DeprecatedResourcesRepository = new()
