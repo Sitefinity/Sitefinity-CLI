@@ -13,6 +13,8 @@ namespace Sitefinity_CLI.Services.Contracts
 
         void SyncProjectReferencesWithPackages(IEnumerable<string> projectFilePaths, string solutionFolder);
 
+        void ReconcileProjectBindingRedirects(IEnumerable<string> projectFilePaths, string solutionFolder);
+
         string GetLatestSitefinityVersion();
     }
 }

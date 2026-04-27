@@ -351,56 +351,78 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private void SyncBindingRedirects(XmlDocument configDoc, XmlNodeList bindingRedirectNodes, string assemblyFullName, string assemblyVersion)
         {
-            if (bindingRedirectNodes != null)
+            if (bindingRedirectNodes == null)
             {
-                foreach (XmlNode node in bindingRedirectNodes)
-                {
-                    XmlNode assemblyIdentity = null;
-                    XmlNode bindingRedirect = null;
-                    foreach (XmlNode childNode in node.ChildNodes)
-                    {
-                        if (childNode.Name == AssemblyIdentityAttributeName)
-                            assemblyIdentity = childNode;
-
-                        if (childNode.Name == BindingRedirectAttributeName)
-                            bindingRedirect = childNode;
-                    }
-
-                    if (assemblyIdentity != null && bindingRedirect != null)
-                    {
-                        var name = assemblyIdentity.Attributes["name"]?.Value;
-                        if (name == assemblyFullName)
-                        {
-                            var newVersionAttribute = bindingRedirect.Attributes[NewVersionAttributeName];
-                            if (newVersionAttribute != null && !ShouldUpdateBindingRedirect(newVersionAttribute.Value, assemblyVersion))
-                            {
-                                break;
-                            }
-
-                            if (newVersionAttribute == null)
-                            {
-                                newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
-
-                                bindingRedirect.Attributes.Append(newVersionAttribute);
-                            }
-
-                            newVersionAttribute.Value = assemblyVersion;
-
-                            var oldVersionAttribute = bindingRedirect.Attributes[OldVersionAttributeName];
-                            if (oldVersionAttribute == null)
-                            {
-                                oldVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
-
-                                bindingRedirect.Attributes.Append(oldVersionAttribute);
-                            }
-
-                            oldVersionAttribute.Value = $"0.0.0.0-{assemblyVersion}";
-
-                            break;
-                        }
-                    }
-                }
+                return;
             }
+
+            foreach (XmlNode node in bindingRedirectNodes)
+            {
+                if (!TryParseBindingRedirectNode(node, out string name, out XmlNode bindingRedirect))
+                {
+                    continue;
+                }
+
+                if (name != assemblyFullName)
+                {
+                    continue;
+                }
+
+                var newVersionAttribute = bindingRedirect.Attributes[NewVersionAttributeName];
+                if (newVersionAttribute != null && !ShouldUpdateBindingRedirect(newVersionAttribute.Value, assemblyVersion))
+                {
+                    break;
+                }
+
+                if (newVersionAttribute == null)
+                {
+                    newVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
+                    bindingRedirect.Attributes.Append(newVersionAttribute);
+                }
+
+                newVersionAttribute.Value = assemblyVersion;
+
+                var oldVersionAttribute = bindingRedirect.Attributes[OldVersionAttributeName];
+                if (oldVersionAttribute == null)
+                {
+                    oldVersionAttribute = configDoc.CreateAttribute(Constants.IncludeAttribute);
+                    bindingRedirect.Attributes.Append(oldVersionAttribute);
+                }
+
+                oldVersionAttribute.Value = $"0.0.0.0-{assemblyVersion}";
+                break;
+            }
+        }
+
+        private static bool TryParseBindingRedirectNode(XmlNode dependentAssemblyNode, out string assemblyName, out XmlNode bindingRedirectNode)
+        {
+            assemblyName = null;
+            bindingRedirectNode = null;
+
+            XmlNode assemblyIdentity = null;
+            XmlNode bindingRedirect = null;
+            foreach (XmlNode childNode in dependentAssemblyNode.ChildNodes)
+            {
+                if (childNode.Name == AssemblyIdentityAttributeName)
+                    assemblyIdentity = childNode;
+
+                if (childNode.Name == BindingRedirectAttributeName)
+                    bindingRedirect = childNode;
+            }
+
+            if (assemblyIdentity == null || bindingRedirect == null)
+            {
+                return false;
+            }
+
+            assemblyName = assemblyIdentity.Attributes["name"]?.Value;
+            if (string.IsNullOrEmpty(assemblyName))
+            {
+                return false;
+            }
+
+            bindingRedirectNode = bindingRedirect;
+            return true;
         }
 
         private static bool ShouldUpdateBindingRedirect(string oldAssemblyVersion, string newAssemblyVersion)
@@ -600,6 +622,171 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             return relativePath.Replace('/', Path.DirectorySeparatorChar);
+        }
+
+        public void ReconcileBindingRedirects(string projectFilePath, string solutionDir)
+        {
+            string projectDir = Path.GetDirectoryName(projectFilePath);
+            string projectConfigPath = this.projectConfigFileEditor.GetProjectConfigPath(projectDir);
+
+            if (string.IsNullOrEmpty(projectConfigPath))
+            {
+                return;
+            }
+
+            XmlDocument projectConfig = new XmlDocument();
+            projectConfig.Load(projectConfigPath);
+
+            XmlNodeList bindingRedirectNodes = projectConfig.GetElementsByTagName("dependentAssembly");
+            if (bindingRedirectNodes == null || bindingRedirectNodes.Count == 0)
+            {
+                return;
+            }
+
+            XmlDocument projectFileXmlDocument = new XmlDocument();
+            projectFileXmlDocument.Load(projectFilePath);
+            string targetFramework = GetTargetFramework(projectFileXmlDocument);
+
+            // Walk the project reference graph and collect assembly versions from all contributing packages
+            Dictionary<string, Version> availableAssemblyVersions = this.GetAssemblyVersionsFromProjectGraph(projectFilePath, solutionDir, targetFramework);
+
+            bool configModified = false;
+            foreach (XmlNode node in bindingRedirectNodes)
+            {
+                if (!TryParseBindingRedirectNode(node, out string assemblyName, out XmlNode bindingRedirect))
+                {
+                    continue;
+                }
+
+                XmlAttribute newVersionAttribute = bindingRedirect.Attributes[NewVersionAttributeName];
+                if (newVersionAttribute == null)
+                {
+                    continue;
+                }
+
+                if (!Version.TryParse(newVersionAttribute.Value, out Version redirectVersion))
+                {
+                    continue;
+                }
+
+                if (availableAssemblyVersions.TryGetValue(assemblyName, out Version highestAvailable))
+                {
+                    if (redirectVersion > highestAvailable)
+                    {
+                        this.logger.LogWarning($"Binding redirect for '{assemblyName}' points to version '{redirectVersion}' but the highest available DLL version is '{highestAvailable}'. Fixing redirect.");
+
+                        newVersionAttribute.Value = highestAvailable.ToString();
+
+                        XmlAttribute oldVersionAttribute = bindingRedirect.Attributes[OldVersionAttributeName];
+                        if (oldVersionAttribute != null)
+                        {
+                            oldVersionAttribute.Value = $"0.0.0.0-{highestAvailable}";
+                        }
+
+                        configModified = true;
+                    }
+                }
+            }
+
+            if (configModified)
+            {
+                projectConfig.Save(projectConfigPath);
+                this.logger.LogInformation($"Reconciled binding redirects in '{projectConfigPath}'");
+            }
+        }
+
+        private Dictionary<string, Version> GetAssemblyVersionsFromProjectGraph(string projectFilePath, string solutionDir, string targetFramework)
+        {
+            var result = new Dictionary<string, Version>(StringComparer.OrdinalIgnoreCase);
+            var visitedProjects = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            CollectAssemblyVersionsRecursive(projectFilePath, solutionDir, targetFramework, result, visitedProjects);
+
+            return result;
+        }
+
+        private void CollectAssemblyVersionsRecursive(string projectFilePath, string solutionDir, string targetFramework, Dictionary<string, Version> result, HashSet<string> visitedProjects)
+        {
+            string normalizedPath = Path.GetFullPath(projectFilePath);
+            if (!visitedProjects.Add(normalizedPath))
+            {
+                return;
+            }
+
+            // Collect assembly versions from this project's <Reference> elements
+            XmlDocument doc = new XmlDocument();
+            doc.Load(normalizedPath);
+
+            XmlNodeList referenceElements = doc.GetElementsByTagName(Constants.ReferenceElem);
+            for (int i = 0; i < referenceElements.Count; i++)
+            {
+                XmlAttribute includeAttribute = referenceElements[i].Attributes[Constants.IncludeAttribute];
+                if (includeAttribute == null || string.IsNullOrWhiteSpace(includeAttribute.Value))
+                {
+                    continue;
+                }
+
+                string assemblyName = includeAttribute.Value.Split(',')[0].Trim();
+                Version version = this.ExtractAssemblyVersionFromIncludeAttribute(includeAttribute.Value);
+
+                if (version == null)
+                {
+                    continue;
+                }
+
+                if (!result.TryGetValue(assemblyName, out Version existing) || version > existing)
+                {
+                    result[assemblyName] = version;
+                }
+            }
+
+            // Follow project references recursively
+            IEnumerable<string> referencedProjectPaths = GetProjectReferencePaths(normalizedPath);
+            foreach (string referencedProjectPath in referencedProjectPaths)
+            {
+                CollectAssemblyVersionsRecursive(referencedProjectPath, solutionDir, targetFramework, result, visitedProjects);
+            }
+        }
+
+        private static IEnumerable<string> GetProjectReferencePaths(string projectFilePath)
+        {
+            string projectDir = Path.GetDirectoryName(projectFilePath);
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(projectFilePath);
+
+            XmlNamespaceManager nsMgr = new XmlNamespaceManager(doc.NameTable);
+            string ns = doc.DocumentElement.NamespaceURI;
+            if (!string.IsNullOrEmpty(ns))
+            {
+                nsMgr.AddNamespace("ms", ns);
+            }
+
+            string xpath = string.IsNullOrEmpty(ns)
+                ? "//ProjectReference/@Include"
+                : "//ms:ProjectReference/@Include";
+
+            XmlNodeList projectReferenceNodes = doc.SelectNodes(xpath, nsMgr);
+            if (projectReferenceNodes == null || projectReferenceNodes.Count == 0)
+            {
+                return Array.Empty<string>();
+            }
+
+            var paths = new List<string>();
+            foreach (XmlNode node in projectReferenceNodes)
+            {
+                string relativePath = node.Value;
+                if (!string.IsNullOrEmpty(relativePath))
+                {
+                    string absolutePath = Path.GetFullPath(Path.Combine(projectDir, relativePath));
+                    if (File.Exists(absolutePath))
+                    {
+                        paths.Add(absolutePath);
+                    }
+                }
+            }
+
+            return paths;
         }
 
         public void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version)
