@@ -341,6 +341,43 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return parsedVersion;
         }
 
+        private Version ExtractAssemblyVersionFromHintPath(XmlNode referenceNode, string projectFilePath)
+        {
+            XmlNode hintPathNode = null;
+            foreach (XmlNode child in referenceNode.ChildNodes)
+            {
+                if (child.Name.Equals("HintPath", StringComparison.OrdinalIgnoreCase))
+                {
+                    hintPathNode = child;
+                    break;
+                }
+            }
+
+            if (hintPathNode == null || string.IsNullOrWhiteSpace(hintPathNode.InnerText))
+            {
+                return null;
+            }
+
+            string projectDir = Path.GetDirectoryName(projectFilePath);
+            string dllPath = Path.GetFullPath(Path.Combine(projectDir, hintPathNode.InnerText));
+
+            if (!File.Exists(dllPath))
+            {
+                return null;
+            }
+
+            try
+            {
+                AssemblyName assemblyName = AssemblyName.GetAssemblyName(dllPath);
+                return assemblyName.Version;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogInformation($"Unable to read assembly version from '{dllPath}': {ex.Message}");
+                return null;
+            }
+        }
+
         public IEnumerable<PackageSource> DefaultPackageSource
         {
             get
@@ -728,6 +765,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
                 string assemblyName = includeAttribute.Value.Split(',')[0].Trim();
                 Version version = this.ExtractAssemblyVersionFromIncludeAttribute(includeAttribute.Value);
+
+                if (version == null)
+                {
+                    version = this.ExtractAssemblyVersionFromHintPath(referenceElements[i], normalizedPath);
+                }
 
                 if (version == null)
                 {
