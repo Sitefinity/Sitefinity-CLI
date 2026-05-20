@@ -149,19 +149,20 @@ namespace Sitefinity_CLI.Commands
             this.dotnetCliClient.InstallProjectTemplate(path);
             this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
 
+            bool migratedToSlnx = false;
             if (!this.UseSlnSolution)
             {
-                this.dotnetCliClient.MigrateSlnToSlnx(this.Name, this.Directory);
+                migratedToSlnx = this.dotnetCliClient.MigrateSlnToSlnx(this.Name, this.Directory);
             }
 
             this.dotnetCliClient.UninstallProjectTemplate(path);
 
-            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, this.Directory);
 
             this.ConfigureAssemblyInfoFile();
 
             int waitTime = 10000;
-            string solutionExtension = this.UseSlnSolution ? Constants.SlnFileExtension : Constants.SlnxFileExtension;
+            string solutionExtension = migratedToSlnx ? Constants.SlnxFileExtension : Constants.SlnFileExtension;
             string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{solutionExtension}");
 
             this.visualStudioWorker.Initialize(solutionFilePath, waitTime);
@@ -221,7 +222,7 @@ namespace Sitefinity_CLI.Commands
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);
 
             File.Copy(path, $"{this.Directory}\\nuget.config", true);
-            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, this.Directory);
 
             if (this.Version != null)
             {
