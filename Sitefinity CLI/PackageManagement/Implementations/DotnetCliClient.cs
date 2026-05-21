@@ -67,7 +67,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void CreateProjectFromTemplate(string templateName, string projectName, string directory)
         {
-            ExecuteCommand($"dotnet new {templateName} -n \"{projectName}\" -o \"{directory}\" --force");
+            ExecuteCommand($"dotnet new {templateName} -n \"{projectName}\" -o \"{directory}\"");
         }
         
         public bool MigrateSlnToSlnx(string projectName, string directory)
