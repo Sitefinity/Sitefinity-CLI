@@ -82,7 +82,7 @@ namespace Sitefinity_CLI
         public const string UninstallingPackagesWarning = "The following nuget packages will be removed during the upgrade:";
         public const string AcceptLicenseNotification = "Do you accept the terms and conditions";
         public const string ProceedWithUpgradeMessage = "Proceed with the upgrade?";
-        public const string UpgradeWarning = "Make sure to have your project under source control. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch visual studio instance in order to execute nuget upgrade. DO NOT CLOSE the opened visual studio. This will stop the upgrade. Do you want to continue?";
+        public const string UpgradeWarning = "Make sure to have your project under source control. Currently there is no revert mechanism in the upgrade tool. The upgrade will launch Visual Studio instance in order to execute nuget upgrade. DO NOT CLOSE the opened Visual Studio. This will stop the upgrade. Do you want to continue?";
         public const string SettingExecutionPolicyMessage = "Setting the execution policy for the current process to unrestricted!";
         public const string UnblockingUpgradeScriptMessage = "Unblocking script file.";
         public static string UpgradeSuccessMessage = "Successfully updated '{0}' to version '{1}'." + Environment.NewLine + "Make sure to REBUILD your solution before starting up the site!";
