@@ -66,7 +66,7 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation("Install Command will be executed with the following parameters: {Params}", JsonSerializer.Serialize(installOptions));
             this.visualStudioService.ExecuteNugetInstall(installOptions);
-            this.logger.LogInformation("Installl package command finished successfully! Parameters used: {Params}", JsonSerializer.Serialize(installOptions));
+            this.logger.LogInformation("Install package command finished successfully! Parameters used: {Params}", JsonSerializer.Serialize(installOptions));
         }
 
         private bool Validate()

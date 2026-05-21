@@ -98,7 +98,7 @@ namespace Sitefinity_CLI.Services
                 string result = this.ReadAllTextFromFile(resultFile);
                 if (result != SuccessIndicator)
                 {
-                    this.logger.LogError("Error occured while executin visual stuido command {Message}", result);
+                    this.logger.LogError("Error occurred while executing Visual Studio command {Message}", result);
                     throw new VisualStudioCommandException("Operation failed");
                 }
 

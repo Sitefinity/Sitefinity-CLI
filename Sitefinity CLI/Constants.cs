@@ -56,7 +56,7 @@ namespace Sitefinity_CLI
         public const string InvalidSitefinityMode = "Please select only 1 mode for Sitefinity.";
         public const string InvalidOptionForRendererMessage = "Invalid options for a renderer project: \"{0}\"";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a solution file";
-        public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
+        public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occurred while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";
         public const string TryToUpdateInvalidVersionMessage = "The version '{0}' you are trying to upgrade to is not valid.";
@@ -94,7 +94,7 @@ namespace Sitefinity_CLI
         public const string ResourcePackageCreatedMessage = "Resource package \"{0}\" created! Path: \"{1}\"";
         public const string ModuleCreatedMessage = "Module \"{0}\" created!";
         public const string IntegrationTestsCreatedMessage = "Integration tests project \"{0}\" created!";
-        public const string AddFilesToSolutionSuccessMessage = "File \"{0}\" succesfully added to solution!";
+        public const string AddFilesToSolutionSuccessMessage = "File \"{0}\" successfully added to solution!";
         public const string NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage = "{0} projects with Sitefinity references found";
         public const string StartUpgradeSuccessMessage = "Starting upgrade of project \"{0}\"...";
         public const string UpgradeWasCanceled = "The upgrade was canceled.";
@@ -128,7 +128,7 @@ namespace Sitefinity_CLI
         public const string RecreateOption = "Instructs the command to recreate the selected page/template AND its parent templates. Useful when testing and experimenting with custom configurations/custom widget migrations.";
         public const string RecursiveOption = "Recursively migrates all the child pages/templates of the selected page/template. When migrating templates, the tool does not recursively migrate pages.";
         public const string ReplaceOption = "Replaces the content of the page. Valid only for pages.";
-        public const string MigrationFrameworkOption = "Specifies the target rednderer framework. Valid only for templates and forms.";
+        public const string MigrationFrameworkOption = "Specifies the target renderer framework. Valid only for templates and forms.";
         public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
         public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
