@@ -67,31 +67,33 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void CreateProjectFromTemplate(string templateName, string projectName, string directory)
         {
-            ExecuteCommand($"dotnet new {templateName} -n {projectName} -o \"{directory}\"");
+            ExecuteCommand($"dotnet new {templateName} -n \"{projectName}\" -o \"{directory}\"");
         }
         
-        public void MigrateSlnToSlnx(string projectName, string directory)
+        public bool MigrateSlnToSlnx(string projectName, string directory)
         {
             string slnPath = Path.Combine(directory, $"{projectName}{Constants.SlnFileExtension}");
             string slnxPath = Path.Combine(directory, $"{projectName}{Constants.SlnxFileExtension}");
             
-            ExecuteCommand($"dotnet sln {slnPath} migrate");
+            ExecuteCommand($"dotnet sln \"{slnPath}\" migrate");
 
             // Remove old .sln file if migration was successful
             if (File.Exists(slnPath) && File.Exists(slnxPath))
             {
                 File.Delete(slnPath);
+                return true;
             }
             else
             {
                 this.logger.LogError("Migration of {0} to slnx failed! Continuing with existing sln file", slnPath);
+                return false;
             }
         }
 
         public void CreateSolution(string name, string directory, bool useSlnFormat)
         {
             string format = useSlnFormat ? "sln" : "slnx";
-            ExecuteCommand($"dotnet new sln -n {name} -o \"{directory}\" -f {format}");
+            ExecuteCommand($"dotnet new sln -n \"{name}\" -o \"{directory}\" -f {format}");
         }
 
         public void AddProjectToSolution(string solutionName, string projectDirectory, string projectName, bool useSln)
@@ -114,17 +116,19 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         public void AddSourcesToNugetConfig(string[] sources, string projectDirectory)
         {
+            string configFilePath = Path.Combine(projectDirectory, "nuget.config");
+
             if (sources != null && sources.Length > 0)
             {
                 for (int i = 0; i < sources.Length; i++)
                 {
-                    ExecuteCommand($"dotnet nuget add source {sources[i]} --name \"SitefinitySource{i + 1}\" --configfile {projectDirectory}\\nuget.config");
+                    ExecuteCommand($"dotnet nuget add source {sources[i]} --name \"SitefinitySource{i + 1}\" --configfile \"{configFilePath}\"");
                 }
             }
 
             //Adds default nuget sources
-            ExecuteCommand($"dotnet nuget add source {Constants.SitefinityDefaultNugetSource} --name SitefinityNuget --configfile {projectDirectory}\\nuget.config");
-            ExecuteCommand($"dotnet nuget add source {Constants.DefaultNugetSource} --name nuget --configfile {projectDirectory}\\nuget.config");
+            ExecuteCommand($"dotnet nuget add source {Constants.SitefinityDefaultNugetSource} --name SitefinityNuget --configfile \"{configFilePath}\"");
+            ExecuteCommand($"dotnet nuget add source {Constants.DefaultNugetSource} --name nuget --configfile \"{configFilePath}\"");
         }
 
         public IEnumerable<string> GetPackageVersionsInNugetSources(string sitefinityPackage, string[] sources)
