@@ -116,6 +116,7 @@ namespace Sitefinity_CLI.Commands
                     Replace = this.Replace,
                     SiteId = this.SiteId,
                     Recursive = this.Recursive,
+                    PlaceholderMap = this.PlaceholderMap,
                     DefaultWidgetMigration = new PlaceholderWidget()
                 });
             }
