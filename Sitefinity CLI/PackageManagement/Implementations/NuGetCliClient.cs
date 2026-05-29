@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 
@@ -65,10 +65,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         {
             if (!File.Exists(nugetFileLocation) || new Version(FileVersionInfo.GetVersionInfo(nugetFileLocation).FileVersion) < NuGetExeVersion)
             {
-                using (var client = new WebClient())
-                {
-                    client.DownloadFile(NuGetExeDownloadUrl, nugetFileLocation);
-                }
+                using var httpClient = new HttpClient();
+                using var response = httpClient.GetAsync(NuGetExeDownloadUrl).GetAwaiter().GetResult();
+                response.EnsureSuccessStatusCode();
+                using var fileStream = File.Create(nugetFileLocation);
+                response.Content.ReadAsStream().CopyTo(fileStream);
             }
         }
 
