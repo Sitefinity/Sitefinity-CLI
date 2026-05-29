@@ -7,6 +7,10 @@ namespace Sitefinity_CLI
     {
         public static void WriteLine(string message, ConsoleColor? foregroundColor = null)
         {
+            // Flush any buffered output to ensure logger messages appear before direct console writes
+            Console.Out.Flush();
+            Console.Error.Flush();
+
             if (foregroundColor.HasValue)
             {
                 Console.ForegroundColor = foregroundColor.Value;

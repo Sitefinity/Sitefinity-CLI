@@ -162,13 +162,13 @@ namespace Sitefinity_CLI.Commands
         {
             if (File.Exists(filePath))
             {
-                this.Logger.LogError(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath));
+                Utils.WriteLine(string.Format(Constants.FileExistsMessage, Path.GetFileName(filePath), filePath), ConsoleColor.Red);
                 return (int)ExitCode.GeneralError;
             }
 
             if (!File.Exists(templatePath))
             {
-                this.Logger.LogError(string.Format(Constants.TemplateNotFoundMessage, resourceFullName, templatePath));
+                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, resourceFullName, templatePath), ConsoleColor.Red);
                 return (int)ExitCode.GeneralError;
             }
 

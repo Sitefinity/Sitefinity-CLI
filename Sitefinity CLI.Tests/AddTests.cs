@@ -16,8 +16,6 @@ namespace Sitefinity_CLI.Tests
 
         private Dictionary<string, string> testFolderPaths;
         private string workingDirectory;
-        private const string LoggerInfo = "info: ";
-        private const string LoggerFail = "fail: ";
 
         [TestInitialize]
         public void Initialize()
@@ -210,8 +208,8 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.CustomWidgetCreatedMessage, resourceName)));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.CustomWidgetCreatedMessage, resourceName));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -244,7 +242,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ResourceExistsMessage, Constants.AddResourcePackageCommandFullName, resourceName, expectedFolderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.ResourceExistsMessage, Constants.AddResourcePackageCommandFullName, resourceName, expectedFolderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -283,7 +281,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -322,7 +320,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -360,8 +358,8 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.FileExistsMessage, fileName, folderPath)));
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.FileExistsMessage, fileName, folderPath));
+                expectedOutputString.AppendLine(string.Format(Constants.ErrorOccuredWhileCreatingItemFromTemplate, folderPath));
 
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
@@ -474,7 +472,7 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
                 expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-                expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.DirectoryNotFoundMessage, folderPath)));
+                expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
@@ -628,7 +626,9 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddModuleTest()
+        [DataRow(true)]
+        [DataRow(false)]
+        public void AddModuleTest(bool useSln)
         {
             var resourceName = "Test";
 
@@ -638,7 +638,7 @@ namespace Sitefinity_CLI.Tests
 
                 var moduleFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
 
-                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], useSln);
                 Process process;
                 try
                 {
@@ -669,7 +669,7 @@ namespace Sitefinity_CLI.Tests
                 folderPath = moduleFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll");
+                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll", useSln);
                 var binFolderRelativePath = Path.GetDirectoryName(sitefinityDllRelativePath);
                 var csProjContents = File.ReadAllText(Path.Combine(folderPath, fileName));
 
@@ -693,15 +693,17 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.ModuleCreatedMessage, resourceName)));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.ModuleCreatedMessage, resourceName));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
 
         [TestMethod]
-        public void AddModuleWithSameNameTest()
+        [DataRow(true)]
+        [DataRow(false)]
+        public void AddModuleWithSameNameTest(bool useSln)
         {
             var resourceName = "Test";
 
@@ -719,7 +721,7 @@ namespace Sitefinity_CLI.Tests
                 {
                 }
 
-                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], useSln);
                 Process process;
                 try
                 {
@@ -775,7 +777,9 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddModuleInvalidSolution()
+        [DataRow(true)]
+        [DataRow(false)]
+        public void AddModuleInvalidSolution(bool useSln)
         {
             var resourceName = "Test";
 
@@ -783,7 +787,7 @@ namespace Sitefinity_CLI.Tests
             {
                 var testFolderPath = this.testFolderPaths[templatesVersion];
 
-                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], false);
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], useSln, false);
 
                 Process process;
                 try
@@ -807,13 +811,19 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
 
-                expectedOutputString.AppendLine(Constants.SolutionNotReadable);
+                if (useSln)
+                {
+                    expectedOutputString.AppendLine(Constants.SolutionNotReadable);
+                }
+
                 Assert.IsTrue(outputString.Contains(expectedOutputString.ToString()));
             }
         }
 
         [TestMethod]
-        public void AddTestsTest()
+        [DataRow(true)]
+        [DataRow(false)]
+        public void AddTestsTest(bool useSln)
         {
             var resourceName = "Test";
 
@@ -823,7 +833,7 @@ namespace Sitefinity_CLI.Tests
 
                 var testsFolderPath = Path.Combine(this.testFolderPaths[templatesVersion], resourceName);
 
-                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], useSln);
                 Process process;
                 try
                 {
@@ -854,7 +864,7 @@ namespace Sitefinity_CLI.Tests
                 folderPath = testsFolderPath;
                 AssertFileCreated(folderPath, fileName, expectedOutputString);
 
-                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll");
+                var sitefinityDllRelativePath = this.GetSolutionRelativePath(folderPath, "Telerik.Sitefinity.dll", useSln);
                 var binFolderRelativePath = Path.GetDirectoryName(sitefinityDllRelativePath);
                 var csProjContents = File.ReadAllText(Path.Combine(folderPath, fileName));
 
@@ -888,15 +898,17 @@ namespace Sitefinity_CLI.Tests
                     AssertFileCreated(folderPath, fileName, expectedOutputString);
                 }
 
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, Constants.FilesAddedToProjectMessage));
-                expectedOutputString.AppendLine(string.Concat(LoggerInfo, string.Format(Constants.IntegrationTestsCreatedMessage, resourceName)));
+                expectedOutputString.AppendLine(Constants.FilesAddedToProjectMessage);
+                expectedOutputString.AppendLine(string.Format(Constants.IntegrationTestsCreatedMessage, resourceName));
                 expectedOutputString.AppendLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, $"{testFolderPath}\\{resourceName}\\{resourceName}{Constants.CsprojFileExtension}"));
                 Assert.AreEqual(expectedOutputString.ToString(), outputString);
             }
         }
 
         [TestMethod]
-        public void AddTestsWithSameNameTest()
+        [DataRow(true)]
+        [DataRow(false)]
+        public void AddTestsWithSameNameTest(bool useSln)
         {
             var resourceName = "Test";
 
@@ -914,7 +926,7 @@ namespace Sitefinity_CLI.Tests
                 {
                 }
 
-                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion]);
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], useSln);
                 Process process;
                 try
                 {
@@ -971,14 +983,16 @@ namespace Sitefinity_CLI.Tests
         }
 
         [TestMethod]
-        public void AddTestsInvalidSolution()
+        [DataRow(true)]
+        [DataRow(false)]
+        public void AddTestsInvalidSolution(bool useSln)
         {
             var resourceName = "Test";
             foreach (var templatesVersion in this.testedTemplateVersions)
             {
                 var testFolderPath = this.testFolderPaths[templatesVersion];
 
-                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], false);
+                this.testFolderPaths[templatesVersion] = this.CreateDummySolution(this.testFolderPaths[templatesVersion], useSln, false);
 
                 Process process;
                 try
@@ -1003,26 +1017,32 @@ namespace Sitefinity_CLI.Tests
                 var outputString = myStreamReader.ReadToEnd();
                 var expectedOutputString = new StringBuilder();
 
-                expectedOutputString.AppendLine(Constants.SolutionNotReadable);
+                if (useSln)
+                {
+                    expectedOutputString.AppendLine(Constants.SolutionNotReadable);
+                }
+
                 Assert.IsTrue(outputString.Contains(expectedOutputString.ToString()));
             }
         }
 
-        private string CreateDummySolution(string folderPath, bool valid = true)
+        private string CreateDummySolution(string folderPath, bool useSln, bool valid = true)
         {
-            var slnPath = Path.Combine(folderPath, "Test.sln");
-            string slnContents;
+            string extension = useSln ? Constants.SlnFileExtension : Constants.SlnxFileExtension;
+            string templateType = useSln ? "Sln" : "Slnx";
+            var solutionPath = Path.Combine(folderPath, $"Test{extension}");
+            string solutionContents;
 
             if (valid)
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements.template");
+                solutionContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithElements{templateType}.template");
             }
             else
             {
-                slnContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements.template");
+                solutionContents = File.ReadAllText($"{Directory.GetCurrentDirectory()}\\SolutionFileEditorTests\\Data\\WithoutElements{templateType}.template");
             }
 
-            File.WriteAllText(slnPath, slnContents);
+            File.WriteAllText(solutionPath, solutionContents);
 
             var webAppFolderPath = Path.Combine(folderPath, "SitefinityWebApp");
             Directory.CreateDirectory(webAppFolderPath);
@@ -1129,7 +1149,7 @@ namespace Sitefinity_CLI.Tests
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.TemplateNotFoundMessage, commandFullName, expectedFolderPath)));
+            expectedOutputString.AppendLine(string.Format(Constants.TemplateNotFoundMessage, commandFullName, expectedFolderPath));
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -1158,7 +1178,7 @@ namespace Sitefinity_CLI.Tests
             var outputString = myStreamReader.ReadToEnd();
             var expectedOutputString = new StringBuilder();
             expectedOutputString.AppendFormat("{0} [y/N] ", Constants.SitefinityNotRecognizedMessage);
-            expectedOutputString.AppendLine(string.Concat(LoggerFail, string.Format(Constants.DirectoryNotFoundMessage, folderPath)));
+            expectedOutputString.AppendLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
             Assert.AreEqual(expectedOutputString.ToString(), outputString);
         }
 
@@ -1179,7 +1199,7 @@ namespace Sitefinity_CLI.Tests
                     RedirectStandardInput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = this.workingDirectory                 
+                    WorkingDirectory = this.workingDirectory
                 }
             };
         }
@@ -1267,10 +1287,11 @@ namespace Sitefinity_CLI.Tests
             return versions;
         }
 
-        private string GetSolutionRelativePath(string relativeTo, string fileName)
+        private string GetSolutionRelativePath(string relativeTo, string fileName, bool useSln)
         {
             var currentPath = relativeTo;
-            while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
+            string extension = useSln ? Constants.SlnFileExtension : Constants.SlnxFileExtension;
+            while (Directory.EnumerateFiles(currentPath, @$"*{extension}", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
             {
                 currentPath = Directory.GetParent(currentPath)?.ToString();
             }

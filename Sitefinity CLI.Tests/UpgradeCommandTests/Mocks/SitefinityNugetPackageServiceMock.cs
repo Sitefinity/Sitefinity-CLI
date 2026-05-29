@@ -11,9 +11,9 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
     {
         public string LatestVersion { get; set; }
 
-        public Task<string> GetLatestSitefinityVersion()
+        public string GetLatestSitefinityVersion()
         {
-            return Task.FromResult(this.LatestVersion);
+            return this.LatestVersion;
         }
 
         public Task<IEnumerable<NuGetPackage>> PrepareAdditionalPackages(UpgradeOptions options)

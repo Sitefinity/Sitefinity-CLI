@@ -70,21 +70,9 @@ namespace Sitefinity_CLI.Services
             }
         }
 
-        public async Task<string> GetLatestSitefinityVersion()
+        public string GetLatestSitefinityVersion()
         {
-            using HttpRequestMessage request = new(HttpMethod.Get, Constants.SfAllNugetUrl);
-            HttpResponseMessage response = await httpClient.SendAsync(request);
-            string contentString = await response.Content.ReadAsStringAsync();
-            object jsonContent = JsonConvert.DeserializeObject(contentString);
-            JObject firstEntry = (jsonContent as JArray).First as JObject;
-            string latestVersion = (firstEntry["LatestVersion"]["Version"] as JValue).Value as string;
-
-            if (string.IsNullOrEmpty(latestVersion))
-            {
-                throw new ArgumentException(Constants.LatestVersionNotFoundMeesage);
-            }
-
-            return latestVersion;
+            return this.dotnetCliClient.GetLatestVersionInNugetSources([Constants.DefaultNugetSource], Constants.SitefinityAllNuGetPackageId);
         }
 
         private async Task<NuGetPackage> GetLatestCompatibleVersion(string packageId, UpgradeOptions options)

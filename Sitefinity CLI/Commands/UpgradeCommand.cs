@@ -93,7 +93,7 @@ namespace Sitefinity_CLI.Commands
 
             if (string.IsNullOrEmpty(this.Version))
             {
-                this.Version = await this.sitefinityPackageService.GetLatestSitefinityVersion();
+                this.Version = this.sitefinityPackageService.GetLatestSitefinityVersion();
                 this.logger.LogInformation(string.Format(Constants.LatestVersionFound, this.Version));
             }
 

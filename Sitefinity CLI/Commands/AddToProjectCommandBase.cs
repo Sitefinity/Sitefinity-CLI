@@ -93,7 +93,7 @@ namespace Sitefinity_CLI.Commands
             {
                 if (!Directory.Exists(folderPath))
                 {
-                    this.Logger.LogError(string.Format(Constants.DirectoryNotFoundMessage, folderPath));
+                    Utils.WriteLine(string.Format(Constants.DirectoryNotFoundMessage, folderPath), ConsoleColor.Red);
 
                     return (int)ExitCode.GeneralError;
                 }
@@ -103,8 +103,7 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(templatePath))
             {
-                this.Logger.LogError(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath));
-
+                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePath), ConsoleColor.Red);
                 return (int)ExitCode.GeneralError;
             }
 
@@ -115,7 +114,7 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            this.Logger.LogInformation(string.Format(this.CreatedMessage, this.Name));
+            Utils.WriteLine(string.Format(this.CreatedMessage, this.Name));
 
             return (int)ExitCode.OK;
         }
@@ -171,11 +170,11 @@ namespace Sitefinity_CLI.Commands
 
                 this.AddFilesToCsProj();
 
-                this.Logger.LogInformation(Constants.FilesAddedToProjectMessage);
+                Utils.WriteLine(Constants.FilesAddedToProjectMessage);
             }
             catch (Exception ex)
             {
-                this.Logger.LogError(ex.Message);
+                Utils.WriteLine(ex.Message, ConsoleColor.Red);
 
                 this.DeleteFiles();
                 this.RemoveFilesFromCsproj();

@@ -37,13 +37,13 @@ namespace Sitefinity_CLI.Commands
 
             if (!Directory.Exists(templatePackageFolderPath))
             {
-                this.Logger.LogError(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePackageFolderPath));
+                Utils.WriteLine(string.Format(Constants.TemplateNotFoundMessage, config.FullName, templatePackageFolderPath), ConsoleColor.Red);
                 return (int)ExitCode.GeneralError;
             }
 
             if (Directory.Exists(newResourcePackagePath))
             {
-                this.Logger.LogError(string.Format(Constants.ResourceExistsMessage, config.FullName, this.SanitizedName, newResourcePackagePath));
+                Utils.WriteLine(string.Format(Constants.ResourceExistsMessage, config.FullName, this.SanitizedName, newResourcePackagePath), ConsoleColor.Red);
                 return (int)ExitCode.GeneralError;
             }
 

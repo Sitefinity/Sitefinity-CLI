@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations;
 using EnvDTE;
 using System.IO;
 using System.Threading.Tasks;
-using System.Management.Automation.Runspaces;
 using Sitefinity_CLI.Exceptions;
 using Newtonsoft.Json.Linq;
 using Sitefinity_CLI.PackageManagement.Contracts;
@@ -26,6 +25,9 @@ namespace Sitefinity_CLI.Commands
 
         [Option(Constants.HeadlessOptionTemplate, Description = Constants.HeadlessModeOptionDescription)]
         public bool Headless { get; set; }
+        
+        [Option(Constants.UseSlnSolutionOptionTemplate, Description = Constants.UseSlnSolutionOptionDescription)]
+        public bool UseSlnSolution { get; set; }
 
         [Option(Constants.CoreModulesOptionTemplate, Description = Constants.CoreModulesModeOptionDescription)]
         public bool CoreModules { get; set; }
@@ -146,16 +148,26 @@ namespace Sitefinity_CLI.Commands
 
             this.dotnetCliClient.InstallProjectTemplate(path);
             this.dotnetCliClient.CreateProjectFromTemplate("netfwebapp", this.Name, this.Directory);
+
+            bool migratedToSlnx = false;
+            if (!this.UseSlnSolution)
+            {
+                migratedToSlnx = this.dotnetCliClient.MigrateSlnToSlnx(this.Name, this.Directory);
+            }
+
             this.dotnetCliClient.UninstallProjectTemplate(path);
 
-            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, this.Directory);
 
             this.ConfigureAssemblyInfoFile();
 
             int waitTime = 10000;
-            this.visualStudioWorker.Initialize($"{this.Directory}\\{this.Name}.sln", waitTime);
+            string solutionExtension = migratedToSlnx ? Constants.SlnxFileExtension : Constants.SlnFileExtension;
+            string solutionFilePath = Path.Combine(this.Directory, $"{this.Name}{solutionExtension}");
 
-            this.logger.LogInformation($"Installing Sitefinity packages to {this.Directory}\\{this.Name}.sln");
+            this.visualStudioWorker.Initialize(solutionFilePath, waitTime);
+
+            this.logger.LogInformation($"Installing Sitefinity packages to {solutionFilePath}");
             this.logger.LogInformation("Running Sitefinity installation...");
 
             command += " -IncludePrerelease";
@@ -204,13 +216,13 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation("Creating renderer project....");
 
             this.dotnetCliClient.CreateProjectFromTemplate("web", this.Name, this.Directory);
-            this.dotnetCliClient.CreateSolution(this.Name, this.Directory);
-            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name);
+            this.dotnetCliClient.CreateSolution(this.Name, this.Directory, this.UseSlnSolution);
+            this.dotnetCliClient.AddProjectToSolution(this.Name, this.Directory, this.Name, this.UseSlnSolution);
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.TemplateNugetConfigPath);
 
             File.Copy(path, $"{this.Directory}\\nuget.config", true);
-            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, $"\"{this.Directory}\"");
+            this.dotnetCliClient.AddSourcesToNugetConfig(nugetSources, this.Directory);
 
             if (this.Version != null)
             {

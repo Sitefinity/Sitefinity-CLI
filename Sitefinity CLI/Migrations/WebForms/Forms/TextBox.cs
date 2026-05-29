@@ -1,64 +1,22 @@
-﻿using Progress.Sitefinity.MigrationTool.Core.Widgets;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Progress.Sitefinity.MigrationTool.Core.Widgets;
 
-namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms;
-internal class TextBox : FormMigrationBase
+namespace Progress.Sitefinity.MigrationTool.ConsoleApp.Migrations.WebForms.Forms;
+internal class TextBox : Paragraph
 {
-    private static readonly IDictionary<string, string> propertiesToRename = new Dictionary<string, string>()
-    {
-        { "Title", "Label" },
-        { "Example", "InstructionalText" },
-        { "DefaultValue", "PredefinedValue" },
-        { "ValidatorDefinition-MaxLengthViolationMessage", "TextLengthViolationMessage" },
-        { "ValidatorDefinition-Required", "Required" }
-    };
-
-    private static readonly string[] propertiesToCopy = new string[] { "CssClass" };
-
+    protected override string SizePropertyName => "TextBoxSize";
     public override string FieldType => "ShortText";
 
     public override Task<MigratedWidget> MigrateFormWidget(WidgetMigrationContext context)
     {
         var migratedProperties = ProcessProperties(context.Source.Properties, propertiesToCopy, propertiesToRename);
+        var propsToRead = context.Source.Properties;
 
-        context.Source.Properties.TryGetValue("ValidatorDefinition-MaxLength", out string maxLength);
-        context.Source.Properties.TryGetValue("ValidatorDefinition-MinLength", out string minLength);
+        ConfigureTextField(propsToRead, migratedProperties);
 
-        if (maxLength != "0" || minLength != "0")
+        if(context.Source.Properties.TryGetValue("ValidatorDefinition-ExpectedFormat", out string expectedFormat) && expectedFormat == "EmailAddress")
         {
-            int.TryParse(minLength, CultureInfo.InvariantCulture, out int min);
-            int.TryParse(maxLength, CultureInfo.InvariantCulture, out int max);
-
-            migratedProperties.Add("Range", JsonSerializer.Serialize(new
-            {
-                Min = min,
-                Max = max
-            }));
-        }
-
-        if (context.Source.Properties.TryGetValue("TextBoxSize", out string size))
-        {
-            switch (size)
-            {
-                case "Small":
-                    migratedProperties.Add("FieldSize", "S");
-                    break;
-                case "Medium":
-                    migratedProperties.Add("FieldSize", "M");
-                    break;
-                case "Large":
-                    migratedProperties.Add("FieldSize", "L");
-                    break;
-                default:
-                    migratedProperties.Add("FieldSize", "None");
-                    break;
-            }
+            migratedProperties["InputType"] = "Email";
         }
 
         return Task.FromResult(new MigratedWidget("SitefinityTextField", migratedProperties));

@@ -18,11 +18,6 @@ namespace Sitefinity_CLI.Commands
         }
 
         /// <summary>
-        /// The guid of the project to be added to solution
-        /// </summary>
-        protected Guid ProjectGuid { get; set; } = Guid.NewGuid();
-
-        /// <summary>
         /// The solution path
         /// </summary>
         protected string SolutionPath { get; set; }
@@ -50,7 +45,7 @@ namespace Sitefinity_CLI.Commands
             if (data is IDictionary<string, string> dictionary)
             {
                 dictionary["binFolder"] = this.BinFolder;
-                dictionary["projectGuid"] = this.ProjectGuid.ToString();
+                dictionary["projectGuid"] = Guid.NewGuid().ToString();
                 dictionary["sitefinityVersion"] = this.SitefinityVersion;
 
                 if (!string.IsNullOrEmpty(this.SitefinityVersion))
@@ -82,17 +77,25 @@ namespace Sitefinity_CLI.Commands
 
             var webAppProjectName = Path.GetFileName(Directory.EnumerateFiles(currentPath, "*.csproj", SearchOption.TopDirectoryOnly).FirstOrDefault());
 
-            while (Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault() == null)
+            while (!string.IsNullOrEmpty(currentPath))
             {
-                currentPath = Directory.GetParent(currentPath)?.ToString();
-                if (string.IsNullOrEmpty(currentPath))
-                {
-                    Utils.WriteLine(Constants.SolutionNotFoundMessage, ConsoleColor.Red);
-                    return (int)ExitCode.GeneralError;
-                }
+                var files = Directory.EnumerateFiles(currentPath, "*.*", SearchOption.TopDirectoryOnly);
+
+                // Take slnx solution file with priority
+                this.SolutionPath = files.FirstOrDefault(f => f.EndsWith(Constants.SlnxFileExtension, StringComparison.OrdinalIgnoreCase))
+                    ?? files.FirstOrDefault(f => f.EndsWith(Constants.SlnFileExtension, StringComparison.OrdinalIgnoreCase));
+
+                if (this.SolutionPath != null)
+                    break;
+
+                currentPath = Directory.GetParent(currentPath)?.FullName;
             }
 
-            this.SolutionPath = Directory.EnumerateFiles(currentPath, @"*.sln", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            if (this.SolutionPath == null)
+            {
+                Utils.WriteLine(Constants.SolutionNotFoundMessage, ConsoleColor.Red);
+                return (int)ExitCode.GeneralError;
+            }
 
             var sitefinityPath = Directory.EnumerateFiles(currentPath, "Telerik.Sitefinity.dll", SearchOption.AllDirectories).FirstOrDefault();
 
@@ -121,14 +124,13 @@ namespace Sitefinity_CLI.Commands
                 return (int)ExitCode.GeneralError;
             }
 
-            var project = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
+            var csprojFilePath = this.createdFiles.FirstOrDefault(x => x.EndsWith(Constants.CsprojFileExtension));
 
             try
             {
-                SolutionProject solutionProject = new SolutionProject(this.ProjectGuid, project, this.SolutionPath, SolutionProjectType.ManagedCsProject);
-                SolutionFileEditor.AddProject(this.SolutionPath, solutionProject);
+                SolutionFileEditor.AddProject(this.SolutionPath, csprojFilePath, SolutionProjectType.ManagedCsProject);
 
-                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, project), ConsoleColor.Green);
+                Utils.WriteLine(string.Format(Constants.AddFilesToSolutionSuccessMessage, csprojFilePath), ConsoleColor.Green);
             }
             catch (Exception ex)
             {

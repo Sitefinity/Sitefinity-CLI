@@ -41,15 +41,12 @@ namespace Sitefinity_CLI.Services
 
         public IEnumerable<string> GetProjectPathsFromSolution(string solutionPath)
         {
-            if (!solutionPath.EndsWith(Constants.SlnFileExtension, StringComparison.InvariantCultureIgnoreCase))
-            {
-                throw new UpgradeException(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
-            }
-
             return SolutionFileEditor.GetProjects(solutionPath)
                 .Select(sp => sp.AbsolutePath)
                 .Where(ap => ap.EndsWith(Constants.CsprojFileExtension, StringComparison.InvariantCultureIgnoreCase) ||
                              ap.EndsWith(Constants.VBProjFileExtension, StringComparison.InvariantCultureIgnoreCase));
+
+            throw new UpgradeException(string.Format(Constants.FileIsNotSolutionMessage, solutionPath));
         }
 
         public IEnumerable<string> GetSitefinityProjectPathsFromSolution(string solutionPath)

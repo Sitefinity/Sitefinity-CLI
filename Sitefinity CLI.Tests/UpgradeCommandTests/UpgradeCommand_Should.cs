@@ -91,7 +91,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         }
 
         [TestMethod]
-        public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedRelatively()
+        public async Task SolutionPathIsSetCorrect_When_SlnSolutionPathCommandIsPassedRelatively()
         {
             var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
             string workingDirectory = Directory.GetCurrentDirectory();
@@ -99,7 +99,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             try
             {
                 string newWorkingDirectory = Path.Combine(workingDirectory, "UpgradeCommandTests");
-                string solutionPath = Path.Combine("Mocks", "fake.sln");
+                string solutionPath = Path.Combine("Mocks", "fakeSln.sln");
 
                 upgradeCommand.SolutionPath = solutionPath;
                 upgradeCommand.Version = "15.1.8325";
@@ -117,11 +117,51 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         }
 
         [TestMethod]
-        public async Task SolutionPathIsSetCorrect_When_SolutionPathCommandIsPassedFull()
+        public async Task SolutionPathIsSetCorrect_When_SlnSolutionPathCommandIsPassedFull()
         {
             var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
             string workingDirectory = Directory.GetCurrentDirectory();
-            string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fake.sln");
+            string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fakeSln.sln");
+
+            upgradeCommand.SolutionPath = solutionPath;
+            upgradeCommand.Version = "15.1.8325";
+            upgradeCommand.SkipPrompts = true;
+            await upgradeCommand.Execute();
+
+            Assert.AreEqual(solutionPath, upgradeCommand.SolutionPath);
+        }
+
+        [TestMethod]
+        public async Task SolutionPathIsSetCorrect_When_SlnxSolutionPathCommandIsPassedRelatively()
+        {
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            string workingDirectory = Directory.GetCurrentDirectory();
+
+            try
+            {
+                string newWorkingDirectory = Path.Combine(workingDirectory, "UpgradeCommandTests");
+                string solutionPath = Path.Combine("Mocks", "fakeSlnx.slnx");
+
+                upgradeCommand.SolutionPath = solutionPath;
+                upgradeCommand.Version = "15.1.8325";
+                upgradeCommand.SkipPrompts = true;
+                Directory.SetCurrentDirectory(newWorkingDirectory);
+                await upgradeCommand.Execute();
+
+                Assert.AreEqual(Path.Combine(newWorkingDirectory, solutionPath), upgradeCommand.SolutionPath);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(workingDirectory);
+            }
+        }
+
+        [TestMethod]
+        public async Task SolutionPathIsSetCorrect_When_SlnxSolutionPathCommandIsPassedFull()
+        {
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            string workingDirectory = Directory.GetCurrentDirectory();
+            string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fakeSlnx.slnx");
 
             upgradeCommand.SolutionPath = solutionPath;
             upgradeCommand.Version = "15.1.8325";
