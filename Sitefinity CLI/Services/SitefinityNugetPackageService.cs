@@ -70,6 +70,14 @@ namespace Sitefinity_CLI.Services
             }
         }
 
+        public void ReconcileProjectBindingRedirects(IEnumerable<string> projectFilePaths, string solutionFolder)
+        {
+            foreach (string projectFilePath in projectFilePaths)
+            {
+                this.sitefinityPackageManager.ReconcileBindingRedirects(projectFilePath, solutionFolder);
+            }
+        }
+
         public string GetLatestSitefinityVersion()
         {
             return this.dotnetCliClient.GetLatestVersionInNugetSources([Constants.DefaultNugetSource], Constants.SitefinityAllNuGetPackageId);

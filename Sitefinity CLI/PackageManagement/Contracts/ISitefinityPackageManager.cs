@@ -31,6 +31,8 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 
+        void ReconcileBindingRedirects(string projectFilePath, string solutionDir);
+
         void SetTargetFramework(IEnumerable<string> sitefinityProjectFilePaths, string version);
 
         IEnumerable<PackageSource> GetNugetPackageSources(string nugetConfigFilePath);

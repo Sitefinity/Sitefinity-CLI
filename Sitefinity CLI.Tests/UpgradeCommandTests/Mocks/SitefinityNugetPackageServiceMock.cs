@@ -29,5 +29,9 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
         public void SyncProjectReferencesWithPackages(IEnumerable<string> projectFilePaths, string solutionFolder)
         {
         }
+
+        public void ReconcileProjectBindingRedirects(IEnumerable<string> projectFilePaths, string solutionFolder)
+        {
+        }
     }
 }
