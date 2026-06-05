@@ -88,9 +88,28 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             this.processedPackagesPerProjectCache[projectFilePath] = new HashSet<string>();
-            if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree, newSitefinityVersionPackageTree))
+
+            bool isMetaPackageDecomposed = this.ShouldDecomposePackage(currentSitefinityVersionPackageTree.Id);
+            if (isMetaPackageDecomposed)
+            {
+                this.logger.LogInformation($"Decomposing '{currentSitefinityVersionPackageTree.Id}' into individual dependency updates to avoid large NuGet transactions.");
+                await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree.Dependencies, newSitefinityVersionPackageTree);
+            }
+            else if (!this.TryAddPackageTreeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree, newSitefinityVersionPackageTree))
             {
                 await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, currentSitefinityVersionPackageTree.Dependencies, newSitefinityVersionPackageTree);
+            }
+
+            // Add the decomposed meta-package as the last entry with ignoreDependencies flag
+            // so its version in packages.config is updated without re-processing all dependencies
+            if (isMetaPackageDecomposed)
+            {
+                NuGetPackage newMetaPackage = this.FindNuGetPackageByIdInDependencyTree(newSitefinityVersionPackageTree, currentSitefinityVersionPackageTree.Id);
+                if (newMetaPackage != null)
+                {
+                    this.AddPackageNodeToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, newMetaPackage, ignoreDependencies: true);
+                    this.processedPackagesPerProjectCache[projectFilePath].Add(newMetaPackage.Id);
+                }
             }
 
             foreach (NuGetPackage additionalPackage in additionalPackagesToUpgrade)
@@ -145,7 +164,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return true;
         }
 
-        private void AddPackageNodeToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, NuGetPackage nuGetPackage)
+        private void AddPackageNodeToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, NuGetPackage nuGetPackage, bool ignoreDependencies = false)
         {
             XmlElement packageNode = powerShellXmlConfig.CreateElement("package");
             XmlAttribute nameAttribute = powerShellXmlConfig.CreateAttribute("name");
@@ -154,6 +173,14 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             versionAttribute.Value = nuGetPackage.Version;
             packageNode.Attributes.Append(nameAttribute);
             packageNode.Attributes.Append(versionAttribute);
+
+            if (ignoreDependencies)
+            {
+                XmlAttribute ignoreDepsAttribute = powerShellXmlConfig.CreateAttribute("ignoreDependencies");
+                ignoreDepsAttribute.Value = "true";
+                packageNode.Attributes.Append(ignoreDepsAttribute);
+            }
+
             projectNode.AppendChild(packageNode);
         }
 
@@ -187,6 +214,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             return null;
+        }
+
+        private bool ShouldDecomposePackage(string packageId)
+        {
+            return packageId.Equals(Constants.SitefinityAllNuGetPackageId, StringComparison.OrdinalIgnoreCase);
         }
 
         private readonly ILogger logger;

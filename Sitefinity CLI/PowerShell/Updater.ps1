@@ -77,7 +77,13 @@ try {
                 if ($isUpdateRequired) {
                     "`nUpgrading from '$oldPackageVersion' to '$packageVersion'"
                     $errorMessage = $null;
-                    Invoke-Expression "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll -IncludePrerelease -ErrorVariable errorMessage" 
+                    $ignoreDeps = $package.ignoreDependencies -eq "true"
+                    $updateCmd = "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll -IncludePrerelease"
+                    if ($ignoreDeps) {
+                        $updateCmd += " -IgnoreDependencies"
+                        "`nUsing -IgnoreDependencies for '$packageName' (dependencies already updated individually)"
+                    }
+                    Invoke-Expression "$updateCmd -ErrorVariable errorMessage" 
 					
                     if ($errorMessage -ne $null) {
                         Write-Error -Message "`nError occured while upgrading $packageName. The error was: $errorMessage" -ErrorAction Stop
