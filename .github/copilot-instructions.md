@@ -4,12 +4,33 @@
 
 This is a .NET 9.0 console application (executable name: `sf`) that provides CLI commands for managing Sitefinity CMS projects. It uses **McMaster.Extensions.CommandLineUtils** for command parsing and follows a layered architecture with commands, services, and file editors.
 
+## Build, Test, and Run
+
+```bash
+# Build the solution
+dotnet build "Sitefinity CLI.sln"
+
+# Publish for Windows x64
+dotnet publish "Sitefinity CLI/Sitefinity CLI.csproj" -c release -r win-x64
+
+# Run all tests
+dotnet test "Sitefinity CLI.Tests/Sitefinity CLI.Tests.csproj"
+
+# Run a single test by fully qualified name
+dotnet test "Sitefinity CLI.Tests/Sitefinity CLI.Tests.csproj" --filter "FullyQualifiedName~ClassName.MethodName"
+
+# Run tests matching a pattern
+dotnet test "Sitefinity CLI.Tests/Sitefinity CLI.Tests.csproj" --filter "DisplayName~Upgrade"
+```
+
+The solution file is `Sitefinity CLI.sln` at the repository root. Note the spaces in project/folder names — always quote paths.
+
 ## Solution Structure
 
-- **Sitefinity CLI/** – Main console application
+- **Sitefinity CLI/** – Main console application (`Sitefinity_CLI` namespace)
 - **Sitefinity CLI.Tests/** – MSTest unit tests
 
-### Folder Organization
+### Folder Organization (under `Sitefinity CLI/`)
 
 | Folder | Purpose |
 |--------|---------|
@@ -18,12 +39,12 @@ This is a .NET 9.0 console application (executable name: `sf`) that provides CLI
 | `Model/` | DTOs and option classes |
 | `VisualStudio/` | Project/solution file editors (.csproj, .sln/.slnx) |
 | `Logging/` | Custom console formatter |
-| `Enums/` | Enumerations |
+| `Enums/` | Enumerations (`ExitCode`, `ProtocolVersion`) |
 | `Exceptions/` | Custom exception types |
-| `PackageManagement/` | NuGet package operations |
-| `Templates/` | Handlebars templates for code generation |
+| `PackageManagement/` | NuGet package operations; interfaces in `Contracts/`, implementations in `Implementations/` |
+| `Templates/` | Handlebars templates for code generation, versioned by Sitefinity CMS version (e.g., `14.4/`, `15.0/`) |
 | `Migrations/` | Migration-related logic |
-| `PowerShell/` | PowerShell integration |
+| `PowerShell/` | PowerShell integration (embedded `.ps1` scripts) |
 
 ## Naming Conventions
 
@@ -65,27 +86,30 @@ internal class MyCommand
 
 - Use `[Subcommand(typeof(...))]` for nested commands.
 - Commands are `internal` classes.
-- Entry method is `OnExecuteAsync` (async) or `OnExecute` (sync), returning an `int` exit code.
+- Entry method is `OnExecuteAsync` (async) or `OnExecute` (sync), returning an `int` exit code (`ExitCode` enum: `OK = 0`, `GeneralError = 1`, `InsufficientPermissions = 2`).
 
 ## Architecture Patterns
+
+### Entry Point and DI
+
+`Program.cs` configures the host with `HostBuilder`, registers all services in `ConfigureServices`, and runs the CLI via `RunCommandLineApplicationAsync<Program>`. Top-level commands are registered as `[Subcommand]` attributes on `Program`. The main project uses `[assembly: InternalsVisibleTo("Sitefinity CLI.Tests")]` so tests can access `internal` types.
 
 ### Base Classes
 
 - **`CommandBase`** – Abstract base for all commands. Provides `Name`, `ProjectRootPath`, `Version`, `TemplateName`. Discovers template versions and validates Sitefinity projects.
-- **`FileEditorBase`** – Manages file attributes (removes Hidden/ReadOnly before edits, restores after).
-- **`XmlFileEditorBase`** – XML manipulation via `XDocument`. Uses `ReadFile()` / `ModifyFile()` with functional lambdas.
+- **`FileEditorBase`** – Wraps file operations with attribute management (`EnsureFileOperation`): removes Hidden/ReadOnly before edits, restores original attributes after. Any class editing files on disk should inherit from this.
+- **`XmlFileEditorBase`** (extends `FileEditorBase`) – XML manipulation via `XDocument`. `ReadFile(path, action)` for reading, `ModifyFile(path, func)` for modifications — both handle file attributes automatically.
 - **`AddToProjectCommandBase`** – Commands that add files to projects. Handles template processing, PascalCase naming, and namespace extraction.
 
 ### Dependency Injection
 
-- Use **Microsoft.Extensions.DependencyInjection** with constructor injection.
-- Register services with `AddTransient()`, `AddScoped()`, or `AddSingleton()`.
+- Register services in `Program.ConfigureServices`. Use constructor injection in commands and services.
 - Inject `ILogger<T>` for logging and service interfaces for business logic.
 
 ### Service Layer
 
-- Define contracts as interfaces in `Services/Contracts/`.
-- Place implementations in `Services/`.
+- Define contracts as interfaces in `Services/Contracts/` and `PackageManagement/Contracts/`.
+- Place implementations in `Services/` and `PackageManagement/Implementations/`.
 - Inject services into commands via constructor injection.
 
 ## Coding Style
