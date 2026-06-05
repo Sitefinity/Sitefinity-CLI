@@ -90,7 +90,7 @@ namespace Sitefinity_CLI.Model
             new DeprecatedPackage("Progress.Sitefinity.Ecommerce", new Version("15.0.8200")),
             new DeprecatedPackage("AntiXSS", new Version("15.0.8200")),
             new DeprecatedPackage("linqtotwitterNET40", new Version("15.2.8400")),
-            new DeprecatedPackage("Telerik.Sitefinity.Twitterizer", new Version("15.2.8400")),
+            new DeprecatedPackage("Telerik.Sitefinity.Twitterizer", new Version("15.2.8400"))
         };
 
         private readonly List<DeprecatedPackage> DeprecatedResourcesRepository = new()
