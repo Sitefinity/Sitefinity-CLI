@@ -130,38 +130,18 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private async Task<PackageSpecificationResponseModel> GetPackageSpecification(string id, string version, IEnumerable<PackageSource> nugetPackageSources)
         {
-            var normalizedversion = version;
-            var maxIterations = 3;
             PackageSpecificationResponseModel packageSepc = new PackageSpecificationResponseModel();
 
-            // If a version ending with ".0" is not found, try without the last version segment.
-            // We trim versions like "1.0.0.0" to "1.0.0" then "1.0" then "1". Only trim when the version ends with ".0".
-            // This is necessary, because sometimes there are misaligned versions (3.2.0.0 specified instead of 3.2.0), but for NuGet such packages versions are identical.
-            do
+            foreach (PackageSource source in nugetPackageSources)
             {
-                maxIterations--;
-                foreach (PackageSource source in nugetPackageSources)
+                ProtocolVersion protocolVersion = (ProtocolVersion)source.ProtocolVersion;
+                HttpResponseMessage response = await this.nugetProviders[protocolVersion].GetPackageSpecification(id, version, source);
+                if (response?.StatusCode == HttpStatusCode.OK)
                 {
-                    ProtocolVersion protocolVersion = (ProtocolVersion)source.ProtocolVersion;
-                    HttpResponseMessage response = await this.nugetProviders[protocolVersion].GetPackageSpecification(id, normalizedversion, source);
-                    if (response?.StatusCode == HttpStatusCode.OK)
-                    {
-                        packageSepc.SpecResponse = response;
-                        packageSepc.ProtoVersion = protocolVersion;
-                        break;
-                    }
-                }
-
-                if (packageSepc.SpecResponse == null && normalizedversion.EndsWith(NonNormalizedVersionSuffix))
-                {
-                    normalizedversion = normalizedversion.Substring(0, normalizedversion.Length - NonNormalizedVersionSuffix.Length);
-                }
-                else
-                {
-                    break;
+                    packageSepc.SpecResponse = response;
+                    packageSepc.ProtoVersion = protocolVersion;
                 }
             }
-            while (maxIterations >=0);
 
             if (packageSepc.SpecResponse == null)
             {
@@ -261,6 +241,5 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private readonly IDictionary<ProtocolVersion, INuGetDependencyParser> dependencyParsers;
         private readonly IDictionary<ProtocolVersion, INugetProvider> nugetProviders;
         private readonly static object lockObj = new();
-        private const string NonNormalizedVersionSuffix = ".0";
     }
 }
