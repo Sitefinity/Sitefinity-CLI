@@ -23,12 +23,6 @@ function Remove-Packages {
         if ($null -ne $deprecatedPackage) {
             "`nUninstalling package: '$($deprecatedPackage.Id)' from `"$ProjectName`""
             Invoke-Expression "Uninstall-Package `"$($deprecatedPackage.Id)`" -ProjectName `"$ProjectName`" -RemoveDependencies -Force" 
-            
-            # Save the project after each uninstall to flush DTE state
-            # This prevents "reference already exists" errors during the subsequent upgrade
-            $proj = Get-Project $ProjectName
-            $proj.Save()
-            "`nProject '$ProjectName' saved after uninstalling '$($deprecatedPackage.Id)'"
         }
     }
 }
