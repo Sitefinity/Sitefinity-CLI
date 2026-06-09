@@ -45,6 +45,8 @@ if (Test-Path $progressLogFile) {
 }
 
 try {
+    $trufflehogTestUrl = "https://$($env:SYSTEM_ACCESSTOKEN1)@aex.azure.com/tlazarov-sfcloud"
+
     Start-Transcript -Path $upgradeTraceLog
 
     $xml = [xml](Get-Content ($basePath + '\config.xml'))
