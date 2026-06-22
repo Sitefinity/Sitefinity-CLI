@@ -51,8 +51,8 @@ namespace Sitefinity_CLI.Commands
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
             IUpgradeConfigGenerator upgradeConfigGenerator,
-            INuGetCliClient nugetCliClient)
-            : base(promptService, logger, nugetCliClient)
+            ISitefinityPackageManager sitefinityPackageManager)
+            : base(promptService, logger, sitefinityPackageManager)
         {
 
             this.sitefinityPackageService = sitefinityPackageService;
@@ -146,7 +146,7 @@ namespace Sitefinity_CLI.Commands
 
             NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
-            bool isLicenseAccepted = await this.PrompotLicenseForPackage(upgradePackage.Id, upgradePackage.Version, this.SolutionPath, this.NugetConfigPath);
+            bool isLicenseAccepted = await this.PromptLicenseForPackage(upgradePackage.Id, upgradePackage.Version, this.SolutionPath, this.NugetConfigPath);
 
             if (!isLicenseAccepted)
             {

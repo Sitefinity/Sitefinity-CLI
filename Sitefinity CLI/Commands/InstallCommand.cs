@@ -33,8 +33,8 @@ namespace Sitefinity_CLI.Commands
             ILogger<InstallCommand> logger,
             IVisualStudioService visualStudioService,
             IPromptService promptService,
-            INuGetCliClient nugetCliClient)
-                : base(promptService, logger, nugetCliClient)
+            ISitefinityPackageManager sitefinityPackageManager)
+                : base(promptService, logger, sitefinityPackageManager)
         {
             this.logger = logger;
             this.visualStudioService = visualStudioService;
@@ -56,7 +56,8 @@ namespace Sitefinity_CLI.Commands
 
         private async Task ExecuteInstallCommand()
         {
-            if (!this.Validate())
+            bool isValid = await this.Validate();
+            if (!isValid)
             {
                 return;
             }
@@ -71,19 +72,12 @@ namespace Sitefinity_CLI.Commands
                 ProjectNames = projectNames
             };
 
-            bool isLicenseAccepted = await this.PrompotLicenseForPackage(installOptions.PackageName, installOptions.Version, installOptions.SolutionPath, this.NugetConfigPath);
-
-            if (!isLicenseAccepted)
-            {
-                return;
-            }
-
             this.logger.LogInformation("Install Command will be executed with the following parameters: {Params}", JsonSerializer.Serialize(installOptions));
             this.visualStudioService.ExecuteNugetInstall(installOptions);
             this.logger.LogInformation("Installl package command finished successfully! Parameters used: {Params}", JsonSerializer.Serialize(installOptions));
         }
 
-        private bool Validate()
+        private async Task<bool> Validate()
         {
             bool isSuccess = true;
             if (!Path.IsPathFullyQualified(this.SolutionPath))
@@ -95,6 +89,8 @@ namespace Sitefinity_CLI.Commands
             {
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
+
+            bool isLicenseAccepted = await this.PromptLicenseForPackage(this.PackageName, this.Version, this.SolutionPath, this.NugetConfigPath);
 
             return isSuccess;
         }

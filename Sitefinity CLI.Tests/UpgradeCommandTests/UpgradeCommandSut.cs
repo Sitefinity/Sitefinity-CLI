@@ -17,8 +17,8 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
             IUpgradeConfigGenerator upgradeConfigGenerator,
-            INuGetCliClient nugetCliClient) 
-            : base(sitefinityPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, nugetCliClient)
+            ISitefinityPackageManager sitefinityPackageManager) 
+            : base(sitefinityPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, sitefinityPackageManager)
         {
         }
 
