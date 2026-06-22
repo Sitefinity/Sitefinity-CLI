@@ -33,8 +33,8 @@ namespace Sitefinity_CLI.Commands
             ILogger<InstallCommand> logger,
             IVisualStudioService visualStudioService,
             IPromptService promptService,
-            ISitefinityPackageManager sitefinityPackageManager)
-                : base(promptService, logger, sitefinityPackageManager)
+            INuGetCliClient nugetCliClient)
+                : base(promptService, logger, nugetCliClient)
         {
             this.logger = logger;
             this.visualStudioService = visualStudioService;
@@ -71,7 +71,7 @@ namespace Sitefinity_CLI.Commands
                 ProjectNames = projectNames
             };
 
-            bool isLicenseAccepted = await this.PrompotLicenseForPackage(installOptions.PackageName, installOptions.Version, installOptions.SolutionPath);
+            bool isLicenseAccepted = await this.PrompotLicenseForPackage(installOptions.PackageName, installOptions.Version, installOptions.SolutionPath, this.NugetConfigPath);
 
             if (!isLicenseAccepted)
             {

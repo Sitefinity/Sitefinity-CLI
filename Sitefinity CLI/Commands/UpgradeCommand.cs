@@ -21,7 +21,7 @@ namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
     [Command(Constants.UpgradeCommandName, Constants.UpgradeCommandDescription)]
-    internal class UpgradeCommand
+    internal class UpgradeCommand : NugetLicenseCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
         [Required(ErrorMessage = Constants.SolutionPathRequired)]
@@ -33,12 +33,6 @@ namespace Sitefinity_CLI.Commands
 
         [Option(Constants.SkipPrompts, Description = Constants.SkipPromptsDescription)]
         public bool SkipPrompts { get; set; }
-
-        [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
-        public bool AcceptLicense { get; set; }
-
-        [Option(Constants.NugetConfigPath, Description = Constants.NugetConfigPathDescrption)]
-        public string NugetConfigPath { get; set; } = GetDefaultNugetConfigpath();
 
         [Option(Constants.AdditionalPackages, Description = Constants.AdditionalPackagesDescription)]
         public string AdditionalPackagesString { get; set; }
@@ -56,7 +50,9 @@ namespace Sitefinity_CLI.Commands
             IPromptService promptService,
             ISitefinityProjectService sitefinityProjectService,
             ISitefinityConfigService sitefinityConfigService,
-            IUpgradeConfigGenerator upgradeConfigGenerator)
+            IUpgradeConfigGenerator upgradeConfigGenerator,
+            INuGetCliClient nugetCliClient)
+            : base(promptService, logger, nugetCliClient)
         {
 
             this.sitefinityPackageService = sitefinityPackageService;
@@ -150,15 +146,11 @@ namespace Sitefinity_CLI.Commands
 
             NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
-            if (!this.AcceptLicense)
-            {
-                string licenseContent = await this.GetLicenseContent(upgradePackage, Constants.LicenseAgreementsFolderName);
-                bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
+            bool isLicenseAccepted = await this.PrompotLicenseForPackage(upgradePackage.Id, upgradePackage.Version, this.SolutionPath, this.NugetConfigPath);
 
-                if (!hasUserAccepted)
-                {
-                    return;
-                }
+            if (!isLicenseAccepted)
+            {
+                return;
             }
 
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade = await this.sitefinityPackageService.PrepareAdditionalPackages(upgradeOptions);
@@ -244,12 +236,6 @@ namespace Sitefinity_CLI.Commands
             }
 
             return hasUserAcceptedEULA;
-        }
-
-        private static string GetDefaultNugetConfigpath()
-        {
-            string executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return Path.Combine(executableLocation, Constants.PackageManagement, "NuGet.Config");
         }
 
         private readonly ISitefinityNugetPackageService sitefinityPackageService;

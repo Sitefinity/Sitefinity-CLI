@@ -8,36 +8,27 @@ using System.Threading.Tasks;
 
 namespace Sitefinity_CLI
 {
-    internal class NugetLicenseCommand
+    internal abstract class NugetLicenseCommand
     {
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
-        public bool AcceptLicense { get; set; }
+        public virtual bool AcceptLicense { get; set; }
 
         [Option(Constants.NugetConfigPath, Description = Constants.NugetConfigPathDescrption)]
-        public string NugetConfigPath { get; set; } = GetDefaultNugetConfigpath();
+        public virtual string NugetConfigPath { get; set; } = GetDefaultNugetConfigpath();
 
-        public NugetLicenseCommand(IPromptService promptService, ILogger logger, ISitefinityPackageManager sitefinityPackageManager)
+        public NugetLicenseCommand(IPromptService promptService, ILogger logger, INuGetCliClient nugetCliClient)
         {
             this.promptService = promptService;
             this.logger = logger;
-            this.sitefinityPackageManager = sitefinityPackageManager;
+            this.nugetCliClient = nugetCliClient;
         }
 
-        public virtual async Task<bool> PrompotLicenseForPackage(string packageId, string version, string solutionPath)
-        {
-            return await this.PrompotLicenseForPackage(packageId, version, solutionPath, string.Empty);
-        }
 
         public virtual async Task<bool> PrompotLicenseForPackage(string packageId, string version, string solutionPath, string nugetConfigPath)
         {
             if (!this.AcceptLicense)
             {
-                if (string.IsNullOrEmpty(nugetConfigPath))
-                {
-                    nugetConfigPath = GetDefaultNugetConfigpath();
-                }
-
-                this.sitefinityPackageManager.Install(packageId, version, solutionPath, nugetConfigPath);
+                this.nugetCliClient.InstallPackage(packageId, version, solutionPath, nugetConfigPath);
 
                 string licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
 
@@ -82,7 +73,7 @@ namespace Sitefinity_CLI
         }
 
         private readonly IPromptService promptService;
-        private readonly ISitefinityPackageManager sitefinityPackageManager;
+        private readonly INuGetCliClient nugetCliClient;
         private readonly ILogger logger;
     }
 }
