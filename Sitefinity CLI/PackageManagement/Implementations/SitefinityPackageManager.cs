@@ -46,7 +46,6 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             this.logger.LogInformation($"[{solutionDirectory}] Installing package '{packageId}'...");
 
-
             this.nuGetCliClient.InstallPackage(packageId, version, solutionDirectory, nugetConfigFilePath);
 
             this.logger.LogInformation($"[{solutionDirectory}] Install for package '{packageId}' completed");

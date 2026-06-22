@@ -102,6 +102,7 @@ namespace Sitefinity_CLI
         public const string TargetFrameworkDoesNotNeedChanged = "Target framework for {0} does not need change ({1})";
         public const string LatestVersionFound = "Latest version for Sitefinity found: {0}";
         public const string RemovingEnhancerAssemblyForProjectsIfExists = "Removing EnhancerAssembly for projects (if exists)";
+        public const string LicenseNotAccepted = "License not accepted. The operation cannot continue.";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";

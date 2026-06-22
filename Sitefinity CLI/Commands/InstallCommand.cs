@@ -1,17 +1,19 @@
-﻿using System;
+﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.Services.Contracts;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text.Json;
-using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging;
-using Sitefinity_CLI.Model;
-using Sitefinity_CLI.Services.Contracts;
+using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
     [Command(Constants.InstallCommandName, Constants.InstallCommandDescription)]
-    internal class InstallCommand
+    internal class InstallCommand : NugetLicenseCommand
     {
         [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
         [Required(ErrorMessage = Constants.SolutionPathRequired)]
@@ -27,17 +29,22 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
         public string ProjectNames { get; set; }
 
-        public InstallCommand(ILogger<InstallCommand> logger, IVisualStudioService visualStudioService)
+        public InstallCommand(
+            ILogger<InstallCommand> logger,
+            IVisualStudioService visualStudioService,
+            IPromptService promptService,
+            ISitefinityPackageManager sitefinityPackageManager)
+                : base(promptService, logger, sitefinityPackageManager)
         {
             this.logger = logger;
             this.visualStudioService = visualStudioService;
         }
 
-        protected int OnExecuteAsync(CommandLineApplication app)
+        protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
             try
             {
-                this.ExecuteInstallCommand();
+                await this.ExecuteInstallCommand();
                 return 0;
             }
             catch (Exception ex)
@@ -47,7 +54,7 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private void ExecuteInstallCommand()
+        private async Task ExecuteInstallCommand()
         {
             if (!this.Validate())
             {
@@ -63,6 +70,13 @@ namespace Sitefinity_CLI.Commands
                 Version = this.Version,
                 ProjectNames = projectNames
             };
+
+            bool isLicenseAccepted = await this.PrompotLicenseForPackage(installOptions.PackageName, installOptions.Version, installOptions.SolutionPath);
+
+            if (!isLicenseAccepted)
+            {
+                return;
+            }
 
             this.logger.LogInformation("Install Command will be executed with the following parameters: {Params}", JsonSerializer.Serialize(installOptions));
             this.visualStudioService.ExecuteNugetInstall(installOptions);
