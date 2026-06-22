@@ -23,7 +23,8 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = Constants.PackageNameRequired)]
         public string PackageName { get; set; }
 
-        [Option(Constants.VersionOptionTemplate, CommandOptionType.SingleValue, Description = Constants.PackageVersion)]
+        [Argument(2, Description = Constants.InstallCommandVersionDescription)]
+        [Required(ErrorMessage = Constants.InstallCommandPackageVersionRequired)]
         public string Version { get; set; }
 
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]

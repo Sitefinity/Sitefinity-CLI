@@ -64,7 +64,7 @@ namespace Sitefinity_CLI
         public const string LatestVersionNotFoundMeesage = "Can't get the latest Sitefinity version. Please specify the upgrade version.";
         public const string SolutionPathRequired = "You must specify a path to a solution file.";
         public const string PackageNameRequired = "You must specify the name of the package you want to install.";
- 
+
         // Warning messages
         public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";
         public const string SearchingProjectForReferencesMessage = "Searching the provided project/s for Sitefinity references...";
@@ -115,7 +115,7 @@ namespace Sitefinity_CLI
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
         public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
-        public const string UseSlnSolutionOptionDescription = "Use this to create a .sln solution file instead of the default .slnx format."; 
+        public const string UseSlnSolutionOptionDescription = "Use this to create a .sln solution file instead of the default .slnx format.";
         public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
         public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
@@ -248,7 +248,7 @@ namespace Sitefinity_CLI
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
         public const string ApiV3IdentifierSegment = "v3/";
-        public const int  NugetProtoclV2 = 2;
+        public const int NugetProtoclV2 = 2;
         public const int NugetProtoclV3 = 3;
 
         // Patterns
@@ -263,7 +263,10 @@ namespace Sitefinity_CLI
         public const string InstallCommandDescription = "Installs a nuget package to a specified solution.";
         public const string PackageNameDescrption = "The name of the nuget package you want to install.";
         public const string PackageVersion = "The version of the nuget package you want to install.";
+        public const string InstallCommandPackageVersionRequired = "You must specify the version of the package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
+        public const string InstallCommandVersionDescription = "The version of Sitefinity that you want to install. If no version is specified, the latest official version will be used.";
+
     }
 }
