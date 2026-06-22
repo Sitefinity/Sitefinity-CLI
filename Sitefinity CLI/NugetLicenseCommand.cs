@@ -27,14 +27,25 @@ namespace Sitefinity_CLI
         {
             if (!this.AcceptLicense)
             {
-                this.sitefinityPackageManager.Install(packageId, version, solutionPath, nugetConfigPath);
-
                 string licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
+
+                if (string.IsNullOrEmpty(licenseContent))
+                {
+                    this.sitefinityPackageManager.Install(packageId, version, solutionPath, nugetConfigPath);
+                    licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
+                }
+
+                if (string.IsNullOrEmpty(licenseContent))
+                {
+                    this.logger.LogWarning("License content is not found for package {PackageId} version {Version}. The package will not be installed without showing license agreement.", packageId, version);
+                    return false;
+                }
 
                 return this.PromptLicenseContent(licenseContent);
             }
 
             return true;
+        }
         }
 
         protected virtual bool PromptLicenseContent(string licenseContent)
