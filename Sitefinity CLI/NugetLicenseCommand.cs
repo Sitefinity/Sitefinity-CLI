@@ -46,7 +46,6 @@ namespace Sitefinity_CLI
 
             return true;
         }
-        }
 
         protected virtual bool PromptLicenseContent(string licenseContent)
         {
