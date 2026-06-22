@@ -79,7 +79,6 @@ namespace Sitefinity_CLI.Commands
 
         private async Task<bool> Validate()
         {
-            bool isSuccess = true;
             if (!Path.IsPathFullyQualified(this.SolutionPath))
             {
                 this.SolutionPath = Path.GetFullPath(this.SolutionPath);
@@ -90,9 +89,7 @@ namespace Sitefinity_CLI.Commands
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            bool isLicenseAccepted = await this.PromptLicenseForPackage(this.PackageName, this.Version, this.SolutionPath, this.NugetConfigPath);
-
-            return isSuccess;
+            return await this.PromptLicenseForPackage(this.PackageName, this.Version, this.SolutionPath, this.NugetConfigPath);
         }
 
         private readonly string[] packageNamesSeprators = [";"];
