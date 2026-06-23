@@ -90,7 +90,7 @@ namespace Sitefinity_CLI.Commands
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            return await this.PromptLicenseForPackage(this.PackageName, this.Version, this.SolutionPath, this.NugetConfigPath);
+            return await this.PromptLicenseForPackage(this.PackageName, this.Version, this.SolutionPath);
         }
 
         private readonly string[] packageNamesSeprators = [";"];

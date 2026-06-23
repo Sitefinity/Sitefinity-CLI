@@ -146,7 +146,7 @@ namespace Sitefinity_CLI.Commands
 
             NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
-            bool isLicenseAccepted = await this.PromptLicenseForPackage(upgradePackage.Id, upgradePackage.Version, this.SolutionPath, this.NugetConfigPath);
+            bool isLicenseAccepted = await this.PromptLicenseForPackage(upgradePackage.Id, upgradePackage.Version, this.SolutionPath);
 
             if (!isLicenseAccepted)
             {

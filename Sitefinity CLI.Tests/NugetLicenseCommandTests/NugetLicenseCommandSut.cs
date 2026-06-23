@@ -19,9 +19,9 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
         {
         }
 
-        public new async Task<bool> PromptLicenseForPackage(string packageId, string version, string solutionPath, string nugetConfigPath)
+        public new async Task<bool> PromptLicenseForPackage(string packageId, string version, string solutionPath)
         {
-            return await base.PromptLicenseForPackage(packageId, version, solutionPath, nugetConfigPath);
+            return await base.PromptLicenseForPackage(packageId, version, solutionPath);
         }
 
         public new bool PromptLicenseContent(string licenseContent)

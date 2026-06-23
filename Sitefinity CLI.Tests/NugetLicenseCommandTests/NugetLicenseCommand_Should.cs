@@ -64,10 +64,9 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             promptMock.Answer = false; // Set to false to ensure it's not being called
 
             string solutionPath = Path.Combine(this.testDirectory, "test.sln");
-            string nugetConfigPath = Path.Combine(this.testDirectory, "nuget.config");
 
             // Act
-            bool result = await sut.PromptLicenseForPackage("TestPackage", "1.0.0", solutionPath, nugetConfigPath);
+            bool result = await sut.PromptLicenseForPackage("TestPackage", "1.0.0", solutionPath);
 
             // Assert
             Assert.IsTrue(result);
@@ -100,7 +99,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "Test License Content");
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath, nugetConfigPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
 
             // Assert
             Assert.IsTrue(result);
@@ -134,7 +133,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             };
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath, nugetConfigPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
 
             // Assert
             Assert.IsTrue(result);
@@ -162,7 +161,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             // OnInstall is not set, so license file won't be created
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath, nugetConfigPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
 
             // Assert
             Assert.IsFalse(result);
@@ -192,7 +191,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "Test License Content");
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath, nugetConfigPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
 
             // Assert
             Assert.IsFalse(result);

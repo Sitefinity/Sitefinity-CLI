@@ -23,7 +23,7 @@ namespace Sitefinity_CLI
             this.sitefinityPackageManager = sitefinityPackageManager;
         }
 
-        public virtual async Task<bool> PromptLicenseForPackage(string packageId, string version, string solutionPath, string nugetConfigPath)
+        public virtual async Task<bool> PromptLicenseForPackage(string packageId, string version, string solutionPath)
         {
             if (!this.AcceptLicense)
             {
@@ -31,7 +31,7 @@ namespace Sitefinity_CLI
 
                 if (string.IsNullOrEmpty(licenseContent))
                 {
-                    this.sitefinityPackageManager.Install(packageId, version, solutionPath, nugetConfigPath);
+                    this.sitefinityPackageManager.Install(packageId, version, solutionPath, this.NugetConfigPath);
                     licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
                 }
 
