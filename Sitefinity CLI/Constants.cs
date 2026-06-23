@@ -30,7 +30,6 @@ namespace Sitefinity_CLI
         public const string PackagesFileName = "packages";
         public const string CsProjTemplateName = "csproj";
         public const string PackagesFolderName = "packages";
-        public const string LicenseAgreementsFolderName = "LicenseAgreements";
         public const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
         public const string LocalNuGetExtractionFolder = "LocalNuGetExtraction";
 

@@ -94,7 +94,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             // Create license file
             string packagesFolder = Path.Combine(this.testDirectory, Constants.PackagesFolderName);
             string packageFolder = Path.Combine(packagesFolder, $"{packageId}.{version}");
-            string licenseFolder = Path.Combine(packageFolder, Constants.LicenseAgreementsFolderName);
+            string licenseFolder = Path.Combine(packageFolder);
             Directory.CreateDirectory(licenseFolder);
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "Test License Content");
 
@@ -127,7 +127,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             {
                 string packagesFolder = Path.Combine(this.testDirectory, Constants.PackagesFolderName);
                 string packageFolder = Path.Combine(packagesFolder, $"{pkgId}.{ver}");
-                string licenseFolder = Path.Combine(packageFolder, Constants.LicenseAgreementsFolderName);
+                string licenseFolder = Path.Combine(packageFolder);
                 Directory.CreateDirectory(licenseFolder);
                 File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "License created after install");
             };
@@ -186,7 +186,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             // Create license file
             string packagesFolder = Path.Combine(this.testDirectory, Constants.PackagesFolderName);
             string packageFolder = Path.Combine(packagesFolder, $"{packageId}.{version}");
-            string licenseFolder = Path.Combine(packageFolder, Constants.LicenseAgreementsFolderName);
+            string licenseFolder = Path.Combine(packageFolder);
             Directory.CreateDirectory(licenseFolder);
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "Test License Content");
 
@@ -208,7 +208,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             string solutionPath = Path.Combine(this.testDirectory, "test.sln");
 
             // Act
-            string licenseContent = await sut.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
+            string licenseContent = await sut.ExtractLicenseContent(solutionPath, packageId, version);
 
             // Assert
             Assert.IsNull(licenseContent);
@@ -228,12 +228,12 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             // Create license file
             string packagesFolder = Path.Combine(this.testDirectory, Constants.PackagesFolderName);
             string packageFolder = Path.Combine(packagesFolder, $"{packageId}.{version}");
-            string licenseFolder = Path.Combine(packageFolder, Constants.LicenseAgreementsFolderName);
+            string licenseFolder = Path.Combine(packageFolder);
             Directory.CreateDirectory(licenseFolder);
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), expectedContent);
 
             // Act
-            string licenseContent = await sut.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
+            string licenseContent = await sut.ExtractLicenseContent(solutionPath, packageId, version);
 
             // Assert
             Assert.IsNotNull(licenseContent);

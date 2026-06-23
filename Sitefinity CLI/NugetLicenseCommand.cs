@@ -4,6 +4,7 @@ using Sitefinity_CLI.PackageManagement.Contracts;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Sitefinity_CLI
@@ -27,12 +28,12 @@ namespace Sitefinity_CLI
         {
             if (!this.AcceptLicense)
             {
-                string licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
+                string licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version);
 
                 if (string.IsNullOrEmpty(licenseContent))
                 {
                     this.sitefinityPackageManager.Install(packageId, version, solutionPath, this.NugetConfigPath);
-                    licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version, Constants.LicenseAgreementsFolderName);
+                    licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version);
                 }
 
                 if (string.IsNullOrEmpty(licenseContent))
@@ -60,19 +61,26 @@ namespace Sitefinity_CLI
             return hasUserAcceptedEULA;
         }
 
-        protected virtual async Task<string> ExtractLicenseContent(string solutionPath, string packageId, string version, string licensesFolder)
+        protected virtual async Task<string> ExtractLicenseContent(string solutionPath, string packageId, string version)
         {
-            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(solutionPath), Constants.PackagesFolderName);
-            string pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{packageId}.{version}", licensesFolder, "License.txt");
+            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(solutionPath), Constants.PackagesFolderName, $"{packageId}.{version}");
 
-            if (!File.Exists(pathToTheLicense))
+            if (!Directory.Exists(pathToPackagesFolder))
             {
+                this.logger.LogWarning("Package folder not found for package {PackageId} version {Version}. License content cannot be extracted.", packageId, version);
                 return null;
             }
 
-            string licenseContent = await File.ReadAllTextAsync(pathToTheLicense);
+            var licenseFiles = Directory.GetFiles(pathToPackagesFolder, "License.txt", SearchOption.AllDirectories);
 
-            return licenseContent;
+            StringBuilder licenseContent = new StringBuilder();
+            foreach (var licenseFilePath in licenseFiles)
+            {
+                string licenseText = await File.ReadAllTextAsync(licenseFilePath);
+                licenseContent.AppendLine(licenseText);
+            }
+
+            return licenseContent.ToString().Trim();
         }
 
         private static string GetDefaultNugetConfigpath()

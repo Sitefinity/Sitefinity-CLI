@@ -159,15 +159,11 @@ namespace Sitefinity_CLI.Commands
             {
                 if (package != null)
                 {
-                    string licenseContent = await this.GetLicenseContent(package);
-                    if (!string.IsNullOrEmpty(licenseContent) && !this.AcceptLicense)
-                    {
-                        bool hasUserAccepted = this.PromptAcceptLicense(licenseContent);
+                    bool additionalPackageLicenseAccepted = await this.PromptLicenseForPackage(package.Id, package.Version, this.SolutionPath);
 
-                        if (!hasUserAccepted)
-                        {
-                            return;
-                        }
+                    if (!additionalPackageLicenseAccepted)
+                    {
+                        return;
                     }
                 }
             }
@@ -210,33 +206,6 @@ namespace Sitefinity_CLI.Commands
             return isSuccess;
         }
 
-        private async Task<string> GetLicenseContent(NuGetPackage newSitefinityPackage, string licensesFolder = "")
-        {
-            string pathToPackagesFolder = Path.Combine(Path.GetDirectoryName(this.SolutionPath), Constants.PackagesFolderName);
-            string pathToTheLicense = Path.Combine(pathToPackagesFolder, $"{newSitefinityPackage.Id}.{newSitefinityPackage.Version}", licensesFolder, "License.txt");
-
-            if (!File.Exists(pathToTheLicense))
-            {
-                return null;
-            }
-
-            string licenseContent = await File.ReadAllTextAsync(pathToTheLicense);
-
-            return licenseContent;
-        }
-
-        private bool PromptAcceptLicense(string licenseContent)
-        {
-            string licensePromptMessage = $"{Environment.NewLine}{licenseContent}{Environment.NewLine}{Constants.AcceptLicenseNotification}";
-            bool hasUserAcceptedEULA = this.promptService.PromptYesNo(licensePromptMessage, false);
-
-            if (!hasUserAcceptedEULA)
-            {
-                this.logger.LogInformation(Constants.UpgradeWasCanceled);
-            }
-
-            return hasUserAcceptedEULA;
-        }
 
         private readonly ISitefinityNugetPackageService sitefinityPackageService;
         private readonly IVisualStudioService visualStudioService;
