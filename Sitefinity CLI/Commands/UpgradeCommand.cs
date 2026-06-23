@@ -23,10 +23,6 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.UpgradeCommandName, Constants.UpgradeCommandDescription)]
     internal class UpgradeCommand : NugetLicenseCommand
     {
-        [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
-        [Required(ErrorMessage = Constants.SolutionPathRequired)]
-        public string SolutionPath { get; set; }
-
         [Argument(1, Description = Constants.VersionToOptionDescription)]
         [UpgradeVersionValidator]
         public string Version { get; set; }
@@ -146,7 +142,7 @@ namespace Sitefinity_CLI.Commands
 
             NuGetPackage upgradePackage = await this.sitefinityPackageService.PrepareSitefinityUpgradePackage(upgradeOptions, sitefinityProjectsFilePaths);
 
-            bool isLicenseAccepted = await this.PromptLicenseForPackage(upgradePackage.Id, upgradePackage.Version, this.SolutionPath);
+            bool isLicenseAccepted = await this.PromptLicenseForPackage(upgradePackage.Id, upgradePackage.Version);
 
             if (!isLicenseAccepted)
             {
@@ -159,7 +155,7 @@ namespace Sitefinity_CLI.Commands
             {
                 if (package != null)
                 {
-                    bool additionalPackageLicenseAccepted = await this.PromptLicenseForPackage(package.Id, package.Version, this.SolutionPath);
+                    bool additionalPackageLicenseAccepted = await this.PromptLicenseForPackage(package.Id, package.Version);
 
                     if (!additionalPackageLicenseAccepted)
                     {

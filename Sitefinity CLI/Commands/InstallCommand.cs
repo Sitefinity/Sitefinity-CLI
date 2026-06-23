@@ -15,9 +15,6 @@ namespace Sitefinity_CLI.Commands
     [Command(Constants.InstallCommandName, Constants.InstallCommandDescription)]
     internal class InstallCommand : NugetLicenseCommand
     {
-        [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
-        [Required(ErrorMessage = Constants.SolutionPathRequired)]
-        public string SolutionPath { get; set; }
 
         [Argument(1, Description = Constants.PackageNameDescrption)]
         [Required(ErrorMessage = Constants.PackageNameRequired)]
@@ -90,7 +87,7 @@ namespace Sitefinity_CLI.Commands
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            return await this.PromptLicenseForPackage(this.PackageName, this.Version, this.SolutionPath);
+            return await this.PromptLicenseForPackage(this.PackageName, this.Version);
         }
 
         private readonly string[] packageNamesSeprators = [";"];

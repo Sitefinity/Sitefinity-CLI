@@ -66,7 +66,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             string solutionPath = Path.Combine(this.testDirectory, "test.sln");
 
             // Act
-            bool result = await sut.PromptLicenseForPackage("TestPackage", "1.0.0", solutionPath);
+            bool result = await sut.PromptLicenseForPackage("TestPackage", "1.0.0");
 
             // Assert
             Assert.IsTrue(result);
@@ -79,7 +79,9 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             // Arrange
             var sut = new NugetLicenseCommandSut(this.promptService, this.logger, this.sitefinityPackageManager)
             {
-                AcceptLicense = false
+                AcceptLicense = false,
+                SolutionPath = Path.Combine(this.testDirectory, "test.sln"),
+                NugetConfigPath = Path.Combine(this.testDirectory, "nuget.config")
             };
 
             var packageManagerMock = this.sitefinityPackageManager as SitefinityPackageManagerMock;
@@ -88,8 +90,6 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
 
             string packageId = "TestPackage";
             string version = "1.0.0";
-            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
-            string nugetConfigPath = Path.Combine(this.testDirectory, "nuget.config");
 
             // Create license file
             string packagesFolder = Path.Combine(this.testDirectory, Constants.PackagesFolderName);
@@ -99,7 +99,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "Test License Content");
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version);
 
             // Assert
             Assert.IsTrue(result);
@@ -114,13 +114,13 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             var promptMock = new PromptServiceMock { Answer = true };
             var sut = new NugetLicenseCommandSut(promptMock, this.logger, packageManagerMock)
             {
-                AcceptLicense = false
+                AcceptLicense = false,
+                SolutionPath = Path.Combine(this.testDirectory, "test.sln"),
+                NugetConfigPath = Path.Combine(this.testDirectory, "nuget.config")
             };
 
             string packageId = "TestPackage";
             string version = "1.0.0";
-            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
-            string nugetConfigPath = Path.Combine(this.testDirectory, "nuget.config");
 
             // Setup OnInstall to create the license file during Install call
             packageManagerMock.OnInstall = (pkgId, ver, solPath, cfgPath) =>
@@ -133,7 +133,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             };
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version);
 
             // Assert
             Assert.IsTrue(result);
@@ -150,18 +150,18 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             var promptMock = new PromptServiceMock { Answer = true };
             var sut = new NugetLicenseCommandSut(promptMock, this.logger, packageManagerMock)
             {
-                AcceptLicense = false
+                AcceptLicense = false,
+                SolutionPath = Path.Combine(this.testDirectory, "test.sln"),
+                NugetConfigPath = Path.Combine(this.testDirectory, "nuget.config")
             };
 
             string packageId = "TestPackage";
             string version = "1.0.0";
-            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
-            string nugetConfigPath = Path.Combine(this.testDirectory, "nuget.config");
 
             // OnInstall is not set, so license file won't be created
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version);
 
             // Assert
             Assert.IsFalse(result);
@@ -175,13 +175,13 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             var promptMock = new PromptServiceMock { Answer = false };
             var sut = new NugetLicenseCommandSut(promptMock, this.logger, this.sitefinityPackageManager)
             {
-                AcceptLicense = false
+                AcceptLicense = false,
+                SolutionPath = Path.Combine(this.testDirectory, "test.sln"),
+                NugetConfigPath = Path.Combine(this.testDirectory, "nuget.config")
             };
 
             string packageId = "TestPackage";
             string version = "1.0.0";
-            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
-            string nugetConfigPath = Path.Combine(this.testDirectory, "nuget.config");
 
             // Create license file
             string packagesFolder = Path.Combine(this.testDirectory, Constants.PackagesFolderName);
@@ -191,7 +191,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
             File.WriteAllText(Path.Combine(licenseFolder, "License.txt"), "Test License Content");
 
             // Act
-            bool result = await sut.PromptLicenseForPackage(packageId, version, solutionPath);
+            bool result = await sut.PromptLicenseForPackage(packageId, version);
 
             // Assert
             Assert.IsFalse(result);
@@ -201,11 +201,12 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
         public async Task ExtractLicenseContent_ReturnsNull_When_FileDoesNotExist()
         {
             // Arrange
+            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
             var sut = new NugetLicenseCommandSut(this.promptService, this.logger, this.sitefinityPackageManager);
+            sut.SolutionPath = solutionPath;
 
             string packageId = "NonExistentPackage";
             string version = "1.0.0";
-            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
 
             // Act
             string licenseContent = await sut.ExtractLicenseContent(solutionPath, packageId, version);
@@ -218,11 +219,12 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests
         public async Task ExtractLicenseContent_ReturnsContent_When_FileExists()
         {
             // Arrange
+            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
             var sut = new NugetLicenseCommandSut(this.promptService, this.logger, this.sitefinityPackageManager);
+            sut.SolutionPath = solutionPath;
 
             string packageId = "TestPackage";
             string version = "1.0.0";
-            string solutionPath = Path.Combine(this.testDirectory, "test.sln");
             string expectedContent = "This is the license content for testing.";
 
             // Create license file

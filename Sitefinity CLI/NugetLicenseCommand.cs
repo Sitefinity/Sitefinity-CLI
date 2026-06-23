@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -11,6 +12,10 @@ namespace Sitefinity_CLI
 {
     internal abstract class NugetLicenseCommand
     {
+        [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
+        [Required(ErrorMessage = Constants.SolutionPathRequired)]
+        public virtual string SolutionPath { get; set; }
+
         [Option(Constants.AcceptLicense, Description = Constants.AcceptLicenseOptionDescription)]
         public virtual bool AcceptLicense { get; set; }
 
@@ -24,16 +29,16 @@ namespace Sitefinity_CLI
             this.sitefinityPackageManager = sitefinityPackageManager;
         }
 
-        public virtual async Task<bool> PromptLicenseForPackage(string packageId, string version, string solutionPath)
+        public virtual async Task<bool> PromptLicenseForPackage(string packageId, string version)
         {
             if (!this.AcceptLicense)
             {
-                string licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version);
+                string licenseContent = await this.ExtractLicenseContent(this.SolutionPath, packageId, version);
 
                 if (string.IsNullOrEmpty(licenseContent))
                 {
-                    this.sitefinityPackageManager.Install(packageId, version, solutionPath, this.NugetConfigPath);
-                    licenseContent = await this.ExtractLicenseContent(solutionPath, packageId, version);
+                    this.sitefinityPackageManager.Install(packageId, version, this.SolutionPath, this.NugetConfigPath);
+                    licenseContent = await this.ExtractLicenseContent(this.SolutionPath, packageId, version);
                 }
 
                 if (string.IsNullOrEmpty(licenseContent))
