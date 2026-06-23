@@ -77,7 +77,7 @@ namespace Sitefinity_CLI
 
         private static string GetDefaultNugetConfigpath()
         {
-            string executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string executableLocation = AppDomain.CurrentDomain.BaseDirectory;
             return Path.Combine(executableLocation, Constants.PackageManagement, "NuGet.Config");
         }
 
