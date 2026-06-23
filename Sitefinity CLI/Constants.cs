@@ -136,7 +136,7 @@ namespace Sitefinity_CLI
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
         public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
-        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
+        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license. You can later on find the license text in the folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used.";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade.";
@@ -265,7 +265,7 @@ namespace Sitefinity_CLI
         public const string InstallCommandPackageVersionRequired = "You must specify the version of the package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
-        public const string InstallCommandVersionDescription = "The version of Sitefinity that you want to install. If no version is specified, the latest official version will be used.";
+        public const string InstallCommandVersionDescription = "The version of Sitefinity that you want to install.";
 
     }
 }
