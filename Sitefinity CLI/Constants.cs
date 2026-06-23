@@ -131,10 +131,9 @@ namespace Sitefinity_CLI
         public const string MigrationFrameworkOption = "Specifies the target rednderer framework. Valid only for templates and forms.";
         public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
-        public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
+        public const string ProjectOrSolutionPathOptionDescription = "The path to the solution file where command will be executed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
-        public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
         public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license. You can later on find the license text in the folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
         public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used.";
@@ -265,7 +264,7 @@ namespace Sitefinity_CLI
         public const string InstallCommandPackageVersionRequired = "You must specify the version of the package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
-        public const string InstallCommandVersionDescription = "The version of Sitefinity that you want to install.";
+        public const string InstallCommandVersionDescription = "The version of the package you want to install.";
 
     }
 }
