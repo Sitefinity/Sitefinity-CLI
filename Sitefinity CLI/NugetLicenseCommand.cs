@@ -71,7 +71,7 @@ namespace Sitefinity_CLI
                 return null;
             }
 
-            var licenseFiles = Directory.GetFiles(pathToPackagesFolder, "License.txt", SearchOption.AllDirectories);
+            var licenseFiles = Directory.GetFiles(pathToPackagesFolder, LicenseFileName, SearchOption.AllDirectories);
 
             StringBuilder licenseContent = new StringBuilder();
             foreach (var licenseFilePath in licenseFiles)
@@ -92,5 +92,6 @@ namespace Sitefinity_CLI
         private readonly IPromptService promptService;
         private readonly ISitefinityPackageManager sitefinityPackageManager;
         private readonly ILogger logger;
+        private const string LicenseFileName = "License.txt";
     }
 }
