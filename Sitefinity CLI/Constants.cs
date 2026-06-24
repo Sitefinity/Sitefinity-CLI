@@ -30,7 +30,6 @@ namespace Sitefinity_CLI
         public const string PackagesFileName = "packages";
         public const string CsProjTemplateName = "csproj";
         public const string PackagesFolderName = "packages";
-        public const string LicenseAgreementsFolderName = "LicenseAgreements";
         public const string PackageBaseAddress = "PackageBaseAddress/3.0.0";
         public const string LocalNuGetExtractionFolder = "LocalNuGetExtraction";
 
@@ -64,7 +63,7 @@ namespace Sitefinity_CLI
         public const string LatestVersionNotFoundMeesage = "Can't get the latest Sitefinity version. Please specify the upgrade version.";
         public const string SolutionPathRequired = "You must specify a path to a solution file.";
         public const string PackageNameRequired = "You must specify the name of the package you want to install.";
- 
+
         // Warning messages
         public const string CollectionSitefinityPackageTreeMessage = "Collecting Sitefinity NuGet package tree for version \"{0}\"...";
         public const string SearchingProjectForReferencesMessage = "Searching the provided project/s for Sitefinity references...";
@@ -102,6 +101,7 @@ namespace Sitefinity_CLI
         public const string TargetFrameworkDoesNotNeedChanged = "Target framework for {0} does not need change ({1})";
         public const string LatestVersionFound = "Latest version for Sitefinity found: {0}";
         public const string RemovingEnhancerAssemblyForProjectsIfExists = "Removing EnhancerAssembly for projects (if exists)";
+        public const string LicenseNotAccepted = "License not accepted. The operation cannot continue.";
 
         // Descriptions
         public const string TemplateNameOptionDescription = "The name of the file you want to replicate. Default value: ";
@@ -114,7 +114,7 @@ namespace Sitefinity_CLI
         public const string TemplateNameOptionTemplate = "-t|--template";
         public const string DescriptionOptionTemplate = "-d|--description";
         public const string HeadlessModeOptionDescription = "Use this for the headless version of Sitefinity CMS. Default is the 'All' version.";
-        public const string UseSlnSolutionOptionDescription = "Use this to create a .sln solution file instead of the default .slnx format."; 
+        public const string UseSlnSolutionOptionDescription = "Use this to create a .sln solution file instead of the default .slnx format.";
         public const string CoreModulesModeOptionDescription = "Use this for the core modules only version of Sitefinity CMS. Default is the 'All' version.";
         public const string RendererOptionDescription = "Use this to install the .NET Core Renderer for Sitefinity";
         public const string InstallDirectoryDescritpion = "The location where the project will be created. If none is provided, the current directory will be used.";
@@ -131,13 +131,12 @@ namespace Sitefinity_CLI
         public const string MigrationFrameworkOption = "Specifies the target rednderer framework. Valid only for templates and forms.";
         public const string DumpOption = "Writes the page/template to a file on the file system. Usefull for debugging.";
         public const string NugetSourcesDescription = "Provide comma-separated nuget package sources (the order matters, the first source will be the first source in the config). If none are provided, the default ones will be used.";
-        public const string ProjectOrSolutionPathOptionDescription = "The path to the project or solution where Sitefinity is installed.";
+        public const string ProjectOrSolutionPathOptionDescription = "The path to the solution file where command will be executed.";
         public const string VersionToOptionDescription = "The Sitefinity version to upgrade to.";
         public const string VersionForUpgradeOptionDescription = "The Sitefinity version to upgrade to. If omitted, the latest available Sitefinity version is used.";
-        public const string SourceForUpgradeOptionDescription = "Specifies the list of package sources (as URLs) to use for the updates. If omitted, the command uses the sources provided in configuration files.";
         public const string SkipPromptsDescription = "If you use this option you will skip all warning prompts.";
-        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license of the version you are upgrading to. You can later on find the license text in the LicenseAgreement folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
-        public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used in the upgrade process";
+        public const string AcceptLicenseOptionDescription = "If you use this option you will automatically accept the license. You can later on find the license text in the folder of a sitefinity package. If you don't agree to any of the terms in the license you must uninstall the product!";
+        public const string NugetConfigPathDescrption = "Provide the path to the NuGet.Config you want to be used.";
         public const string AdditionalPackagesDescription = "Provide comma-separated IDs of nuget packages which depend on Sitefinity and you want to be upgraded";
         public const string RemoveDeprecatedPackagesDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade.";
         public const string RemoveDeprecatedPackagesExceptDescription = "Use it if you want to uninstall the packages that are deprecated prior the upgrade. To retain packages list them separated by ; (e.g. --removeDeprecatedPackagesExcept \"Telerik.DataAccess.Fluent;CsvHelper\")";
@@ -247,7 +246,7 @@ namespace Sitefinity_CLI
         public const string GroupElem = "group";
         public const string TargetFramework = "targetFramework";
         public const string ApiV3IdentifierSegment = "v3/";
-        public const int  NugetProtoclV2 = 2;
+        public const int NugetProtoclV2 = 2;
         public const int NugetProtoclV3 = 3;
 
         // Patterns
@@ -262,7 +261,10 @@ namespace Sitefinity_CLI
         public const string InstallCommandDescription = "Installs a nuget package to a specified solution.";
         public const string PackageNameDescrption = "The name of the nuget package you want to install.";
         public const string PackageVersion = "The version of the nuget package you want to install.";
+        public const string InstallCommandPackageVersionRequired = "You must specify the version of the package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
+        public const string InstallCommandVersionDescription = "The version of the package you want to install.";
+
     }
 }

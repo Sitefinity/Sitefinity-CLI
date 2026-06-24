@@ -1,43 +1,48 @@
-﻿using System;
+﻿using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Sitefinity_CLI.Model;
+using Sitefinity_CLI.PackageManagement.Contracts;
+using Sitefinity_CLI.Services.Contracts;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text.Json;
-using McMaster.Extensions.CommandLineUtils;
-using Microsoft.Extensions.Logging;
-using Sitefinity_CLI.Model;
-using Sitefinity_CLI.Services.Contracts;
+using System.Threading.Tasks;
 
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
     [Command(Constants.InstallCommandName, Constants.InstallCommandDescription)]
-    internal class InstallCommand
+    internal class InstallCommand : NugetLicenseCommand
     {
-        [Argument(0, Description = Constants.ProjectOrSolutionPathOptionDescription)]
-        [Required(ErrorMessage = Constants.SolutionPathRequired)]
-        public string SolutionPath { get; set; }
 
         [Argument(1, Description = Constants.PackageNameDescrption)]
         [Required(ErrorMessage = Constants.PackageNameRequired)]
         public string PackageName { get; set; }
 
-        [Option(Constants.VersionOptionTemplate, CommandOptionType.SingleValue, Description = Constants.PackageVersion)]
+        [Argument(2, Description = Constants.InstallCommandVersionDescription)]
+        [Required(ErrorMessage = Constants.InstallCommandPackageVersionRequired)]
         public string Version { get; set; }
 
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
         public string ProjectNames { get; set; }
 
-        public InstallCommand(ILogger<InstallCommand> logger, IVisualStudioService visualStudioService)
+        public InstallCommand(
+            ILogger<InstallCommand> logger,
+            IVisualStudioService visualStudioService,
+            IPromptService promptService,
+            ISitefinityPackageManager sitefinityPackageManager)
+                : base(promptService, logger, sitefinityPackageManager)
         {
             this.logger = logger;
             this.visualStudioService = visualStudioService;
         }
 
-        protected int OnExecuteAsync(CommandLineApplication app)
+        protected async Task<int> OnExecuteAsync(CommandLineApplication app)
         {
             try
             {
-                this.ExecuteInstallCommand();
+                await this.ExecuteInstallCommand();
                 return 0;
             }
             catch (Exception ex)
@@ -47,9 +52,10 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private void ExecuteInstallCommand()
+        private async Task ExecuteInstallCommand()
         {
-            if (!this.Validate())
+            bool isValid = await this.Validate();
+            if (!isValid)
             {
                 return;
             }
@@ -66,12 +72,11 @@ namespace Sitefinity_CLI.Commands
 
             this.logger.LogInformation("Install Command will be executed with the following parameters: {Params}", JsonSerializer.Serialize(installOptions));
             this.visualStudioService.ExecuteNugetInstall(installOptions);
-            this.logger.LogInformation("Installl package command finished successfully! Parameters used: {Params}", JsonSerializer.Serialize(installOptions));
+            this.logger.LogInformation("Install package command finished successfully! Parameters used: {Params}", JsonSerializer.Serialize(installOptions));
         }
 
-        private bool Validate()
+        private async Task<bool> Validate()
         {
-            bool isSuccess = true;
             if (!Path.IsPathFullyQualified(this.SolutionPath))
             {
                 this.SolutionPath = Path.GetFullPath(this.SolutionPath);
@@ -82,7 +87,7 @@ namespace Sitefinity_CLI.Commands
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            return isSuccess;
+            return await this.PromptLicenseForPackage(this.PackageName, this.Version);
         }
 
         private readonly string[] packageNamesSeprators = [";"];

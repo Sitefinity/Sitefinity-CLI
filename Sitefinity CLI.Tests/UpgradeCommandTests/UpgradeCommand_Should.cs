@@ -76,7 +76,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         [TestMethod]
         public async Task Throw_When_SolutionPathIsNotFound()
         {
-            var upgradeComamnd = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            var upgradeComamnd = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, sitefinityPackageManager);
             string path = "wrongSolutionpath";
             try
             {
@@ -93,7 +93,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         [TestMethod]
         public async Task SolutionPathIsSetCorrect_When_SlnSolutionPathCommandIsPassedRelatively()
         {
-            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, sitefinityPackageManager);
             string workingDirectory = Directory.GetCurrentDirectory();
 
             try
@@ -119,7 +119,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         [TestMethod]
         public async Task SolutionPathIsSetCorrect_When_SlnSolutionPathCommandIsPassedFull()
         {
-            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, sitefinityPackageManager);
             string workingDirectory = Directory.GetCurrentDirectory();
             string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fakeSln.sln");
 
@@ -134,7 +134,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         [TestMethod]
         public async Task SolutionPathIsSetCorrect_When_SlnxSolutionPathCommandIsPassedRelatively()
         {
-            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, sitefinityPackageManager);
             string workingDirectory = Directory.GetCurrentDirectory();
 
             try
@@ -159,7 +159,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         [TestMethod]
         public async Task SolutionPathIsSetCorrect_When_SlnxSolutionPathCommandIsPassedFull()
         {
-            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator);
+            var upgradeCommand = new UpgradeCommandSut(sitefinityNugetPackageService, visualStudioService, logger, promptService, sitefinityProjectService, sitefinityConfigService, upgradeConfigGenerator, sitefinityPackageManager);
             string workingDirectory = Directory.GetCurrentDirectory();
             string solutionPath = Path.Combine(workingDirectory, "UpgradeCommandTests", "Mocks", "fakeSlnx.slnx");
 
