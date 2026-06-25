@@ -79,13 +79,13 @@ You can use the add command with the following subcommands:
   Add ```--headless``` to the command to install the headless version of Sitefinity.
 
   Add ```--coreModules```  to the command to install the core modules only version of Sitefinity.
-  
+
   Add ```--renderer``` to the command to create a new ASP.NET Core renderer project for Sitefinity.
 
   Add ```--use-sln``` to the command to use .sln solution type instead of the default one .slnx type.
 
   **NOTE**: After creating the renderer project, you have to set your Sitefinity CMS url in the *appsettings.json* and update *launchSettings.json*. For more information, see [Configure the ASP.NET Core Renderer](https://www.progress.com/documentation/sitefinity-cms/install-sitefinity-in-.net-core-mode-dp#configure-the-asp-net-core-renderer).
-  
+
 
   Run the help option to see all available install options and configurations.
 
@@ -225,8 +225,8 @@ To migrate your Sitefinity CMS project, perform the following procedure:
     * Ensure that only the migrated form is used on the frontend and the initial form is hidden from all MVC and Web Forms resources.
     * Run the CLI command `migrate responses` to migrate form responses.
 
-**IMPORTANT**: Sitefinity CLI migrates fully all form responses every time you run the command. Therefore, if you run the command multiple times, Sitefinity CLI will create duplicated form responses.
-To avoid duplications, delete the common responses before running the `migrate responses` command for second time.
+    **IMPORTANT**: Sitefinity CLI migrates fully all form responses every time you run the command. Therefore, if you run the command multiple times, Sitefinity CLI will create duplicated form responses.<br>
+    To avoid duplications, delete the common responses before running the `migrate responses` command for second time.
 
 #### Considerations
 
@@ -279,10 +279,10 @@ The following CLI paramaters are optional:
   Replaces the content of the page. Valid only for pages.
 * `--action`<br>
   The action to execute at the end of the migration. Allowed values are:
-  * `draft` - saves the migrated resource as a `Draft`.
+  * `draft` - saves the migrated resource as `Draft`.
   * `publish` - publishes the migrated resource.
 * `--siteid`<br>
-  The site id. You use the `--siteid` parameter to specify the site id when you work with a site different from the default site.
+  The site id. You use the `--siteid` parameter to specify the site id when you work with a non-default site.
 
 **NOTE**: You can set the parameters manually in the appsettings.json file. You need to manually create the appsettings.json file next to the _sf.exe_ binary.<br>
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
@@ -376,12 +376,40 @@ Widget migrations are invoked for each **occurrence** of the widget found on the
 
 A return value of type `MigratedWidget` is required as the output of the migration. It contains the new widget name and properties.
 
+#### Migration of complex properties
+In complex projects, your business logic may use complex properties. For example:
+
+```C#
+// in your MVC controller
+public MyComplexModel Model {get; set;}
+
+public class MyComplexModel {
+  public MyEntity Entity {get; set;}
+}
+
+public class MyEntity
+{
+  public string Title {get;set;}
+}
+```
+
+When migrating such complex logic, you need to fork [Sitefinity CLI](https://github.com/Sitefinity/Sitefinity-CLI) and manually add the migration logic to it, as described in _Custom widget migrations_ above.
+
+Your `Migrate` method can access the complex properties using the `context.Source.Properties` property of its `context` parameter, as described above.\
+You form the key to access a property by separating the nested property names with dashes. In the example above, the key is `Model-Entity-Title`.
+
+> success **EXAMPLE**: For example about migrating widgets with complex properties in the controller, see the `Migrate` method in [SearchBoxWidget.cs](https://github.com/Sitefinity/Sitefinity-CLI/blob/master/Sitefinity%20CLI/Migrations/Mvc/SearchBoxWidget.cs).
+
+If you are migrating properties from the same type, a simpler approach is to use JSON config mappings, as described in the _Migration through configuration_ section above.
+
+> success **EXAMPLE**: For an example of how to use JSON config mappings, see [WidgetMigrationDefaults.cs](https://github.com/Sitefinity/Sitefinity-CLI/blob/master/Sitefinity%20CLI/Migrations/WidgetMigrationDefaults.cs).
+
 #### Useful functions
 
 From base class `MigrationBase`:
 
 * `ProcessProperties`
-  Copes and renames properties.
+  Copies and renames properties.
 * `GetMasterIds`
   Gets the master ids of the live content items (usually referenced in Web Forms widgets).
 * `GetSingleItemMixedContentValue`, `GetMixedContentValue`
@@ -391,7 +419,7 @@ From base class `MigrationBase`:
 
 When migrating forms responses, you may want to change the type of fields you are migrating.<br>
 For example, you may want to migrate a custom field to a built-in one, or migrate a built-in one, which is no longer supported, to a custom one.<br>
-To do this, you create a mapping configuration in the sf.exe's `appsettings.json` file.<br>
+To do this, you create a mapping configuration in the `appsettings.json` configuration file of sf.exe.<br>
 In the `FormFieldNameMap` object, you create a name/value pair, containing the names of the developer types of the respective form fields.<br>
 For example, to map a MVC text form field to an ASP.NET Core form field, the configuration should look like:
 
@@ -403,7 +431,7 @@ For example, to map a MVC text form field to an ASP.NET Core form field, the con
 
 You construct the JSON key using the name of the source form (the one you migrate from), DOT, and the name of the form field. The JSON value is the name of the target form field (the one you migrate to).<br>
 In the Migration Analyzer, you navigate to the form you want to migrate. You take the form name from the _'Form name' form info_ table, under the _Form name_ column, and the field name from the _Fields used in this form_ table under the _Name (used in code)_ column.<br>
-You can take both names from the Sitefinity Migration Analyzer. For more information see [Sitefinity Migration Analyzer Forms](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer-forms).
+You can take both names from the Sitefinity Migration Analyzer. For more information, see [Sitefinity Migration Analyzer Forms](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer-forms).
 
 **EXAMPLE**:
 
@@ -480,9 +508,9 @@ You need to implement a custom widget in ASP.NET Core and manually migrate. We r
 
 The new Content list widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) comes with different predefined basic filter options than the MVC and Web Forms widgets.
 
-Migration process transfers the old filters for past, current, and upcoming events into the *Filter Expression* field in Advanced mode of the widget designer. 
+Migration process transfers the old filters for past, current, and upcoming events into the *Filter Expression* field in Advanced mode of the widget designer.
 
-Because of the difference in the filtering functionality between the different widgets, after the migration, you need to check the filters directly in the *Filter Expression* field. 
+Because of the difference in the filtering functionality between the different widgets, after the migration, you need to check the filters directly in the *Filter Expression* field.
 
 If the filters expressions cannot be matched, you need to implement a custom widget in ASP.NET Core and manually migrate using this new widget. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) to implement your custom widget.
 
