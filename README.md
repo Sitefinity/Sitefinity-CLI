@@ -79,13 +79,13 @@ You can use the add command with the following subcommands:
   Add ```--headless``` to the command to install the headless version of Sitefinity.
 
   Add ```--coreModules```  to the command to install the core modules only version of Sitefinity.
-  
+
   Add ```--renderer``` to the command to create a new ASP.NET Core renderer project for Sitefinity.
 
   Add ```--use-sln``` to the command to use .sln solution type instead of the default one .slnx type.
 
   **NOTE**: After creating the renderer project, you have to set your Sitefinity CMS url in the *appsettings.json* and update *launchSettings.json*. For more information, see [Configure the ASP.NET Core Renderer](https://www.progress.com/documentation/sitefinity-cms/install-sitefinity-in-.net-core-mode-dp#configure-the-asp-net-core-renderer).
-  
+
 
   Run the help option to see all available install options and configurations.
 
@@ -376,6 +376,34 @@ Widget migrations are invoked for each **occurrence** of the widget found on the
 
 A return value of type `MigratedWidget` is required as the output of the migration. It contains the new widget name and properties.
 
+#### Migration of complex properties
+In complex projects, your business logic may use complex properties. For example:
+
+```C#
+// in your MVC controller
+public MyComplexModel Model {get; set;}
+
+public class MyComplexModel {
+  public MyEntity Entity {get; set;}
+}
+
+public class MyEntity
+{
+  public string Title {get;set;}
+}
+```
+
+When migrating such complex logic, you need to fork [Sitefinity CLI](https://github.com/Sitefinity/Sitefinity-CLI) and manually add the migration logic to it, as described in _Custom widget migrations_ above.
+
+Your `Migrate` method can access the complex properties using the `context.Source.Properties` property of its `context` parameter, as described above.\
+You form the key to access a property by separating the nested property names with dashes. In the example above, the key is `Model-Entity-Title`.
+
+> success **EXAMPLE**: For example about migrating widgets with complex properties in the controller, see the `Migrate` method in [SearchBoxWidget.cs](https://github.com/Sitefinity/Sitefinity-CLI/blob/master/Sitefinity%20CLI/Migrations/Mvc/SearchBoxWidget.cs).
+
+If you are migrating properties from the same type, a simpler approach is to use JSON config mappings, as described in the _Migration through configuration_ section above.
+
+> success **EXAMPLE**: For an example of how to use JSON config mappings, see [WidgetMigrationDefaults.cs](https://github.com/Sitefinity/Sitefinity-CLI/blob/master/Sitefinity%20CLI/Migrations/WidgetMigrationDefaults.cs).
+
 #### Useful functions
 
 From base class `MigrationBase`:
@@ -480,9 +508,9 @@ You need to implement a custom widget in ASP.NET Core and manually migrate. We r
 
 The new Content list widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) comes with different predefined basic filter options than the MVC and Web Forms widgets.
 
-Migration process transfers the old filters for past, current, and upcoming events into the *Filter Expression* field in Advanced mode of the widget designer. 
+Migration process transfers the old filters for past, current, and upcoming events into the *Filter Expression* field in Advanced mode of the widget designer.
 
-Because of the difference in the filtering functionality between the different widgets, after the migration, you need to check the filters directly in the *Filter Expression* field. 
+Because of the difference in the filtering functionality between the different widgets, after the migration, you need to check the filters directly in the *Filter Expression* field.
 
 If the filters expressions cannot be matched, you need to implement a custom widget in ASP.NET Core and manually migrate using this new widget. We recommend using the Content List widget ([ASP.NET](https://www.progress.com/documentation/sitefinity-cms/content-list-widget-core), [Next.js](https://www.progress.com/documentation/sitefinity-cms/next.js-content-list-widget)) to implement your custom widget.
 
