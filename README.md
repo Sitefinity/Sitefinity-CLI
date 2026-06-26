@@ -225,8 +225,8 @@ To migrate your Sitefinity CMS project, perform the following procedure:
     * Ensure that only the migrated form is used on the frontend and the initial form is hidden from all MVC and Web Forms resources.
     * Run the CLI command `migrate responses` to migrate form responses.
 
-**IMPORTANT**: Sitefinity CLI migrates fully all form responses every time you run the command. Therefore, if you run the command multiple times, Sitefinity CLI will create duplicated form responses.
-To avoid duplications, delete the common responses before running the `migrate responses` command for second time.
+    **IMPORTANT**: Sitefinity CLI migrates fully all form responses every time you run the command. Therefore, if you run the command multiple times, Sitefinity CLI will create duplicated form responses.<br>
+    To avoid duplications, delete the common responses before running the `migrate responses` command for second time.
 
 #### Considerations
 
@@ -279,10 +279,10 @@ The following CLI paramaters are optional:
   Replaces the content of the page. Valid only for pages.
 * `--action`<br>
   The action to execute at the end of the migration. Allowed values are:
-  * `draft` - saves the migrated resource as a `Draft`.
+  * `draft` - saves the migrated resource as `Draft`.
   * `publish` - publishes the migrated resource.
 * `--siteid`<br>
-  The site id. You use the `--siteid` parameter to specify the site id when you work with a site different from the default site.
+  The site id. You use the `--siteid` parameter to specify the site id when you work with a non-default site.
 
 **NOTE**: You can set the parameters manually in the appsettings.json file. You need to manually create the appsettings.json file next to the _sf.exe_ binary.<br>
 You can mix both appsettings.json parameters and direct command-line parameters, with the latter having precedence.
@@ -409,7 +409,7 @@ If you are migrating properties from the same type, a simpler approach is to use
 From base class `MigrationBase`:
 
 * `ProcessProperties`
-  Copes and renames properties.
+  Copies and renames properties.
 * `GetMasterIds`
   Gets the master ids of the live content items (usually referenced in Web Forms widgets).
 * `GetSingleItemMixedContentValue`, `GetMixedContentValue`
@@ -419,7 +419,7 @@ From base class `MigrationBase`:
 
 When migrating forms responses, you may want to change the type of fields you are migrating.<br>
 For example, you may want to migrate a custom field to a built-in one, or migrate a built-in one, which is no longer supported, to a custom one.<br>
-To do this, you create a mapping configuration in the sf.exe's `appsettings.json` file.<br>
+To do this, you create a mapping configuration in the `appsettings.json` configuration file of sf.exe.<br>
 In the `FormFieldNameMap` object, you create a name/value pair, containing the names of the developer types of the respective form fields.<br>
 For example, to map a MVC text form field to an ASP.NET Core form field, the configuration should look like:
 
@@ -431,7 +431,7 @@ For example, to map a MVC text form field to an ASP.NET Core form field, the con
 
 You construct the JSON key using the name of the source form (the one you migrate from), DOT, and the name of the form field. The JSON value is the name of the target form field (the one you migrate to).<br>
 In the Migration Analyzer, you navigate to the form you want to migrate. You take the form name from the _'Form name' form info_ table, under the _Form name_ column, and the field name from the _Fields used in this form_ table under the _Name (used in code)_ column.<br>
-You can take both names from the Sitefinity Migration Analyzer. For more information see [Sitefinity Migration Analyzer Forms](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer-forms).
+You can take both names from the Sitefinity Migration Analyzer. For more information, see [Sitefinity Migration Analyzer Forms](https://www.progress.com/documentation/sitefinity-cms/sitefinity-migration-analyzer-forms).
 
 **EXAMPLE**:
 
