@@ -56,6 +56,7 @@ namespace Sitefinity_CLI
         public const string InvalidOptionForRendererMessage = "Invalid options for a renderer project: \"{0}\"";
         public const string FileIsNotSolutionMessage = "File \"{0}\" is not a solution file";
         public const string InvalidXmlFileMessage = "Unable to parse XML file \"{0}\". {1}";
+        public const string InvalidXmlCharactersReplacedMessage = "The XML file \"{0}\" contained invalid characters that were replaced with the Unicode replacement character (U+FFFD). If this file is modified and saved, the replacements will be persisted.";
         public const string ErrorOccuredWhileCreatingItemFromTemplate = "An error occured while creating an item from template. Path: {0}";
         public const string VersionNotFound = "Version: {0} was not found in any of the provided sources";
         public const string VersionIsGreaterThanOrEqual = "{0} Sitefinity version ({1}) is >= than the version you are trying to upgrade to ({2})";

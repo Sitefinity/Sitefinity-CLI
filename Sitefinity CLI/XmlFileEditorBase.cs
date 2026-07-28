@@ -3,11 +3,19 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Sitefinity_CLI
 {
     public abstract class XmlFileEditorBase : FileEditorBase
     {
+        private readonly ILogger logger;
+
+        protected XmlFileEditorBase(ILogger logger = null)
+        {
+            this.logger = logger;
+        }
+
         protected void ReadFile(string xmlFilePath, Action<XDocument> readFileAction)
         {
             base.EnsureFileOperation(xmlFilePath, false, () =>
@@ -30,7 +38,7 @@ namespace Sitefinity_CLI
             });
         }
 
-        private static XDocument LoadDocument(string xmlFilePath)
+        private XDocument LoadDocument(string xmlFilePath)
         {
             try
             {
@@ -40,7 +48,14 @@ namespace Sitefinity_CLI
 
                 using StreamReader reader = new StreamReader(xmlFilePath, encoding, detectEncodingFromByteOrderMarks: true);
 
-                return XDocument.Load(reader);
+                string content = reader.ReadToEnd();
+
+                if (content.Contains('\uFFFD'))
+                {
+                    this.logger?.LogWarning(string.Format(Constants.InvalidXmlCharactersReplacedMessage, xmlFilePath));
+                }
+
+                return XDocument.Parse(content);
             }
             catch (XmlException ex)
             {

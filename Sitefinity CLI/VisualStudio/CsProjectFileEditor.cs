@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Sitefinity_CLI.VisualStudio
 {
     public class CsProjectFileEditor : XmlFileEditorBase, ICsProjectFileEditor
     {
+        public CsProjectFileEditor(ILogger<CsProjectFileEditor> logger = null) : base(logger)
+        {
+        }
+
         public void RemovePropertyGroupElement(string csProjFilePath, string elementName)
         {
             base.ModifyFile(csProjFilePath, (doc) =>
