@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Sitefinity_CLI
@@ -9,7 +12,7 @@ namespace Sitefinity_CLI
         {
             base.EnsureFileOperation(xmlFilePath, false, () =>
             {
-                XDocument doc = XDocument.Load(xmlFilePath);
+                XDocument doc = LoadDocument(xmlFilePath);
 
                 readFileAction(doc);
             });
@@ -19,12 +22,30 @@ namespace Sitefinity_CLI
         {
             base.EnsureFileOperation(xmlFilePath, true, () =>
             {
-                XDocument doc = XDocument.Load(xmlFilePath);
+                XDocument doc = LoadDocument(xmlFilePath);
 
                 doc = modifyFileAction(doc);
 
                 doc.Save(xmlFilePath);
             });
+        }
+
+        private static XDocument LoadDocument(string xmlFilePath)
+        {
+            try
+            {
+                // Use a decoder that replaces invalid bytes instead of throwing, so that a single
+                // malformed/corrupt byte in a project or solution file does not hard-abort the operation.
+                Encoding encoding = Encoding.GetEncoding(Encoding.UTF8.WebName, EncoderFallback.ReplacementFallback, DecoderFallback.ReplacementFallback);
+
+                using StreamReader reader = new StreamReader(xmlFilePath, encoding, detectEncodingFromByteOrderMarks: true);
+
+                return XDocument.Load(reader);
+            }
+            catch (XmlException ex)
+            {
+                throw new XmlException(string.Format(Constants.InvalidXmlFileMessage, xmlFilePath, ex.Message), ex, ex.LineNumber, ex.LinePosition);
+            }
         }
     }
 }
