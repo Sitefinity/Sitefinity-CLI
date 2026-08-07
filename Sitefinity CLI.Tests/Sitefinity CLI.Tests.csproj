@@ -26,6 +26,9 @@
     <None Include="CsProjectFileEditorTests\Data\WithElements.csproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="CsProjectFileEditorTests\Data\WithInvalidByte.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="UpgradeCommandTests\Mocks\fakeSln.sln">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
