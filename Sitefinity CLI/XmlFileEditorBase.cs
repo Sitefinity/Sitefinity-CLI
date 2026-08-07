@@ -12,10 +12,7 @@ namespace Sitefinity_CLI
         {
             base.EnsureFileOperation(xmlFilePath, false, () =>
             {
-                // The read-only scan tolerates invalid bytes so a single malformed/corrupt byte in a
-                // project or solution file does not hard-abort the operation. The replaced characters
-                // only exist in memory and are never written back to disk.
-                XDocument doc = LoadDocument(xmlFilePath, tolerateInvalidBytes: true);
+                XDocument doc = LoadDocument(xmlFilePath);
 
                 readFileAction(doc);
             });
@@ -25,9 +22,7 @@ namespace Sitefinity_CLI
         {
             base.EnsureFileOperation(xmlFilePath, true, () =>
             {
-                // Modifications are saved back to disk, so invalid bytes are not silently replaced here
-                // to avoid corrupting the original file content. A helpful, file-scoped error is raised instead.
-                XDocument doc = LoadDocument(xmlFilePath, tolerateInvalidBytes: false);
+                XDocument doc = LoadDocument(xmlFilePath);
 
                 doc = modifyFileAction(doc);
 
@@ -35,17 +30,13 @@ namespace Sitefinity_CLI
             });
         }
 
-        private static XDocument LoadDocument(string xmlFilePath, bool tolerateInvalidBytes)
+        private static XDocument LoadDocument(string xmlFilePath)
         {
             try
             {
-                if (!tolerateInvalidBytes)
-                {
-                    return XDocument.Load(xmlFilePath);
-                }
-
-                DecoderFallback decoderFallback = DecoderFallback.ReplacementFallback;
-                Encoding encoding = Encoding.GetEncoding(Encoding.UTF8.WebName, EncoderFallback.ReplacementFallback, decoderFallback);
+                // Use a decoder that replaces invalid bytes instead of throwing, so that a single
+                // malformed/corrupt byte in a project or solution file does not hard-abort the operation.
+                Encoding encoding = Encoding.GetEncoding(Encoding.UTF8.WebName, EncoderFallback.ReplacementFallback, DecoderFallback.ReplacementFallback);
 
                 using StreamReader reader = new StreamReader(xmlFilePath, encoding, detectEncodingFromByteOrderMarks: true);
 
