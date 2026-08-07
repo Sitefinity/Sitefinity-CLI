@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.PackageManagement.Contracts;
 
 namespace Sitefinity_CLI.PackageManagement.Implementations
 {
     internal class PackagesConfigFileEditor : XmlFileEditorBase, IPackagesConfigFileEditor
     {
-        public PackagesConfigFileEditor(ILogger<PackagesConfigFileEditor> logger = null) : base(logger)
-        {
-        }
-
         public IEnumerable<NuGetPackage> GetPackages(string packagesConfigFilePath)
         {
             IEnumerable<NuGetPackage> nuGetPackages = null;
