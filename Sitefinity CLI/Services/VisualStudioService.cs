@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Sitefinity_CLI.Exceptions;
@@ -40,11 +41,12 @@ namespace Sitefinity_CLI.Services
             worker.Initialize(options.SolutionPath);
 
             string installerPowerShellPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "Installer.ps1");
-            List<string> scriptParameters = [$"-PackageToInstall \"{options.PackageName}\""];
+            List<string> scriptParameters = new List<string>();
 
-            if (!string.IsNullOrEmpty(options.Version))
+            if (options.Packages != null && options.Packages.Count > 0)
             {
-                scriptParameters.Add($"-Version {options.Version}");
+                string packagesToInstall = string.Join(',', options.Packages.Select(package => string.IsNullOrEmpty(package.Version) ? package.Name : $"{package.Name}:{package.Version}"));
+                scriptParameters.Add($"-PackagesToInstall {packagesToInstall}");
             }
             if (options.ProjectNames != null && options.ProjectNames.Count > 0)
             {

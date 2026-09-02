@@ -259,13 +259,17 @@ namespace Sitefinity_CLI
 
         // Install command
         public const string InstallCommandName = "install";
-        public const string InstallCommandDescription = "Installs a nuget package to a specified solution.";
-        public const string PackageNameDescrption = "The name of the nuget package you want to install.";
+        public const string InstallCommandDescription = "Installs one or more nuget packages to a specified solution.";
+        public const string PackageNameDescrption = "The name(s) of the nuget package(s) you want to install. Multiple packages can be separated by ';' and each package can specify its own version using the 'PackageId@Version' format, e.g. \"PackageA@1.0.0;PackageB@2.0.0;PackageC\".";
         public const string PackageVersion = "The version of the nuget package you want to install.";
         public const string InstallCommandPackageVersionRequired = "You must specify the version of the package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
-        public const string InstallCommandVersionDescription = "The version of the package you want to install.";
+        public const string InstallCommandVersionDescription = "The version of the package you want to install. Used as a fallback version when a single package is specified without an inline version.";
+        public const string PackageVersionSeparator = "@";
+        public const string PackagesSeparator = ";";
+        public const string InstallCommandNoPackagesSpecified = "You must specify at least one package to install.";
+        public const string InstallCommandMultiplePackagesVersionConflict = "The version argument cannot be used together with multiple packages. Specify the version for each package using the 'PackageId@Version' format instead.";
 
     }
 }

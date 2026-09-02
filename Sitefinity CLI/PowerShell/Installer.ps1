@@ -1,6 +1,5 @@
 param(
-	$PackageToInstall,
-	$VersionToInstall,
+	[string[]]$PackagesToInstall,
 	[string[]]$TargetProjectFiles
 )
 
@@ -40,16 +39,23 @@ try
 {
 	Start-Transcript -Path $installTraceLogPath
 
-	if ($TargetProjectFiles -ne $null) 
+	foreach ($package in $PackagesToInstall)
 	{
-		foreach ($project in $TargetProjectFiles)
+		$packageNameAndVersion = $package -split ":", 2
+		$packageName = $packageNameAndVersion[0]
+		$packageVersion = if ($packageNameAndVersion.Length -gt 1) { $packageNameAndVersion[1] } else { $null }
+
+		if ($TargetProjectFiles -ne $null) 
 		{
-			Install-NugetPackage -packageName $PackageToInstall -version $VersionToInstall -projectName $project
+			foreach ($project in $TargetProjectFiles)
+			{
+				Install-NugetPackage -packageName $packageName -version $packageVersion -projectName $project
+			}
 		}
-	}
-	else
-	{
-		Install-NugetPackage -packageName $PackageToInstall -version $VersionToInstall
+		else
+		{
+			Install-NugetPackage -packageName $packageName -version $packageVersion
+		}
 	}
 
 	New-Item -Path $PSScriptRoot -Name $resultLogFileName -ItemType "file" -Value "success"
@@ -63,3 +69,4 @@ finally
 {
 	Stop-Transcript
 }
+

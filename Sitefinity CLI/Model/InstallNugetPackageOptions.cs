@@ -6,9 +6,7 @@ namespace Sitefinity_CLI.Model
     {
         public string SolutionPath { get; set; }
 
-        public string Version { get; set; }
-
-        public string PackageName { get; set; }
+        public ICollection<PackageVersion> Packages { get; set; }
 
         public ICollection<string> ProjectNames { get; set; }
     }
