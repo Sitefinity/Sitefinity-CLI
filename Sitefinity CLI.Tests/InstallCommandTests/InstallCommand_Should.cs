@@ -96,18 +96,25 @@ namespace Sitefinity_CLI.Tests.InstallCommandTests
         }
 
         [TestMethod]
-        public async Task InstallPackageWithoutVersion_When_NoVersionIsSpecifiedForIt()
+        public async Task Throw_When_SinglePackageHasNoVersionSpecified()
+        {
+            var visualStudioServiceMock = new VisualStudioServiceMock();
+            var sut = CreateSut(visualStudioServiceMock);
+            sut.PackageName = "PackageA";
+
+            await Assert.ThrowsExceptionAsync<ArgumentException>(sut.Execute);
+            Assert.IsFalse(visualStudioServiceMock.ExecuteNugetInstallWasCalled);
+        }
+
+        [TestMethod]
+        public async Task Throw_When_OneOfMultiplePackagesHasNoVersionSpecified()
         {
             var visualStudioServiceMock = new VisualStudioServiceMock();
             var sut = CreateSut(visualStudioServiceMock);
             sut.PackageName = "PackageA@1.0.0;PackageB";
 
-            await sut.Execute();
-
-            var packages = visualStudioServiceMock.LastInstallOptions.Packages.ToList();
-            Assert.AreEqual(2, packages.Count);
-            Assert.AreEqual("PackageB", packages[1].Name);
-            Assert.IsNull(packages[1].Version);
+            await Assert.ThrowsExceptionAsync<ArgumentException>(sut.Execute);
+            Assert.IsFalse(visualStudioServiceMock.ExecuteNugetInstallWasCalled);
         }
 
         [TestMethod]

@@ -21,7 +21,7 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = Constants.PackageNameRequired)]
         public string PackageName { get; set; }
 
-        [Argument(2, "Version (optional)", Constants.InstallCommandVersionDescription)]
+        [Argument(2, "Version", Constants.InstallCommandVersionDescription)]
         public string Version { get; set; }
 
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
@@ -86,7 +86,9 @@ namespace Sitefinity_CLI.Commands
                 throw new ArgumentException(Constants.InstallCommandNoPackagesSpecified);
             }
 
-            if (packageEntries.Length > 1 && !string.IsNullOrEmpty(this.Version))
+            bool isMultiplePackages = packageEntries.Length > 1;
+
+            if (isMultiplePackages && !string.IsNullOrEmpty(this.Version))
             {
                 throw new ArgumentException(Constants.InstallCommandMultiplePackagesVersionConflict);
             }
@@ -96,7 +98,22 @@ namespace Sitefinity_CLI.Commands
             {
                 string[] packageParts = packageEntry.Split(this.packageVersionSeparators, 2, StringSplitOptions.RemoveEmptyEntries);
                 string packageName = packageParts[0].Trim();
-                string packageVersion = packageParts.Length > 1 ? packageParts[1].Trim() : this.Version;
+                string packageVersion = packageParts.Length > 1 ? packageParts[1].Trim() : null;
+
+                if (string.IsNullOrEmpty(packageVersion))
+                {
+                    if (isMultiplePackages)
+                    {
+                        throw new ArgumentException(string.Format(Constants.InstallCommandMultiplePackagesEachRequiresVersion, packageName));
+                    }
+
+                    packageVersion = this.Version;
+                }
+
+                if (string.IsNullOrEmpty(packageVersion))
+                {
+                    throw new ArgumentException(Constants.InstallCommandPackageVersionRequired);
+                }
 
                 packages.Add(new PackageVersion()
                 {

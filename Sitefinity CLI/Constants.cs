@@ -260,24 +260,25 @@ namespace Sitefinity_CLI
         // Install command
         public const string InstallCommandName = "install";
         public const string InstallCommandDescription = "Installs one or more nuget packages to a specified solution.";
-        public const string PackageNameDescrption = "The name(s) of the nuget package(s) you want to install. To install multiple packages at once, separate them with ';'. Each package can optionally specify its own version using the 'PackageId@Version' format, e.g. \"PackageA@1.0.0;PackageB@2.0.0;PackageC\". A package without an inline version installs the latest version available, unless the 'Version' argument is used.";
+        public const string PackageNameDescrption = "The name(s) of the nuget package(s) you want to install. To install multiple packages at once, separate them with ';', each specifying its own version using the 'PackageId@Version' format, e.g. \"PackageA@1.0.0;PackageB@2.0.0\". For a single package, the version can instead be provided via the 'Version' argument.";
         public const string PackageVersion = "The version of the nuget package you want to install.";
         public const string InstallCommandPackageVersionRequired = "You must specify the version of the package you want to install.";
         public const string ProjectNamesOptionTempate = "-pn|--projectNames";
         public const string ProjectNamesOptionDescription = "The names of the projects where you want to install the package.";
-        public const string InstallCommandVersionDescription = "(Optional) The version to install. Can only be used when a single package is specified without an inline version; ignored otherwise. If omitted, the latest available version is installed.";
+        public const string InstallCommandVersionDescription = "The version to install. Can only be used when a single package is specified without the 'PackageId@Version' syntax; ignored otherwise.";
         public const string PackageVersionSeparator = "@";
         public const string PackagesSeparator = ";";
         public const string InstallCommandNoPackagesSpecified = "You must specify at least one package to install.";
         public const string InstallCommandMultiplePackagesVersionConflict = "The version argument cannot be used together with multiple packages. Specify the version for each package using the 'PackageId@Version' format instead.";
+        public const string InstallCommandMultiplePackagesEachRequiresVersion = "You must specify a version for package '{0}' using the 'PackageId@Version' format when installing multiple packages.";
         public const string InstallCommandExtendedHelpText =
             "\nExamples:\n" +
-            "  sf install MySolution.sln PackageA\n" +
-            "    Installs the latest version of a single package.\n\n" +
             "  sf install MySolution.sln PackageA 1.0.0\n" +
             "    Installs a specific version of a single package.\n\n" +
-            "  sf install MySolution.sln \"PackageA@1.0.0;PackageB@2.0.0;PackageC\"\n" +
-            "    Installs multiple packages in one call. Each package version is optional; PackageC installs the latest version.\n";
+            "  sf install MySolution.sln PackageA@1.0.0\n" +
+            "    Installs a specific version of a single package using inline syntax.\n\n" +
+            "  sf install MySolution.sln \"PackageA@1.0.0;PackageB@2.0.0\"\n" +
+            "    Installs multiple packages in one call. Each package must specify its own version.\n";
 
     }
 }
