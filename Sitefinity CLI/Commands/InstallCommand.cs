@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.InstallCommandName, Constants.InstallCommandDescription)]
+    [Command(Constants.InstallCommandName, Description = Constants.InstallCommandDescription, ExtendedHelpText = Constants.InstallCommandExtendedHelpText)]
     internal class InstallCommand : NugetLicenseCommand
     {
 
@@ -21,7 +21,7 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = Constants.PackageNameRequired)]
         public string PackageName { get; set; }
 
-        [Argument(2, Description = Constants.InstallCommandVersionDescription)]
+        [Argument(2, "Version (optional)", Constants.InstallCommandVersionDescription)]
         public string Version { get; set; }
 
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
