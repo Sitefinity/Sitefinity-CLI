@@ -4,6 +4,7 @@ using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.Services.Contracts;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text.Json;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace Sitefinity_CLI.Commands
 {
     [HelpOption]
-    [Command(Constants.InstallCommandName, Constants.InstallCommandDescription)]
+    [Command(Constants.InstallCommandName, Description = Constants.InstallCommandDescription, ExtendedHelpText = Constants.InstallCommandExtendedHelpText)]
     internal class InstallCommand : NugetLicenseCommand
     {
 
@@ -20,8 +21,7 @@ namespace Sitefinity_CLI.Commands
         [Required(ErrorMessage = Constants.PackageNameRequired)]
         public string PackageName { get; set; }
 
-        [Argument(2, Description = Constants.InstallCommandVersionDescription)]
-        [Required(ErrorMessage = Constants.InstallCommandPackageVersionRequired)]
+        [Argument(2, "Version", Constants.InstallCommandVersionDescription)]
         public string Version { get; set; }
 
         [Option(Constants.ProjectNamesOptionTempate, CommandOptionType.SingleValue, Description = Constants.ProjectNamesOptionDescription)]
@@ -52,21 +52,22 @@ namespace Sitefinity_CLI.Commands
             }
         }
 
-        private async Task ExecuteInstallCommand()
+        protected virtual async Task ExecuteInstallCommand()
         {
-            bool isValid = await this.Validate();
+            IList<PackageVersion> packages = this.ParsePackages();
+
+            bool isValid = await this.Validate(packages);
             if (!isValid)
             {
                 return;
             }
 
-            string[] projectNames = this.ProjectNames?.Split(this.packageNamesSeprators, StringSplitOptions.RemoveEmptyEntries);
+            string[] projectNames = this.ProjectNames?.Split(this.packageEntrySeparators, StringSplitOptions.RemoveEmptyEntries);
 
             InstallNugetPackageOptions installOptions = new InstallNugetPackageOptions()
             {
                 SolutionPath = this.SolutionPath,
-                PackageName = this.PackageName,
-                Version = this.Version,
+                Packages = packages,
                 ProjectNames = projectNames
             };
 
@@ -75,7 +76,56 @@ namespace Sitefinity_CLI.Commands
             this.logger.LogInformation("Install package command finished successfully! Parameters used: {Params}", JsonSerializer.Serialize(installOptions));
         }
 
-        private async Task<bool> Validate()
+        private IList<PackageVersion> ParsePackages()
+        {
+            string[] packageEntries = this.PackageName?.Split(this.packageEntrySeparators, StringSplitOptions.RemoveEmptyEntries)
+                ?? Array.Empty<string>();
+
+            if (packageEntries.Length == 0)
+            {
+                throw new ArgumentException(Constants.InstallCommandNoPackagesSpecified);
+            }
+
+            bool isMultiplePackages = packageEntries.Length > 1;
+
+            if (isMultiplePackages && !string.IsNullOrEmpty(this.Version))
+            {
+                throw new ArgumentException(Constants.InstallCommandMultiplePackagesVersionConflict);
+            }
+
+            IList<PackageVersion> packages = new List<PackageVersion>();
+            foreach (string packageEntry in packageEntries)
+            {
+                string[] packageParts = packageEntry.Split(this.packageVersionSeparators, 2, StringSplitOptions.RemoveEmptyEntries);
+                string packageName = packageParts[0].Trim();
+                string packageVersion = packageParts.Length > 1 ? packageParts[1].Trim() : null;
+
+                if (string.IsNullOrEmpty(packageVersion))
+                {
+                    if (isMultiplePackages)
+                    {
+                        throw new ArgumentException(string.Format(Constants.InstallCommandMultiplePackagesEachRequiresVersion, packageName));
+                    }
+
+                    packageVersion = this.Version;
+                }
+
+                if (string.IsNullOrEmpty(packageVersion))
+                {
+                    throw new ArgumentException(Constants.InstallCommandPackageVersionRequired);
+                }
+
+                packages.Add(new PackageVersion()
+                {
+                    Name = packageName,
+                    Version = packageVersion
+                });
+            }
+
+            return packages;
+        }
+
+        private async Task<bool> Validate(IList<PackageVersion> packages)
         {
             if (!Path.IsPathFullyQualified(this.SolutionPath))
             {
@@ -87,10 +137,20 @@ namespace Sitefinity_CLI.Commands
                 throw new FileNotFoundException(string.Format(Constants.FileNotFoundMessage, this.SolutionPath));
             }
 
-            return await this.PromptLicenseForPackage(this.PackageName, this.Version);
+            foreach (PackageVersion package in packages)
+            {
+                bool isLicenseAccepted = await this.PromptLicenseForPackage(package.Name, package.Version);
+                if (!isLicenseAccepted)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        private readonly string[] packageNamesSeprators = [";"];
+        private readonly string[] packageEntrySeparators = [";"];
+        private readonly string[] packageVersionSeparators = ["@"];
         private readonly ILogger<InstallCommand> logger;
         private readonly IVisualStudioService visualStudioService;
     }
