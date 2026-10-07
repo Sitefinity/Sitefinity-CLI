@@ -178,6 +178,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
         {
             ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 4, 8639);
             ((SitefinityPackageManagerMock)this.sitefinityPackageManager).InstalledPackages.Add(Constants.TelerikCentaurAllNuGetPackageId);
+            
             UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8650");
 
             await upgradeCommand.Execute();
@@ -216,7 +217,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             public async Task DoNotScheduleLegacyCentaurRemoval_When_Upgrading15_2_8442WithoutLegacyPackage()
             {
                 ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 2, 8442);
-                
+
                 UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8650");
 
                 await upgradeCommand.Execute();
