@@ -58,6 +58,7 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityProjectService = sitefinityProjectService;
             this.sitefinityConfigService = sitefinityConfigService;
             this.upgradeConfigGenerator = upgradeConfigGenerator;
+            this.sitefinityPackageManager = sitefinityPackageManager;
         }
 
         protected async Task<int> OnExecuteAsync(CommandLineApplication app)
@@ -123,10 +124,12 @@ namespace Sitefinity_CLI.Commands
             }
 
             bool targetUsesPackagesWithoutLegacyCentaur = upgradeOptions.Version >= Constants.CentaurPackageRemovalVersion;
-            bool upgradesFromSitefinityWithLegacyCentaur = projectFilePathsWithSitefinityVersion.Any(project => project.Version != null && project.Version < Constants.CentaurPackageRemovalVersion);
+            bool upgradesFromSitefinityWithLegacyCentaur = projectFilePathsWithSitefinityVersion.Any(project =>
+                project.Version != null &&
+                project.Version < Constants.CentaurPackageRemovalVersion &&
+                this.sitefinityPackageManager.PackageExists(Constants.TelerikCentaurAllNuGetPackageId, project.FilePath));
             
-            if (targetUsesPackagesWithoutLegacyCentaur && upgradesFromSitefinityWithLegacyCentaur &&
-                !upgradeOptions.DeprecatedPackagesList.Contains(Constants.TelerikCentaurAllNuGetPackageId, StringComparer.OrdinalIgnoreCase))
+            if (targetUsesPackagesWithoutLegacyCentaur && upgradesFromSitefinityWithLegacyCentaur && !upgradeOptions.DeprecatedPackagesList.Contains(Constants.TelerikCentaurAllNuGetPackageId, StringComparer.OrdinalIgnoreCase))
             {
                 upgradeOptions.DeprecatedPackagesList.Add(Constants.TelerikCentaurAllNuGetPackageId);
             }
@@ -219,5 +222,6 @@ namespace Sitefinity_CLI.Commands
         private readonly ISitefinityProjectService sitefinityProjectService;
         private readonly ISitefinityConfigService sitefinityConfigService;
         private readonly IUpgradeConfigGenerator upgradeConfigGenerator;
+        private readonly ISitefinityPackageManager sitefinityPackageManager;
     }
 }
