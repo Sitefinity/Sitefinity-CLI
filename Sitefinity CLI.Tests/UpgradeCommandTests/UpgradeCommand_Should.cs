@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using Sitefinity_CLI.Commands;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
 using Sitefinity_CLI.Services.Contracts;
+using Sitefinity_CLI.Tests.NugetLicenseCommandTests.Mocks;
 using Sitefinity_CLI.Tests.UpgradeCommandTests;
 using Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks;
 using Sitefinity_CLI.VisualStudio;
@@ -51,7 +53,7 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGeneratorMock>();
             services.AddTransient<ISitefinityConfigService, SitefinityConfigServiceMock>();
             services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageServiceMock>();
-            services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();
+            services.AddSingleton<ISitefinityPackageManager, SitefinityPackageManagerMock>();
             services.AddSingleton<IVisualStudioWorker, VisualStudioWorker>();
             services.AddSingleton<IVisualStudioService, VisualStudioServiceMock>();
             services.AddSingleton<IPromptService, PromptServiceMock>();
@@ -169,6 +171,84 @@ namespace SitefinityCLI.Tests.UpgradeCommandTests
             await upgradeCommand.Execute();
 
             Assert.AreEqual(solutionPath, upgradeCommand.SolutionPath);
+        }
+
+        [TestMethod]
+        public async Task ScheduleLegacyCentaurRemoval_When_UpgradingFromBefore15_4_8640To15_4_8640OrLater()
+        {
+            ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 4, 8639);
+            ((SitefinityPackageManagerMock)this.sitefinityPackageManager).InstalledPackages.Add(Constants.TelerikCentaurAllNuGetPackageId);
+            
+            UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8650");
+
+            await upgradeCommand.Execute();
+
+            Assert.IsTrue(((VisualStudioServiceMock)this.visualStudioService).LastUpgradeOptions.DeprecatedPackagesList
+                .Contains(Constants.TelerikCentaurAllNuGetPackageId));
+        }
+
+        [TestMethod]
+        public async Task DoNotScheduleLegacyCentaurRemoval_When_TargetIsBefore15_4_8640()
+        {
+            ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 4, 8638);
+            ((SitefinityPackageManagerMock)this.sitefinityPackageManager).InstalledPackages.Add(Constants.TelerikCentaurAllNuGetPackageId);
+            UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8639");
+
+            await upgradeCommand.Execute();
+
+            Assert.IsFalse(((VisualStudioServiceMock)this.visualStudioService).LastUpgradeOptions.DeprecatedPackagesList
+                .Contains(Constants.TelerikCentaurAllNuGetPackageId));
+        }
+
+        [TestMethod]
+        public async Task DoNotScheduleLegacyCentaurRemoval_When_CurrentVersionIs15_4_8640OrLater()
+        {
+            ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 4, 8640);
+            ((SitefinityPackageManagerMock)this.sitefinityPackageManager).InstalledPackages.Add(Constants.TelerikCentaurAllNuGetPackageId);
+            UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8650");
+
+            await upgradeCommand.Execute();
+
+            Assert.IsFalse(((VisualStudioServiceMock)this.visualStudioService).LastUpgradeOptions.DeprecatedPackagesList
+                .Contains(Constants.TelerikCentaurAllNuGetPackageId));
+        }
+
+            [TestMethod]
+            public async Task DoNotScheduleLegacyCentaurRemoval_When_Upgrading15_2_8442WithoutLegacyPackage()
+            {
+                ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 2, 8442);
+
+                UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8650");
+
+                await upgradeCommand.Execute();
+
+                Assert.IsFalse(((VisualStudioServiceMock)this.visualStudioService).LastUpgradeOptions.DeprecatedPackagesList
+                .Contains(Constants.TelerikCentaurAllNuGetPackageId));
+            }
+
+            [TestMethod]
+            public async Task DoNotScheduleLegacyCentaurRemoval_When_LegacyPackageIsNotInstalled()
+            {
+                ((SitefinityProjectServiceMock)this.sitefinityProjectService).SFVersion = new Version(15, 4, 8639);
+                UpgradeCommandSut upgradeCommand = this.CreateUpgradeCommand("15.4.8650");
+
+                await upgradeCommand.Execute();
+
+                Assert.IsFalse(((VisualStudioServiceMock)this.visualStudioService).LastUpgradeOptions.DeprecatedPackagesList
+                .Contains(Constants.TelerikCentaurAllNuGetPackageId));
+            }
+
+        private UpgradeCommandSut CreateUpgradeCommand(string targetVersion)
+        {
+            UpgradeCommandSut upgradeCommand = new UpgradeCommandSut(this.sitefinityNugetPackageService, this.visualStudioService, this.logger, this.promptService, this.sitefinityProjectService, this.sitefinityConfigService, this.upgradeConfigGenerator, this.sitefinityPackageManager)
+            {
+                SolutionPath = Path.Combine(Directory.GetCurrentDirectory(), "UpgradeCommandTests", "Mocks", "fakeSln.sln"),
+                Version = targetVersion,
+                SkipPrompts = true,
+                AcceptLicense = true
+            };
+
+            return upgradeCommand;
         }
     }
 }
