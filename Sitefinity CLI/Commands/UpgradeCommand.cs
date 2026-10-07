@@ -99,20 +99,6 @@ namespace Sitefinity_CLI.Commands
                 this.RemoveDeprecatedPackages,
                 this.RemoveDeprecatedPackagesExcept);
 
-            if (upgradeOptions.DeprecatedPackagesList.Count > 0)
-            {
-                this.logger.LogInformation("Deprecated packages that will be removed as part of the upgrade: {DeprecatedPackages}", string.Join(", ", upgradeOptions.DeprecatedPackagesList));
-                if (!upgradeOptions.SkipPrompts)
-                {
-                    string formatedDeprecatedPackagesMessage = string.Join(Environment.NewLine, upgradeOptions.DeprecatedPackagesList);
-                    Utils.WriteLine($"{Environment.NewLine}{Constants.UninstallingPackagesWarning}{Environment.NewLine}{formatedDeprecatedPackagesMessage}", ConsoleColor.DarkYellow);
-                    if (!this.promptService.PromptYesNo(Constants.ProceedWithUpgradeMessage))
-                    {
-                        return;
-                    }
-                }
-            }
-
             this.logger.LogInformation(Constants.SearchingProjectForReferencesMessage);
 
             IEnumerable<(string FilePath, Version Version)> projectFilePathsWithSitefinityVersion = this.sitefinityProjectService.GetSitefinityProjectPathsFromSolution(this.SolutionPath)
@@ -143,6 +129,20 @@ namespace Sitefinity_CLI.Commands
                 !upgradeOptions.DeprecatedPackagesList.Contains(Constants.TelerikCentaurAllNuGetPackageId, StringComparer.OrdinalIgnoreCase))
             {
                 upgradeOptions.DeprecatedPackagesList.Add(Constants.TelerikCentaurAllNuGetPackageId);
+            }
+
+            if (upgradeOptions.DeprecatedPackagesList.Count > 0)
+            {
+                this.logger.LogInformation("Deprecated packages that will be removed as part of the upgrade: {DeprecatedPackages}", string.Join(", ", upgradeOptions.DeprecatedPackagesList));
+                if (!upgradeOptions.SkipPrompts)
+                {
+                    string formatedDeprecatedPackagesMessage = string.Join(Environment.NewLine, upgradeOptions.DeprecatedPackagesList);
+                    Utils.WriteLine($"{Environment.NewLine}{Constants.UninstallingPackagesWarning}{Environment.NewLine}{formatedDeprecatedPackagesMessage}", ConsoleColor.DarkYellow);
+                    if (!this.promptService.PromptYesNo(Constants.ProceedWithUpgradeMessage))
+                    {
+                        return;
+                    }
+                }
             }
 
             List<string> sitefinityProjectsFilePaths = projectFilePathsWithSitefinityVersion.Select(p => p.FilePath).ToList();
