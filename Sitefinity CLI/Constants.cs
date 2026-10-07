@@ -227,6 +227,8 @@ namespace Sitefinity_CLI
         public const string SitefinityAllNuGetPackageId = "Telerik.Sitefinity.All";
         public const string SitefinityCloudPackage = "Progress.Sitefinity.Cloud";
         public const string SitefinityHeadlessNuGetPackageId = "Progress.Sitefinity.Headless";
+        public const string TelerikCentaurAllNuGetPackageId = "Telerik.Centaur.All";
+        public static readonly Version CentaurPackageRemovalVersion = new Version(15, 4, 8640);
         public const string SitefinityCoreModulesNuGetPackageId = "Progress.Sitefinity";
         public const string SitefinityWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.Widgets";
         public const string SitefinityFormWidgetsNuGetPackageId = "Progress.Sitefinity.AspNetCore.FormWidgets";

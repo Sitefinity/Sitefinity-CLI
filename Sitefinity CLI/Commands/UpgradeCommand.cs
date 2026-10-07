@@ -136,6 +136,15 @@ namespace Sitefinity_CLI.Commands
                 return;
             }
 
+            bool targetUsesPackagesWithoutLegacyCentaur = upgradeOptions.Version >= Constants.CentaurPackageRemovalVersion;
+            bool upgradesFromSitefinityWithLegacyCentaur = projectFilePathsWithSitefinityVersion.Any(project => project.Version != null && project.Version < Constants.CentaurPackageRemovalVersion);
+            
+            if (targetUsesPackagesWithoutLegacyCentaur && upgradesFromSitefinityWithLegacyCentaur &&
+                !upgradeOptions.DeprecatedPackagesList.Contains(Constants.TelerikCentaurAllNuGetPackageId, StringComparer.OrdinalIgnoreCase))
+            {
+                upgradeOptions.DeprecatedPackagesList.Add(Constants.TelerikCentaurAllNuGetPackageId);
+            }
+
             List<string> sitefinityProjectsFilePaths = projectFilePathsWithSitefinityVersion.Select(p => p.FilePath).ToList();
             this.logger.LogInformation(string.Format(Constants.NumberOfProjectsWithSitefinityReferencesFoundSuccessMessage, sitefinityProjectsFilePaths.Count));
             this.logger.LogInformation(string.Format(Constants.CollectionSitefinityPackageTreeMessage, this.Version));
