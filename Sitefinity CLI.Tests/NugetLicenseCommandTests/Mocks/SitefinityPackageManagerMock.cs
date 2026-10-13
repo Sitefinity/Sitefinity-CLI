@@ -16,6 +16,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests.Mocks
         public string LastInstalledVersion { get; private set; }
         public string LastInstalledSolutionPath { get; private set; }
         public string LastInstalledNugetConfigPath { get; private set; }
+        public HashSet<string> InstalledPackages { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Optional action to execute during Install (e.g., to create license files for testing).
@@ -40,7 +41,7 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests.Mocks
 
         public bool PackageExists(string packageId, string projectFilePath)
         {
-            return false;
+            return this.InstalledPackages.Contains(packageId);
         }
 
         public Task<NuGetPackage> GetSitefinityPackageTree(string version)
