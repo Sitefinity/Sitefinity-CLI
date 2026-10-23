@@ -18,20 +18,24 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         public UpgradeConfigGenerator(
             ISitefinityPackageManager sitefinityPackageManager,
              ISitefinityProjectService sitefinityProjectService,
+            IPackageCompatibilityAnalyzer packageCompatibilityAnalyzer,
             ILogger<UpgradeConfigGenerator> logger)
         {
             this.sitefinityPackageManager = sitefinityPackageManager;
             this.sitefinityProjectService = sitefinityProjectService;
+            this.packageCompatibilityAnalyzer = packageCompatibilityAnalyzer;
             this.logger = logger;
             this.processedPackagesPerProjectCache = new Dictionary<string, HashSet<string>>();
         }
 
-        public async Task GenerateUpgradeConfig(
+        public async Task<IEnumerable<PackageCompatibilityReport>> GenerateUpgradeConfig(
             IEnumerable<(string FilePath, Version Version)> projectPathsWithSitefinityVersion,
             NuGetPackage newSitefinityVersionPackageTree,
             string nugetConfigPath,
-            IEnumerable<NuGetPackage> additionalPackagesToUpgrade)
+            IEnumerable<NuGetPackage> additionalPackagesToUpgrade,
+            bool checkPackageCompatibility = true)
         {
+            List<PackageCompatibilityReport> compatibilityReports = new List<PackageCompatibilityReport>();
             this.logger.LogInformation("Exporting upgrade config...");
 
             XmlDocument powerShellXmlConfig = new XmlDocument();
@@ -42,7 +46,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
             foreach ((string FilePath, Version Version) projectFilePathWithSitefinityVersion in projectPathsWithSitefinityVersion)
             {
-                await this.GenerateProjectUpgradeConfigSection(
+                XmlElement projectNode = await this.GenerateProjectUpgradeConfigSection(
                     powerShellXmlConfig, 
                     powerShellXmlConfigNode, 
                     projectFilePathWithSitefinityVersion.FilePath, 
@@ -50,13 +54,60 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                     packageSources, 
                     projectFilePathWithSitefinityVersion.Version, 
                     additionalPackagesToUpgrade);
+
+                if (checkPackageCompatibility && projectFilePathWithSitefinityVersion.Version != null)
+                {
+                    PackageCompatibilityReport report = await this.AddPrerequisitePackagesToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePathWithSitefinityVersion.FilePath, packageSources, nugetConfigPath);
+                    if (report != null)
+                    {
+                        compatibilityReports.Add(report);
+                    }
+                }
             }
 
             powerShellXmlConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Constants.SitefinityUpgradePowershellFolderName, "config.xml"));
             this.logger.LogInformation("Successfully exported upgrade config!");
+
+            return compatibilityReports;
         }
 
-        private async Task GenerateProjectUpgradeConfigSection(
+        private async Task<PackageCompatibilityReport> AddPrerequisitePackagesToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, string projectFilePath, IEnumerable<PackageSource> packageSources, string nugetConfigPath)
+        {
+            List<NuGetPackage> packagesToUpgrade = projectNode.ChildNodes.OfType<XmlElement>()
+                .Where(n => n.Name == "package")
+                .Select(n => new NuGetPackage(n.GetAttribute("name"), n.GetAttribute("version")))
+                .ToList();
+
+            if (!packagesToUpgrade.Any())
+            {
+                return null;
+            }
+
+            this.logger.LogInformation($"Checking installed packages of '{projectFilePath}' for compatibility with the upgrade...");
+
+            PackageCompatibilityReport report;
+            try
+            {
+                report = await this.packageCompatibilityAnalyzer.Analyze(projectFilePath, packagesToUpgrade, packageSources, nugetConfigPath);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning($"Unable to check the package compatibility for '{projectFilePath}': {ex.Message}");
+                return null;
+            }
+
+            // The upgrade script processes the packages in document order, so the prerequisites are inserted first.
+            foreach (NuGetPackage prerequisite in report.Prerequisites.Reverse())
+            {
+                XmlElement packageNode = this.CreatePackageNode(powerShellXmlConfig, prerequisite);
+                packageNode.SetAttribute("prerequisite", "true");
+                projectNode.PrependChild(packageNode);
+            }
+
+            return report;
+        }
+
+        private async Task<XmlElement> GenerateProjectUpgradeConfigSection(
             XmlDocument powerShellXmlConfig,
             XmlElement powerShellXmlConfigNode,
             string projectFilePath,
@@ -75,7 +126,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             {
                 this.logger.LogInformation($"Skip upgrade for project: '{projectFilePath}'. Current Sitefinity version was not detected.");
 
-                return;
+                                return projectNode;
             }
 
             this.logger.LogInformation($"Detected sitefinity version for '{projectFilePath}' - '{currentSitefinityVersion}'.");
@@ -100,6 +151,8 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
                     await this.ProcessPackagesForProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePath, additionalPackage.Dependencies, additionalPackage);
                 }
             }
+
+            return projectNode;
         }
 
         private async Task ProcessPackagesForProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, string projectFilePath, IEnumerable<NuGetPackage> currentSitefinityVersionPackages, NuGetPackage newSitefinityVersionPackageTree)
@@ -147,6 +200,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
         private void AddPackageNodeToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, NuGetPackage nuGetPackage)
         {
+            projectNode.AppendChild(this.CreatePackageNode(powerShellXmlConfig, nuGetPackage));
+        }
+
+        private XmlElement CreatePackageNode(XmlDocument powerShellXmlConfig, NuGetPackage nuGetPackage)
+        {
             XmlElement packageNode = powerShellXmlConfig.CreateElement("package");
             XmlAttribute nameAttribute = powerShellXmlConfig.CreateAttribute("name");
             nameAttribute.Value = nuGetPackage.Id;
@@ -154,7 +212,8 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             versionAttribute.Value = nuGetPackage.Version;
             packageNode.Attributes.Append(nameAttribute);
             packageNode.Attributes.Append(versionAttribute);
-            projectNode.AppendChild(packageNode);
+
+            return packageNode;
         }
 
         private void AddNuGetPackageTreeToCache(string projectFilePath, NuGetPackage nuGetPackage)
@@ -192,6 +251,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         private readonly ILogger logger;
         private readonly ISitefinityPackageManager sitefinityPackageManager;
         private readonly ISitefinityProjectService sitefinityProjectService;
+        private readonly IPackageCompatibilityAnalyzer packageCompatibilityAnalyzer;
         private readonly IDictionary<string, HashSet<string>> processedPackagesPerProjectCache;
     }
 }

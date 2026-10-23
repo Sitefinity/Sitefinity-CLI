@@ -1,4 +1,6 @@
 using NuGet.Configuration;
+using NuGet.Frameworks;
+using NuGet.Packaging.Core;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
 using Sitefinity_CLI.PackageManagement.Implementations;
@@ -57,6 +59,11 @@ namespace Sitefinity_CLI.Tests.NugetLicenseCommandTests.Mocks
         public Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<PackageSource> nugetPackageSources, Func<NuGetPackage, bool> breakPackageCalculationPrediacte = null)
         {
             return Task.FromResult(new NuGetPackage());
+        }
+
+        public Task<IReadOnlyList<PackageDependency>> GetPackageDependencies(string id, string version, IEnumerable<PackageSource> nugetPackageSources, NuGetFramework targetFramework)
+        {
+            return Task.FromResult<IReadOnlyList<PackageDependency>>(new List<PackageDependency>());
         }
 
         public void SyncReferencesWithPackages(string projectFilePath, string solutionFolder)

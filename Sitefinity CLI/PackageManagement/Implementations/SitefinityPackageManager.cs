@@ -10,6 +10,8 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using NuGet.Configuration;
+using NuGet.Frameworks;
+using NuGet.Packaging.Core;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Contracts;
@@ -89,6 +91,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
         public async Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<PackageSource> nugetPackageSources, Func<NuGetPackage, bool> breakPackageCalculationPrediacte = null)
         {
             return await this.nuGetApiClient.GetPackageWithFullDependencyTree(id, version, nugetPackageSources, supportedFrameworksRegex, breakPackageCalculationPrediacte);
+        }
+
+        public async Task<IReadOnlyList<PackageDependency>> GetPackageDependencies(string id, string version, IEnumerable<PackageSource> nugetPackageSources, NuGetFramework targetFramework)
+        {
+            return await this.nuGetApiClient.GetPackageDependencies(id, version, nugetPackageSources, targetFramework);
         }
 
         public void SyncReferencesWithPackages(string projectFilePath, string solutionDir)

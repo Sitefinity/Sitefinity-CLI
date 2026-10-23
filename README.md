@@ -96,6 +96,8 @@ You can use the add command with the following subcommands:
 
   Add ```--removeDeprecatedPackages``` to the command to automatically remove deprecated packages during the upgrade process to ensure a clean and up-to-date codebase.
 
+  Before the upgrade, the CLI checks the installed packages of projects using *packages.config* for dependency constraints that are incompatible with the new Sitefinity version (for example, an installed package that requires ```System.Diagnostics.DiagnosticSource (>= 6.0.1 && < 9.0.0)``` while the new version requires ```10.0.3```). Such packages are upgraded to their lowest compatible version before the Sitefinity packages. Add ```--skipPrerequisitesCheck``` to the command to skip this check.
+
   For more information, see [Upgrade using Sitefinity CLI](https://www.progress.com/documentation/sitefinity-cms/upgrade-using-sitefinity-cli).
 
 * To show the version of Sitefinity CLI, execute the following command:

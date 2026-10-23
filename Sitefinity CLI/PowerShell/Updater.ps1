@@ -67,6 +67,10 @@ try {
             $packageVersion = $package.version
 			
             "`nPackage '$packageName' version '$packageVersion'"
+
+            if ($package.prerequisite -eq "true") {
+                "`nUpgrading prerequisite package '$packageName', because its dependency constraints are incompatible with the upgrade"
+            }
 			
             $projectPackages = Get-Package -ProjectName $projectName
             $oldPackage = $projectPackages | Where-Object { $_.Id -eq $packageName }

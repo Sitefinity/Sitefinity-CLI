@@ -62,6 +62,7 @@ namespace Sitefinity_CLI
                     services.AddTransient<IPackagesConfigFileEditor, PackagesConfigFileEditor>();
                     services.AddTransient<IProjectConfigFileEditor, ProjectConfigFileEditor>();
                     services.AddTransient<IUpgradeConfigGenerator, UpgradeConfigGenerator>();
+                    services.AddTransient<IPackageCompatibilityAnalyzer, PackageCompatibilityAnalyzer>();
                     services.AddTransient<ISitefinityConfigService, SitefinityConfigService>();
                     services.AddTransient<ISitefinityNugetPackageService, SitefinityNugetPackageService>();
                     services.AddScoped<ISitefinityPackageManager, SitefinityPackageManager>();

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NuGet.Configuration;
+using NuGet.Frameworks;
+using NuGet.Packaging.Core;
 using Sitefinity_CLI.Model;
 using Sitefinity_CLI.PackageManagement.Implementations;
 
@@ -28,6 +30,12 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
         /// <param name="breakPackageCalculationPrediacte">Executed on every package and its dependency. If true - breaks the search and return the calculated packages at this point.</param>
         /// <returns>Tje nuget package tree.</returns>
         Task<NuGetPackage> GetPackageTree(string id, string version, IEnumerable<PackageSource> nugetPackageSources, Func<NuGetPackage, bool> breakPackageCalculationPrediacte = null);
+
+        /// <summary>
+        /// Gets the direct dependencies (with full version ranges) of a package for the given target framework.
+        /// </summary>
+        /// <returns>The dependencies, or null if the package cannot be found.</returns>
+        Task<IReadOnlyList<PackageDependency>> GetPackageDependencies(string id, string version, IEnumerable<PackageSource> nugetPackageSources, NuGetFramework targetFramework);
 
         void SyncReferencesWithPackages(string projectFilePath, string solutionFolder);
 

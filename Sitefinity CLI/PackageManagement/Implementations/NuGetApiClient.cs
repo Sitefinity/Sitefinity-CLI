@@ -11,6 +11,10 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NuGet.Configuration;
+using NuGet.Frameworks;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Versioning;
 using Sitefinity_CLI.Enums;
 using Sitefinity_CLI.Exceptions;
 using Sitefinity_CLI.Model;
@@ -60,6 +64,59 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             }
 
             return nuGetPackage;
+        }
+
+        public async Task<IReadOnlyList<PackageDependency>> GetPackageDependencies(string id, string version, IEnumerable<PackageSource> sources, NuGetFramework targetFramework)
+        {
+            PackageXmlDocumentModel nuGetPackageXmlDoc = await this.GetPackageXmlDocument(id, version, sources);
+            if (nuGetPackageXmlDoc == null)
+            {
+                return null;
+            }
+
+            IEnumerable<PackageDependencyGroup> dependencyGroups = nuGetPackageXmlDoc.ProtoVersion == ProtocolVersion.NuGetAPIV2
+                ? ParseV2DependencyGroups(nuGetPackageXmlDoc.XDocumentData)
+                : new NuspecReader(nuGetPackageXmlDoc.XDocumentData).GetDependencyGroups();
+
+            PackageDependencyGroup nearestGroup = NuGetFrameworkUtility.GetNearest(dependencyGroups, targetFramework, group => group.TargetFramework);
+
+            return nearestGroup?.Packages.ToList() ?? new List<PackageDependency>();
+        }
+
+        private static IEnumerable<PackageDependencyGroup> ParseV2DependencyGroups(XDocument document)
+        {
+            XNamespace atom = "http://www.w3.org/2005/Atom";
+            XNamespace metadata = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
+            XNamespace data = "http://schemas.microsoft.com/ado/2007/08/dataservices";
+
+            string dependenciesString = document.Element(atom + Constants.EntryElem)?
+                .Element(metadata + Constants.PropertiesElem)?
+                .Element(data + Constants.DependenciesElem)?.Value;
+
+            // V2 format: "id:versionRange:targetFramework|...". An entry with an empty id denotes an empty dependency group.
+            Dictionary<NuGetFramework, List<PackageDependency>> groups = new();
+            foreach (string entry in (dependenciesString ?? string.Empty).Split('|', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] parts = entry.Split(':');
+                string dependencyId = parts[0].Trim();
+                string range = parts.Length > 1 ? parts[1].Trim() : string.Empty;
+                string framework = parts.Length > 2 ? parts[2].Trim() : string.Empty;
+
+                NuGetFramework groupFramework = string.IsNullOrEmpty(framework) ? NuGetFramework.AnyFramework : NuGetFramework.Parse(framework);
+                if (!groups.TryGetValue(groupFramework, out List<PackageDependency> dependencies))
+                {
+                    dependencies = new List<PackageDependency>();
+                    groups[groupFramework] = dependencies;
+                }
+
+                if (!string.IsNullOrEmpty(dependencyId))
+                {
+                    VersionRange versionRange = string.IsNullOrEmpty(range) ? VersionRange.All : VersionRange.Parse(range);
+                    dependencies.Add(new PackageDependency(dependencyId, versionRange));
+                }
+            }
+
+            return groups.Select(g => new PackageDependencyGroup(g.Key, g.Value));
         }
 
         private async Task<PackageXmlDocumentModel> GetPackageXmlDocument(string id, string version, IEnumerable<PackageSource> sources)
