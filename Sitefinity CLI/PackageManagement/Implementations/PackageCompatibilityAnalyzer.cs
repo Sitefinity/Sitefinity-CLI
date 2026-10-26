@@ -34,7 +34,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.logger = logger;
         }
 
-        public async Task<PackageCompatibilityReport> Analyze(string projectFilePath, IEnumerable<NuGetPackage> packagesToUpgrade, IEnumerable<PackageSource> packageSources, string nugetConfigPath)
+        public async Task<PackageCompatibilityReport> Analyze(string projectFilePath, IEnumerable<NuGetPackage> packagesToUpgrade, IEnumerable<PackageSource> packageSources, string nugetConfigPath, IEnumerable<string> packagesToRemove = null)
         {
             PackageCompatibilityReport report = new PackageCompatibilityReport() { ProjectFilePath = projectFilePath };
 
@@ -54,10 +54,11 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             this.packageSources = packageSources;
             this.targetFramework = targetFramework;
 
+            HashSet<string> removedPackages = new HashSet<string>(packagesToRemove ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
             Dictionary<string, NuGetVersion> installedPackages = new Dictionary<string, NuGetVersion>(StringComparer.OrdinalIgnoreCase);
             foreach (NuGetPackage package in this.packagesConfigFileEditor.GetPackages(packagesConfigFilePath))
             {
-                if (package?.Id != null && NuGetVersion.TryParse(package.Version, out NuGetVersion installedVersion))
+                if (package?.Id != null && !removedPackages.Contains(package.Id) && NuGetVersion.TryParse(package.Version, out NuGetVersion installedVersion))
                 {
                     installedPackages[package.Id] = installedVersion;
                 }

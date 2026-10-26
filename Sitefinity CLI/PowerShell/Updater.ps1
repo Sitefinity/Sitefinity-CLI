@@ -47,32 +47,67 @@ function Update-PackageWithReferenceConflictRetry {
     $removedReferences = @()
     while ($true) {
         $errorMessage = $null
-        Invoke-Expression "Update-Package -Id $PackageName -ProjectName `"$ProjectName`" -Version $PackageVersion -FileConflictAction OverwriteAll -IncludePrerelease -ErrorVariable errorMessage"
+        # Only the error must be returned, so the cmdlet output is sent to the host
+        Invoke-Expression "Update-Package -Id $PackageName -ProjectName `"$ProjectName`" -Version $PackageVersion -FileConflictAction OverwriteAll -IncludePrerelease -ErrorVariable errorMessage" | Out-Host
         if (!$errorMessage) {
             return $null
         }
 
-        $match = [regex]::Match(($errorMessage | Out-String), "A reference to the component '([^']+)' already exists")
+        # Out-String wraps long lines to the console width, so the raw messages are matched instead
+        $errorText = ($errorMessage | ForEach-Object { $_.ToString() }) -join ' '
+        $match = [regex]::Match($errorText, "A reference to the component '([^']+)' already exists")
+        if (!$match.Success) {
+            $match = [regex]::Match($errorText, "Failed to add reference to '([^']+)'")
+        }
+
         if (!$match.Success) {
             return $errorMessage
         }
 
         $referenceName = $match.Groups[1].Value
         if ($removedReferences -contains $referenceName) {
+            Write-Host "`nReference '$referenceName' was already removed once, but the conflict persists"
             return $errorMessage
         }
 
         $project = Get-Project $ProjectName
-        $reference = $project.Object.References.Item($referenceName)
+        $reference = Find-ProjectReference -Project $project -ReferenceName $referenceName
         if ($null -eq $reference) {
+            Write-Host "`nReference '$referenceName' was not found in '$ProjectName', so the conflict cannot be resolved"
             return $errorMessage
         }
 
-        "`nRemoving stale reference '$referenceName' from '$ProjectName' and retrying the upgrade of '$PackageName'"
+        Write-Host "`nRemoving stale reference '$referenceName' from '$ProjectName' and retrying the upgrade of '$PackageName'"
         $reference.Remove()
         $project.Save()
         $removedReferences += $referenceName
     }
+}
+
+function Find-ProjectReference {
+    param(
+        $Project,
+        [string] $ReferenceName
+    )
+
+    $references = $Project.Object.References
+    try {
+        $reference = $references.Item($ReferenceName)
+        if ($null -ne $reference) {
+            return $reference
+        }
+    }
+    catch {
+        # Item throws when no reference has this exact name, so fall back to a case-insensitive search
+    }
+
+    foreach ($reference in $references) {
+        if ($reference.Name -ieq $ReferenceName -or $reference.Identity -ieq $ReferenceName) {
+            return $reference
+        }
+    }
+
+    return $null
 }
 
 $basePath = $PSScriptRoot

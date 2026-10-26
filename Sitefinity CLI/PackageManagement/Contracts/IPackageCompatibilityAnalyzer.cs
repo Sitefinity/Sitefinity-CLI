@@ -16,6 +16,7 @@ namespace Sitefinity_CLI.PackageManagement.Contracts
         /// <param name="packagesToUpgrade">The packages (and versions) that will be upgraded in the project.</param>
         /// <param name="packageSources">The NuGet package sources.</param>
         /// <param name="nugetConfigPath">The NuGet config file path, used to list available package versions.</param>
-        Task<PackageCompatibilityReport> Analyze(string projectFilePath, IEnumerable<NuGetPackage> packagesToUpgrade, IEnumerable<PackageSource> packageSources, string nugetConfigPath);
+        /// <param name="packagesToRemove">Installed packages that are uninstalled before the upgrade, so their constraints are ignored.</param>
+        Task<PackageCompatibilityReport> Analyze(string projectFilePath, IEnumerable<NuGetPackage> packagesToUpgrade, IEnumerable<PackageSource> packageSources, string nugetConfigPath, IEnumerable<string> packagesToRemove = null);
     }
 }

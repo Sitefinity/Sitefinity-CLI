@@ -33,7 +33,8 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             NuGetPackage newSitefinityVersionPackageTree,
             string nugetConfigPath,
             IEnumerable<NuGetPackage> additionalPackagesToUpgrade,
-            bool checkPackageCompatibility = true)
+            bool checkPackageCompatibility = true,
+            IEnumerable<string> packagesToRemove = null)
         {
             List<PackageCompatibilityReport> compatibilityReports = new List<PackageCompatibilityReport>();
             this.logger.LogInformation("Exporting upgrade config...");
@@ -57,7 +58,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
 
                 if (checkPackageCompatibility && projectFilePathWithSitefinityVersion.Version != null)
                 {
-                    PackageCompatibilityReport report = await this.AddPrerequisitePackagesToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePathWithSitefinityVersion.FilePath, packageSources, nugetConfigPath);
+                    PackageCompatibilityReport report = await this.AddPrerequisitePackagesToProjectUpgradeConfigSection(powerShellXmlConfig, projectNode, projectFilePathWithSitefinityVersion.FilePath, packageSources, nugetConfigPath, packagesToRemove);
                     if (report != null)
                     {
                         compatibilityReports.Add(report);
@@ -71,7 +72,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             return compatibilityReports;
         }
 
-        private async Task<PackageCompatibilityReport> AddPrerequisitePackagesToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, string projectFilePath, IEnumerable<PackageSource> packageSources, string nugetConfigPath)
+        private async Task<PackageCompatibilityReport> AddPrerequisitePackagesToProjectUpgradeConfigSection(XmlDocument powerShellXmlConfig, XmlElement projectNode, string projectFilePath, IEnumerable<PackageSource> packageSources, string nugetConfigPath, IEnumerable<string> packagesToRemove)
         {
             List<NuGetPackage> packagesToUpgrade = projectNode.ChildNodes.OfType<XmlElement>()
                 .Where(n => n.Name == "package")
@@ -88,7 +89,7 @@ namespace Sitefinity_CLI.PackageManagement.Implementations
             PackageCompatibilityReport report;
             try
             {
-                report = await this.packageCompatibilityAnalyzer.Analyze(projectFilePath, packagesToUpgrade, packageSources, nugetConfigPath);
+                report = await this.packageCompatibilityAnalyzer.Analyze(projectFilePath, packagesToUpgrade, packageSources, nugetConfigPath, packagesToRemove);
             }
             catch (Exception ex)
             {

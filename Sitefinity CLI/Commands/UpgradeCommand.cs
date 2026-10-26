@@ -179,7 +179,7 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            IEnumerable<PackageCompatibilityReport> compatibilityReports = await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList(), !this.SkipPrerequisitesCheck);
+            IEnumerable<PackageCompatibilityReport> compatibilityReports = await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList(), !this.SkipPrerequisitesCheck, upgradeOptions.DeprecatedPackagesList);
             if (!this.ReportPackageCompatibilityIssues(compatibilityReports, upgradeOptions.SkipPrompts))
             {
                 return;

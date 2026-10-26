@@ -9,7 +9,7 @@ namespace Sitefinity_CLI.Tests.UpgradeCommandTests.Mocks
 {
     internal class UpgradeConfigGeneratorMock : IUpgradeConfigGenerator
     {
-        public Task<IEnumerable<PackageCompatibilityReport>> GenerateUpgradeConfig(IEnumerable<(string FilePath, Version Version)> projectFilePathsWithSitefinityVersion, NuGetPackage newSitefinityVersionPackageTree, string nugetConfigPath, IEnumerable<NuGetPackage> additionalPackagesToUpgrade, bool checkPackageCompatibility = true)
+        public Task<IEnumerable<PackageCompatibilityReport>> GenerateUpgradeConfig(IEnumerable<(string FilePath, Version Version)> projectFilePathsWithSitefinityVersion, NuGetPackage newSitefinityVersionPackageTree, string nugetConfigPath, IEnumerable<NuGetPackage> additionalPackagesToUpgrade, bool checkPackageCompatibility = true, IEnumerable<string> packagesToRemove = null)
         {
             return Task.FromResult<IEnumerable<PackageCompatibilityReport>>(new List<PackageCompatibilityReport>());
         }
