@@ -39,6 +39,9 @@ namespace Sitefinity_CLI.Commands
         [Option(Constants.RemoveDeprecatedPackagesExcept, Description = Constants.RemoveDeprecatedPackagesExceptDescription)]
         public string RemoveDeprecatedPackagesExcept { get; set; }
 
+        [Option(Constants.SkipPrerequisitesCheck, Description = Constants.SkipPrerequisitesCheckDescription)]
+        public bool SkipPrerequisitesCheck { get; set; }
+
         public UpgradeCommand(
             ISitefinityNugetPackageService sitefinityPackageService,
             IVisualStudioService visualStudioService,
@@ -176,7 +179,12 @@ namespace Sitefinity_CLI.Commands
                 }
             }
 
-            await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList());
+            IEnumerable<PackageCompatibilityReport> compatibilityReports = await this.upgradeConfigGenerator.GenerateUpgradeConfig(projectFilePathsWithSitefinityVersion, upgradePackage, upgradeOptions.NugetConfigPath, additionalPackagesToUpgrade.ToList(), !this.SkipPrerequisitesCheck, upgradeOptions.DeprecatedPackagesList);
+            if (!this.ReportPackageCompatibilityIssues(compatibilityReports, upgradeOptions.SkipPrompts))
+            {
+                return;
+            }
+
             this.sitefinityProjectService.PrepareProjectFilesForUpgrade(upgradeOptions, sitefinityProjectsFilePaths);
 
             IDictionary<string, string> configsWithoutSitefinity = this.sitefinityConfigService.GetConfigurtaionsForProjectsWithoutSitefinity(this.SolutionPath);
@@ -190,6 +198,45 @@ namespace Sitefinity_CLI.Commands
             this.sitefinityProjectService.RestoreBackupFilesAfterUpgrade(upgradeOptions);
 
             this.logger.LogInformation(string.Format(Constants.UpgradeSuccessMessage, this.SolutionPath, this.Version));
+        }
+
+        /// <returns>False if the user canceled the upgrade.</returns>
+        private bool ReportPackageCompatibilityIssues(IEnumerable<PackageCompatibilityReport> compatibilityReports, bool skipPrompts)
+        {
+            List<PackageCompatibilityReport> reportsWithIssues = (compatibilityReports ?? Enumerable.Empty<PackageCompatibilityReport>()).Where(r => r.HasIssues).ToList();
+            if (!reportsWithIssues.Any())
+            {
+                return true;
+            }
+
+            foreach (PackageCompatibilityReport report in reportsWithIssues)
+            {
+                Utils.WriteLine($"{Environment.NewLine}Project '{report.ProjectFilePath}':", ConsoleColor.DarkYellow);
+
+                if (report.Prerequisites.Any())
+                {
+                    Utils.WriteLine(Constants.PrerequisitePackagesWarning, ConsoleColor.DarkYellow);
+                    foreach (NuGetPackage prerequisite in report.Prerequisites)
+                    {
+                        Utils.WriteLine($"  {prerequisite.Id} -> {prerequisite.Version}", ConsoleColor.DarkYellow);
+                        foreach (PackageConflict conflict in report.ResolvedConflicts.Where(c => c.BlockingPackageId.Equals(prerequisite.Id, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            Utils.WriteLine($"    {conflict}", ConsoleColor.DarkYellow);
+                        }
+                    }
+                }
+
+                if (report.UnresolvedConflicts.Any())
+                {
+                    Utils.WriteLine(Constants.UnresolvedPackageConflictsWarning, ConsoleColor.Yellow);
+                    foreach (PackageConflict conflict in report.UnresolvedConflicts)
+                    {
+                        Utils.WriteLine($"  {conflict}", ConsoleColor.Yellow);
+                    }
+                }
+            }
+
+            return skipPrompts || this.promptService.PromptYesNo(Constants.ProceedWithUpgradeMessage);
         }
 
         private bool Validate()

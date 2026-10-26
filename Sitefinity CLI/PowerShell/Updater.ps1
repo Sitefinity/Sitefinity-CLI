@@ -33,6 +33,83 @@ function Remove-Packages {
     }
 }
 
+# Visual Studio sometimes fails to remove the old assembly reference while NuGet updates a packages.config package
+# (https://github.com/NuGet/Home/issues/10594), so adding the new reference fails with
+# "A reference to the component 'X' already exists in the project". NuGet rolls back the update,
+# so the stale reference is removed through the project system and the update is retried.
+function Update-PackageWithReferenceConflictRetry {
+    param(
+        [string] $ProjectName,
+        [string] $PackageName,
+        [string] $PackageVersion
+    )
+
+    $removedReferences = @()
+    while ($true) {
+        $errorMessage = $null
+        # Only the error must be returned, so the cmdlet output is sent to the host
+        Invoke-Expression "Update-Package -Id $PackageName -ProjectName `"$ProjectName`" -Version $PackageVersion -FileConflictAction OverwriteAll -IncludePrerelease -ErrorVariable errorMessage" | Out-Host
+        if (!$errorMessage) {
+            return $null
+        }
+
+        # Out-String wraps long lines to the console width, so the raw messages are matched instead
+        $errorText = ($errorMessage | ForEach-Object { $_.ToString() }) -join ' '
+        $match = [regex]::Match($errorText, "A reference to the component '([^']+)' already exists")
+        if (!$match.Success) {
+            $match = [regex]::Match($errorText, "Failed to add reference to '([^']+)'")
+        }
+
+        if (!$match.Success) {
+            return $errorMessage
+        }
+
+        $referenceName = $match.Groups[1].Value
+        if ($removedReferences -contains $referenceName) {
+            Write-Host "`nReference '$referenceName' was already removed once, but the conflict persists"
+            return $errorMessage
+        }
+
+        $project = Get-Project $ProjectName
+        $reference = Find-ProjectReference -Project $project -ReferenceName $referenceName
+        if ($null -eq $reference) {
+            Write-Host "`nReference '$referenceName' was not found in '$ProjectName', so the conflict cannot be resolved"
+            return $errorMessage
+        }
+
+        Write-Host "`nRemoving stale reference '$referenceName' from '$ProjectName' and retrying the upgrade of '$PackageName'"
+        $reference.Remove()
+        $project.Save()
+        $removedReferences += $referenceName
+    }
+}
+
+function Find-ProjectReference {
+    param(
+        $Project,
+        [string] $ReferenceName
+    )
+
+    $references = $Project.Object.References
+    try {
+        $reference = $references.Item($ReferenceName)
+        if ($null -ne $reference) {
+            return $reference
+        }
+    }
+    catch {
+        # Item throws when no reference has this exact name, so fall back to a case-insensitive search
+    }
+
+    foreach ($reference in $references) {
+        if ($reference.Name -ieq $ReferenceName -or $reference.Identity -ieq $ReferenceName) {
+            return $reference
+        }
+    }
+
+    return $null
+}
+
 $basePath = $PSScriptRoot
 $logFileName = $basePath + '\result.log'
 $upgradeTraceLog = $basePath + '\upgrade.log'
@@ -67,6 +144,10 @@ try {
             $packageVersion = $package.version
 			
             "`nPackage '$packageName' version '$packageVersion'"
+
+            if ($package.prerequisite -eq "true") {
+                "`nUpgrading prerequisite package '$packageName', because its dependency constraints are incompatible with the upgrade"
+            }
 			
             $projectPackages = Get-Package -ProjectName $projectName
             $oldPackage = $projectPackages | Where-Object { $_.Id -eq $packageName }
@@ -76,10 +157,9 @@ try {
                 $isUpdateRequired = IsUpgradeRequired $oldPackageVersion $packageVersion
                 if ($isUpdateRequired) {
                     "`nUpgrading from '$oldPackageVersion' to '$packageVersion'"
-                    $errorMessage = $null;
-                    Invoke-Expression "Update-Package -Id $packageName -ProjectName `"$projectName`" -Version $packageVersion -FileConflictAction OverwriteAll -IncludePrerelease -ErrorVariable errorMessage" 
+                    $errorMessage = Update-PackageWithReferenceConflictRetry -ProjectName $projectName -PackageName $packageName -PackageVersion $packageVersion
 					
-                    if ($errorMessage -ne $null) {
+                    if ($errorMessage) {
                         Write-Error -Message "`nError occured while upgrading $packageName. The error was: $errorMessage" -ErrorAction Stop
                     }
                 }
